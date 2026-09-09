@@ -1,0 +1,69 @@
+{
+  "today": "2026-09-08",
+  "editions": [
+    {
+      "date": "2026-09-08",
+      "title": "Nyhetsbrev",
+      "kind": "text",
+      "hasPdf": false,
+      "hasWeb": true,
+      "updatedAt": "2026-09-08T15:21:19.834Z"
+    },
+    {
+      "date": "2026-09-07",
+      "title": "Nyhetsbrev",
+      "kind": "text",
+      "hasPdf": false,
+      "hasWeb": true,
+      "updatedAt": "2026-09-08T15:21:19.835Z"
+    },
+    {
+      "date": "2026-09-03",
+      "title": "Nyhetsbrev",
+      "kind": "text",
+      "hasPdf": false,
+      "hasWeb": true,
+      "updatedAt": "2026-09-08T15:21:19.835Z"
+    },
+    {
+      "date": "2026-09-02",
+      "title": "Nyhetsbrev",
+      "kind": "text",
+      "hasPdf": false,
+      "hasWeb": true,
+      "updatedAt": "2026-09-08T15:21:19.836Z"
+    },
+    {
+      "date": "2026-09-01",
+      "title": "Nyhetsbrev",
+      "kind": "text",
+      "hasPdf": false,
+      "hasWeb": true,
+      "updatedAt": "2026-09-08T15:21:19.836Z"
+    },
+    {
+      "date": "2026-08-31",
+      "title": "Nyhetsbrev",
+      "kind": "text",
+      "hasPdf": false,
+      "hasWeb": true,
+      "updatedAt": "2026-09-08T15:21:19.837Z"
+    },
+    {
+      "date": "2026-08-28",
+      "title": "Nyhetsbrev",
+      "kind": "text",
+      "hasPdf": false,
+      "hasWeb": true,
+      "updatedAt": "2026-09-08T15:21:19.837Z"
+    },
+    {
+      "date": "2026-08-27",
+      "title": "Marknadsöversikt",
+      "kind": "text",
+      "hasPdf": false,
+      "hasWeb": true,
+      "updatedAt": "2026-09-08T15:21:19.838Z"
+    }
+  ]
+}

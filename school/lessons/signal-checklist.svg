@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 240" role="img" aria-label="Granska signaler">
+  <rect width="520" height="240" rx="16" fill="#0f172a"/>
+  <text x="260" y="32" text-anchor="middle" fill="#e2e8f0" font-family="system-ui,sans-serif" font-size="14" font-weight="700">Signal-checklista (utbildning)</text>
+  <g font-family="system-ui,sans-serif" font-size="13">
+    <rect x="48" y="56" width="424" height="36" rx="8" fill="#1e293b"/>
+    <text x="68" y="79" fill="#34d399">✓</text>
+    <text x="96" y="79" fill="#e2e8f0">Symbol · riktning · entry · SL · TP</text>
+    <rect x="48" y="100" width="424" height="36" rx="8" fill="#1e293b"/>
+    <text x="68" y="123" fill="#34d399">✓</text>
+    <text x="96" y="123" fill="#e2e8f0">Förstår du logiken? (inte “garanterad vinst”)</text>
+    <rect x="48" y="144" width="424" height="36" rx="8" fill="#1e293b"/>
+    <text x="68" y="167" fill="#fbbf24">!</text>
+    <text x="96" y="167" fill="#e2e8f0">Inget auto-köp – du ansvarar för risken</text>
+    <rect x="48" y="188" width="424" height="36" rx="8" fill="#1e293b"/>
+    <text x="68" y="211" fill="#f87171">✗</text>
+    <text x="96" y="211" fill="#e2e8f0">Ignorera “gratis pengar” / pressade tips</text>
+  </g>
+</svg>

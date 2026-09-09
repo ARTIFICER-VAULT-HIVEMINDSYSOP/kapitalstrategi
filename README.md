@@ -1,7 +1,7 @@
 # kapitalstrategi
 
-Hosting för [kapitalstrategi.com](https://www.kapitalstrategi.com).
+Hosting for [kapitalstrategi.com](https://www.kapitalstrategi.com).
 
-**Nu:** interim status-sida (`index.html`) medan Firebase-kvoten är full och Vite-källan flyttas hit.
+**Site:** Vite production build served from repo root via GitHub Pages (Actions).
 
-**Pages:** GitHub Actions → GitHub Pages. Custom domain: peka DNS (CNAME/A) till Pages när Actions är grön.
+**Custom domain:** Point DNS (CNAME/A) to GitHub Pages when the Actions deploy is green.

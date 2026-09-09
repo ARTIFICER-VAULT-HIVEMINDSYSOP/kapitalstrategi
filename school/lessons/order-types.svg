@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 280" role="img" aria-label="Marknadsorder och sma positioner">
+  <rect width="560" height="280" rx="16" fill="#0a1628"/>
+  <text x="280" y="32" text-anchor="middle" fill="#c4a35a" font-family="system-ui,sans-serif" font-size="12" font-weight="700" letter-spacing="0.1em">KURS 02 · VÅR MODELL</text>
+  <text x="280" y="58" text-anchor="middle" fill="#f3ead2" font-family="Georgia,serif" font-size="17" font-weight="700">Marknadsorder – öppna och stäng</text>
+  <text x="280" y="80" text-anchor="middle" fill="#e8d5a3" font-family="system-ui,sans-serif" font-size="12" font-weight="600">Rekommendation: små positioner</text>
+
+  <rect x="28" y="100" width="240" height="140" rx="12" fill="#12243d" stroke="#34d399" stroke-width="2"/>
+  <text x="148" y="132" text-anchor="middle" fill="#34d399" font-family="system-ui,sans-serif" font-size="14" font-weight="700">KÖP (LONG)</text>
+  <text x="148" y="162" text-anchor="middle" fill="#eef2f7" font-family="system-ui,sans-serif" font-size="13">Tror priset stiger</text>
+  <text x="148" y="190" text-anchor="middle" fill="#9aabc0" font-family="system-ui,sans-serif" font-size="12">Marknadsorder nu</text>
+  <text x="148" y="216" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="11">Stäng = sälj samma storlek</text>
+
+  <rect x="292" y="100" width="240" height="140" rx="12" fill="#12243d" stroke="#f87171" stroke-width="2"/>
+  <text x="412" y="132" text-anchor="middle" fill="#f87171" font-family="system-ui,sans-serif" font-size="14" font-weight="700">SÄLJ (SHORT / STÄNG)</text>
+  <text x="412" y="162" text-anchor="middle" fill="#eef2f7" font-family="system-ui,sans-serif" font-size="13">Tror priset faller / stäng long</text>
+  <text x="412" y="190" text-anchor="middle" fill="#9aabc0" font-family="system-ui,sans-serif" font-size="12">Marknadsorder nu</text>
+  <text x="412" y="216" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="11">Små positioner · planera risk</text>
+</svg>

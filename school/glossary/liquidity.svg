@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <!-- Likviditet: flödande medel / droppar + vågor -->
+  <path d="M18 10 C18 10 12 20 12 26 C12 31 14.5 34 18 34 C21.5 34 24 31 24 26 C24 20 18 10 18 10 Z" fill="#3b82f6" opacity="0.25" stroke="#60a5fa" stroke-width="1.8"/>
+  <path d="M30 14 C30 14 25 22 25 27 C25 31 27.2 34 30 34 C32.8 34 35 31 35 27 C35 22 30 14 30 14 Z" fill="#c4a35a" opacity="0.3" stroke="#c4a35a" stroke-width="1.8"/>
+  <path d="M8 40 C12 36 16 36 20 40 C24 44 28 44 32 40 C36 36 40 36 44 40" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M8 44 C12 40 16 40 20 44 C24 48 28 48 32 44" stroke="#c4a35a" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+</svg>

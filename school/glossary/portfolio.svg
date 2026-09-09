@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <!-- Portfölj / briefcase -->
+  <rect x="8" y="18" width="32" height="22" rx="3" fill="#0a1628" opacity="0.1" stroke="#c4a35a" stroke-width="2"/>
+  <path d="M18 18 V14 C18 12 19.5 11 21 11 H27 C28.5 11 30 12 30 14 V18" stroke="#c4a35a" stroke-width="2" stroke-linecap="round"/>
+  <path d="M8 26 H40" stroke="#9a7b3c" stroke-width="1.5"/>
+  <rect x="21" y="24" width="6" height="5" rx="1" fill="#c4a35a"/>
+</svg>

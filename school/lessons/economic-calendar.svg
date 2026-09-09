@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 240" role="img" aria-label="Ekonomisk kalender">
+  <rect width="520" height="240" rx="16" fill="#0f172a"/>
+  <text x="260" y="30" text-anchor="middle" fill="#e2e8f0" font-family="system-ui,sans-serif" font-size="14" font-weight="700">Kalenderrad (förenklad)</text>
+  <rect x="32" y="52" width="456" height="150" rx="12" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+  <text x="56" y="90" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="12">Tid</text>
+  <text x="56" y="112" fill="#e2e8f0" font-family="system-ui,sans-serif" font-size="13" font-weight="700">14:30</text>
+  <text x="150" y="90" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="12">Händelse</text>
+  <text x="150" y="112" fill="#e2e8f0" font-family="system-ui,sans-serif" font-size="13" font-weight="700">KPI / inflation</text>
+  <text x="320" y="90" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="12">Forecast</text>
+  <text x="320" y="112" fill="#fbbf24" font-family="system-ui,sans-serif" font-size="13" font-weight="700">2,4 %</text>
+  <text x="420" y="90" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="12">Actual</text>
+  <text x="420" y="112" fill="#34d399" font-family="system-ui,sans-serif" font-size="13" font-weight="700">2,1 %</text>
+  <text x="260" y="165" text-anchor="middle" fill="#cbd5e1" font-family="system-ui,sans-serif" font-size="12">Marknaden reagerar ofta på skillnaden actual − forecast</text>
+  <text x="260" y="188" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="11">Inte alltid på siffran i sig · mer volatilitet runt stora siffror</text>
+</svg>

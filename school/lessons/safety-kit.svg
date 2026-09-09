@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" role="img" aria-label="Sakerhetsutrustning S/L T/P R:R">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a1628"/>
+      <stop offset="100%" stop-color="#12243d"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="340" rx="18" fill="url(#bg)"/>
+
+  <!-- Title -->
+  <text x="360" y="32" text-anchor="middle" fill="#c4a35a" font-family="system-ui,sans-serif" font-size="11" font-weight="700" letter-spacing="0.16em">SIKERHETSUTRUSTNING</text>
+  <text x="360" y="58" text-anchor="middle" fill="#f3ead2" font-family="Georgia,serif" font-size="20" font-weight="700">Ta pa dig detta innan du oppnar</text>
+  <text x="360" y="78" text-anchor="middle" fill="#8a9bb0" font-family="system-ui,sans-serif" font-size="12">Gasen (havstang) ersatter aldrig de tre anordningarna</text>
+
+  <!-- S/L seatbelt -->
+  <g transform="translate(36,100)">
+    <rect width="208" height="210" rx="16" fill="#0f1f35" stroke="#f87171" stroke-width="2"/>
+    <text x="16" y="28" fill="#f87171" font-family="system-ui,sans-serif" font-size="11" font-weight="700" letter-spacing="0.08em">01</text>
+    <!-- seatbelt icon -->
+    <circle cx="104" cy="62" r="26" fill="none" stroke="#f87171" stroke-width="3"/>
+    <path d="M84 62 h40 M104 42 v40" stroke="#f87171" stroke-width="3" stroke-linecap="round"/>
+    <text x="104" y="112" text-anchor="middle" fill="#fca5a5" font-family="system-ui,sans-serif" font-size="14" font-weight="700">S/L</text>
+    <text x="104" y="140" text-anchor="middle" fill="#e8d5a3" font-family="Georgia,serif" font-size="17" font-weight="700">Sakerhetsbalte</text>
+    <text x="104" y="164" text-anchor="middle" fill="#9aabc0" font-family="system-ui,sans-serif" font-size="12">Stop-loss</text>
+    <text x="104" y="188" text-anchor="middle" fill="#c5d0de" font-family="system-ui,sans-serif" font-size="12">Begransar skadan</text>
+    <text x="104" y="206" text-anchor="middle" fill="#c5d0de" font-family="system-ui,sans-serif" font-size="12">om det gar fel</text>
+  </g>
+
+  <!-- T/P life vest -->
+  <g transform="translate(256,100)">
+    <rect width="208" height="210" rx="16" fill="#0f1f35" stroke="#34d399" stroke-width="2"/>
+    <text x="16" y="28" fill="#34d399" font-family="system-ui,sans-serif" font-size="11" font-weight="700" letter-spacing="0.08em">02</text>
+    <ellipse cx="104" cy="58" rx="32" ry="24" fill="none" stroke="#34d399" stroke-width="3"/>
+    <path d="M84 58 Q104 78 124 58" fill="none" stroke="#34d399" stroke-width="3"/>
+    <text x="104" y="112" text-anchor="middle" fill="#6ee7b7" font-family="system-ui,sans-serif" font-size="14" font-weight="700">T/P</text>
+    <text x="104" y="140" text-anchor="middle" fill="#e8d5a3" font-family="Georgia,serif" font-size="17" font-weight="700">Flytvast</text>
+    <text x="104" y="164" text-anchor="middle" fill="#9aabc0" font-family="system-ui,sans-serif" font-size="12">Take-profit</text>
+    <text x="104" y="188" text-anchor="middle" fill="#c5d0de" font-family="system-ui,sans-serif" font-size="12">Tar dig i land</text>
+    <text x="104" y="206" text-anchor="middle" fill="#c5d0de" font-family="system-ui,sans-serif" font-size="12">med vinsten</text>
+  </g>
+
+  <!-- R:R helmet -->
+  <g transform="translate(476,100)">
+    <rect width="208" height="210" rx="16" fill="#0f1f35" stroke="#38bdf8" stroke-width="2"/>
+    <text x="16" y="28" fill="#38bdf8" font-family="system-ui,sans-serif" font-size="11" font-weight="700" letter-spacing="0.08em">03</text>
+    <path d="M76 66 Q104 36 132 66 L132 76 Q104 86 76 76 Z" fill="none" stroke="#38bdf8" stroke-width="3"/>
+    <text x="104" y="112" text-anchor="middle" fill="#7dd3fc" font-family="system-ui,sans-serif" font-size="14" font-weight="700">R:R</text>
+    <text x="104" y="140" text-anchor="middle" fill="#e8d5a3" font-family="Georgia,serif" font-size="17" font-weight="700">Hjalm</text>
+    <text x="104" y="164" text-anchor="middle" fill="#9aabc0" font-family="system-ui,sans-serif" font-size="12">Risk / reward</text>
+    <text x="104" y="188" text-anchor="middle" fill="#c5d0de" font-family="system-ui,sans-serif" font-size="12">Ar resan vard</text>
+    <text x="104" y="206" text-anchor="middle" fill="#c5d0de" font-family="system-ui,sans-serif" font-size="12">risken?</text>
+  </g>
+</svg>

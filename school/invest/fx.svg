@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <!-- Valutor: mynt + hävstång -->
+  <circle cx="18" cy="26" r="10" fill="#c4a35a" opacity="0.25" stroke="#c4a35a" stroke-width="2"/>
+  <circle cx="18" cy="26" r="6" stroke="#9a7b3c" stroke-width="1.5"/>
+  <text x="14.5" y="29.5" fill="#c4a35a" font-size="10" font-family="system-ui,sans-serif" font-weight="700">$</text>
+  <circle cx="32" cy="20" r="8" fill="#e8d5a3" opacity="0.2" stroke="#e8d5a3" stroke-width="1.8"/>
+  <text x="28" y="23.5" fill="#e8d5a3" font-size="9" font-family="system-ui,sans-serif" font-weight="700">€</text>
+  <!-- hävstång / fulcrum -->
+  <path d="M28 36 L40 30" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M28 36 L40 38" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="28" cy="36" r="2.2" fill="#fbbf24"/>
+</svg>

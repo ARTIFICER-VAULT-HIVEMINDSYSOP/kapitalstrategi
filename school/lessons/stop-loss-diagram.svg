@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 240" role="img" aria-label="Stop-loss som nödutgång">
+  <rect width="520" height="240" rx="16" fill="#0f172a"/>
+  <text x="260" y="30" text-anchor="middle" fill="#e2e8f0" font-family="system-ui,sans-serif" font-size="14" font-weight="700">Stop-loss = planerad nödutgång</text>
+  <line x1="60" y1="180" x2="460" y2="180" stroke="#475569" stroke-width="2"/>
+  <!-- price path -->
+  <polyline fill="none" stroke="#38bdf8" stroke-width="3" points="80,90 160,100 220,70 280,95 340,130 400,165 440,190"/>
+  <!-- entry -->
+  <circle cx="160" cy="100" r="6" fill="#34d399"/>
+  <text x="160" y="88" text-anchor="middle" fill="#6ee7b7" font-family="system-ui,sans-serif" font-size="11" font-weight="700">Entry 100</text>
+  <!-- SL line -->
+  <line x1="80" y1="150" x2="420" y2="150" stroke="#f87171" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="430" y="154" fill="#fca5a5" font-family="system-ui,sans-serif" font-size="12" font-weight="700">SL 95</text>
+  <circle cx="380" cy="150" r="6" fill="#f87171"/>
+  <text x="380" y="172" text-anchor="middle" fill="#fca5a5" font-family="system-ui,sans-serif" font-size="11">stäng här</text>
+  <text x="260" y="220" text-anchor="middle" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="11">Du bestämmer maxförlusten innan känslorna tar över</text>
+</svg>
