@@ -29,8 +29,9 @@ Expect HTTP 200 and a SAN that includes `www.kapitalstrategi.com` (not only `*.g
 
 Do **not** change `live.kapitalstrategi.com` (separate tunnel).
 
-Remaining apex cleanup so apex HTTPS is not a random shared cert:
+Remaining DNS cleanup (do not orange-cloud proxy GitHub Pages):
 
 - Keep `www` as DNS-only (grey cloud) CNAME → `artificer-vault-hivemindsysop.github.io`
+- Remove leftover Firebase TXT on `www`: `hosting-site=investeringsgruppen-c28b7` (CNAME must not sit next to other record types; this can stall the Pages cert)
 - Apex A records should be only GitHub Pages: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
-- Remove leftover apex A `199.36.158.100`
+- Remove leftover apex A `199.36.158.100` (that IP currently serves an unrelated shared cert which includes `kapitalstrategi.com` in a huge SAN)
