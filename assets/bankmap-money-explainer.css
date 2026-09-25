@@ -1,0 +1,204 @@
+/* Educational block mounted beside .bank-map-disclaimer. Uses the site palette. */
+.bme {
+  margin: 0;
+  padding: 1rem 1rem 1.15rem;
+  border: 1px solid var(--border-strong, #c4a35a3d);
+  border-radius: var(--radius, 12px);
+  background: color-mix(in srgb, var(--bg-card, #12243d) 88%, #000 12%);
+  box-shadow: var(--shadow, 0 8px 24px #0000002e);
+}
+
+.bme-eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--gold, #c4a35a);
+  font-family: var(--sans, "Source Sans 3", system-ui, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bme h2 {
+  font-size: clamp(1.45rem, 2.4vw, 1.85rem);
+  margin: 0 0 0.45rem;
+}
+
+.bme-lead,
+.bme p {
+  margin: 0 0 0.75rem;
+  color: var(--text-dim, #c5d0de);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.bme h3 {
+  margin: 1.15rem 0 0.4rem;
+  font-size: clamp(1.15rem, 2vw, 1.35rem);
+}
+
+.bme h4 {
+  margin: 0.85rem 0 0.35rem;
+  font-size: 1.02rem;
+}
+
+.bme-table-wrap {
+  overflow-x: auto;
+  margin: 0.35rem 0 0.5rem;
+  border: 1px solid var(--border, #c4a35a1f);
+  border-radius: var(--radius-sm, 8px);
+}
+
+.bme-table {
+  width: 100%;
+  min-width: 42rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.bme-table caption {
+  caption-side: bottom;
+  padding: 0.45rem 0.6rem 0.55rem;
+  color: var(--muted, #9aabc0);
+  font-size: 0.78rem;
+  text-align: left;
+}
+
+.bme-table th,
+.bme-table td {
+  padding: 0.65rem 0.7rem;
+  border-bottom: 1px solid var(--border, #c4a35a1f);
+  vertical-align: top;
+  text-align: left;
+}
+
+.bme-table thead th {
+  background: color-mix(in srgb, var(--gold, #c4a35a) 12%, transparent);
+  color: var(--gold-soft, #e8d5a3);
+  font-family: var(--sans, "Source Sans 3", system-ui, sans-serif);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.bme-table tbody th {
+  width: 22%;
+  color: var(--text-h, #fff);
+  font-family: var(--sans, "Source Sans 3", system-ui, sans-serif);
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.bme-table td {
+  width: 39%;
+  color: var(--text, #eef2f7);
+}
+
+.bme-span {
+  color: var(--text, #eef2f7);
+}
+
+.bme-table tr td.bme-span {
+  background: color-mix(in srgb, var(--bg, #0a1628) 35%, transparent);
+  padding-top: 0.15rem;
+  padding-bottom: 0.55rem;
+}
+
+.bme-src {
+  margin: 0.4rem 0 0;
+  color: var(--muted, #9aabc0);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.bme-src a {
+  color: var(--accent-hover, #e8d5a3);
+  text-underline-offset: 0.12em;
+}
+
+.bme-status {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+  margin: 0.35rem 0 0.25rem;
+}
+
+.bme-card,
+.bme-report,
+.bme-quiz {
+  border: 1px solid var(--border, #c4a35a1f);
+  border-radius: var(--radius-sm, 8px);
+  background: color-mix(in srgb, var(--bg-elevated, #0f1f35) 80%, transparent);
+  padding: 0.75rem 0.8rem 0.85rem;
+}
+
+.bme-card h3,
+.bme-report h3,
+.bme-quiz h3 {
+  margin-top: 0;
+}
+
+.bme-quiz fieldset {
+  margin: 0 0 0.85rem;
+  padding: 0.65rem 0.7rem 0.7rem;
+  border: 1px solid var(--border, #c4a35a1f);
+  border-radius: var(--radius-sm, 8px);
+}
+
+.bme-quiz legend {
+  padding: 0 0.25rem;
+  color: var(--text-h, #fff);
+  font-weight: 650;
+}
+
+.bme-option {
+  display: flex;
+  gap: 0.45rem;
+  align-items: flex-start;
+  margin: 0.35rem 0;
+  color: var(--text, #eef2f7);
+  font-size: 0.92rem;
+}
+
+.bme-feedback {
+  margin: 0.35rem 0 0;
+  font-size: 0.86rem;
+}
+
+.bme-feedback.is-correct {
+  color: var(--success, #34d399);
+}
+
+.bme-feedback.is-wrong {
+  color: var(--warning, #fbbf24);
+}
+
+.bme-reset {
+  appearance: none;
+  border: 1px solid var(--border-strong, #c4a35a3d);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--gold-soft, #e8d5a3);
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 0.35rem 0.8rem;
+  cursor: pointer;
+}
+
+.bme-reset:hover {
+  background: var(--accent-soft, #c4a35a1f);
+}
+
+.bme-report {
+  margin-top: 0.85rem;
+}
+
+@media (max-width: 800px) {
+  .bme-status {
+    grid-template-columns: 1fr;
+  }
+
+  .bme-table {
+    min-width: 36rem;
+  }
+}
