@@ -1,0 +1,41 @@
+/* Homepage teaser for the public model page. Source Sans, site navy/gold. */
+.ks-modell-teaser {
+  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  border-color: color-mix(in srgb, var(--gold, #c4a35a) 35%, var(--border));
+  background:
+    radial-gradient(80% 90% at 100% 0%, rgba(56, 189, 248, 0.12), transparent 55%),
+    var(--bg-card, #12243d);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem 1.25rem;
+  padding: 1.1rem 1.2rem;
+}
+
+.ks-modell-teaser .eyebrow {
+  margin: 0;
+  color: #7dd3fc;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ks-modell-teaser h2 {
+  margin: 0.2rem 0 0.3rem;
+  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  font-size: clamp(1.25rem, 2.4vw, 1.55rem);
+  letter-spacing: -0.02em;
+  color: var(--text-h, #fff);
+}
+
+.ks-modell-teaser p {
+  margin: 0;
+  max-width: 46rem;
+}
+
+.ks-modell-teaser .btn {
+  text-decoration: none;
+  white-space: nowrap;
+}
