@@ -14,7 +14,7 @@ html[data-theme="light"] .kbs-col,html[data-theme="light"] .nwe-card,html[data-t
 html[data-theme="light"] .bank-map-table thead th{background:#efe6d4}
 html[data-theme="light"] th{background:#efe6d4}
 html[data-theme="light"] tbody tr:hover td{background:#0a16280a}
-html[data-theme="light"] .lang-switcher-btn:hover,html[data-theme="light"] .main-nav-link:hover,html[data-theme="light"] .nav-more-item:hover,html[data-theme="light"] .pv-tab:hover,html[data-theme="light"] .btn.ghost:hover:not(:disabled),html[data-theme="light"] .ks-segment-item:hover,html[data-theme="light"] .tab:hover,html[data-theme="light"] .fs-check-item:hover{background:#0a16280f}
+html[data-theme="light"] .ks-segment{background:#e7dfd0}html[data-theme="light"] .lang-switcher-btn:hover,html[data-theme="light"] .main-nav-link:hover:not(.active),html[data-theme="light"] .nav-more-item:hover,html[data-theme="light"] .pv-tab:hover:not(.active),html[data-theme="light"] .btn.ghost:hover:not(:disabled),html[data-theme="light"] .ks-segment-item:hover:not(.is-active),html[data-theme="light"] .tab:hover:not(.active),html[data-theme="light"] .fs-check-item:hover{color:var(--text-h);background:#0a16280f}
 html[data-theme="light"] .progress-bar,html[data-theme="light"] .tab .count,html[data-theme="light"] .pv-tab-badge{background:#0a162814;color:#24344c}
 html[data-theme="light"] .pv-tab.active .pv-tab-badge{color:#0a1628;background:#0a162822}
 html[data-theme="light"] .banner.error,html[data-theme="light"] .btn.danger,html[data-theme="light"] .bank-map-score--1,html[data-theme="light"] .bank-map-score--2,html[data-theme="light"] .bank-map-flag--warn{color:#991b1b}
