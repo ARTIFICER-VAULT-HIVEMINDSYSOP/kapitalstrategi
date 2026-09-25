@@ -1,0 +1,40 @@
+<!doctype html><html><head><meta charset="utf-8"><title>HUD-porträtt · alla lägen</title>
+<style>body{margin:0;background:#0b0f16;color:#dfe6ee;font:12px/1.3 system-ui,sans-serif;padding:18px}
+h1{font-size:18px;margin:0 0 4px}p{margin:0 0 12px;color:#9aa6b2}
+table{border-collapse:collapse}td,th{padding:6px 5px;text-align:center;vertical-align:top}th{font-weight:600;color:#c9a04a;font-size:11px;width:92px}
+td.lbl{text-align:left;color:#e4c36a;font-weight:700;width:120px;vertical-align:middle}canvas{display:block;margin:0 auto;image-rendering:pixelated}</style></head><body>
+<h1>Traderider · statusbar-porträtt (övningsläge) — alla reaktionsrutor</h1>
+<p>Egen pixelgrafik (24×24, procedurellt ritad). Rad = läge, kolumn = reaktion. P/L-nivå i procent av basen; indikatorvarningar (RSI 14, Bollinger 20/2) läggs ovanpå som ögon/bryn/svett. Endast pedagogisk signal.</p>
+<table id="t"></table>
+<script src="tr-face.js"></script>
+<script>
+const F=window.TRFace, flags0={rsi:50,bwRatio:1,rsiAlert:false,bandAlarm:false,volTense:false,volElevated:false,squeeze:false,highLev:false,sweatRisk:false};
+const cols=[
+ ['Neutral',()=>F.baseExpr(0,'ride',false,false)],
+ ['Blink',()=>({...F.baseExpr(0,'ride',false,false),eyes:'blink'})],
+ ['Blick vänster (SÄLJ)',()=>({...F.baseExpr(0,'ride',false,false),look:-1})],
+ ['Blick höger (KÖP)',()=>({...F.baseExpr(0,'ride',false,false),look:1})],
+ ['Vinst ≥ +0,5 %',()=>F.baseExpr(1,'ride',false,false)],
+ ['Vinst ≥ +2,5 %',()=>F.baseExpr(3,'ride',false,false)],
+ ['Nivå 1 (−1…−2,5 %)',()=>F.baseExpr(-1.5,'ride',false,false)],
+ ['Nivå 2 (−2,5…−5 %)',()=>F.baseExpr(-3,'ride',false,false)],
+ ['Nivå 3 (−5…−8 %)',()=>F.baseExpr(-6,'ride',false,false)],
+ ['Nivå 4 (≤ −8 %)',()=>F.baseExpr(-10,'ride',false,false)],
+ ['Hög hävstång',()=>F.baseExpr(0,'ride',true,false)],
+ ['RSI mot positionen',()=>F.applyOverlay(F.baseExpr(0,'ride',false,false),{...flags0,rsiAlert:true},0)],
+ ['Pris utanför band',()=>F.applyOverlay(F.baseExpr(0,'ride',false,false),{...flags0,bandAlarm:true},0)],
+ ['Volatilitet (squeeze/spik)',()=>F.applyOverlay(F.baseExpr(0,'ride',false,false),{...flags0,volTense:true},0)],
+ ['Hävstång + hög vol.',()=>F.applyOverlay(F.baseExpr(0,'ride',true,false),{...flags0,highLev:true,volElevated:true,volTense:true,sweatRisk:true},0)],
+ ['Stor candle emot',()=>({...F.baseExpr(0,'ride',false,false),eyes:'squeeze',mouth:'open',flash:0.8})],
+ ['Resultat +',()=>F.baseExpr(4,'done',false,false)],
+ ['Resultat −',()=>F.baseExpr(-3,'done',false,false)],
+];
+const rows=[['rider','Läge 1 · NVDA Rider (tåg)'],['akademin','Läge 2 · Akademin (skepp)'],['raket','Läge 3 · Raket']];
+const t=document.getElementById('t');let h='';const half=[cols.slice(0,9).map((c,i)=>[c,i]),cols.slice(9).map((c,i)=>[c,i+9])];
+for(const [id,l] of rows){for(const [ri,part] of half.entries()){h+='<tr><td class="lbl">'+(ri===0?l:'')+'</td>'+part.map(([c,k])=>'<td><canvas data-t="'+id+'" data-k="'+k+'"></canvas><div style="margin-top:4px;color:#9aa6b2;font-size:10px">'+c[0]+'</div></td>').join('')+'</tr>'}
+ h+='<tr><td colspan="10" style="height:8px"></td></tr>'}
+t.innerHTML=h;
+for(const cv of document.querySelectorAll('canvas')){const S=84;cv.width=S*2;cv.height=S*2;cv.style.width=S+'px';cv.style.height=S+'px';
+ const x=cv.getContext('2d');x.setTransform(2,0,0,2,0,0);const e=cols[+cv.dataset.k][1]();
+ const tt=+cv.dataset.k===12?0:+cv.dataset.k===16?0:100; F.drawFace(x,cv.dataset.t,e,tt,S)}
+</script></body></html>

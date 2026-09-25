@@ -1,0 +1,121 @@
+/* Läge 3 — Raket. Style only (teal/petrol, neon city grid, frosted glass, orange pills, cyan accents). */
+.rk-page {
+  position: relative;
+  min-height: calc(100vh - 88px);
+  overflow: hidden;
+  color: #f4fbff;
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  background: linear-gradient(180deg, #0c3a40 0%, #082c31 45%, #06242a 100%);
+}
+.rk-backdrop { position: absolute; inset: 0; pointer-events: none; }
+.rk-glow {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 8%, rgba(60, 230, 255, 0.22), transparent 70%),
+    radial-gradient(ellipse 30% 30% at 12% 70%, rgba(255, 171, 74, 0.08), transparent 70%),
+    radial-gradient(ellipse 30% 30% at 88% 60%, rgba(60, 230, 255, 0.12), transparent 70%);
+}
+.rk-skyline { position: absolute; left: 0; right: 0; top: 70px; width: 100%; height: 360px; opacity: 0.55; }
+.rk-floor {
+  position: absolute; left: -20%; right: -20%; bottom: -10%; height: 55%;
+  background:
+    repeating-linear-gradient(90deg, rgba(60, 230, 255, 0.22) 0 1px, transparent 1px 72px),
+    repeating-linear-gradient(0deg, rgba(60, 230, 255, 0.18) 0 1px, transparent 1px 48px);
+  transform: perspective(520px) rotateX(62deg);
+  transform-origin: 50% 100%;
+  mask-image: linear-gradient(0deg, black 20%, transparent 95%);
+  opacity: 0.7;
+}
+.rk-inner { position: relative; max-width: 1240px; margin: 0 auto; padding: 18px 20px 28px; }
+.rk-glass {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(214, 248, 255, 0.28);
+  border-radius: 18px;
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+.rk-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 20px; align-items: end; }
+.rk-kicker { margin: 0; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #3ce6ff; font-weight: 600; }
+.rk-title { margin: 4px 0 6px; font-size: 52px; line-height: 1; font-weight: 800; letter-spacing: -0.01em; color: #fff; }
+.rk-sub { margin: 0; max-width: 520px; font-size: 14px; line-height: 1.5; color: rgba(230, 248, 252, 0.82); }
+.rk-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.rk-stat { padding: 10px 14px; border-radius: 14px; }
+.rk-stat-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(200, 236, 240, 0.7); }
+.rk-stat-value { margin-top: 2px; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rk-up { color: #3ce6ff; }
+.rk-down { color: #ff6b7d; }
+
+.rk-arena { margin-top: 16px; display: grid; grid-template-columns: 132px minmax(0, 1fr) 96px 132px; gap: 14px; align-items: center; }
+.rk-chart { position: relative; padding: 10px; }
+.rk-face { position: absolute; left: 20px; bottom: 20px; z-index: 3; border-radius: 12px; box-shadow: 0 0 0 1px rgba(95, 243, 255, 0.35), 0 0 22px rgba(31, 211, 230, 0.35); pointer-events: none; }
+.rk-chart-head { display: flex; justify-content: space-between; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(200, 236, 240, 0.75); padding: 2px 6px 8px; }
+.rk-canvas { display: block; width: 100%; height: 470px; border-radius: 12px; background: rgba(4, 26, 30, 0.55); border: 1px solid rgba(60, 230, 255, 0.18); }
+
+.rk-pill {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  border: 0; border-radius: 999px; cursor: pointer;
+  background: linear-gradient(180deg, #ffbd66, #ff9f3a);
+  color: #10262a; font-weight: 800; letter-spacing: 0.06em;
+  box-shadow: 0 8px 26px rgba(255, 159, 58, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.rk-pill:hover { filter: brightness(1.06); }
+.rk-pill:active { transform: translateY(1px); }
+.rk-arrow { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 999px; background: #fff; color: #10262a; }
+.rk-edge { position: relative; flex-direction: column; height: 200px; width: 132px; border-radius: 70px; font-size: 20px; }
+.rk-edge .rk-arrow { width: 44px; height: 44px; }
+.rk-edge .rk-arrow svg { width: 24px; height: 24px; }
+.rk-key { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: rgba(16, 38, 42, 0.7); }
+.rk-edge-right { box-shadow: 0 8px 30px rgba(255, 159, 58, 0.35), 0 0 0 2px rgba(60, 230, 255, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.5); }
+.rk-edge-left { box-shadow: 0 8px 30px rgba(255, 159, 58, 0.35), 0 0 0 2px rgba(255, 107, 125, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.5); }
+.rk-pill-small { padding: 6px 6px 6px 16px; font-size: 13px; }
+
+.rk-rsi { height: 470px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.rk-rsi-title { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #3ce6ff; }
+.rk-rsi-track { position: relative; flex: 1; width: 22px; border-radius: 12px; background: rgba(4, 26, 30, 0.65); border: 1px solid rgba(214, 248, 255, 0.25); }
+.rk-rsi-zone { position: absolute; left: 0; right: 0; }
+.rk-rsi-ob { top: 0; background: rgba(255, 107, 125, 0.28); border-radius: 12px 12px 0 0; }
+.rk-rsi-os { bottom: 0; background: rgba(60, 230, 255, 0.28); border-radius: 0 0 12px 12px; }
+.rk-rsi-line { position: absolute; left: -8px; right: -8px; height: 0; border-top: 1px dashed rgba(244, 251, 255, 0.7); }
+.rk-rsi-line span { position: absolute; right: -24px; top: -8px; font-size: 10px; color: rgba(230, 248, 252, 0.85); }
+.rk-rsi-mid { border-top-color: rgba(244, 251, 255, 0.3); }
+.rk-rsi-knob { position: absolute; left: 50%; width: 30px; height: 12px; margin-left: -15px; margin-bottom: -6px; border-radius: 6px; background: #fff; box-shadow: 0 0 14px rgba(255, 255, 255, 0.8); transition: bottom 0.15s linear; }
+.rk-rsi-knob.rk-z-overbought { background: #ff6b7d; box-shadow: 0 0 14px #ff6b7d; }
+.rk-rsi-knob.rk-z-oversold { background: #3ce6ff; box-shadow: 0 0 14px #3ce6ff; }
+.rk-rsi-value { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.rk-rsi-value.rk-z-overbought { color: #ff6b7d; }
+.rk-rsi-value.rk-z-oversold { color: #3ce6ff; }
+.rk-rsi-zone-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(200, 236, 240, 0.8); }
+
+.rk-lower { margin-top: 16px; display: grid; grid-template-columns: 1.2fr 1.2fr 1fr; gap: 14px; }
+.rk-card { padding: 14px 16px; }
+.rk-card h2 { margin: 0 0 6px; font-size: 18px; font-weight: 800; color: #fff; }
+.rk-nav { margin: 0; font-size: 14px; line-height: 1.45; color: rgba(236, 250, 253, 0.92); }
+.rk-meta { margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: rgba(200, 236, 240, 0.72); font-variant-numeric: tabular-nums; }
+.rk-controls { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.rk-chip { border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: #e9fbff; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(60, 230, 255, 0.45); cursor: pointer; }
+.rk-chip:hover { background: rgba(60, 230, 255, 0.14); }
+.rk-end { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(420px, 90%); padding: 18px; text-align: left; background: rgba(8, 44, 49, 0.85); }
+.rk-end h3 { margin: 0 0 6px; font-size: 18px; font-weight: 800; }
+.rk-end p { margin: 0 0 12px; font-size: 13px; line-height: 1.45; color: rgba(230, 248, 252, 0.85); }
+
+@media (max-width: 900px) {
+  .rk-hero { grid-template-columns: 1fr; }
+  .rk-title { font-size: 40px; }
+  .rk-stats { grid-template-columns: 1fr 1fr; }
+  .rk-arena {
+    grid-template-columns: minmax(0, 1fr) 72px;
+    grid-template-areas:
+      "chart rsi"
+      "sell buy";
+  }
+  .rk-chart { grid-area: chart; }
+  .rk-rsi { grid-area: rsi; display: flex; height: 260px; }
+  .rk-edge-left { grid-area: sell; }
+  .rk-edge-right { grid-area: buy; }
+  .rk-edge { width: 100%; height: 72px; flex-direction: row; border-radius: 40px; font-size: 16px; }
+  .rk-canvas { height: 260px; }
+  .rk-lower { grid-template-columns: 1fr; }
+  .rk-chip { min-height: 44px; }
+  .rk-chart-head { flex-direction: column; gap: 4px; }
+}
