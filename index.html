@@ -24,6 +24,25 @@
       rel="stylesheet"
     />
     <script type="module" crossorigin src="/assets/index-CBayL6Go.js"></script>
+    <script>
+      (function () {
+        var theme = "dark";
+        var saved = null;
+        try {
+          var raw = localStorage.getItem("ig.app.theme");
+          if (raw != null) saved = JSON.parse(raw);
+        } catch (e) {}
+        if (saved === "light" || saved === "dark") theme = saved;
+        else {
+          try {
+            if (window.matchMedia("(prefers-color-scheme: light)").matches) theme = "light";
+          } catch (e) {}
+        }
+        document.documentElement.setAttribute("data-theme", theme);
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute("content", theme === "light" ? "#f4efe4" : "#0a1628");
+      })();
+    </script>
     <link rel="stylesheet" crossorigin href="/assets/index-BPAiygCJ.css">
   </head>
   <body>
