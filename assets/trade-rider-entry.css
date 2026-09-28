@@ -1,0 +1,91 @@
+/* Trade Rider practice switcher. Selectors do not match other pages. */
+.tr-ks-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.tr-ks-bar {
+  margin: 0 0.75rem;
+  padding: 0.85rem 0.95rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--gold, #c4a35a) 8%, var(--bg-card, #12243d));
+}
+
+.tr-ks-entry-title {
+  margin: 0.2rem 0 0.35rem;
+  font-family: var(--serif, "Fraunces", "Source Sans 3", sans-serif);
+  font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-h, #fff);
+}
+
+.tr-ks-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.8rem;
+}
+
+.tr-ks-tab {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--border-strong, #c4a35a3d);
+  border-radius: 999px;
+  background: var(--bg-card, #12243d);
+  color: var(--text, #eef2f7);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tr-ks-tab:hover,
+.tr-ks-tab:focus-visible {
+  border-color: var(--gold, #c4a35a);
+  outline: none;
+}
+
+.tr-ks-tab.is-on {
+  background: var(--gold, #c4a35a);
+  border-color: var(--gold, #c4a35a);
+  color: #0a1628;
+}
+
+.tr-ks-frame {
+  display: block;
+  width: calc(100% - 1.5rem);
+  height: min(78vh, 920px);
+  min-height: 560px;
+  margin: 0 0.75rem 0.75rem;
+  border: 1px solid var(--border, #c4a35a29);
+  border-radius: 12px;
+  background: #101412;
+}
+
+@media (max-width: 420px) {
+  .tr-ks-bar,
+  .tr-ks-frame {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+
+  .tr-ks-frame {
+    width: calc(100% - 1rem);
+    height: 72vh;
+    min-height: 480px;
+  }
+
+  .tr-ks-tab {
+    flex: 1 1 calc(50% - 0.35rem);
+    padding-left: 0.55rem;
+    padding-right: 0.55rem;
+  }
+}
