@@ -30,6 +30,7 @@ html[data-theme="light"] .theme-toggle svg{fill:currentColor;stroke:none}
 html[data-theme="light"] .theme-toggle:hover{color:#0a1628;background:#0a16280f}
 .theme-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .player-value-page .pv-onb-step-card,.player-value-page .pv-onb-summary,.player-value-page .pv-brand-picker,.player-value-page .pv-fold{background:var(--surface);color:var(--text);border:1px solid var(--border)}.player-value-page .pv-fold-body .card.sbp,.player-value-page .pv-fold-body .card.live-report,.player-value-page .pv-fold-body .card.form-card,.player-value-page .pv-fold-body .card.lgp,.player-value-page .pv-fold-body .pv-migrate-panel{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);box-shadow:none;padding:.85rem .95rem}.player-value-page .sbp-floor-value{color:var(--gold-soft)}
+.tr-practice-notice{border:1px solid color-mix(in srgb,var(--gold,#c4a35a) 45%,transparent);background:color-mix(in srgb,var(--gold,#c4a35a) 14%,transparent);border-radius:12px;margin:0 .75rem;padding:.8rem .95rem;font-size:.98rem;line-height:1.45;color:var(--text,#eef2f7)}
 .om-modellen{gap:1.35rem}
 .om-modellen-hero{flex-direction:column;align-items:flex-start;gap:.4rem;max-width:42rem;display:flex}
 .om-modellen-eyebrow{color:var(--gold);letter-spacing:.14em;text-transform:uppercase;margin:0;font-size:.78rem;font-weight:700}
