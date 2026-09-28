@@ -1,0 +1,8 @@
+iframe.hopfield-frame {
+  display: block;
+  width: 100%;
+  min-height: 36rem;
+  border: 1px solid var(--border, rgba(196, 163, 90, 0.28));
+  border-radius: 12px;
+  background: var(--bg-card, #12243d);
+}
