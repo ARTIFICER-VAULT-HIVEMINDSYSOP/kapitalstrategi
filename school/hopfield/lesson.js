@@ -1,5 +1,9 @@
 /** Readable source for the Tradingskolan lesson. Patched into the Vite bundle. */
 
+function compareTable(caption, headers, rows) {
+  return "@table " + JSON.stringify({ caption, headers, rows });
+}
+
 export const lesson = {
   moduleId: "hopfield-minne",
   moduleTitle: "08 · Minne och mönsterigenkänning",
@@ -12,9 +16,9 @@ export const lesson = {
   summaryUk:
     "Як мережа Гопфілда (1982) зберігає образи як долини енергії і як шумна підказка може відновити весь образ — те саме доповнення, через яке знайомі фігури графіка з'являються в шумі.",
   durationMinutes: 14,
-  topics: ["Hopfield", "Hinton", "Hebb", "Minne", "Quiz"],
-  topicsEn: ["Hopfield", "Hinton", "Hebb", "Memory", "Quiz"],
-  topicsUk: ["Гопфілд", "Гінтон", "Гебб", "Пам'ять", "Тест"],
+  topics: ["Hopfield", "Hinton", "Symbolisk AI", "Hebb", "Minne", "Quiz"],
+  topicsEn: ["Hopfield", "Hinton", "Symbolic AI", "Hebb", "Memory", "Quiz"],
+  topicsUk: ["Гопфілд", "Гінтон", "Символьний ШІ", "Гебб", "Пам'ять", "Тест"],
   content: [
     "# Vad modellen är",
     "John Hopfield beskrev 1982 ett nätverk av binära neuroner. Varje neuron är antingen +1 eller −1. Varje par är kopplat med en symmetrisk vikt: vikten från i till j är samma som från j till i.",
@@ -33,6 +37,21 @@ export const lesson = {
     "Han bidrog också till backpropagation, tillsammans med David Rumelhart och Ronald Williams (1986). Den metoden ligger bakom dagens djupinlärning.",
     "Hinton och Hopfield fick Nobelpriset i fysik 2024.",
     "I utbildningen gäller samma kontroll. Ett lärande system hittar mönster, men kan också överanpassa sig till brus. Kontrollera mönstret mot data innan ett beslut.",
+    "# Symbolisk AI",
+    "Symbolisk AI, också kallad GOFAI, arbetar med explicita regler och logik som människor skriver. Expertsystem och if-then-regler är exempel. Den är lätt att förklara, men skör när verkligheten avviker från reglerna.",
+    "Nätverk i Hopfields och Hintons anda lär sig i stället mönster ur data. De tål brus, men är svårare att förklara.",
+    "Neurosymbolisk AI kombinerar båda.",
+    compareTable(
+      "Symbolisk AI och nätverk",
+      ["Egenskap", "Symbolisk AI (GOFAI)", "Nätverk (Hopfield/Hinton)"],
+      [
+        ["Arbetssätt", "Explicita regler och logik som människor skriver", "Lär sig mönster ur data"],
+        ["Exempel", "Expertsystem, if-then-regler", "Hopfield-nätverk, Boltzmann-maskin"],
+        ["Styrka", "Lätt att förklara", "Tål brus"],
+        ["Gräns", "Skör när verkligheten avviker", "Svårare att förklara"],
+      ],
+    ),
+    "I utbildningen ger mönsterigenkänning idén. Skrivna regler, till exempel en förbestämd stop-loss och storlek, kontrollerar den innan ett beslut.",
     "@quiet",
     "Tradingskolan ger adaptiva verktyg. Kunskapstestet låser upp nästa rekommenderade utbildningsmodul. Det är inte en licens eller ett certifikat, och det öppnar inte handel med riktiga medel.",
     "# Prova nätverket",
@@ -45,6 +64,8 @@ export const lesson = {
     "https://www.nobelprize.org/prizes/physics/2024/press-release/",
     "Geoffrey Hinton. Wikipedia.",
     "https://en.wikipedia.org/wiki/Geoffrey_Hinton",
+    "Symbolisk AI. Wikipedia.",
+    "https://en.wikipedia.org/wiki/Symbolic_artificial_intelligence",
   ],
   contentEn: [
     "# What the model is",
@@ -64,6 +85,21 @@ export const lesson = {
     "He also contributed to backpropagation, with David Rumelhart and Ronald Williams (1986). That method underlies today's deep learning.",
     "Hinton and Hopfield received the Nobel Prize in Physics 2024.",
     "The same check applies in study. A learning system finds patterns, but it can also overfit to noise. Check the pattern against the data before a decision.",
+    "# Symbolic AI",
+    "Symbolic AI, also called GOFAI, works with explicit rules and logic that people write. Expert systems and if-then rules are examples. It is easy to explain, but brittle when reality departs from the rules.",
+    "Networks in the manner of Hopfield and Hinton instead learn patterns from data. They tolerate noise, but they are harder to explain.",
+    "Neurosymbolic AI combines both.",
+    compareTable(
+      "Symbolic AI and networks",
+      ["Property", "Symbolic AI (GOFAI)", "Networks (Hopfield/Hinton)"],
+      [
+        ["How it works", "Explicit rules and logic that people write", "Learns patterns from data"],
+        ["Examples", "Expert systems, if-then rules", "Hopfield network, Boltzmann machine"],
+        ["Strength", "Easy to explain", "Tolerates noise"],
+        ["Limit", "Brittle when reality departs", "Harder to explain"],
+      ],
+    ),
+    "In study, pattern recognition supplies the idea. Written rules, for example a predetermined stop-loss and size, check that idea before a decision.",
     "@quiet",
     "The trading school gives adaptive tools. The knowledge test unlocks the next recommended learning module. It is not a licence or a certificate, and it does not open trading with real money.",
     "# Try the network",
@@ -76,6 +112,8 @@ export const lesson = {
     "https://www.nobelprize.org/prizes/physics/2024/press-release/",
     "Geoffrey Hinton. Wikipedia.",
     "https://en.wikipedia.org/wiki/Geoffrey_Hinton",
+    "Symbolic AI. Wikipedia.",
+    "https://en.wikipedia.org/wiki/Symbolic_artificial_intelligence",
   ],
   contentUk: [
     "# Що це за модель",
@@ -95,6 +133,21 @@ export const lesson = {
     "Він також долучився до backpropagation разом із Девідом Румельгартом і Рональдом Вільямсом (1986). Цей метод лежить в основі сучасного глибокого навчання.",
     "Гінтон і Гопфілд отримали Нобелівську премію з фізики 2024 року.",
     "У навчанні діє та сама перевірка. Система, що вчиться, знаходить образи, але може й перенавчитися на шум. Перевірте образ за даними перед рішенням.",
+    "# Символьний ШІ",
+    "Символьний ШІ, його також називають GOFAI, працює з явними правилами і логікою, які пишуть люди. Приклади — експертні системи та правила if-then. Його легко пояснити, але він крихкий, коли дійсність відхиляється від правил.",
+    "Мережі в дусі Гопфілда і Гінтона натомість вчаться образів з даних. Вони терплять шум, але їх важче пояснити.",
+    "Нейросимвольний ШІ поєднує обидва підходи.",
+    compareTable(
+      "Символьний ШІ і мережі",
+      ["Властивість", "Символьний ШІ (GOFAI)", "Мережі (Гопфілд/Гінтон)"],
+      [
+        ["Як працює", "Явні правила і логіка, які пишуть люди", "Вчиться образів з даних"],
+        ["Приклади", "Експертні системи, правила if-then", "Мережа Гопфілда, машина Больцмана"],
+        ["Сила", "Легко пояснити", "Терпить шум"],
+        ["Межа", "Крихкий, коли дійсність відхиляється", "Важче пояснити"],
+      ],
+    ),
+    "У навчанні розпізнавання образів дає ідею. Написані правила, наприклад заздалегідь визначені stop-loss і розмір, перевіряють її перед рішенням.",
     "@quiet",
     "Торгова школа дає адаптивні інструменти. Перевірка знань відкриває наступний рекомендований навчальний модуль. Це не ліцензія і не сертифікат, і вона не відкриває торгівлю справжніми коштами.",
     "# Спробуйте мережу",
@@ -107,6 +160,8 @@ export const lesson = {
     "https://www.nobelprize.org/prizes/physics/2024/press-release/",
     "Джеффрі Гінтон. Wikipedia.",
     "https://en.wikipedia.org/wiki/Geoffrey_Hinton",
+    "Символьний ШІ. Wikipedia.",
+    "https://en.wikipedia.org/wiki/Symbolic_artificial_intelligence",
   ],
   quiz: [
     {
@@ -316,6 +371,48 @@ export const lesson = {
         },
       ],
     },
+    {
+      id: "hop-q6",
+      prompt: "Hur skiljer sig symbolisk AI från nätverk som Hopfields och Hintons, enligt lektionen?",
+      promptEn: "How does symbolic AI differ from networks such as Hopfield's and Hinton's, according to this lesson?",
+      promptUk: "Чим символьний ШІ відрізняється від мереж на кшталт Гопфілда і Гінтона, згідно з уроком?",
+      explanation:
+        "Symbolisk AI (GOFAI) arbetar med explicita regler och logik som människor skriver. Nätverken lär sig mönster ur data. Neurosymbolisk AI kombinerar båda. I utbildningen ger mönsterigenkänning idén, och skrivna regler, till exempel en förbestämd stop-loss och storlek, kontrollerar den innan ett beslut.",
+      explanationEn:
+        "Symbolic AI (GOFAI) works with explicit rules and logic that people write. The networks learn patterns from data. Neurosymbolic AI combines both. In study, pattern recognition supplies the idea, and written rules, for example a predetermined stop-loss and size, check it before a decision.",
+      explanationUk:
+        "Символьний ШІ (GOFAI) працює з явними правилами і логікою, які пишуть люди. Мережі вчаться образів з даних. Нейросимвольний ШІ поєднує обидва підходи. У навчанні розпізнавання образів дає ідею, а написані правила, наприклад заздалегідь визначені stop-loss і розмір, перевіряють її перед рішенням.",
+      options: [
+        {
+          id: "a",
+          text: "Symbolisk AI lär sig mönster ur data och tål brus bättre än skrivna regler",
+          textEn: "Symbolic AI learns patterns from data and tolerates noise better than written rules",
+          textUk: "Символьний ШІ вчиться образів з даних і терпить шум краще за написані правила",
+          correct: false,
+        },
+        {
+          id: "b",
+          text: "Symbolisk AI använder explicita regler som människor skriver. Den är lätt att förklara men skör. Nätverken lär sig mönster ur data och tål brus, men är svårare att förklara",
+          textEn: "Symbolic AI uses explicit rules that people write. It is easy to explain but brittle. The networks learn patterns from data and tolerate noise, but they are harder to explain",
+          textUk: "Символьний ШІ використовує явні правила, які пишуть люди. Його легко пояснити, але він крихкий. Мережі вчаться образів з даних і терплять шум, але їх важче пояснити",
+          correct: true,
+        },
+        {
+          id: "c",
+          text: "Nätverk är if-then-regler som människor skriver, och de är sköra när verkligheten avviker",
+          textEn: "Networks are if-then rules that people write, and they are brittle when reality departs",
+          textUk: "Мережі — це правила if-then, які пишуть люди, і вони крихкі, коли дійсність відхиляється",
+          correct: false,
+        },
+        {
+          id: "d",
+          text: "Mönsterigenkänning räcker som beslut. Skrivna regler som stop-loss behövs inte",
+          textEn: "Pattern recognition is enough as a decision. Written rules such as a stop-loss are not needed",
+          textUk: "Розпізнавання образів достатньо як рішення. Написані правила, як-от stop-loss, не потрібні",
+          correct: false,
+        },
+      ],
+    },
   ],
   relatedLinks: [
     {
@@ -347,6 +444,16 @@ export const lesson = {
       descriptionSv: "Boltzmann-maskinen, backpropagation och Nobelpriset i fysik 2024.",
       descriptionEn: "The Boltzmann machine, backpropagation and the Nobel Prize in Physics 2024.",
       descriptionUk: "Машина Больцмана, backpropagation і Нобелівська премія з фізики 2024.",
+    },
+    {
+      to: "https://en.wikipedia.org/wiki/Symbolic_artificial_intelligence",
+      external: true,
+      labelSv: "Symbolisk AI, Wikipedia",
+      labelEn: "Symbolic AI, Wikipedia",
+      labelUk: "Символьний ШІ, Wikipedia",
+      descriptionSv: "Explicita regler och logik, som kontrast till nätverk som lär sig mönster ur data.",
+      descriptionEn: "Explicit rules and logic, as a contrast to networks that learn patterns from data.",
+      descriptionUk: "Явні правила і логіка, як контраст до мереж, що вчаться образів з даних.",
     },
     {
       to: "/nyheter/2026-09-28/tyst-tid/",

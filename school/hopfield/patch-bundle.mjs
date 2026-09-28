@@ -10,12 +10,51 @@ let s = fs.readFileSync(bundlePath, "utf8");
 
 function once(label, from, to) {
   const n = s.split(from).length - 1;
+  if (n === 0) {
+    console.log("skip", label);
+    return;
+  }
   if (n !== 1) throw new Error(`${label}: expected 1 occurrence, found ${n}`);
   s = s.replace(from, to);
 }
 
+function replaceLessonObject() {
+  const marker = '{"moduleId":"hopfield-minne"';
+  const start = s.indexOf(marker);
+  if (start < 0) throw new Error("lesson object missing");
+  if (s.indexOf(marker, start + 1) !== -1) throw new Error("lesson object appears more than once");
+  let depth = 0;
+  let inStr = false;
+  let esc = false;
+  let end = -1;
+  for (let i = start; i < s.length; i++) {
+    const c = s[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (c === "\\") esc = true;
+      else if (c === '"') inStr = false;
+      continue;
+    }
+    if (c === '"') {
+      inStr = true;
+      continue;
+    }
+    if (c === "{") depth++;
+    else if (c === "}") {
+      depth--;
+      if (depth === 0) {
+        end = i + 1;
+        break;
+      }
+    }
+  }
+  if (end < 0) throw new Error("lesson object did not close");
+  s = s.slice(0, start) + JSON.stringify(lesson) + s.slice(end);
+}
+
 if (s.includes("hopfield-minne")) {
-  console.log("bundle already contains hopfield-minne, skipping content insert");
+  replaceLessonObject();
+  console.log("replaced hopfield lesson object");
 } else {
   once(
     "module",
@@ -67,6 +106,12 @@ const hopfieldUi = `if(e.trim()===\`@hopfield\`){let o=typeof document==\`undefi
 
 if (!s.includes("hopfield-frame")) {
   once("demo-ui", "return e.trimStart().startsWith(`⚠️`)?", hopfieldUi + "return e.trimStart().startsWith(`⚠️`)?");
+}
+
+const tableUi = `if(e.startsWith(\`@table \`)){let d;try{d=JSON.parse(e.slice(7))}catch{return(0,X.jsx)(\`p\`,{children:e},\`bad-table-\${t}\`)}return(0,X.jsx)(\`div\`,{className:\`ts-compare-wrap\`,children:(0,X.jsxs)(\`table\`,{className:\`ts-compare\`,children:[d.caption?(0,X.jsx)(\`caption\`,{children:d.caption}):null,(0,X.jsx)(\`thead\`,{children:(0,X.jsx)(\`tr\`,{children:(d.headers||[]).map((n,r)=>(0,X.jsx)(\`th\`,{scope:\`col\`,children:n},\`th-\${r}\`))})}),(0,X.jsx)(\`tbody\`,{children:(d.rows||[]).map((n,r)=>(0,X.jsx)(\`tr\`,{children:n.map((c,i)=>(0,X.jsx)(i===0?\`th\`:\`td\`,{scope:i===0?\`row\`:void 0,children:c},\`c-\${i}\`))},\`tr-\${r}\`))})]})},\`table-\${t}\`)}`;
+
+if (!s.includes("ts-compare")) {
+  once("table-ui", "if(e.trim()===`@hopfield`)", tableUi + "if(e.trim()===`@hopfield`)");
 }
 
 once(

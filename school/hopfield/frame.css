@@ -6,3 +6,40 @@ iframe.hopfield-frame {
   border-radius: 12px;
   background: var(--bg-card, #12243d);
 }
+
+.ts-compare-wrap {
+  overflow-x: auto;
+  margin: 0.35rem 0 1rem;
+}
+
+table.ts-compare {
+  width: 100%;
+  min-width: 36rem;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+table.ts-compare caption {
+  caption-side: top;
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: 0.45rem;
+  color: var(--text-h, #fff);
+}
+
+table.ts-compare th,
+table.ts-compare td {
+  border: 1px solid var(--border-strong, rgba(196, 163, 90, 0.28));
+  padding: 0.55rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+table.ts-compare thead th {
+  background: var(--accent-soft, rgba(196, 163, 90, 0.12));
+  color: var(--text-h, #fff);
+}
+
+table.ts-compare tbody th {
+  font-weight: 600;
+}

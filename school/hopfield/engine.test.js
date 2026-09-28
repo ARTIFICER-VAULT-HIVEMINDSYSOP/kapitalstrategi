@@ -75,11 +75,24 @@ test("lesson copy stays inside the school rules and is translated", () => {
   for (const banned of ["riskprofil", "lämplighet", "lamplighet", "suitability", "risk profile", "livehandel", "live trading"]) {
     assert.equal(joined.includes(banned), false, banned);
   }
-  assert.equal(lesson.quiz.length, 5);
+  assert.equal(lesson.quiz.length, 6);
   assert.ok(lesson.content.some((line) => line.startsWith("# Geoffrey Hinton")));
   assert.ok(lesson.contentEn.some((line) => line.startsWith("# Geoffrey Hinton")));
   assert.ok(lesson.contentUk.some((line) => line.startsWith("# Джеффрі Гінтон")));
+  const hintonAt = lesson.content.findIndex((line) => line.startsWith("# Geoffrey Hinton"));
+  const symbolicAt = lesson.content.findIndex((line) => line.startsWith("# Symbolisk AI"));
+  assert.ok(symbolicAt > hintonAt);
+  assert.ok(lesson.contentEn.some((line) => line.startsWith("# Symbolic AI")));
+  assert.ok(lesson.contentUk.some((line) => line.startsWith("# Символьний ШІ")));
+  for (const lines of [lesson.content, lesson.contentEn, lesson.contentUk]) {
+    const tableLine = lines.find((line) => line.startsWith("@table "));
+    const table = JSON.parse(tableLine.slice("@table ".length));
+    assert.equal(table.headers.length, 3);
+    assert.equal(table.rows.length, 4);
+    assert.ok(table.rows.every((row) => row.length === 3));
+  }
   assert.ok(lesson.content.includes("https://en.wikipedia.org/wiki/Geoffrey_Hinton"));
+  assert.ok(lesson.content.includes("https://en.wikipedia.org/wiki/Symbolic_artificial_intelligence"));
   assert.ok(lesson.content.includes("@hopfield"));
   assert.ok(lesson.content.includes("@quiet"));
   assert.ok(lesson.content.includes("https://www.pnas.org/doi/10.1073/pnas.79.8.2554"));
@@ -96,6 +109,8 @@ test("the Vite bundle lists the lesson last on the trading path", () => {
   assert.ok(pathAt > moduleAt);
   assert.ok(bundle.includes(lesson.moduleTitle));
   assert.ok(bundle.includes("hopfield-frame"));
+  assert.ok(bundle.includes("ts-compare"));
+  assert.ok(bundle.includes("Symbolic_artificial_intelligence"));
   const pathEnd = bundle.indexOf("];function Hc");
   assert.ok(pathAt < pathEnd);
   assert.equal(bundle.slice(pathAt, pathEnd).includes('"moduleId":"ipo-01'), false);

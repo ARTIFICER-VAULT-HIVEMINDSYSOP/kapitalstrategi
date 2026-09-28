@@ -62,6 +62,7 @@ const CORRECT = [
   "En ofullständig eller brusig ledtråd kan hämta hela mönstret",
   "Ungefär 0,14·N mönster ryms. För många blandar minnen. Kontrollera mönstret mot data och regler innan ett beslut",
   "Boltzmann-maskinen (1985, med Ackley och Sejnowski) har stokastiska neuroner och dolda enheter, så nätet lär sig känna igen och generera mönster. Hinton bidrog också till backpropagation (1986)",
+  "Symbolisk AI använder explicita regler som människor skriver. Den är lätt att förklara men skör. Nätverken lär sig mönster ur data och tål brus, men är svårare att förklara",
 ];
 
 function assert(cond, msg) {
@@ -122,8 +123,24 @@ try {
   assert(lessonText.includes("Geoffrey Hinton"), "Hinton section missing");
   assert(lessonText.includes("Boltzmann-maskinen"), "Boltzmann machine missing");
   assert(lessonText.indexOf("Hopfield") < lessonText.indexOf("Geoffrey Hinton"), "Hinton section is not after Hopfield");
+  assert(lessonText.includes("Symbolisk AI"), "symbolic AI section missing");
+  assert(lessonText.indexOf("Geoffrey Hinton") < lessonText.indexOf("Symbolisk AI"), "symbolic AI is not after Hinton");
+  assert(lessonText.includes("Neurosymbolisk AI"), "neurosymbolic sentence missing");
   const wiki = await page.$eval('a[href="https://en.wikipedia.org/wiki/Geoffrey_Hinton"]', (el) => el.getAttribute("href"));
   assert(wiki.includes("Geoffrey_Hinton"), "Wikipedia link missing");
+  const symbolic = await page.$eval('a[href="https://en.wikipedia.org/wiki/Symbolic_artificial_intelligence"]', (el) => el.getAttribute("href"));
+  assert(symbolic.includes("Symbolic_artificial_intelligence"), "symbolic AI source missing");
+  const table = await page.$eval("table.ts-compare", (el) => ({
+    caption: el.querySelector("caption")?.textContent || "",
+    headers: [...el.querySelectorAll("thead th")].map((th) => th.textContent),
+    rows: [...el.querySelectorAll("tbody tr")].map((tr) => [...tr.children].map((cell) => cell.textContent)),
+  }));
+  assert(table.caption.includes("Symbolisk AI"), `table caption: ${table.caption}`);
+  assert(table.headers.length === 3, `table headers: ${table.headers.join("|")}`);
+  assert(table.rows.length === 4, `table rows: ${table.rows.length}`);
+  assert(table.rows[0][1].includes("Explicita regler"), `table cell: ${table.rows[0][1]}`);
+  const tableEl = await page.$(".ts-compare-wrap");
+  await tableEl.screenshot({ path: path.join(shotDir, "hopfield-compare.png") });
 
   const lastChip = await page.$$eval(".ts-path-chip-label", (els) => els.map((el) => el.textContent));
   assert(lastChip.at(-1).includes("18 · Minne och mönster"), `path does not end with the new lesson: ${lastChip.at(-1)}`);
