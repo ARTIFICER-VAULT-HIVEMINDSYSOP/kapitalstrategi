@@ -1,0 +1,29 @@
+{
+  "edition": "2026-09-28",
+  "date": "2026-09-28",
+  "dateLabel": {
+    "sv": "28 september 2026"
+  },
+  "slug": "skolan",
+  "order": 5,
+  "translations": {
+    "sv": {
+      "title": "Prova först · skolan",
+      "ingress": "Robban: först säkerhetsutrustning. Sedan fart.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Robban: först säkerhetsutrustning. Sedan fart."
+        },
+        {
+          "type": "p",
+          "text": "**SKOLA** — Tradingskolan: [https://live.kapitalstrategi.com/tradingskolan](https://live.kapitalstrategi.com/tradingskolan)"
+        },
+        {
+          "type": "p",
+          "text": "Nytt i skolan: tredjepart & escrow — villkor och bevis före frisläppning. Kapital och Strategi utbildar dig i spelet. Escrow sköts av tredjepart."
+        }
+      ]
+    }
+  }
+}
