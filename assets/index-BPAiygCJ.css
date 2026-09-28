@@ -31,3 +31,27 @@ html[data-theme="light"] .theme-toggle:hover{color:#0a1628;background:#0a16280f}
 .theme-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .player-value-page .pv-onb-step-card,.player-value-page .pv-onb-summary,.player-value-page .pv-brand-picker,.player-value-page .pv-fold{background:var(--surface);color:var(--text);border:1px solid var(--border)}.player-value-page .pv-fold-body .card.sbp,.player-value-page .pv-fold-body .card.live-report,.player-value-page .pv-fold-body .card.form-card,.player-value-page .pv-fold-body .card.lgp,.player-value-page .pv-fold-body .pv-migrate-panel{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);box-shadow:none;padding:.85rem .95rem}.player-value-page .sbp-floor-value{color:var(--gold-soft)}
 .tr-practice-notice{border:1px solid color-mix(in srgb,var(--gold,#c4a35a) 45%,transparent);background:color-mix(in srgb,var(--gold,#c4a35a) 14%,transparent);border-radius:12px;margin:0 .75rem;padding:.8rem .95rem;font-size:.98rem;line-height:1.45;color:var(--text,#eef2f7)}
+.om-modellen{gap:1.35rem}
+.om-modellen-hero{flex-direction:column;align-items:flex-start;gap:.4rem;max-width:42rem;display:flex}
+.om-modellen-eyebrow{color:var(--gold);letter-spacing:.14em;text-transform:uppercase;margin:0;font-size:.78rem;font-weight:700}
+.om-modellen-brand{font-family:var(--serif);letter-spacing:-.03em;margin:0;font-size:clamp(2.35rem,5vw,3.35rem);font-weight:650;line-height:1.02}
+.om-modellen-kicker{color:var(--gold-soft);font-family:var(--serif);margin:0;font-size:clamp(1.45rem,2.6vw,1.9rem);line-height:1.15}
+.om-modellen-lead{color:var(--text-dim);max-width:40rem;margin:0;font-size:1.05rem;line-height:1.55}
+.om-modellen-toc{flex-wrap:wrap;gap:.55rem .9rem;margin:0;padding:.15rem 0;display:flex}
+.om-modellen-toc a{color:var(--gold-soft);border-bottom:1px solid color-mix(in srgb,var(--gold) 50%,transparent);text-underline-offset:.18rem;font-weight:600;text-decoration:none}
+.om-modellen-section{flex-direction:column;gap:.7rem;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.05rem 1.1rem 1.15rem;display:flex}
+.om-modellen-section h2{font-size:clamp(1.5rem,2.8vw,1.95rem)}
+.om-modellen-section p{color:var(--text);margin:0;font-size:1.02rem;line-height:1.6}
+.om-modellen-stage{color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin:0;font-size:.72rem;font-weight:700}
+.om-modellen-rooms{grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin:.2rem 0;padding:0;list-style:none;display:grid}
+.om-modellen-room{background:color-mix(in srgb,var(--bg) 62%,transparent);border:1px solid var(--border-strong);border-radius:8px;margin:0;padding:.8rem .85rem}
+.om-modellen-room h3{align-items:baseline;gap:.45rem;margin:0 0 .35rem;font-size:1.2rem;display:flex}
+.om-modellen-room p{font-size:.98rem}
+.om-modellen-letter{color:var(--gold);font-family:var(--serif);font-size:1.35rem;line-height:1}
+.om-modellen-disclaimer{border-top:1px solid var(--border-strong);padding-top:1rem}
+.om-modellen-disclaimer p{color:var(--muted);max-width:46rem;font-size:.95rem;line-height:1.55}
+@media (max-width:760px){
+.om-modellen-rooms{grid-template-columns:1fr}
+.om-modellen-section{padding:.9rem .85rem 1rem}
+.om-modellen-brand{font-size:2.15rem}
+}
