@@ -1,0 +1,25 @@
+{
+  "edition": "2026-09-28",
+  "date": "2026-09-28",
+  "dateLabel": {
+    "sv": "28 september 2026"
+  },
+  "slug": "ovriga-ravaror",
+  "order": 4,
+  "translations": {
+    "sv": {
+      "title": "Övriga råvaror",
+      "ingress": "DI (28 sep): silver spot 61,98 dollar/uns (−3,55 %, 06:50); platina spot 1 733,80 dollar/uns (−2,65 %, 06:50); koppar 14 647 dollar/ton (−0,80 %, 3 mån termin, 18:00).",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "DI (28 sep): **silver** spot **61,98 dollar/uns** (**−3,55 %**, **06:50**); **platina** spot **1 733,80 dollar/uns** (**−2,65 %**, **06:50**); **koppar** **14 647 dollar/ton** (**−0,80 %**, 3 mån termin, **18:00**)."
+        },
+        {
+          "type": "p",
+          "text": "Källa: [DI råvaror 28 sep](https://www.di.se/ravaror/)"
+        }
+      ]
+    }
+  }
+}

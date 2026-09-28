@@ -1,0 +1,110 @@
+/* Kort för modulartiklar på den befintliga nyhetssidan. */
+.ks-edition-modules {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 1rem 1rem 1.05rem;
+  border: 1px solid var(--border-strong, rgba(196, 163, 90, 0.32));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg-elevated, #0f1f35) 90%, transparent);
+  color: var(--text, #eef2f7);
+}
+
+.ks-edition-brand {
+  margin: 0;
+  color: var(--gold, #c4a35a);
+  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ks-edition-title {
+  margin: 0;
+  font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  font-size: clamp(1.7rem, 3vw, 2.15rem);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--text-h, #fff);
+}
+
+.ks-edition-lead {
+  margin: 0;
+  max-width: 68ch;
+  color: var(--text-dim, #c5d0de);
+  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+.ks-edition-note {
+  margin: 0;
+  color: var(--gold-soft, #e8d5a3);
+  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.ks-mod-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+}
+
+@media (min-width: 720px) {
+  .ks-mod-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 1100px) {
+  .ks-mod-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+.ks-mod-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  min-height: 100%;
+  padding: 0.8rem 0.85rem 0.9rem;
+  border: 1px solid var(--border, rgba(196, 163, 90, 0.22));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg, #0a1628) 55%, transparent);
+  color: inherit;
+  text-decoration: none;
+}
+
+.ks-mod-card:hover {
+  border-color: var(--gold, #c4a35a);
+}
+
+.ks-mod-card:focus-visible {
+  outline: 2px solid var(--gold, #c4a35a);
+  outline-offset: 2px;
+}
+
+.ks-mod-date {
+  margin: 0;
+  color: var(--gold, #c4a35a);
+  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.ks-mod-card h3 {
+  margin: 0;
+  font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-h, #fff);
+}
+
+.ks-mod-ingress {
+  margin: 0;
+  color: var(--muted, #9aabc0);
+  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}

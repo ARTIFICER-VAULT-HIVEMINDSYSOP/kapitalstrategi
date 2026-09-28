@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="sv" data-theme="dark">
   <head>
+    <script>
+      (function () {
+        var path = location.pathname;
+        if (path.length > 1 && path.endsWith("/")) {
+          history.replaceState(null, "", path.replace(/\/+$/, "") + location.search + location.hash);
+        }
+      })();
+    </script>
+
     <meta charset="UTF-8" />
     <!-- Flik- och adressfältsikon: sköld -->
     <link rel="icon" href="/favicon.ico" sizes="48x48" />

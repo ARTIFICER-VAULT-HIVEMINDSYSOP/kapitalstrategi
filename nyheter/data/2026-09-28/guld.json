@@ -1,0 +1,29 @@
+{
+  "edition": "2026-09-28",
+  "date": "2026-09-28",
+  "dateLabel": {
+    "sv": "28 september 2026"
+  },
+  "slug": "guld",
+  "order": 3,
+  "translations": {
+    "sv": {
+      "title": "Guld",
+      "ingress": "DI spot (28 sep, visad tid 06:50): 4 197,36 dollar/uns (−2,04 %).",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "DI spot (28 sep, visad tid **06:50**): **4 197,36 dollar/uns** (**−2,04 %**)."
+        },
+        {
+          "type": "p",
+          "text": "Senaste DI-visning: **06:50**; öppna terminalen för livekurs."
+        },
+        {
+          "type": "p",
+          "text": "Källa: [DI råvaror 28 sep](https://www.di.se/ravaror/)"
+        }
+      ]
+    }
+  }
+}
