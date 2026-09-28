@@ -48,6 +48,37 @@
     <script defer src="/assets/traderider-demo-nav.js"></script>
     <link rel="stylesheet" href="/nyheter/embed.css" />
     <script defer src="/nyheter/embed.js"></script>
+    <link rel="stylesheet" href="/school/hopfield/frame.css" />
+    <script>
+      (function () {
+        function hopfieldFrames() {
+          return document.querySelectorAll("iframe.hopfield-frame");
+        }
+        window.addEventListener("message", function (e) {
+          if (e.origin !== window.location.origin) return;
+          if (!e.data || e.data.type !== "hopfield-height") return;
+          var h = Number(e.data.height);
+          if (!(h > 200 && h < 1600)) return;
+          var list = hopfieldFrames();
+          for (var i = 0; i < list.length; i++) {
+            if (list[i].contentWindow === e.source) list[i].style.height = h + "px";
+          }
+        });
+        function pushTheme() {
+          var theme = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+          var list = hopfieldFrames();
+          for (var i = 0; i < list.length; i++) {
+            try {
+              list[i].contentWindow.postMessage({ type: "hopfield-theme", theme: theme }, window.location.origin);
+            } catch (err) {}
+          }
+        }
+        new MutationObserver(pushTheme).observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ["data-theme"],
+        });
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
