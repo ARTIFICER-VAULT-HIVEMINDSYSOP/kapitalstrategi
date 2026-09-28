@@ -23,13 +23,6 @@
   color: var(--text-h, #fff);
 }
 
-.tr-ks-entry-lead {
-  max-width: 68ch;
-  margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.45;
-}
-
 .tr-ks-switch {
   display: flex;
   flex-wrap: wrap;
