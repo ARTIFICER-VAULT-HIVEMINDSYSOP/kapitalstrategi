@@ -73,6 +73,20 @@
           "ingress": {
             "sv": "Robban: först säkerhetsutrustning. Sedan fart."
           }
+        },
+        {
+          "slug": "tyst-tid",
+          "order": 6,
+          "href": "/nyheter/2026-09-28/tyst-tid/",
+          "title": {
+            "sv": "Tyst tid före beslut"
+          },
+          "ingress": {
+            "sv": "Ett viloläge i hjärnan får plats när ingen röst fyller örat. Ta den pausen innan ett övningsbeslut."
+          },
+          "category": {
+            "sv": "Skolan"
+          }
         }
       ]
     }

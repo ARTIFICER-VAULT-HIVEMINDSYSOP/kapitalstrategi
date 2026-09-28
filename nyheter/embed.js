@@ -104,11 +104,20 @@
         var heading = document.createElement("h3");
         heading.textContent = tx(mod.title);
 
+        if (mod.category) {
+          var category = document.createElement("p");
+          category.className = "ks-mod-cat";
+          category.textContent = tx(mod.category);
+          card.append(date, category, heading);
+        } else {
+          card.append(date, heading);
+        }
+
         var ingress = document.createElement("p");
         ingress.className = "ks-mod-ingress";
         ingress.textContent = tx(mod.ingress);
 
-        card.append(date, heading, ingress);
+        card.append(ingress);
         grid.append(card);
       });
 

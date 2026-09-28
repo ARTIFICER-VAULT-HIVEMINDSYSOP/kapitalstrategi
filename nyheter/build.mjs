@@ -85,6 +85,8 @@ function articleHtml(edition, module, modules) {
   const brand = pick(edition.brand, lang);
   const signoff = pick(edition.signoff, lang);
   const href = `/nyheter/${edition.date}/${module.slug}/`;
+  const category = pick(module.category, lang);
+  const kicker = category ? `${category} · ${dateLabel}` : `Nyhetsbrev · ${dateLabel}`;
   const paragraphs = copy.blocks
     .map((block) => {
       const source = /^(Källa|Källor):/.test(block.text);
@@ -142,7 +144,7 @@ function articleHtml(edition, module, modules) {
       </div>
     </header>
     <main id="innehall" class="ks-wrap">
-      <p class="ks-kicker">Nyhetsbrev · ${escapeHtml(dateLabel)}</p>
+      <p class="ks-kicker">${escapeHtml(kicker)}</p>
       <h1>${escapeHtml(title)}</h1>
       <p class="ks-disclaimer">${escapeHtml(disclaimer)}</p>
       <article class="ks-article">
@@ -215,6 +217,7 @@ function main() {
         ingress: Object.fromEntries(
           Object.entries(module.translations).map(([language, copy]) => [language, copy.ingress])
         ),
+        ...(module.category ? { category: module.category } : {}),
       })),
     });
   }

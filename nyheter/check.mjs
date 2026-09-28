@@ -65,7 +65,6 @@ const banned = [
   "investeringsrekommendation",
   "Fraunces",
   "Trade Rider",
-  "Traderider",
   "trade-rider",
 ];
 
@@ -89,10 +88,22 @@ for (const needle of required) {
   if (!corpus.includes(needle)) fail(`saknar text: ${needle}`);
 }
 
+const traderiderMentionOk = new Set([
+  "data/2026-09-28/tyst-tid.json",
+  "2026-09-28/tyst-tid/index.html",
+]);
+
 for (const file of files) {
   const text = fs.readFileSync(file, "utf8");
+  const rel = path.relative(here, file);
   for (const needle of banned) {
-    if (text.includes(needle)) fail(`${path.relative(here, file)} innehåller ${needle}`);
+    if (text.includes(needle)) fail(`${rel} innehåller ${needle}`);
+  }
+  if (text.includes("Traderider") && !traderiderMentionOk.has(rel)) {
+    fail(`${rel} nämner Traderider utanför skolmodulen`);
+  }
+  if (/href="[^"]*traderider/i.test(text) || /href="[^"]*trade-rider/i.test(text)) {
+    fail(`${rel} länkar till Traderider`);
   }
   if (file.endsWith(".html") && /(?:^|\n)Hej,/.test(text)) fail(`${file} innehåller hälsningen Hej,`);
 }
@@ -104,7 +115,7 @@ const olja = fs.readFileSync(path.join(here, "2026-09-28/olja/index.html"), "utf
 if ((olja.split("saknas").length - 1) !== 1) fail("Oljeartikeln ska behålla Baha.com saknas");
 
 const editions = JSON.parse(fs.readFileSync(path.join(here, "data/editions.json"), "utf8"));
-if (editions.editions[0].modules.length !== 5) fail("utgåvan ska ha 5 moduler");
+if (editions.editions[0].modules.length !== 6) fail("utgåvan ska ha 6 moduler");
 const hrefs = editions.editions[0].modules.map((mod) => mod.href);
 const expectedHrefs = [
   "/nyheter/2026-09-28/ipo/",
@@ -112,7 +123,23 @@ const expectedHrefs = [
   "/nyheter/2026-09-28/guld/",
   "/nyheter/2026-09-28/ovriga-ravaror/",
   "/nyheter/2026-09-28/skolan/",
+  "/nyheter/2026-09-28/tyst-tid/",
 ];
+const tyst = editions.editions[0].modules.find((mod) => mod.slug === "tyst-tid");
+if (tyst?.category?.sv !== "Skolan") fail("tyst-tid ska ligga i kategorin Skolan");
+const tystHtml = fs.readFileSync(path.join(here, "2026-09-28/tyst-tid/index.html"), "utf8");
+if (!tystHtml.includes("https://doi.org/10.1073/pnas.98.2.676")) fail("saknar Raichle-källan");
+if (!tystHtml.includes("slopa-hörlurarna-vad-som-verkligen-händer-med-din-hjärna-utan-tysta-stunder/ar-AA2d3RyU") && !tystHtml.includes("slopa-h%C3%B6rlurarna")) {
+  fail("saknar Dagens.se/MSN-källan");
+}
+if (!tystHtml.includes("Utbildning och information, inte investeringsråd.")) fail("tyst-tid saknar utbildningsraden");
+const tystJson = JSON.parse(fs.readFileSync(path.join(here, "data/2026-09-28/tyst-tid.json"), "utf8"));
+const tystBody = tystJson.translations.sv.blocks
+  .filter((block) => !block.text.startsWith("Källor:"))
+  .map((block) => block.text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1"))
+  .join(" ");
+const tystWords = tystBody.split(/\s+/).filter(Boolean);
+if (tystWords.length < 250 || tystWords.length > 400) fail(`tyst-tid ordantal ${tystWords.length}`);
 if (JSON.stringify(hrefs) !== JSON.stringify(expectedHrefs)) fail(`fel modul-URL:er ${hrefs.join(", ")}`);
 
 const rendered = renderInline("**46 kr** och [IPO-kalender](/nyheter#ipo-cal-heading)");
