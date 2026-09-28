@@ -1,0 +1,61 @@
+/* Entry on /trade-rider only. Selectors do not match other pages. */
+.tr-ks-entry {
+  margin: 0 0.75rem 0.85rem;
+  padding: 0.85rem 0.95rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--gold, #c4a35a) 8%, var(--bg-card, #12243d));
+}
+
+.tr-ks-entry-title {
+  margin: 0.2rem 0 0.35rem;
+  font-family: var(--serif, "Fraunces", "Source Sans 3", sans-serif);
+  font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-h, #fff);
+}
+
+.tr-ks-entry-lead {
+  max-width: 68ch;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.tr-ks-entry-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.8rem;
+}
+
+.tr-ks-entry-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 100%;
+  padding: 0.8rem 0.85rem;
+  border: 1px solid var(--border-strong, #c4a35a3d);
+  border-radius: 10px;
+  background: var(--bg-card, #12243d);
+  color: var(--text, #eef2f7);
+  text-decoration: none;
+}
+
+.tr-ks-entry-card:hover,
+.tr-ks-entry-card:focus-visible {
+  border-color: var(--gold, #c4a35a);
+  outline: none;
+}
+
+.tr-ks-entry-card strong {
+  font-size: 1.02rem;
+  color: var(--text-h, #fff);
+}
+
+.tr-ks-entry-card span {
+  color: var(--muted, #9aabc0);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
