@@ -75,7 +75,11 @@ test("lesson copy stays inside the school rules and is translated", () => {
   for (const banned of ["riskprofil", "lämplighet", "lamplighet", "suitability", "risk profile", "livehandel", "live trading"]) {
     assert.equal(joined.includes(banned), false, banned);
   }
-  assert.equal(lesson.quiz.length >= 3 && lesson.quiz.length <= 4, true);
+  assert.equal(lesson.quiz.length, 5);
+  assert.ok(lesson.content.some((line) => line.startsWith("# Geoffrey Hinton")));
+  assert.ok(lesson.contentEn.some((line) => line.startsWith("# Geoffrey Hinton")));
+  assert.ok(lesson.contentUk.some((line) => line.startsWith("# Джеффрі Гінтон")));
+  assert.ok(lesson.content.includes("https://en.wikipedia.org/wiki/Geoffrey_Hinton"));
   assert.ok(lesson.content.includes("@hopfield"));
   assert.ok(lesson.content.includes("@quiet"));
   assert.ok(lesson.content.includes("https://www.pnas.org/doi/10.1073/pnas.79.8.2554"));

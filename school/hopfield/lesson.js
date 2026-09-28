@@ -12,9 +12,9 @@ export const lesson = {
   summaryUk:
     "Як мережа Гопфілда (1982) зберігає образи як долини енергії і як шумна підказка може відновити весь образ — те саме доповнення, через яке знайомі фігури графіка з'являються в шумі.",
   durationMinutes: 14,
-  topics: ["Hopfield", "Hebb", "Minne", "Kapacitet", "Quiz"],
-  topicsEn: ["Hopfield", "Hebb", "Memory", "Capacity", "Quiz"],
-  topicsUk: ["Гопфілд", "Гебб", "Пам'ять", "Ємність", "Тест"],
+  topics: ["Hopfield", "Hinton", "Hebb", "Minne", "Quiz"],
+  topicsEn: ["Hopfield", "Hinton", "Hebb", "Memory", "Quiz"],
+  topicsUk: ["Гопфілд", "Гінтон", "Гебб", "Пам'ять", "Тест"],
   content: [
     "# Vad modellen är",
     "John Hopfield beskrev 1982 ett nätverk av binära neuroner. Varje neuron är antingen +1 eller −1. Varje par är kopplat med en symmetrisk vikt: vikten från i till j är samma som från j till i.",
@@ -28,6 +28,11 @@ export const lesson = {
     "# Koppling till trading",
     "Hjärnan kompletterar mönster på liknande sätt. Det är nyttigt när en ofullständig bild ska bli en känd struktur. Samma mekanism gör att man kan se kända grafmönster i brus.",
     "Lärdom i utbildningen: kontrollera mönstret mot data och mot reglerna innan ett beslut.",
+    "# Geoffrey Hinton",
+    "Geoffrey Hinton byggde vidare på Hopfield-nätverket med Boltzmann-maskinen (1985, tillsammans med David Ackley och Terry Sejnowski). Neuronerna är stokastiska, och nätet har dolda enheter. Då lär sig nätverket känna igen och generera mönster i data, i stället för att bara lagra mönster som redan är givna.",
+    "Han bidrog också till backpropagation, tillsammans med David Rumelhart och Ronald Williams (1986). Den metoden ligger bakom dagens djupinlärning.",
+    "Hinton och Hopfield fick Nobelpriset i fysik 2024.",
+    "I utbildningen gäller samma kontroll. Ett lärande system hittar mönster, men kan också överanpassa sig till brus. Kontrollera mönstret mot data innan ett beslut.",
     "@quiet",
     "Tradingskolan ger adaptiva verktyg. Kunskapstestet låser upp nästa rekommenderade utbildningsmodul. Det är inte en licens eller ett certifikat, och det öppnar inte handel med riktiga medel.",
     "# Prova nätverket",
@@ -38,6 +43,8 @@ export const lesson = {
     "https://www.pnas.org/doi/10.1073/pnas.79.8.2554",
     "Nobelpriset i fysik 2024, pressmeddelande. John Hopfield tillsammans med Geoffrey Hinton.",
     "https://www.nobelprize.org/prizes/physics/2024/press-release/",
+    "Geoffrey Hinton. Wikipedia.",
+    "https://en.wikipedia.org/wiki/Geoffrey_Hinton",
   ],
   contentEn: [
     "# What the model is",
@@ -52,6 +59,11 @@ export const lesson = {
     "# Link to trading",
     "The brain completes patterns in a similar way. That is useful when an incomplete picture should become a known structure. The same mechanism lets you see familiar chart patterns in noise.",
     "Lesson for study: check the pattern against the data and against your rules before a decision.",
+    "# Geoffrey Hinton",
+    "Geoffrey Hinton built on the Hopfield network with the Boltzmann machine (1985, with David Ackley and Terry Sejnowski). The neurons are stochastic, and the net has hidden units. The network then learns to recognise and generate patterns in data, instead of only storing patterns that were already given.",
+    "He also contributed to backpropagation, with David Rumelhart and Ronald Williams (1986). That method underlies today's deep learning.",
+    "Hinton and Hopfield received the Nobel Prize in Physics 2024.",
+    "The same check applies in study. A learning system finds patterns, but it can also overfit to noise. Check the pattern against the data before a decision.",
     "@quiet",
     "The trading school gives adaptive tools. The knowledge test unlocks the next recommended learning module. It is not a licence or a certificate, and it does not open trading with real money.",
     "# Try the network",
@@ -62,6 +74,8 @@ export const lesson = {
     "https://www.pnas.org/doi/10.1073/pnas.79.8.2554",
     "The Nobel Prize in Physics 2024, press release. John Hopfield together with Geoffrey Hinton.",
     "https://www.nobelprize.org/prizes/physics/2024/press-release/",
+    "Geoffrey Hinton. Wikipedia.",
+    "https://en.wikipedia.org/wiki/Geoffrey_Hinton",
   ],
   contentUk: [
     "# Що це за модель",
@@ -76,6 +90,11 @@ export const lesson = {
     "# Зв'язок із трейдингом",
     "Мозок доповнює образи схожим чином. Це корисно, коли неповна картина має стати відомою структурою. Той самий механізм змушує бачити знайомі фігури графіка в шумі.",
     "Висновок для навчання: перевірте образ за даними і за правилами перед рішенням.",
+    "# Джеффрі Гінтон",
+    "Джеффрі Гінтон розвинув мережу Гопфілда машиною Больцмана (1985, разом із Девідом Еклі та Террі Сейновським). Нейрони стохастичні, і мережа має приховані одиниці. Тоді мережа вчиться розпізнавати й породжувати образи в даних, а не лише зберігати вже задані образи.",
+    "Він також долучився до backpropagation разом із Девідом Румельгартом і Рональдом Вільямсом (1986). Цей метод лежить в основі сучасного глибокого навчання.",
+    "Гінтон і Гопфілд отримали Нобелівську премію з фізики 2024 року.",
+    "У навчанні діє та сама перевірка. Система, що вчиться, знаходить образи, але може й перенавчитися на шум. Перевірте образ за даними перед рішенням.",
     "@quiet",
     "Торгова школа дає адаптивні інструменти. Перевірка знань відкриває наступний рекомендований навчальний модуль. Це не ліцензія і не сертифікат, і вона не відкриває торгівлю справжніми коштами.",
     "# Спробуйте мережу",
@@ -86,6 +105,8 @@ export const lesson = {
     "https://www.pnas.org/doi/10.1073/pnas.79.8.2554",
     "Нобелівська премія з фізики 2024, пресреліз. Джон Гопфілд разом із Джеффрі Гінтоном.",
     "https://www.nobelprize.org/prizes/physics/2024/press-release/",
+    "Джеффрі Гінтон. Wikipedia.",
+    "https://en.wikipedia.org/wiki/Geoffrey_Hinton",
   ],
   quiz: [
     {
@@ -253,6 +274,48 @@ export const lesson = {
         },
       ],
     },
+    {
+      id: "hop-q5",
+      prompt: "Vad tillförde Geoffrey Hinton efter Hopfield-nätverket, enligt lektionen?",
+      promptEn: "What did Geoffrey Hinton add after the Hopfield network, according to this lesson?",
+      promptUk: "Що Джеффрі Гінтон додав після мережі Гопфілда, згідно з уроком?",
+      explanation:
+        "Boltzmann-maskinen (1985, med Ackley och Sejnowski) har stokastiska neuroner och dolda enheter, så nätet lär sig känna igen och generera mönster i data. Hinton bidrog också till backpropagation (Rumelhart, Hinton, Williams 1986). Ett lärande system kan överanpassa sig till brus, så mönstret ska kontrolleras mot data.",
+      explanationEn:
+        "The Boltzmann machine (1985, with Ackley and Sejnowski) has stochastic neurons and hidden units, so the net learns to recognise and generate patterns in data. Hinton also contributed to backpropagation (Rumelhart, Hinton, Williams 1986). A learning system can overfit to noise, so the pattern should be checked against the data.",
+      explanationUk:
+        "Машина Больцмана (1985, з Еклі та Сейновським) має стохастичні нейрони й приховані одиниці, тож мережа вчиться розпізнавати й породжувати образи в даних. Гінтон також долучився до backpropagation (Rumelhart, Hinton, Williams 1986). Система, що вчиться, може перенавчитися на шум, тож образ треба перевірити за даними.",
+      options: [
+        {
+          id: "a",
+          text: "Boltzmann-maskinen lagrar bara färdiga mönster och har inga dolda enheter",
+          textEn: "The Boltzmann machine only stores finished patterns and has no hidden units",
+          textUk: "Машина Больцмана лише зберігає готові образи і не має прихованих одиниць",
+          correct: false,
+        },
+        {
+          id: "b",
+          text: "Boltzmann-maskinen (1985, med Ackley och Sejnowski) har stokastiska neuroner och dolda enheter, så nätet lär sig känna igen och generera mönster. Hinton bidrog också till backpropagation (1986)",
+          textEn: "The Boltzmann machine (1985, with Ackley and Sejnowski) has stochastic neurons and hidden units, so the net learns to recognise and generate patterns. Hinton also contributed to backpropagation (1986)",
+          textUk: "Машина Больцмана (1985, з Еклі та Сейновським) має стохастичні нейрони й приховані одиниці, тож мережа вчиться розпізнавати й породжувати образи. Гінтон також долучився до backpropagation (1986)",
+          correct: true,
+        },
+        {
+          id: "c",
+          text: "Backpropagation gör att ett mönster i brus inte behöver kontrolleras mot data",
+          textEn: "Backpropagation means a pattern in noise need not be checked against the data",
+          textUk: "Backpropagation означає, що образ у шумі не треба перевіряти за даними",
+          correct: false,
+        },
+        {
+          id: "d",
+          text: "Hinton bytte ut neuronerna mot en lista med färdiga grafnamn",
+          textEn: "Hinton replaced the neurons with a list of finished chart names",
+          textUk: "Гінтон замінив нейрони списком готових назв графіків",
+          correct: false,
+        },
+      ],
+    },
   ],
   relatedLinks: [
     {
@@ -274,6 +337,16 @@ export const lesson = {
       descriptionSv: "Pressmeddelande: John Hopfield tillsammans med Geoffrey Hinton.",
       descriptionEn: "Press release: John Hopfield together with Geoffrey Hinton.",
       descriptionUk: "Пресреліз: Джон Гопфілд разом із Джеффрі Гінтоном.",
+    },
+    {
+      to: "https://en.wikipedia.org/wiki/Geoffrey_Hinton",
+      external: true,
+      labelSv: "Geoffrey Hinton, Wikipedia",
+      labelEn: "Geoffrey Hinton, Wikipedia",
+      labelUk: "Джеффрі Гінтон, Wikipedia",
+      descriptionSv: "Boltzmann-maskinen, backpropagation och Nobelpriset i fysik 2024.",
+      descriptionEn: "The Boltzmann machine, backpropagation and the Nobel Prize in Physics 2024.",
+      descriptionUk: "Машина Больцмана, backpropagation і Нобелівська премія з фізики 2024.",
     },
     {
       to: "/nyheter/2026-09-28/tyst-tid/",

@@ -61,6 +61,7 @@ const CORRECT = [
   "wᵢⱼ är summan över mönster av xᵢ·xⱼ, och diagonalen är 0",
   "En ofullständig eller brusig ledtråd kan hämta hela mönstret",
   "Ungefär 0,14·N mönster ryms. För många blandar minnen. Kontrollera mönstret mot data och regler innan ett beslut",
+  "Boltzmann-maskinen (1985, med Ackley och Sejnowski) har stokastiska neuroner och dolda enheter, så nätet lär sig känna igen och generera mönster. Hinton bidrog också till backpropagation (1986)",
 ];
 
 function assert(cond, msg) {
@@ -117,6 +118,12 @@ try {
   await page.waitForSelector("iframe.hopfield-frame");
   const heading = await page.$eval(".ts-main h3", (el) => el.textContent);
   assert(heading.includes("Minne och mönsterigenkänning"), `lesson heading missing: ${heading}`);
+  const lessonText = await page.$eval(".ts-content", (el) => el.innerText);
+  assert(lessonText.includes("Geoffrey Hinton"), "Hinton section missing");
+  assert(lessonText.includes("Boltzmann-maskinen"), "Boltzmann machine missing");
+  assert(lessonText.indexOf("Hopfield") < lessonText.indexOf("Geoffrey Hinton"), "Hinton section is not after Hopfield");
+  const wiki = await page.$eval('a[href="https://en.wikipedia.org/wiki/Geoffrey_Hinton"]', (el) => el.getAttribute("href"));
+  assert(wiki.includes("Geoffrey_Hinton"), "Wikipedia link missing");
 
   const lastChip = await page.$$eval(".ts-path-chip-label", (els) => els.map((el) => el.textContent));
   assert(lastChip.at(-1).includes("18 · Minne och mönster"), `path does not end with the new lesson: ${lastChip.at(-1)}`);
