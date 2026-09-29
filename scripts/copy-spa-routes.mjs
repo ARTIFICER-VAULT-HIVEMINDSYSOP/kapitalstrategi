@@ -14,7 +14,8 @@
  *
  * Asset URLs in the shell are root-absolute (base "/"). Relative href/src
  * values are rewritten to root-absolute so a copy under a subdirectory still
- * loads /assets, /modell and /nyheter.
+ * loads /assets, /modell and /nyheter. Copies also strip a trailing slash
+ * before the SPA boots, because Pages redirects /route to /route/.
  */
 
 import fs from "node:fs";
@@ -55,6 +56,30 @@ export function absolutizeAssetUrls(html) {
     if (next === value) return full;
     return `${attr}${eq}${quote}${next}${quote}`;
   });
+}
+
+/**
+ * GitHub Pages redirects /tradingskolan to /tradingskolan/ before serving
+ * the directory index. Drop that slash before the SPA boots so the address
+ * bar matches the router path. Same snippet already used by /nyheter.
+ */
+const CANONICAL_PATH_SCRIPT = `    <script>
+      (function () {
+        var path = location.pathname;
+        if (path.length > 1 && path.endsWith("/")) {
+          history.replaceState(null, "", path.replace(/\\/+$/, "") + location.search + location.hash);
+        }
+      })();
+    </script>
+`;
+
+export function withCanonicalPath(html) {
+  if (html.includes("history.replaceState") && html.includes('endsWith("/")')) {
+    return html;
+  }
+  const head = html.match(/<head[^>]*>/);
+  if (!head) return html;
+  return html.replace(head[0], `${head[0]}\n${CANONICAL_PATH_SCRIPT}`);
 }
 
 function bundlePathFromIndex(distDir, indexHtml) {
@@ -118,7 +143,7 @@ export function copySpaRoutes({
     }
   }
 
-  const shell = absolutizeAssetUrls(indexHtml);
+  const shell = withCanonicalPath(absolutizeAssetUrls(indexHtml));
   const written = [];
   for (const route of routes) {
     if (typeof route !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/.test(route)) {

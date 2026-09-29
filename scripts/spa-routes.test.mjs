@@ -79,6 +79,11 @@ test("copy writes a shell per route and leaves unknown paths and 404.html alone"
   const school = fs.readFileSync(path.join(dist, "tradingskolan", "index.html"), "utf8");
   assert.match(school, /src="\/assets\/index-test\.js"/);
   assert.match(school, /id="root"/);
+  assert.match(school, /history\.replaceState/);
+  assert.doesNotMatch(
+    fs.readFileSync(path.join(dist, "index.html"), "utf8"),
+    /history\.replaceState/,
+  );
   assert.equal(fs.readFileSync(path.join(dist, "404.html"), "utf8"), "missing");
   assert.equal(fs.existsSync(path.join(dist, "not-a-route", "index.html")), false);
   assert.equal(
