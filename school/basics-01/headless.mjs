@@ -109,6 +109,7 @@ async function openLesson(lang, lesson) {
       cls: el.className,
       h: Math.round(el.getBoundingClientRect().height),
     }));
+    const caption = document.querySelector(".ts-lesson-media-caption")?.textContent || "";
     const summary = document.querySelector(".ts-summary")?.textContent || "";
     const cardSummary = document.querySelector(".ts-mod-summary")?.textContent || "";
     const headings = [...document.querySelectorAll(".ts-content-heading")].map(el => el.textContent);
@@ -125,7 +126,7 @@ async function openLesson(lang, lesson) {
       }
     }
     summaryEl?.scrollIntoView({ block: "start" });
-    return { videos, iframes, hasOwn: !!own, media, summary, cardSummary, headings: headings.slice(0, 3), topicLine, between };
+    return { videos, iframes, hasOwn: !!own, media, caption, summary, cardSummary, headings: headings.slice(0, 3), topicLine, between };
   })()`);
   await new Promise((r) => setTimeout(r, 200));
   const shot = await send("Page.captureScreenshot", { format: "png" }, sessionId);
@@ -141,9 +142,38 @@ const cases = [
   ["en", "basics-01-samma-sprak"],
   ["uk", "basics-01-samma-sprak"],
   ["sv", "basics-03-ranta-pa-ranta"],
+  ["en", "basics-03-ranta-pa-ranta"],
+  ["sv", "basics-02-webtrader"],
+  ["en", "basics-02-webtrader"],
 ];
 
+const expect = {
+  "sv basics-01-samma-sprak": { iframe: null },
+  "en basics-01-samma-sprak": { iframe: "p7HKvqRI_Bo" },
+  "uk basics-01-samma-sprak": { iframe: null },
+  "sv basics-03-ranta-pa-ranta": { iframe: "MvNGY5UzdF4", caption: "Vad är ränta på ränta-effekten?" },
+  "en basics-03-ranta-pa-ranta": { iframe: "za1Q4ZWRiWg", caption: "8th Wonder" },
+  "sv basics-02-webtrader": { iframe: "oUAhA_BXsNE", caption: "Hävstång och risk" },
+  "en basics-02-webtrader": { iframe: "Tiyystl8x40", caption: "Order types: market, limit and stop" },
+};
+
 const results = [];
-for (const [lang, lesson] of cases) results.push(await openLesson(lang, lesson));
+const problems = [];
+for (const [lang, lesson] of cases) {
+  const row = await openLesson(lang, lesson);
+  results.push(row);
+  const want = expect[`${lang} ${lesson}`];
+  const src = row.iframes[0] || "";
+  if (row.videos.length || row.hasOwn) problems.push(`${lang} ${lesson}: unexpected video element`);
+  if (row.errors.length) problems.push(`${lang} ${lesson}: console ${JSON.stringify(row.errors)}`);
+  if (want.iframe && !src.includes(want.iframe)) problems.push(`${lang} ${lesson}: iframe ${src || "(none)"}`);
+  if (!want.iframe && row.iframes.length) problems.push(`${lang} ${lesson}: unexpected iframe ${src}`);
+  if (want.caption && !row.caption.includes(want.caption)) problems.push(`${lang} ${lesson}: caption ${row.caption}`);
+}
 console.log(JSON.stringify(results, null, 2));
+if (problems.length) {
+  console.error(problems.join("\n"));
+  browser.close();
+  process.exit(1);
+}
 browser.close();

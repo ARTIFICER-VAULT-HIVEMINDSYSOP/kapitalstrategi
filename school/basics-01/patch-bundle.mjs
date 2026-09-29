@@ -146,6 +146,24 @@ once(
 );
 
 once(
+  "compound-sv-clip",
+  "topics:[`Ränta på ränta`,`Tid`,`Återinvestering`,`Video`,`Quiz`],youtubeUrlSv:`https://www.youtube.com/watch?v=za1Q4ZWRiWg`,youtubeTitleSv:`YouTube · Accountant Explains: The 8th Wonder – Compound Interest (engelska)`,youtubeUrlEn:`https://www.youtube.com/watch?v=za1Q4ZWRiWg`",
+  "topics:[`Ränta på ränta`,`Tid`,`Återinvestering`,`Video`,`Quiz`],youtubeUrlSv:`https://www.youtube.com/watch?v=MvNGY5UzdF4`,youtubeTitleSv:`YouTube · Nordnet Academy: Vad är ränta på ränta-effekten?`,youtubeUrlEn:`https://www.youtube.com/watch?v=za1Q4ZWRiWg`",
+);
+
+once(
+  "compound-sv-caption",
+  "`1) Spela videoklippet (engelska – pedagogiskt, ca 5–10 min). 2) Svara på Robbans korta fråga. 3) Läs de korta avsnitten och gör quiz.`,`Klippet: **Accountant Explains: The 8th Wonder – Compound Interest**. Om en egen MP4 också finns kan du se den bredvid.`",
+  "`1) Spela videoklippet (svenska, Nordnet Academy). 2) Svara på Robbans korta fråga. 3) Läs de korta avsnitten och gör quiz.`,`Klippet: **Nordnet Academy: Vad är ränta på ränta-effekten?**. I English-läge visas **Accountant Explains: The 8th Wonder – Compound Interest**. Om en egen MP4 också finns kan du se den bredvid.`",
+);
+
+once(
+  "leverage-clips",
+  "youtubeUrlEn:`https://www.youtube.com/watch?v=Tiyystl8x40`,youtubeTitleEn:`YouTube · Risk basics (optional English clip)`",
+  "youtubeUrlSv:`https://www.youtube.com/watch?v=oUAhA_BXsNE`,youtubeTitleSv:`YouTube · Hävstång och risk`,youtubeUrlEn:`https://www.youtube.com/watch?v=Tiyystl8x40`,youtubeTitleEn:`YouTube · Order types: market, limit and stop`",
+);
+
+once(
   "admin-blurb",
   "[`Ladda upp bild eller MP4, och skapa Grok-voiceover (kräver XAI_API_KEY). Första basic-lektionen (`,(0,X.jsx)(`code`,{className:`mono`,children:`basics-01-samma-sprak`}),`) är avsedd för introduktionsvideo.`]",
   "[`Ladda upp bild eller MP4, och skapa Grok-voiceover (kräver XAI_API_KEY).`]",
@@ -155,7 +173,10 @@ const checks = [
   ["mp4 path gone", !s.includes("basics-01-samma-sprak.mp4")],
   ["static map empty", s.includes("var In={};function Ln(e){return In[e]??null}")],
   ["ted-ed kept", s.includes("https://www.youtube.com/watch?v=p7HKvqRI_Bo")],
-  ["other lesson video kept", s.includes("https://www.youtube.com/watch?v=za1Q4ZWRiWg")],
+  ["compound en kept", s.includes("youtubeUrlEn:`https://www.youtube.com/watch?v=za1Q4ZWRiWg`")],
+  ["compound sv clip", s.includes("youtubeUrlSv:`https://www.youtube.com/watch?v=MvNGY5UzdF4`") && !s.includes("youtubeUrlSv:`https://www.youtube.com/watch?v=za1Q4ZWRiWg`")],
+  ["leverage sv clip", s.includes("youtubeUrlSv:`https://www.youtube.com/watch?v=oUAhA_BXsNE`,youtubeTitleSv:`YouTube · Hävstång och risk`")],
+  ["leverage en kept", s.includes("youtubeUrlEn:`https://www.youtube.com/watch?v=Tiyystl8x40`,youtubeTitleEn:`YouTube · Order types: market, limit and stop`") && !s.includes("Risk basics")],
   ["own mp4 copy gone", !s.includes("vår egen lektionsvideo") && !s.includes("own lesson video (MP4)") && !s.includes("own lesson MP4") && !s.includes("med egen lektionsvideo")],
   ["lesson video topic gone", !s.includes("topics:[`Video`,`Begrepp`") && !s.includes("topicsEn:[`Video`,`Terms`") && !s.includes("topicsUk:[`Відео`,`Терміни`")],
   ["compound video topic kept", s.includes("topics:[`Ränta på ränta`,`Tid`,`Återinvestering`,`Video`,`Quiz`]")],
