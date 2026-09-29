@@ -2,12 +2,17 @@
  * Remove the bundled lesson-01 MP4 from the committed Vite bundle.
  * Run from the repo root: node school/basics-01/patch-bundle.mjs
  *
- * The static map is `var In={…}`. Lesson 01 has no contentUk; Ukrainian
- * falls back to contentEn, so a contentUk body without a clip intro is added.
+ * The static map is `var Rn={…}` in assets/index-h-vLI-Je.js (it was `var In`
+ * in index-CBayL6Go.js). Lesson 01 has no contentUk; Ukrainian falls back to
+ * contentEn, so a contentUk body without a clip intro is added.
+ *
+ * Minified names updated for the a03d57c bundle: Rn/zn (static map),
+ * preferVideo:t.moduleId===Sl, var Sl + function Cl, and hl(fe.module,a)
+ * with the JSX helper J.
  */
 import fs from "node:fs";
 
-const bundlePath = new URL("../../assets/index-CBayL6Go.js", import.meta.url);
+const bundlePath = new URL("../../assets/index-h-vLI-Je.js", import.meta.url);
 let s = fs.readFileSync(bundlePath, "utf8");
 
 function once(label, from, to) {
@@ -23,8 +28,8 @@ function once(label, from, to) {
 
 once(
   "static-media",
-  'var In={"basics-01-samma-sprak":{moduleId:`basics-01-samma-sprak`,url:`/school/videos/basics-01-samma-sprak.mp4`,kind:`video`,mimeType:`video/mp4`,filename:`basics-01-samma-sprak.mp4`}};',
-  "var In={};",
+  'var Rn={"basics-01-samma-sprak":{moduleId:`basics-01-samma-sprak`,url:`/school/videos/basics-01-samma-sprak.mp4`,kind:`video`,mimeType:`video/mp4`,filename:`basics-01-samma-sprak.mp4`}};',
+  "var Rn={};",
 );
 
 once(
@@ -129,20 +134,20 @@ once(
 
 once(
   "admin-flag",
-  "preferVideo:t.moduleId===Gl",
+  "preferVideo:t.moduleId===Sl",
   "preferVideo:!1",
 );
 
 once(
   "admin-gl",
-  "var Gl=`basics-01-samma-sprak`;function Kl(e)",
-  "function Kl(e)",
+  "var Sl=`basics-01-samma-sprak`;function Cl(e)",
+  "function Cl(e)",
 );
 
 once(
   "summary-locale",
-  "(0,X.jsx)(`p`,{className:`ts-summary`,children:ue.module.summary})",
-  "(0,X.jsx)(`p`,{className:`ts-summary`,children:Rl(ue.module,a).summary})",
+  "(0,J.jsx)(`p`,{className:`ts-summary`,children:fe.module.summary})",
+  "(0,J.jsx)(`p`,{className:`ts-summary`,children:hl(fe.module,a).summary})",
 );
 
 once(
@@ -165,13 +170,13 @@ once(
 
 once(
   "admin-blurb",
-  "[`Ladda upp bild eller MP4, och skapa Grok-voiceover (kräver XAI_API_KEY). Första basic-lektionen (`,(0,X.jsx)(`code`,{className:`mono`,children:`basics-01-samma-sprak`}),`) är avsedd för introduktionsvideo.`]",
+  "[`Ladda upp bild eller MP4, och skapa Grok-voiceover (kräver XAI_API_KEY). Första basic-lektionen (`,(0,J.jsx)(`code`,{className:`mono`,children:`basics-01-samma-sprak`}),`) är avsedd för introduktionsvideo.`]",
   "[`Ladda upp bild eller MP4, och skapa Grok-voiceover (kräver XAI_API_KEY).`]",
 );
 
 const checks = [
   ["mp4 path gone", !s.includes("basics-01-samma-sprak.mp4")],
-  ["static map empty", s.includes("var In={};function Ln(e){return In[e]??null}")],
+  ["static map empty", s.includes("var Rn={};function zn(e){return Rn[e]??null}")],
   ["ted-ed kept", s.includes("https://www.youtube.com/watch?v=p7HKvqRI_Bo")],
   ["compound en kept", s.includes("youtubeUrlEn:`https://www.youtube.com/watch?v=za1Q4ZWRiWg`")],
   ["compound sv clip", s.includes("youtubeUrlSv:`https://www.youtube.com/watch?v=MvNGY5UzdF4`") && !s.includes("youtubeUrlSv:`https://www.youtube.com/watch?v=za1Q4ZWRiWg`")],
@@ -180,8 +185,9 @@ const checks = [
   ["own mp4 copy gone", !s.includes("vår egen lektionsvideo") && !s.includes("own lesson video (MP4)") && !s.includes("own lesson MP4") && !s.includes("med egen lektionsvideo")],
   ["lesson video topic gone", !s.includes("topics:[`Video`,`Begrepp`") && !s.includes("topicsEn:[`Video`,`Terms`") && !s.includes("topicsUk:[`Відео`,`Терміни`")],
   ["compound video topic kept", s.includes("topics:[`Ränta på ränta`,`Tid`,`Återinvestering`,`Video`,`Quiz`]")],
-  ["admin flag off", s.includes("preferVideo:!1") && !s.includes("preferVideo:t.moduleId===Gl")],
-  ["summary follows language", s.includes("className:`ts-summary`,children:Rl(ue.module,a).summary}")],
+  ["admin flag off", s.includes("preferVideo:!1") && !s.includes("preferVideo:t.moduleId===Sl")],
+  ["admin blurb", s.includes("Ladda upp bild eller MP4, och skapa Grok-voiceover (kräver XAI_API_KEY).") && !s.includes("är avsedd för introduktionsvideo")],
+  ["summary follows language", s.includes("className:`ts-summary`,children:hl(fe.module,a).summary}")],
   ["nudge compound kept", s.includes("Se lektionsvideon om ränta på ränta")],
 ];
 
