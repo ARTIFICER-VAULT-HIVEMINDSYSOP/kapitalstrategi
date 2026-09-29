@@ -1,0 +1,915 @@
+{
+ "desktop": {
+  "spoke_forsta_varv": {
+   "n": 15,
+   "phase": "won",
+   "prog": 44.25,
+   "lvl": null,
+   "cd": null,
+   "msg": "Nivå klarad – TP nådd (övning).",
+   "end": {
+    "reason": "tp",
+    "r": null,
+    "pct": 6.490259999999992,
+    "candles": 11,
+    "ms": 3750,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "niva_setup": {
+   "targets": {
+    "tpPct": 2,
+    "slPct": 1
+   },
+   "start": 33,
+   "deadline": null,
+   "ghost": false,
+   "shock": null
+  },
+  "niva_spel": {
+   "n": 3,
+   "phase": "ride",
+   "prog": 34.22,
+   "lvl": 1.009638803705147,
+   "cd": null,
+   "msg": "Köp (long) på 219.86. TP 224.26 · SL 217.66.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": null
+  },
+  "niva_margin": {
+   "n": 74,
+   "phase": "ride",
+   "prog": 55.43,
+   "lvl": 0.8437304201188885,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": null,
+   "sideTried": "sell"
+  },
+  "niva_margin_slut": {
+   "n": 2,
+   "phase": "lost",
+   "prog": 56.04,
+   "lvl": null,
+   "cd": null,
+   "msg": "Margin call – positionen tvångsstängd (övning).",
+   "end": {
+    "reason": "margin",
+    "r": null,
+    "pct": -27.2818,
+    "candles": 23,
+    "ms": 19000,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "tid_setup": {
+   "targets": {
+    "tpPct": 1.8,
+    "slPct": 1
+   },
+   "start": 33,
+   "deadline": 63,
+   "ghost": false,
+   "shock": null
+  },
+  "tid_spel": {
+   "n": 3,
+   "phase": "ride",
+   "prog": 34.22,
+   "lvl": 1.009638803705147,
+   "cd": null,
+   "msg": "Köp (long) på 219.86. TP 223.82 · SL 217.66.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": null
+  },
+  "tid_margin": {
+   "n": 74,
+   "phase": "ride",
+   "prog": 55.43,
+   "lvl": 0.8437304201188885,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": null,
+   "sideTried": "sell"
+  },
+  "tid_margin_slut": {
+   "n": 2,
+   "phase": "lost",
+   "prog": 56.04,
+   "lvl": null,
+   "cd": null,
+   "msg": "Margin call – positionen tvångsstängd (övning).",
+   "end": {
+    "reason": "margin",
+    "r": null,
+    "pct": -27.2818,
+    "candles": 23,
+    "ms": 19000,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "budget_setup": {
+   "targets": {
+    "tpPct": 1.8,
+    "slPct": 1
+   },
+   "start": 33,
+   "deadline": null,
+   "ghost": false,
+   "shock": null
+  },
+  "budget_spel": {
+   "n": 3,
+   "phase": "ride",
+   "prog": 34.22,
+   "lvl": 1.009638803705147,
+   "cd": null,
+   "msg": "Köp (long) på 219.86. TP 223.82 · SL 217.66.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": null
+  },
+  "budget_margin": {
+   "n": 74,
+   "phase": "ride",
+   "prog": 55.43,
+   "lvl": 0.8437304201188885,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": null,
+   "sideTried": "sell"
+  },
+  "budget_margin_slut": {
+   "n": 200,
+   "phase": "ride",
+   "prog": 116.06,
+   "lvl": null,
+   "cd": null,
+   "msg": "Stop-loss nådd – positionen stängd kontrollerat (övning). Riskbudget kvar: 2 R.",
+   "end": null,
+   "side": null,
+   "usedR": 1,
+   "shock": null
+  },
+  "stopp_setup": {
+   "targets": {
+    "tpPct": 3.6,
+    "slPct": 1.8
+   },
+   "start": 33,
+   "deadline": null,
+   "ghost": false,
+   "shock": null
+  },
+  "stopp_spel": {
+   "n": 3,
+   "phase": "ride",
+   "prog": 34.22,
+   "lvl": 1.009638803705147,
+   "cd": null,
+   "msg": "Köp (long) på 219.86. TP 227.77 · SL 215.90.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": null
+  },
+  "stopp_margin": {
+   "n": 74,
+   "phase": "ride",
+   "prog": 55.43,
+   "lvl": 0.8437304201188885,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": null,
+   "sideTried": "sell"
+  },
+  "stopp_margin_slut": {
+   "n": 2,
+   "phase": "lost",
+   "prog": 56.04,
+   "lvl": null,
+   "cd": null,
+   "msg": "Stop-loss nådd – positionen stängd kontrollerat (övning).",
+   "end": {
+    "reason": "sl",
+    "r": -1,
+    "pct": -27.2818,
+    "candles": 23,
+    "ms": 19000,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "chock_setup": {
+   "targets": {
+    "tpPct": 3,
+    "slPct": 2
+   },
+   "start": 83,
+   "deadline": 103,
+   "ghost": false,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": false
+   }
+  },
+  "chock_spel": {
+   "n": 10,
+   "phase": "ride",
+   "prog": 87.06,
+   "lvl": 0.9920278790148711,
+   "cd": null,
+   "msg": "Sälj (short) på 218.34. TP 211.79 · SL 222.71.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": false
+   }
+  },
+  "chock_efter": {
+   "n": 10,
+   "phase": "won",
+   "prog": 91.13,
+   "lvl": null,
+   "cd": null,
+   "msg": "Nivå klarad – TP nådd (övning).",
+   "end": {
+    "reason": "tp",
+    "r": 1.8056696365634548,
+    "pct": 7.181440000000006,
+    "candles": 8,
+    "ms": 5000,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": true
+   }
+  },
+  "chock_margin": {
+   "n": 31,
+   "phase": "ride",
+   "prog": 93.61,
+   "lvl": 0.8228364089718079,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": true
+   },
+   "sideTried": "buy"
+  },
+  "chock_margin_slut": {
+   "n": 12,
+   "phase": "lost",
+   "prog": 97.25,
+   "lvl": null,
+   "cd": null,
+   "msg": "Margin call – positionen tvångsstängd (övning).",
+   "end": {
+    "reason": "margin",
+    "r": -0.8083679698573916,
+    "pct": -19.590059999999998,
+    "candles": 14,
+    "ms": 11750,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": true
+   }
+  },
+  "spoke_setup": {
+   "targets": {
+    "tpPct": 2,
+    "slPct": 1
+   },
+   "start": 33,
+   "deadline": null,
+   "ghost": true,
+   "shock": null
+  },
+  "spoke_spel": {
+   "n": 6,
+   "phase": "ride",
+   "prog": 34.82,
+   "lvl": 1.009638803705147,
+   "cd": null,
+   "msg": "Köp (long) på 219.86. TP 224.26 · SL 217.66.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": null
+  },
+  "spoke_margin": {
+   "n": 74,
+   "phase": "ride",
+   "prog": 55.43,
+   "lvl": 0.8437304201188885,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": null,
+   "sideTried": "sell"
+  },
+  "spoke_margin_slut": {
+   "n": 2,
+   "phase": "lost",
+   "prog": 56.04,
+   "lvl": null,
+   "cd": null,
+   "msg": "Margin call – positionen tvångsstängd (övning).",
+   "end": {
+    "reason": "margin",
+    "r": null,
+    "pct": -27.2818,
+    "candles": 23,
+    "ms": 19000,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "niva_vinst": {
+   "n": 25,
+   "phase": "won",
+   "prog": 43.16,
+   "lvl": null,
+   "cd": null,
+   "msg": "Nivå klarad – TP nådd (övning).",
+   "end": {
+    "reason": "tp",
+    "r": 2.256679970678448,
+    "pct": 5.826690000000001,
+    "candles": 10,
+    "ms": 6250,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "niva_sl": {
+   "n": 23,
+   "phase": "lost",
+   "prog": 42.34,
+   "lvl": null,
+   "cd": null,
+   "msg": "Stop-loss nådd – positionen stängd kontrollerat (övning).",
+   "end": {
+    "reason": "sl",
+    "r": -1,
+    "pct": -2.8118999999999894,
+    "candles": 9,
+    "ms": 5750,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "budget_sl": {
+   "n": 23,
+   "phase": "ride",
+   "usedR": 1,
+   "msg": "Stop-loss nådd – positionen stängd kontrollerat (övning). Riskbudget kvar: 2 R."
+  },
+  "niva_margin_lugn": {
+   "n": 74,
+   "phase": "ride",
+   "prog": 55.43,
+   "lvl": 0.8437304201188885,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": null,
+   "calmClass": true,
+   "vignetteAnim": "none"
+  },
+  "tangenter": {
+   "lev_efter_2xUpp": 4,
+   "lev_efter_1": 1,
+   "lev_efter_]_s": 1,
+   "gas_efter_2E": 0.55,
+   "gas_efter_Q": 0.45,
+   "tp_setup_efter_T": {
+    "tpPct": 2.1,
+    "slPct": 1
+   },
+   "efter_D": {
+    "phase": "ride",
+    "side": "long"
+   },
+   "tp_under_rond_T": [
+    224.47706,
+    224.69692
+   ],
+   "paus": true,
+   "dra_tp": [
+    224.69692,
+    226.67519075976097,
+    461.1948083424877
+   ],
+   "efter_A_stangt": {
+    "live": null,
+    "msg": "Positionen stängd manuellt (long). Tryck igen för att öppna andra sidan."
+   }
+  },
+  "ingang_klick_raket": "/traderider/demo/raket/",
+  "errs": []
+ },
+ "mobil": {
+  "spoke_forsta_varv": {
+   "n": 15,
+   "phase": "won",
+   "prog": 44.25,
+   "lvl": null,
+   "cd": null,
+   "msg": "Nivå klarad – TP nådd (övning).",
+   "end": {
+    "reason": "tp",
+    "r": null,
+    "pct": 6.490259999999992,
+    "candles": 11,
+    "ms": 3750,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "niva_setup": {
+   "targets": {
+    "tpPct": 2,
+    "slPct": 1
+   },
+   "start": 33,
+   "deadline": null,
+   "ghost": false,
+   "shock": null
+  },
+  "niva_spel": {
+   "n": 3,
+   "phase": "ride",
+   "prog": 34.22,
+   "lvl": 1.009638803705147,
+   "cd": null,
+   "msg": "Köp (long) på 219.86. TP 224.26 · SL 217.66.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": null
+  },
+  "niva_margin": {
+   "n": 74,
+   "phase": "ride",
+   "prog": 55.43,
+   "lvl": 0.8437304201188885,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": null,
+   "sideTried": "sell"
+  },
+  "niva_margin_slut": {
+   "n": 2,
+   "phase": "lost",
+   "prog": 56.04,
+   "lvl": null,
+   "cd": null,
+   "msg": "Margin call – positionen tvångsstängd (övning).",
+   "end": {
+    "reason": "margin",
+    "r": null,
+    "pct": -27.2818,
+    "candles": 23,
+    "ms": 19000,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "tid_setup": {
+   "targets": {
+    "tpPct": 1.8,
+    "slPct": 1
+   },
+   "start": 33,
+   "deadline": 63,
+   "ghost": false,
+   "shock": null
+  },
+  "tid_spel": {
+   "n": 3,
+   "phase": "ride",
+   "prog": 34.22,
+   "lvl": 1.009638803705147,
+   "cd": null,
+   "msg": "Köp (long) på 219.86. TP 223.82 · SL 217.66.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": null
+  },
+  "tid_margin": {
+   "n": 74,
+   "phase": "ride",
+   "prog": 55.43,
+   "lvl": 0.8437304201188885,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": null,
+   "sideTried": "sell"
+  },
+  "tid_margin_slut": {
+   "n": 2,
+   "phase": "lost",
+   "prog": 56.04,
+   "lvl": null,
+   "cd": null,
+   "msg": "Margin call – positionen tvångsstängd (övning).",
+   "end": {
+    "reason": "margin",
+    "r": null,
+    "pct": -27.2818,
+    "candles": 23,
+    "ms": 19000,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "budget_setup": {
+   "targets": {
+    "tpPct": 1.8,
+    "slPct": 1
+   },
+   "start": 33,
+   "deadline": null,
+   "ghost": false,
+   "shock": null
+  },
+  "budget_spel": {
+   "n": 3,
+   "phase": "ride",
+   "prog": 34.22,
+   "lvl": 1.009638803705147,
+   "cd": null,
+   "msg": "Köp (long) på 219.86. TP 223.82 · SL 217.66.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": null
+  },
+  "budget_margin": {
+   "n": 74,
+   "phase": "ride",
+   "prog": 55.43,
+   "lvl": 0.8437304201188885,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": null,
+   "sideTried": "sell"
+  },
+  "budget_margin_slut": {
+   "n": 200,
+   "phase": "ride",
+   "prog": 116.06,
+   "lvl": null,
+   "cd": null,
+   "msg": "Stop-loss nådd – positionen stängd kontrollerat (övning). Riskbudget kvar: 2 R.",
+   "end": null,
+   "side": null,
+   "usedR": 1,
+   "shock": null
+  },
+  "stopp_setup": {
+   "targets": {
+    "tpPct": 3.6,
+    "slPct": 1.8
+   },
+   "start": 33,
+   "deadline": null,
+   "ghost": false,
+   "shock": null
+  },
+  "stopp_spel": {
+   "n": 3,
+   "phase": "ride",
+   "prog": 34.22,
+   "lvl": 1.009638803705147,
+   "cd": null,
+   "msg": "Köp (long) på 219.86. TP 227.77 · SL 215.90.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": null
+  },
+  "stopp_margin": {
+   "n": 74,
+   "phase": "ride",
+   "prog": 55.43,
+   "lvl": 0.8437304201188885,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": null,
+   "sideTried": "sell"
+  },
+  "stopp_margin_slut": {
+   "n": 2,
+   "phase": "lost",
+   "prog": 56.04,
+   "lvl": null,
+   "cd": null,
+   "msg": "Stop-loss nådd – positionen stängd kontrollerat (övning).",
+   "end": {
+    "reason": "sl",
+    "r": -1,
+    "pct": -27.2818,
+    "candles": 23,
+    "ms": 19000,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "chock_setup": {
+   "targets": {
+    "tpPct": 3,
+    "slPct": 2
+   },
+   "start": 83,
+   "deadline": 103,
+   "ghost": false,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": false
+   }
+  },
+  "chock_spel": {
+   "n": 10,
+   "phase": "ride",
+   "prog": 87.06,
+   "lvl": 0.9920278790148711,
+   "cd": null,
+   "msg": "Sälj (short) på 218.34. TP 211.79 · SL 222.71.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": false
+   }
+  },
+  "chock_efter": {
+   "n": 10,
+   "phase": "won",
+   "prog": 91.13,
+   "lvl": null,
+   "cd": null,
+   "msg": "Nivå klarad – TP nådd (övning).",
+   "end": {
+    "reason": "tp",
+    "r": 1.8056696365634548,
+    "pct": 7.181440000000006,
+    "candles": 8,
+    "ms": 5000,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": true
+   }
+  },
+  "chock_margin": {
+   "n": 31,
+   "phase": "ride",
+   "prog": 93.61,
+   "lvl": 0.8228364089718079,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": true
+   },
+   "sideTried": "buy"
+  },
+  "chock_margin_slut": {
+   "n": 12,
+   "phase": "lost",
+   "prog": 97.25,
+   "lvl": null,
+   "cd": null,
+   "msg": "Margin call – positionen tvångsstängd (övning).",
+   "end": {
+    "reason": "margin",
+    "r": -0.8083679698573916,
+    "pct": -19.590059999999998,
+    "candles": 14,
+    "ms": 11750,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": true
+   }
+  },
+  "spoke_setup": {
+   "targets": {
+    "tpPct": 2,
+    "slPct": 1
+   },
+   "start": 33,
+   "deadline": null,
+   "ghost": true,
+   "shock": null
+  },
+  "spoke_spel": {
+   "n": 6,
+   "phase": "ride",
+   "prog": 34.82,
+   "lvl": 1.009638803705147,
+   "cd": null,
+   "msg": "Köp (long) på 219.86. TP 224.26 · SL 217.66.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": null
+  },
+  "spoke_margin": {
+   "n": 74,
+   "phase": "ride",
+   "prog": 55.43,
+   "lvl": 0.8437304201188885,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": null,
+   "sideTried": "sell"
+  },
+  "spoke_margin_slut": {
+   "n": 2,
+   "phase": "lost",
+   "prog": 56.04,
+   "lvl": null,
+   "cd": null,
+   "msg": "Margin call – positionen tvångsstängd (övning).",
+   "end": {
+    "reason": "margin",
+    "r": null,
+    "pct": -27.2818,
+    "candles": 23,
+    "ms": 19000,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "niva_vinst": {
+   "n": 25,
+   "phase": "won",
+   "prog": 43.16,
+   "lvl": null,
+   "cd": null,
+   "msg": "Nivå klarad – TP nådd (övning).",
+   "end": {
+    "reason": "tp",
+    "r": 2.256679970678448,
+    "pct": 5.826690000000001,
+    "candles": 10,
+    "ms": 6250,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "niva_sl": {
+   "n": 23,
+   "phase": "lost",
+   "prog": 42.34,
+   "lvl": null,
+   "cd": null,
+   "msg": "Stop-loss nådd – positionen stängd kontrollerat (övning).",
+   "end": {
+    "reason": "sl",
+    "r": -1,
+    "pct": -2.8118999999999894,
+    "candles": 9,
+    "ms": 5750,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": null
+  },
+  "budget_sl": {
+   "n": 23,
+   "phase": "ride",
+   "usedR": 1,
+   "msg": "Stop-loss nådd – positionen stängd kontrollerat (övning). Riskbudget kvar: 2 R."
+  },
+  "niva_margin_lugn": {
+   "n": 74,
+   "phase": "ride",
+   "prog": 55.43,
+   "lvl": 0.8437304201188885,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "short",
+   "usedR": 0,
+   "shock": null,
+   "calmClass": true,
+   "vignetteAnim": "none"
+  },
+  "ingang_klick_raket": "/traderider/demo/raket/",
+  "errs": []
+ }
+}
