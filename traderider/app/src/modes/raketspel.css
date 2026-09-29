@@ -1,0 +1,192 @@
+/* Raket-lägen (utkast). Samma teal/neon-tema som klassiska Raket. Blink högst 2 Hz. Mindre rörelse = stadigt rött, ingen skakning. */
+.rs-wrap {
+  position: relative;
+  color: #f4fbff;
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  background: linear-gradient(180deg, #0c3a40 0%, #082c31 45%, #06242a 100%);
+  border-radius: 18px;
+  padding: 16px 18px 20px;
+  overflow: hidden;
+}
+.rs-wrap kbd {
+  display: inline-block; min-width: 1.4em; padding: 0 5px; border-radius: 5px; text-align: center;
+  background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(214, 248, 255, 0.3); font: 600 11px/1.6 "IBM Plex Sans", sans-serif; color: #f4fbff;
+}
+.rs-head h1 { margin: 2px 0 10px; font-size: 34px; line-height: 1.05; font-weight: 800; color: #fff; }
+.rs-head h1 small { font-size: 15px; font-weight: 600; color: #3ce6ff; margin-left: 8px; letter-spacing: 0.04em; }
+.rs-kicker { margin: 0; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #3ce6ff; font-weight: 600; }
+.rs-tabs { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
+.rs-tabs button {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 1px; text-align: left; cursor: pointer;
+  padding: 8px 10px; border-radius: 12px; color: #f4fbff;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(214, 248, 255, 0.22);
+}
+.rs-tabs button strong { font-size: 13px; }
+.rs-tabs button span { font-size: 11px; color: rgba(200, 236, 240, 0.7); }
+.rs-tabs button[aria-pressed="true"] { background: linear-gradient(180deg, #ffbd66, #ff9f3a); color: #10262a; border-color: transparent; }
+.rs-tabs button[aria-pressed="true"] span { color: #3a2a10; }
+.rs-rules { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: rgba(230, 248, 252, 0.85); }
+.rs-rules p { margin: 0; }
+.rs-rules ul { margin: 0; padding-left: 18px; display: flex; flex-wrap: wrap; gap: 0 20px; }
+
+.rs-hud { margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+.rs-stat {
+  padding: 6px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(214, 248, 255, 0.18);
+  display: flex; flex-direction: column; min-width: 0;
+}
+.rs-stat span { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(200, 236, 240, 0.7); }
+.rs-stat strong { font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rs-up strong { color: #3ce6ff; }
+.rs-down strong { color: #ff6b7d; }
+.rs-warn strong { color: #ffc247; }
+.rs-tpc strong { color: #4dff9a; }
+.rs-slc strong { color: #ffc247; }
+
+.rs-gauge { grid-column: span 2; padding: 6px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(214, 248, 255, 0.18); }
+.rs-gauge-head { display: flex; justify-content: space-between; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(200, 236, 240, 0.7); }
+.rs-gauge-head strong { font-size: 14px; letter-spacing: 0; color: #f4fbff; }
+.rs-gauge-track { position: relative; height: 10px; margin: 5px 0 3px; border-radius: 6px; background: linear-gradient(90deg, #ff4d5e 0 40%, #ffc247 40% 68%, #1f6d5a 68%); opacity: 0.9; overflow: hidden; }
+.rs-gauge-fill { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(244, 251, 255, 0.85); mix-blend-mode: overlay; }
+.rs-gauge-track i { position: absolute; top: -2px; bottom: -2px; width: 2px; background: #fff; }
+.rs-gauge-scale { display: flex; justify-content: space-between; font-size: 9px; color: rgba(200, 236, 240, 0.6); }
+.rs-gauge-call .rs-gauge-head strong { color: #ff4d5e; }
+.rs-gauge-warn .rs-gauge-head strong { color: #ffc247; }
+
+.rs-arena { margin-top: 12px; display: grid; grid-template-columns: 112px minmax(0, 1fr) 76px 112px; gap: 12px; align-items: stretch; }
+.rs-edge {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer;
+  border: 0; border-radius: 22px; font-weight: 800; letter-spacing: 0.06em; font-size: 18px; color: #10262a;
+  background: linear-gradient(180deg, #ffbd66, #ff9f3a); box-shadow: 0 8px 26px rgba(255, 159, 58, 0.3);
+}
+.rs-edge-sell { background: linear-gradient(180deg, #ff8a98, #ff5a6e); }
+.rs-edge-buy { background: linear-gradient(180deg, #7ff0ff, #2fd4ee); }
+.rs-edge-arrow { font-size: 30px; line-height: 1; }
+.rs-chart { position: relative; padding: 8px; border-radius: 18px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(214, 248, 255, 0.22); }
+.rs-chart-head { display: flex; justify-content: space-between; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(200, 236, 240, 0.75); padding: 0 4px 6px; }
+.rs-canvas { display: block; width: 100%; height: 480px; border-radius: 12px; background: rgba(4, 26, 30, 0.55); border: 1px solid rgba(60, 230, 255, 0.18); touch-action: none; }
+.rs-msg { position: absolute; left: 18px; right: 18px; bottom: 16px; margin: 0; padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; background: rgba(4, 20, 24, 0.86); border: 1px solid rgba(214, 248, 255, 0.25); z-index: 2; }
+.rs-msg-warn { border-color: #ffc247; color: #ffe2a0; }
+.rs-msg-sl { border-color: #ffc247; color: #ffc247; }
+.rs-msg-tp { border-color: #4dff9a; color: #4dff9a; }
+.rs-msg-margin { border-color: #ff4d5e; color: #ff8a98; }
+
+.rs-gas { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 10px 4px; border-radius: 18px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(214, 248, 255, 0.22); font-size: 12px; text-align: center; }
+.rs-gas label { display: flex; flex-direction: column; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(200, 236, 240, 0.8); }
+.rs-gas label strong { font-size: 16px; color: #ffab4a; letter-spacing: 0; }
+.rs-gas input[type="range"] { writing-mode: vertical-lr; direction: rtl; height: 300px; width: 34px; accent-color: #ffab4a; cursor: pointer; }
+.rs-gas-keys, .rs-gas-note { font-size: 10px; color: rgba(200, 236, 240, 0.7); }
+
+.rs-controls { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; font-size: 13px; }
+.rs-lev { display: flex; align-items: center; gap: 6px; }
+.rs-lev span { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(200, 236, 240, 0.75); margin-right: 4px; }
+.rs-lev button, .rs-chips button, .rs-unit button {
+  cursor: pointer; padding: 6px 11px; border-radius: 999px; font-weight: 700; font-size: 12px; color: #f4fbff;
+  background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(214, 248, 255, 0.28);
+}
+.rs-lev button[aria-pressed="true"], .rs-unit button[aria-pressed="true"] { background: #ffab4a; color: #10262a; border-color: transparent; }
+.rs-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.rs-toggles { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.rs-keys { flex-basis: 100%; margin: 0; color: rgba(230, 248, 252, 0.8); line-height: 1.9; font-size: 12px; }
+
+.rs-setup, .rs-end {
+  position: absolute; z-index: 4; top: 44px; left: 50%; transform: translateX(-50%); width: min(560px, calc(100% - 24px));
+  max-height: calc(100% - 56px); overflow: auto; padding: 16px 18px; border-radius: 16px;
+  background: rgba(6, 30, 34, 0.95); border: 1px solid rgba(214, 248, 255, 0.35); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.rs-setup h3, .rs-end h3 { margin: 0 0 6px; font-size: 19px; }
+.rs-setup-goal { margin: 0 0 10px; font-size: 13px; color: rgba(230, 248, 252, 0.85); }
+.rs-unit { display: flex; gap: 6px; margin-bottom: 10px; }
+.rs-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.rs-field { display: grid; grid-template-columns: 1fr auto; gap: 3px 6px; align-items: center; padding: 8px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.06); }
+.rs-field span { grid-column: 1 / -1; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+.rs-field-tp span { color: #4dff9a; }
+.rs-field-sl span { color: #ffc247; }
+.rs-field input { width: 100%; font: 700 18px "IBM Plex Sans", sans-serif; color: #fff; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(214, 248, 255, 0.3); border-radius: 8px; padding: 4px 8px; }
+.rs-field em { font-style: normal; font-size: 12px; color: rgba(200, 236, 240, 0.7); }
+.rs-check { grid-column: 1 / -1; font-size: 12px; color: rgba(230, 248, 252, 0.85); }
+.rs-preview { width: 100%; margin: 10px 0 6px; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.rs-preview th { text-align: left; font-weight: 600; color: rgba(200, 236, 240, 0.8); padding: 3px 6px 3px 0; }
+.rs-preview td { padding: 3px 6px; }
+.rs-tp { color: #4dff9a; }
+.rs-sl { color: #ffc247; }
+.rs-rulenote { margin: 4px 0; font-size: 11px; color: rgba(200, 236, 240, 0.7); }
+.rs-errs { margin: 6px 0; padding: 8px 10px 8px 26px; border-radius: 10px; background: rgba(255, 194, 71, 0.12); border: 1px solid #ffc247; color: #ffe2a0; font-size: 12px; }
+.rs-ok { margin: 6px 0; font-size: 13px; color: #4dff9a; font-weight: 600; }
+.rs-setup-go { display: flex; gap: 10px; margin-top: 8px; }
+.rs-go { flex: 1; cursor: pointer; padding: 10px 12px; border: 0; border-radius: 999px; font-weight: 800; font-size: 14px; letter-spacing: 0.04em; color: #10262a; }
+.rs-go:disabled { opacity: 0.4; cursor: not-allowed; }
+.rs-go-sell { background: linear-gradient(180deg, #ff8a98, #ff5a6e); }
+.rs-go-buy { background: linear-gradient(180deg, #7ff0ff, #2fd4ee); }
+.rs-end-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 8px 0; }
+.rs-end-note { margin: 6px 0; font-size: 13px; color: rgba(230, 248, 252, 0.85); }
+.rs-end-win { border-color: #4dff9a; box-shadow: 0 0 0 2px rgba(77, 255, 154, 0.35), 0 20px 60px rgba(0, 0, 0, 0.5); }
+.rs-end-win h3 { color: #4dff9a; }
+.rs-end-sl { border-color: #ffc247; }
+.rs-end-sl h3 { color: #ffc247; }
+.rs-end-margin { border-color: #ff4d5e; box-shadow: 0 0 0 2px rgba(255, 77, 94, 0.45), 0 20px 60px rgba(0, 0, 0, 0.5); }
+.rs-end-margin h3 { color: #ff4d5e; }
+
+/* margin call: rött blinkande vinjett 2 Hz (0,5 s-cykel, steg = av/på), skakning, stor nedräkning */
+.rs-vignette {
+  position: absolute; inset: 0; z-index: 6; pointer-events: none; border-radius: 18px;
+  box-shadow: inset 0 0 0 6px #ff2a3d, inset 0 0 120px 40px rgba(255, 30, 50, 0.55);
+  animation: rs-blink 0.5s steps(1, end) infinite;
+}
+@keyframes rs-blink { 0% { opacity: 1; } 50% { opacity: 0.2; } }
+.rs-shake { animation: rs-shake 0.36s linear infinite; }
+@keyframes rs-shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-4px, 1px); }
+  50% { transform: translate(3px, -2px); }
+  75% { transform: translate(-2px, 2px); }
+}
+.rs-alarm {
+  position: absolute; z-index: 5; top: 40px; left: 50%; transform: translateX(-50%); width: min(460px, calc(100% - 24px));
+  text-align: center; padding: 12px 16px; border-radius: 16px; background: rgba(60, 0, 8, 0.9); border: 2px solid #ff2a3d;
+  box-shadow: 0 0 40px rgba(255, 42, 61, 0.6);
+}
+.rs-alarm-title { margin: 0; font-size: 32px; font-weight: 900; letter-spacing: 0.06em; color: #ff4d5e; }
+.rs-alarm-bell { margin: 0; font-size: 16px; font-weight: 800; color: #ffd0d5; letter-spacing: 0.2em; }
+.rs-alarm-count { margin: 2px 0; font-size: 72px; line-height: 1; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; text-shadow: 0 0 20px #ff2a3d; }
+.rs-alarm-text { margin: 4px 0 0; font-size: 13px; color: #ffe4e7; }
+.rs-panic .rs-gauge { border-color: #ff4d5e; }
+
+/* Mindre rörelse: stadigt rött, ingen skakning. Text, nedräkning och ljud finns kvar. */
+.rs-calm .rs-vignette { animation: none; opacity: 1; }
+.rs-calm .rs-shake { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .rs-vignette { animation: none; opacity: 1; }
+  .rs-shake { animation: none; }
+}
+
+@media (max-width: 900px) {
+  .rs-wrap { padding: 12px 10px 16px; border-radius: 14px; }
+  .rs-head h1 { font-size: 24px; }
+  .rs-tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+  .rs-tabs button { padding: 6px 7px; }
+  .rs-tabs button strong { font-size: 12px; }
+  .rs-tabs button span { display: none; }
+  .rs-rules { font-size: 12px; }
+  .rs-rules ul { display: block; }
+  .rs-hud { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+  .rs-stat { padding: 4px 7px; }
+  .rs-stat strong { font-size: 13px; }
+  .rs-gauge { grid-column: 1 / -1; }
+  .rs-arena { grid-template-columns: 1fr 1fr; grid-template-areas: "chart chart" "gas gas" "sell buy"; gap: 8px; }
+  .rs-chart { grid-area: chart; padding: 5px; }
+  .rs-canvas { height: 430px; }
+  .rs-gas { grid-area: gas; flex-direction: row; flex-wrap: wrap; padding: 6px 10px; }
+  .rs-gas input[type="range"] { writing-mode: horizontal-tb; direction: ltr; width: 100%; height: 28px; flex: 1 1 60%; }
+  .rs-gas label { flex-direction: row; gap: 6px; align-items: baseline; }
+  .rs-edge-sell { grid-area: sell; }
+  .rs-edge-buy { grid-area: buy; }
+  .rs-edge { flex-direction: row; min-height: 64px; font-size: 17px; }
+  .rs-edge kbd { display: none; }
+  .rs-fields { grid-template-columns: 1fr; }
+  .rs-setup, .rs-end { top: 30px; padding: 12px; }
+  .rs-end-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rs-alarm-title { font-size: 24px; }
+  .rs-alarm-count { font-size: 56px; }
+  .rs-keys { display: none; }
+}
