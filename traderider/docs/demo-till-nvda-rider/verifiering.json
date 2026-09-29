@@ -1,0 +1,154 @@
+{
+ "redirects": {
+  "dator /traderider/demo/": {
+   "final": "/nvda-rider/",
+   "blocked_assets_loaded": [],
+   "banned_text": []
+  },
+  "dator /traderider/demo/tag/": {
+   "final": "/nvda-rider/",
+   "blocked_assets_loaded": [],
+   "banned_text": []
+  },
+  "dator /traderider/demo/raket/": {
+   "final": "/nvda-rider/",
+   "blocked_assets_loaded": [],
+   "banned_text": []
+  },
+  "dator /traderider/demo/akademin/": {
+   "final": "/nvda-rider/",
+   "blocked_assets_loaded": [],
+   "banned_text": []
+  },
+  "dator /traderider/demo/raket/?lage=klassisk": {
+   "final": "/nvda-rider/",
+   "blocked_assets_loaded": [],
+   "banned_text": []
+  },
+  "dator /traderider/demo": {
+   "final": "/nvda-rider/",
+   "blocked_assets_loaded": [],
+   "banned_text": []
+  },
+  "dator synlig länk på omdirigeringssidan": 1,
+  "mobil /traderider/demo/": {
+   "final": "/nvda-rider/",
+   "blocked_assets_loaded": [],
+   "banned_text": []
+  },
+  "mobil /traderider/demo/tag/": {
+   "final": "/nvda-rider/",
+   "blocked_assets_loaded": [],
+   "banned_text": []
+  },
+  "mobil /traderider/demo/raket/": {
+   "final": "/nvda-rider/",
+   "blocked_assets_loaded": [],
+   "banned_text": []
+  },
+  "mobil /traderider/demo/akademin/": {
+   "final": "/nvda-rider/",
+   "blocked_assets_loaded": [],
+   "banned_text": []
+  },
+  "mobil /traderider/demo/raket/?lage=klassisk": {
+   "final": "/nvda-rider/",
+   "blocked_assets_loaded": [],
+   "banned_text": []
+  },
+  "mobil /traderider/demo": {
+   "final": "/nvda-rider/",
+   "blocked_assets_loaded": [],
+   "banned_text": []
+  },
+  "mobil synlig länk på omdirigeringssidan": 1
+ },
+ "nojs": {
+  "dator /traderider/demo/": "/nvda-rider/",
+  "dator /traderider/demo/tag/": "/nvda-rider/",
+  "dator /traderider/demo/raket/": "/nvda-rider/",
+  "dator /traderider/demo/akademin/": "/nvda-rider/",
+  "mobil /traderider/demo/": "/nvda-rider/",
+  "mobil /traderider/demo/tag/": "/nvda-rider/",
+  "mobil /traderider/demo/raket/": "/nvda-rider/",
+  "mobil /traderider/demo/akademin/": "/nvda-rider/"
+ },
+ "demo_links_per_page": {
+  "dator /": [],
+  "dator /traderider/": [],
+  "dator /traderider": [],
+  "dator /nvda-rider/": [],
+  "dator /om-modellen/": [],
+  "dator /nyheter/": [],
+  "dator /trade-rider": [],
+  "dator /tradingskolan": [],
+  "dator /kapital-och-strategi": [],
+  "dator /synergi": [],
+  "dator /player-value": [],
+  "dator /paper/": [],
+  "dator /school/": [],
+  "dator /kampanjer/": [],
+  "dator /skoldfonden/": [],
+  "dator /modell/": [],
+  "dator /property/": [],
+  "mobil /": [],
+  "mobil /traderider/": [],
+  "mobil /traderider": [],
+  "mobil /nvda-rider/": [],
+  "mobil /om-modellen/": [],
+  "mobil /nyheter/": [],
+  "mobil /trade-rider": [],
+  "mobil /tradingskolan": [],
+  "mobil /kapital-och-strategi": [],
+  "mobil /synergi": [],
+  "mobil /player-value": [],
+  "mobil /paper/": [],
+  "mobil /school/": [],
+  "mobil /kampanjer/": [],
+  "mobil /skoldfonden/": [],
+  "mobil /modell/": [],
+  "mobil /property/": []
+ },
+ "menu_dator": [
+  [
+   "Start",
+   "/",
+   "Startvy med genvägar till alla delar."
+  ],
+  [
+   "Player Value",
+   "/player-value",
+   "Smart spår: onboarding, arvsmål, portfölj – mappat till TradeSkolan."
+  ],
+  [
+   "Tradingskolan",
+   "/tradingskolan",
+   "Smart spår: grund → compound → risk – smartare placeringar steg för steg."
+  ],
+  [
+   "Nyheter",
+   "/nyheter",
+   "Ekonomi och börs: primärkälla, vem som får betalt, grindvakt. Utbildning, inte råd."
+  ],
+  [
+   "Kapital & Strategi",
+   "/kapital-och-strategi",
+   "Ekonomiskt försvar – banker är inte partner till spararen utan kan blockera flöden utanför egen cirkulation; diversifiera och äg din plan."
+  ],
+  [
+   "Modellen",
+   "/om-modellen",
+   "Artificer AI, CaveCore, Sköldfonden och mineralmandat. Information och utbildning, inget erbjudande."
+  ],
+  [
+   "Traderider",
+   "/traderider/",
+   "Traderider: NVDA Rider – övning på historiska NVDA-kurser. Inga riktiga pengar."
+  ],
+  [
+   "Synergi",
+   "/synergi",
+   "Gemensamt kundvärde, bolagens samverkan och högre kundlivstidsvärde i koncernen."
+  ]
+ ]
+}
