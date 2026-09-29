@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0a1628" />
-    <title>Traderider · NVDA Rider, Raket och Akademin · Kapital &amp; Strategi</title>
-    <meta name="description" content="Traderider: tre övningar på riktiga historiska NVDA-kurser – NVDA Rider, Raket och Akademin. Inga riktiga pengar, inget konto." />
+    <title>Traderider · NVDA Rider · Kapital &amp; Strategi</title>
+    <meta name="description" content="Traderider: öva med NVDA Rider på riktiga historiska NVDA-kurser. Inga riktiga pengar, inget konto." />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -36,7 +36,7 @@
       .lead{max-width:48rem;color:var(--text-dim);font-size:1.05rem;margin:0}
       .note{display:flex;gap:.8rem;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:1.1rem 0 1.4rem;padding:.8rem 1rem;border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);color:var(--text-dim)}
       .note a{color:var(--gold-soft);font-weight:700;text-decoration:none;white-space:nowrap}
-      .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+      .grid{display:grid;grid-template-columns:minmax(0,26rem);gap:1rem}
       .mode{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;text-decoration:none;transition:border-color .15s,transform .15s}
       .mode:hover,.mode:focus-visible{border-color:var(--gold);transform:translateY(-2px);outline:none}
       .art{height:150px;display:grid;place-items:center;background:#0c1b30;border-bottom:1px solid var(--border)}
@@ -75,7 +75,7 @@
         <section class="hero">
           <p class="eyebrow">Traderider · övning · historiska NVDA-kurser</p>
           <h1>Traderider</h1>
-          <p class="lead">Tre sätt att öva på samma riktiga historiska NVDA-kurser. Inga riktiga pengar, inget konto och ingen mäklare.
+          <p class="lead">Öva på riktiga historiska NVDA-kurser. Inga riktiga pengar, inget konto och ingen mäklare.
             Alla utfall är simuleringar – övningen kan både gå bra och dåligt, och inget är ett löfte om avkastning.</p>
         </section>
 
@@ -86,46 +86,16 @@
           <a class="mode" href="/nvda-rider/">
             <div class="art cover" role="img" aria-label="NVDA Rider"></div>
             <div class="body">
-              <p class="tag">Läge 1 · åk på rälsen</p>
+              <p class="tag">Övning · åk på rälsen</p>
               <h2>NVDA Rider</h2>
               <p class="d">Kurslinjen är en bana med Bollinger-räls: övre bandet är köp, undre bandet är sälj. Välj sida och håll kursen.</p>
               <p class="keys">Köp ↑ / W · sälj ↓ / S · hävstång [ ] · paus mellanslag</p>
               <span class="cta">Starta NVDA Rider →</span>
             </div>
           </a>
-          <a class="mode" href="/traderider/demo/raket/">
-            <div class="art" aria-hidden="true">
-              <svg width="120" height="120" viewBox="0 0 120 120" fill="none"><path d="M18 108 C40 90 34 70 52 60 S70 40 64 16" stroke="#9aabc0" stroke-opacity=".45" stroke-width="2" stroke-dasharray="4 5"/>
-                <path d="M22 110 C30 80 10 60 30 30" stroke="#ff6b7d" stroke-width="2.5"/><path d="M98 110 C92 80 112 60 92 30" stroke="#3ce6ff" stroke-width="2.5"/>
-                <g transform="translate(60 52) rotate(18)"><path d="M0 -26 C10 -16 10 6 6 16 H-6 C-10 6 -10 -16 0 -26Z" fill="#f4fbff"/><circle cy="-6" r="4.5" fill="#3ce6ff"/>
-                <path d="M-6 10 L-14 20 L-6 17Z M6 10 L14 20 L6 17Z" fill="#3ce6ff"/><path d="M-4 17 L0 30 L4 17Z" fill="#ffab4a"/></g></svg>
-            </div>
-            <div class="body">
-              <p class="tag">Läge 2 · vänd på höjden</p>
-              <h2>Raket</h2>
-              <p class="d">Samma graf, men tiden går uppåt och priset i sidled. Sex körlägen: nå din TP, tidsattack, riskbudget, stoppträning, stort timdrag och spöke. Egen TP och SL, gas för tempo, hävstång för risk – och margin call med larm när marginalen tar slut.</p>
-              <p class="keys">Köp → / D · sälj ← / A · hävstång ↑ ↓ · gas E Q · platt F · paus mellanslag</p>
-              <span class="cta">Starta Raket →</span>
-            </div>
-          </a>
-          <a class="mode" href="/traderider/demo/akademin/">
-            <div class="art" aria-hidden="true">
-              <svg width="120" height="120" viewBox="0 0 120 120" fill="none"><rect x="18" y="30" width="84" height="60" rx="8" stroke="#c4a35a" stroke-opacity=".6" stroke-width="2"/>
-                <g stroke-width="2"><path d="M34 76 V56" stroke="#3ce6ff"/><rect x="31" y="60" width="6" height="10" fill="#3ce6ff"/><path d="M50 72 V48" stroke="#ff6b7d"/><rect x="47" y="52" width="6" height="12" fill="#ff6b7d"/>
-                <path d="M66 66 V42" stroke="#3ce6ff"/><rect x="63" y="46" width="6" height="12" fill="#3ce6ff"/><path d="M82 60 V40" stroke="#3ce6ff"/><rect x="79" y="44" width="6" height="9" fill="#3ce6ff"/></g>
-                <path d="M26 44 H96" stroke="#34d399" stroke-dasharray="4 4" stroke-width="1.5"/><path d="M26 80 H96" stroke="#f87171" stroke-dasharray="4 4" stroke-width="1.5"/></svg>
-            </div>
-            <div class="body">
-              <p class="tag">Läge 3 · guidade lektioner</p>
-              <h2>Akademin</h2>
-              <p class="d">Fyra lektioner på samma graf: risk och positionsstorlek, stop-loss och take-profit, Bollingerband och RSI. XP ges för lärande, aldrig för simulerad vinst.</p>
-              <p class="keys">Paus mellanslag · tempo − / + · spola tillbaka</p>
-              <span class="cta">Starta Akademin →</span>
-            </div>
-          </a>
         </div>
 
-        <p class="more">Alla tre på en sida: <a href="/traderider/demo/">Traderider-översikten</a> · NVDA Rider i sajtens ram: <a href="/trade-rider">Trade Rider</a></p>
+        <p class="more">Fler lägen kommer.</p>
       </main>
 
       <footer>Övning på riktiga historiska NVDA-kurser (timcandles). Inga riktiga pengar, ingen mäklare, inget konto, inga personuppgifter.
