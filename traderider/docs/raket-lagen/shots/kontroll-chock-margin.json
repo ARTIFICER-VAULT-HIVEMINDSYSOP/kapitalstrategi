@@ -1,0 +1,90 @@
+{
+ "desktop": {
+  "margin": {
+   "n": 31,
+   "phase": "ride",
+   "prog": 93.61,
+   "lvl": 0.8228364089718079,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": true
+   }
+  },
+  "slut": {
+   "n": 12,
+   "phase": "lost",
+   "prog": 97.25,
+   "lvl": null,
+   "cd": null,
+   "msg": "Margin call – positionen tvångsstängd (övning).",
+   "end": {
+    "reason": "margin",
+    "r": -0.8083679698573916,
+    "pct": -19.590059999999998,
+    "candles": 14,
+    "ms": 11750,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": true
+   }
+  },
+  "errs": []
+ },
+ "mobil": {
+  "margin": {
+   "n": 31,
+   "phase": "ride",
+   "prog": 93.61,
+   "lvl": 0.8228364089718079,
+   "cd": 3000,
+   "msg": "MARGIN CALL! Marginalen under 85 %. Stäng (F) eller vänd innan nedräkningen tar slut.",
+   "end": null,
+   "side": "long",
+   "usedR": 0,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": true
+   }
+  },
+  "slut": {
+   "n": 12,
+   "phase": "lost",
+   "prog": 97.25,
+   "lvl": null,
+   "cd": null,
+   "msg": "Margin call – positionen tvångsstängd (övning).",
+   "end": {
+    "reason": "margin",
+    "r": -0.8083679698573916,
+    "pct": -19.590059999999998,
+    "candles": 14,
+    "ms": 11750,
+    "beatGhost": null
+   },
+   "side": null,
+   "usedR": 0,
+   "shock": {
+    "index": 91,
+    "pct": -3.5494936872178973,
+    "t": 1789392600,
+    "revealed": true
+   }
+  },
+  "errs": []
+ }
+}

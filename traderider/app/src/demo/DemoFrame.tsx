@@ -79,13 +79,24 @@ export function DemoIntro({ mode, candles }: { mode: ModeId; candles: Candle[] }
   )
 }
 
-export function DemoShell({ mode, candles, children }: { mode?: ModeId; candles: Candle[]; children?: ReactNode }) {
+export function DemoShell({
+  mode,
+  candles,
+  children,
+  intro = true,
+}: {
+  mode?: ModeId
+  candles: Candle[]
+  children?: ReactNode
+  /** false = hoppa över intro/teaser (Raket-lägena startar direkt i spelet). */
+  intro?: boolean
+}) {
   return (
     <div className="td-page">
       <SiteBar here={mode} />
       <Disclaimer />
       <main className="td-wrap">
-        {mode ? <DemoIntro mode={mode} candles={candles} /> : children}
+        {mode && intro ? <DemoIntro mode={mode} candles={candles} /> : mode ? null : children}
         {mode ? children : null}
       </main>
     </div>

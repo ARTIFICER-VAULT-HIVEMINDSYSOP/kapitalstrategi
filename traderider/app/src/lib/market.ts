@@ -210,6 +210,7 @@ function openPosition(
   quote: Quote,
   leverage: number,
   candleTime: number,
+  enforce = true,
 ): OrderResult {
   const px = fillPrice(action, quote)
   const equity = markEquity(book, quote.last)
@@ -250,7 +251,8 @@ function openPosition(
     avgFill: px,
     liquidated: false,
   }
-  next = enforceMaintenance(next, quote, candleTime)
+  // Raket-lägena har egen margin call (nedräkning + tvångsstängning) och stänger av den här direktkontrollen.
+  if (enforce) next = enforceMaintenance(next, quote, candleTime)
   if (next.liquidated) return { book: next, event: 'liquidated' }
   return { book: next, event: long ? 'opened_long' : 'opened_short' }
 }
@@ -259,7 +261,7 @@ function openPosition(
  * BUY opens a long from flat.
  * BUY while short only closes — it does not flip to long.
  */
-export function submitBuy(book: Book, quote: Quote, leverage: number, candleTime: number): OrderResult {
+export function submitBuy(book: Book, quote: Quote, leverage: number, candleTime: number, enforce = true): OrderResult {
   const side = sideOf(book)
   if (side === 'short') {
     return {
@@ -268,14 +270,14 @@ export function submitBuy(book: Book, quote: Quote, leverage: number, candleTime
     }
   }
   if (side === 'long') return { book, event: 'unchanged' }
-  return openPosition(book, 'buy', quote, leverage, candleTime)
+  return openPosition(book, 'buy', quote, leverage, candleTime, enforce)
 }
 
 /**
  * SELL opens a short from flat.
  * SELL while long only closes — it does not flip to short.
  */
-export function submitSell(book: Book, quote: Quote, leverage: number, candleTime: number): OrderResult {
+export function submitSell(book: Book, quote: Quote, leverage: number, candleTime: number, enforce = true): OrderResult {
   const side = sideOf(book)
   if (side === 'long') {
     return {
@@ -284,7 +286,7 @@ export function submitSell(book: Book, quote: Quote, leverage: number, candleTim
     }
   }
   if (side === 'short') return { book, event: 'unchanged' }
-  return openPosition(book, 'sell', quote, leverage, candleTime)
+  return openPosition(book, 'sell', quote, leverage, candleTime, enforce)
 }
 
 export function flattenBook(book: Book, quote: Quote, candleTime: number): OrderResult {

@@ -1,4 +1,5 @@
-/* Adds a full-page link to /modell/ from the app nav and homepage. */
+/* Adds a full-page link to /modell/ from the homepage (teaser card). The nav entry was dropped:
+   the app nav already has «Modellen» (/om-modellen), so the menu showed «Modellen» twice. */
 (function () {
   var HREF = "/modell/";
   var KEY = "ig.app.language";
@@ -108,7 +109,6 @@
     scheduled = false;
     var t = copy[lang()] || copy.sv;
     document.documentElement.setAttribute("data-ks-modell-lang", lang());
-    ensureNav(t);
     ensureTeaser(t);
   }
 
