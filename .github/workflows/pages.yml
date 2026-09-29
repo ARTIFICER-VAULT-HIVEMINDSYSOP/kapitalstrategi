@@ -20,6 +20,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Omit practice app source from the Pages upload
         run: rm -rf traderider/app
+      - name: SPA route shells so known client routes return 200
+        run: node scripts/copy-spa-routes.mjs --dist .
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
