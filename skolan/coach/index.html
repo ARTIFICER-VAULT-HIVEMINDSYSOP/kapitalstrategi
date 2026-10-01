@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a1628" />
+    <meta name="description" content="Fråga Robban Robotsson. Han förklarar lektionerna i Bankernas historia och Marknadens framtid." />
+    <title>Fråga Robban · Tradingskolan</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/skolan/skolan.css" />
+  </head>
+  <body>
+    <a class="skip" href="#innehall">Till innehållet</a>
+    <header class="site-header">
+      <a class="brand" href="/skolan/">
+        <img class="brand-avatar" src="/brand/robban-portrait.png" alt="" width="48" height="48" />
+        <span><strong>Tradingskolan</strong><small>Kapital och Strategi</small></span>
+      </a>
+      <nav class="site-nav" aria-label="Skolsidor">
+        <a href="/skolan/">Start</a>
+        <a href="/skolan/coach/" aria-current="page">Fråga Robban</a>
+        <a href="/skolan/signaler/">Signaler</a>
+        <a href="/skolan/framsteg/">Framsteg</a>
+        <a href="/skolan/studiegrupp/">Studiegrupp</a>
+        <a href="/skolan/signalhistorik/">Signalhistorik</a>
+      </nav>
+    </header>
+    <main id="innehall" class="shell">
+      <div class="hero">
+        <div>
+          <p class="lede">Robban Robotsson · pedagog</p>
+          <h1>Fråga Robban</h1>
+          <p class="lede">Jag förklarar lektionerna i Bankernas historia och Marknadens framtid. Jag ställer en kontrollfråga och pekar på nästa lektion. Först förstå lektionen. Sedan nästa steg.</p>
+        </div>
+        <img src="/brand/robban-wave.png" alt="Robban Robotsson vinkar" width="180" height="180" />
+      </div>
+      <ol class="chat-log" id="chat-log" aria-live="polite">
+        <li class="msg msg-robban">
+          <img src="/brand/robban-portrait.png" alt="" width="36" height="36" />
+          <div>
+            <p class="msg-name">Robban Robotsson</p>
+            <p>Hej! Jag är Robban Robotsson. Fråga mig om en lektion, till exempel Riksbanken 1668 eller e-kronan. Jag svarar från kurskorten.</p>
+          </div>
+        </li>
+      </ol>
+      <div class="chips">
+        <button type="button" data-ask="Riksbanken 1668">Riksbanken 1668</button>
+        <button type="button" data-ask="Delreservsystemet">Delreservsystemet</button>
+        <button type="button" data-ask="E-kronan">E-kronan</button>
+        <button type="button" data-ask="Ställ en kontrollfråga">Ställ en kontrollfråga</button>
+      </div>
+      <form class="coach-form" id="coach-form">
+        <label for="coach-input">Fråga Robban</label>
+        <textarea id="coach-input" name="fraga" rows="3" required placeholder="Skriv om en lektion"></textarea>
+        <button type="submit">Skicka</button>
+      </form>
+      <p class="note">Robban svarar från kurskorten. Han säger inte om du ska köpa eller sälja, och han bedömer inte vad som passar dig.</p>
+    </main>
+    <footer class="site-foot">
+      <p>Det här är utbildning. Det är inte personlig investeringsrådgivning. Efter kursen kan du själv välja att handla med egna pengar hos en mäklare som du väljer. Skolan låser aldrig upp handel med riktiga pengar. <a href="/tradingskolan">Till kursen</a></p>
+    </footer>
+    <script type="module" src="/skolan/coach/coach.js"></script>
+  </body>
+</html>
