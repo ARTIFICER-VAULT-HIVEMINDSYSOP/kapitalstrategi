@@ -7,6 +7,76 @@
   },
   "editions": [
     {
+      "id": "2026-10-01",
+      "date": "2026-10-01",
+      "dateLabel": {
+        "sv": "1 oktober 2026"
+      },
+      "lead": {
+        "sv": "Torsdag 1 oktober — oljan vände upp under förmiddagen och Brent står åter kring 100 dollar fatet, sedan Kina stoppat exporten av raffinerade oljeprodukter. NordAmps fick en tung första dag på First North i går och fortsätter nedåt i dag. Guldet rör sig lite inför fredagens amerikanska jobbrapport. DI:s siffror för Brent, guld, silver, koppar och platina ligger klara."
+      },
+      "signoff": {
+        "sv": "Kapital och Strategi · utbildning och verktyg"
+      },
+      "modules": [
+        {
+          "slug": "ipo",
+          "order": 1,
+          "href": "/nyheter/2026-10-01/ipo/",
+          "title": {
+            "sv": "IPO / nytt på börsen"
+          },
+          "ingress": {
+            "sv": "NordAmps (NRDAMP) — första handelsdag 30 sep (First North)."
+          }
+        },
+        {
+          "slug": "olja",
+          "order": 2,
+          "href": "/nyheter/2026-10-01/olja/",
+          "title": {
+            "sv": "Vad som rör olja"
+          },
+          "ingress": {
+            "sv": "Morgonen började nedåt: DI/Direkt (kl 07:55) skrev att ökade oljeflöden från Mellanöstern dämpade utbudsoron."
+          }
+        },
+        {
+          "slug": "guld",
+          "order": 3,
+          "href": "/nyheter/2026-10-01/guld/",
+          "title": {
+            "sv": "Guld"
+          },
+          "ingress": {
+            "sv": "DI spot (1 okt, visad tid 12:23): 4 162,47 dollar/uns (+0,13 %; −2,60 % på en vecka)."
+          }
+        },
+        {
+          "slug": "ovriga-ravaror",
+          "order": 4,
+          "href": "/nyheter/2026-10-01/ovriga-ravaror/",
+          "title": {
+            "sv": "Övriga råvaror"
+          },
+          "ingress": {
+            "sv": "DI (1 okt): silver spot 60,58 dollar/uns (+0,30 %, 12:23); platina spot 1 712,16 dollar/uns (−0,22 %, 12:23); koppar 14 455 dollar/ton (−0,13 %, 3 mån termin, 18:00)."
+          }
+        },
+        {
+          "slug": "skolan",
+          "order": 5,
+          "href": "/nyheter/2026-10-01/skolan/",
+          "title": {
+            "sv": "Prova först · skolan"
+          },
+          "ingress": {
+            "sv": "Säkerhet först, sedan fart."
+          }
+        }
+      ]
+    },
+    {
       "id": "2026-09-28",
       "date": "2026-09-28",
       "dateLabel": {

@@ -1,0 +1,33 @@
+{
+  "edition": "2026-10-01",
+  "date": "2026-10-01",
+  "dateLabel": {
+    "sv": "1 oktober 2026"
+  },
+  "slug": "olja",
+  "order": 2,
+  "translations": {
+    "sv": {
+      "title": "Vad som rör olja",
+      "ingress": "Morgonen började nedåt: DI/Direkt (kl 07:55) skrev att ökade oljeflöden från Mellanöstern dämpade utbudsoron.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Morgonen började nedåt: DI/Direkt (kl **07:55**) skrev att ökade oljeflöden från Mellanöstern dämpade utbudsoron. Under förmiddagen vände det. Reuters: kinesiska raffinaderier har tills vidare stoppat exporten av oljeprodukter utanför Hongkong och Macao, vilket stramar åt en redan ansträngd bränslemarknad; EFN pekar på att PetroChina ställt in planerade leveranser av bensin och flygbränsle i oktober. Reuters uppger också att USA uppmanat Tyskland och Frankrike att använda sina beredskapslager av diesel. På utbudssidan: Saudiarabien lastar åter från Yanbu vid Röda havet, och Gulfexporten har enligt en bankbedömning som Reuters citerar återhämtat sig till **23,3 miljoner fat per dag** senaste veckan. Novemberkontraktet för Brent löpte ut i går på **103,50 dollar**, med en uppgång på cirka **14 %** i september."
+        },
+        {
+          "type": "p",
+          "text": "Hormuz och diplomatin: Iran har tagit emot USA:s svar på sitt senaste förslag via qatarisk medling; Teherans villkor gäller slut på striderna på alla fronter inklusive Libanon, hävd blockad och frisläppta tillgångar (Anadolu). SVT/TT: enligt AP-källor beordrade USA:s utrikesminister Rubio Irans FN-delegation att lämna USA i förtid. Enligt Anadolu behåller sju OPEC+-länder sina produktionsmål för oktober på septembernivå."
+        },
+        {
+          "type": "p",
+          "text": "DI spot (1 okt, visad tid **12:23**): Brent **100,03 USD/fat** (**+2,24 %**); WTI **91,72** (**+1,58 %**). Reuters (kl **10:29**): Brent decemberkontrakt **100,09 dollar** (**+2,1 %**)."
+        },
+        {
+          "type": "p",
+          "text": "Källor: [DI/Direkt 1 okt: oljan backar på morgonen](https://www.di.se/live/oljepriserna-backar-flodena-nastan-aterstallda/) · [Reuters/MarketScreener 1 okt: Kina stoppar bränsleexport](https://se.marketscreener.com/nyheter/oljepriserna-i-stort-sett-oforandrade-nar-marknaden-utvarderar-fredssamtal-mellan-usa-och-iran-samt-ce785ad3da8ff622) · [EFN 1 okt: oljan över 100 dollar igen](https://efn.se/oljan-over-100-dollar-igen) · [Anadolu 1 okt](https://www.anews.com.tr/economy/2026/10/01/brent-crude-tops-100-per-barrel-again-amid-uncertainty-over-us-iran-talks) · [SVT live Iran/USA](https://www.svt.se/nyheter/utrikes/senaste-nytt-om-iran-och-konflikten-med-usa-och-israel) · [DI råvaror 1 okt](https://www.di.se/ravaror/)"
+        }
+      ]
+    }
+  }
+}
