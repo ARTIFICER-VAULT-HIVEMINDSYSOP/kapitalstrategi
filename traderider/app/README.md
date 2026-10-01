@@ -9,7 +9,7 @@ Pages, served by GitHub Pages:
 - `/traderider/demo/akademin/` lessons
 - `/traderider/demo/raket/` rocket
 
-> **Spärrad variant (tills vidare).** Ägaren har stängt demoramen under `/traderider/demo/` (pixeltåget med konduktörsporträtt, 20-SMA-mittfilen, «Övningskapital (sim.)», «Alla lägen»). Alla fyra ingångarna ovan är nu enkla omdirigeringar till `/nvda-rider/` (`scripts/nvda-rider-redirect.html`). `npm run build:demo` skriver över dem med samma omdirigering efter bygget (`REDIRECTED_TO_NVDA_RIDER` i `vite.demo.config.ts`), och `scripts/check-demo.mjs` fallerar om någon ingång inte är omdirigeringen. Källkoden och de byggda bundlarna ligger kvar men laddas inte av någon sida. Öppna inte ett läge igen utan ägarens uttryckliga ja.
+> **Spärrad demoram (permanent).** Ägaren har stängt demoramen i `src/demo/` för gott. Ingångarna under `/traderider/demo/` är enkla omdirigeringar (`scripts/demo-redirects.json`, mall `scripts/demo-redirect.html`): översikten till `/traderider/`, `tag/` till `/traderider/spel/#nvda-rider`, `raket/` till `/traderider/spel/#raket` och `akademin/` till `/traderider/spel/#akademin`. `npm run build:demo` skriver över ingångarna med omdirigeringarna och tar bort de byggda bundlarna (`DEMO_REDIRECTS` i `vite.demo.config.ts`); `scripts/check-demo.mjs` fallerar om något annat än omdirigeringarna finns kvar i `../demo/` eller om ramens texter dyker upp där. De nya lägena (NVDA Rider, Raket, Akademin) ligger i `/traderider/spel/` och bygger inte på den här appen. Öppna inte demoramen igen. Dokumentationen för den spärrade varianten ligger i `docs/` här (följer inte med till Pages).
 
 The existing `/nvda-rider/` page is unchanged. Trade Rider can keep embedding it.
 

@@ -1,0 +1,460 @@
+{
+ "desktop": {
+  "checks": {
+   "/ laddar (200) utan JS-fel": {
+    "ok": true
+   },
+   "/traderider/ har tre kort: NVDA Rider, Raket, Akademin": {
+    "ok": true,
+    "detail": [
+     "/traderider/spel/#nvda-rider",
+     "/traderider/spel/#raket",
+     "/traderider/spel/#akademin"
+    ]
+   },
+   "/traderider/ utan «Fler lägen kommer.» och utan spärrade ord": {
+    "ok": true,
+    "detail": []
+   },
+   "/traderider/ utan JS-fel": {
+    "ok": true,
+    "detail": []
+   },
+   "NVDA Rider öppnas från kortet (vy line, «NVDA Rider» aktiv)": {
+    "ok": true,
+    "detail": {
+     "view": "line",
+     "pressed": [
+      "NVDA Rider",
+      "1P"
+     ],
+     "url": "http://127.0.0.1:18931/traderider/spel/#nvda-rider"
+    }
+   },
+   "Loket kör framåt (x ökar, lokets +x = plog/skorsten pekar i färdriktningen, vinkel följer rälsen)": {
+    "ok": true,
+    "detail": {
+     "dx": 248.152942654629,
+     "cosAngle": 0.992472826579481,
+     "angleMinusTrack": -0.34225395997185737
+    }
+   },
+   "NVDA Rider utan spärrade ord i sidtexten": {
+    "ok": true,
+    "detail": []
+   },
+   "Helskärmsknappen går in och ur helskärm": {
+    "ok": true,
+    "detail": {
+     "på": {
+      "api": true,
+      "css": false,
+      "label": "Avsluta helskärm (Esc)"
+     },
+     "av": {
+      "api": false,
+      "css": false,
+      "label": "Helskärm"
+     }
+    }
+   },
+   "Växeln byter till Raket (#raket, NVDA Rider pausas)": {
+    "ok": true,
+    "detail": {
+     "view": "raket",
+     "hash": "#raket",
+     "linePaused": true
+    }
+   },
+   "Raket spelar (BUY, positionen rör sig)": {
+    "ok": true,
+    "detail": {
+     "p": 13.083000000000018,
+     "side": "buy",
+     "playing": true,
+     "lev": 1
+    }
+   },
+   "Raket utan spärrade ord i sidtexten": {
+    "ok": true,
+    "detail": []
+   },
+   "Växeln byter till Akademin (#akademin, lektioner och utmärkelser syns)": {
+    "ok": true,
+    "detail": {
+     "view": "akademin",
+     "hash": "#akademin"
+    }
+   },
+   "Akademin utan spärrade/förbjudna ord i sidtexten": {
+    "ok": true,
+    "detail": []
+   },
+   "Akademin kallar belöningen «utmärkelse»": {
+    "ok": true
+   },
+   "Växeln tillbaka till NVDA Rider": {
+    "ok": true
+   },
+   "Spelet (alla tre lägen) utan oväntade JS-fel": {
+    "ok": true,
+    "detail": []
+   },
+   "Direktlänk /traderider/spel/#nvda-rider öppnar rätt läge": {
+    "ok": true,
+    "detail": {
+     "view": "line",
+     "unexpected": []
+    }
+   },
+   "Direktlänk /traderider/spel/#raket öppnar rätt läge": {
+    "ok": true,
+    "detail": {
+     "view": "raket",
+     "unexpected": []
+    }
+   },
+   "Direktlänk /traderider/spel/#akademin öppnar rätt läge": {
+    "ok": true,
+    "detail": {
+     "view": "akademin",
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/ -> /traderider/": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/",
+     "view": null,
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/tag/ -> /traderider/spel/#nvda-rider": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/spel/#nvda-rider",
+     "view": "line",
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/raket/ -> /traderider/spel/#raket": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/spel/#raket",
+     "view": "raket",
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/akademin/ -> /traderider/spel/#akademin": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/spel/#akademin",
+     "view": "akademin",
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "SPA-rutt /tradingskolan renderar (404) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 404,
+     "chars": 5683,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "SPA-rutt /nyheter renderar (200) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 200,
+     "chars": 22353,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "SPA-rutt /player-value renderar (404) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 404,
+     "chars": 615,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "SPA-rutt /om-modellen/ renderar (200) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 200,
+     "chars": 2525,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "/nvda-rider/ (oförändrad) laddar 200 utan oväntade JS-fel": {
+    "ok": true,
+    "detail": {
+     "unexpected": [],
+     "not": "befintligt: /nvda-rider/ frågar /api/auth/get-session (404 på Pages)"
+    }
+   }
+  },
+  "train": {
+   "a": {
+    "x": 2069.649340250422,
+    "y": 904.1404595728405,
+    "a": -0.05753758862930476,
+    "flat": false,
+    "side": "buy",
+    "playing": true
+   },
+   "b": {
+    "x": 2317.802282905051,
+    "y": 857.5585340812407,
+    "a": -0.12277325016190313,
+    "flat": false,
+    "side": "buy",
+    "playing": true
+   },
+   "dx": 248.152942654629,
+   "cosAngle": 0.992472826579481,
+   "angleMinusTrack": -0.34225395997185737,
+   "screen": {
+    "x": 368.6708020353239,
+    "y": 288.16143599479074,
+    "z": 0.9200000008787412
+   }
+  }
+ },
+ "mobil": {
+  "checks": {
+   "/ laddar (200) utan JS-fel": {
+    "ok": true
+   },
+   "/traderider/ har tre kort: NVDA Rider, Raket, Akademin": {
+    "ok": true,
+    "detail": [
+     "/traderider/spel/#nvda-rider",
+     "/traderider/spel/#raket",
+     "/traderider/spel/#akademin"
+    ]
+   },
+   "/traderider/ utan «Fler lägen kommer.» och utan spärrade ord": {
+    "ok": true,
+    "detail": []
+   },
+   "/traderider/ utan JS-fel": {
+    "ok": true,
+    "detail": []
+   },
+   "NVDA Rider öppnas från kortet (vy line, «NVDA Rider» aktiv)": {
+    "ok": true,
+    "detail": {
+     "view": "line",
+     "pressed": [
+      "NVDA Rider",
+      "1P"
+     ],
+     "url": "http://127.0.0.1:18931/traderider/spel/#nvda-rider"
+    }
+   },
+   "Loket kör framåt (x ökar, lokets +x = plog/skorsten pekar i färdriktningen, vinkel följer rälsen)": {
+    "ok": true,
+    "detail": {
+     "dx": 247.9912363367407,
+     "cosAngle": 0.9944121396554995,
+     "angleMinusTrack": -0.3252452799031567
+    }
+   },
+   "NVDA Rider utan spärrade ord i sidtexten": {
+    "ok": true,
+    "detail": []
+   },
+   "Helskärmsknappen går in och ur helskärm": {
+    "ok": true,
+    "detail": {
+     "på": {
+      "api": true,
+      "css": false,
+      "label": "Avsluta helskärm (Esc)"
+     },
+     "av": {
+      "api": false,
+      "css": false,
+      "label": "Helskärm"
+     }
+    }
+   },
+   "Växeln byter till Raket (#raket, NVDA Rider pausas)": {
+    "ok": true,
+    "detail": {
+     "view": "raket",
+     "hash": "#raket",
+     "linePaused": true
+    }
+   },
+   "Raket spelar (BUY, positionen rör sig)": {
+    "ok": true,
+    "detail": {
+     "p": 13.082500000000001,
+     "side": "buy",
+     "playing": true,
+     "lev": 1
+    }
+   },
+   "Raket utan spärrade ord i sidtexten": {
+    "ok": true,
+    "detail": []
+   },
+   "Växeln byter till Akademin (#akademin, lektioner och utmärkelser syns)": {
+    "ok": true,
+    "detail": {
+     "view": "akademin",
+     "hash": "#akademin"
+    }
+   },
+   "Akademin utan spärrade/förbjudna ord i sidtexten": {
+    "ok": true,
+    "detail": []
+   },
+   "Akademin kallar belöningen «utmärkelse»": {
+    "ok": true
+   },
+   "Växeln tillbaka till NVDA Rider": {
+    "ok": true
+   },
+   "Spelet (alla tre lägen) utan oväntade JS-fel": {
+    "ok": true,
+    "detail": []
+   },
+   "Direktlänk /traderider/spel/#nvda-rider öppnar rätt läge": {
+    "ok": true,
+    "detail": {
+     "view": "line",
+     "unexpected": []
+    }
+   },
+   "Direktlänk /traderider/spel/#raket öppnar rätt läge": {
+    "ok": true,
+    "detail": {
+     "view": "raket",
+     "unexpected": []
+    }
+   },
+   "Direktlänk /traderider/spel/#akademin öppnar rätt läge": {
+    "ok": true,
+    "detail": {
+     "view": "akademin",
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/ -> /traderider/": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/",
+     "view": null,
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/tag/ -> /traderider/spel/#nvda-rider": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/spel/#nvda-rider",
+     "view": "line",
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/raket/ -> /traderider/spel/#raket": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/spel/#raket",
+     "view": "raket",
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/akademin/ -> /traderider/spel/#akademin": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/spel/#akademin",
+     "view": "akademin",
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "SPA-rutt /tradingskolan renderar (404) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 404,
+     "chars": 5573,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "SPA-rutt /nyheter renderar (200) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 200,
+     "chars": 22275,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "SPA-rutt /player-value renderar (404) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 404,
+     "chars": 615,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "SPA-rutt /om-modellen/ renderar (200) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 200,
+     "chars": 2525,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "/nvda-rider/ (oförändrad) laddar 200 utan oväntade JS-fel": {
+    "ok": true,
+    "detail": {
+     "unexpected": [],
+     "not": "befintligt: /nvda-rider/ frågar /api/auth/get-session (404 på Pages)"
+    }
+   }
+  },
+  "train": {
+   "a": {
+    "x": 2077.721972291529,
+    "y": 903.5049896628226,
+    "a": -0.06609119870843745,
+    "flat": false,
+    "side": "buy",
+    "playing": true
+   },
+   "b": {
+    "x": 2325.7132086282695,
+    "y": 856.7570559285454,
+    "a": -0.10576457009320246,
+    "flat": false,
+    "side": "buy",
+    "playing": true
+   },
+   "dx": 247.9912363367407,
+   "cosAngle": 0.9944121396554995,
+   "angleMinusTrack": -0.3252452799031567,
+   "screen": {
+    "x": 70.81840369624139,
+    "y": 310.16495606412474,
+    "z": 0.9200000008164865
+   }
+  }
+ }
+}
