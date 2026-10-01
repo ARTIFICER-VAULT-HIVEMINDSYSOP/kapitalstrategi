@@ -9,8 +9,14 @@ VIEWS = {
     'desktop': dict(viewport={'width': 1280, 'height': 800}, device_scale_factor=1),
     'mobil': dict(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True),
 }
-# Kända fel lokalt: NVDA Riders externa API-värd (trycloudflare) svarar inte -> spelet använder den bundlade historiska datan.
+# Kända fel lokalt: sajtens (SPA:ns och /nvda-rider/:s) externa API-värd (trycloudflare) svarar inte.
+# Spelet under /traderider/spel/ får inte fråga någon extern värd alls (kontrolleras separat nedan).
 KNOWN = [re.compile(r'trycloudflare\.com'), re.compile(r'net::ERR_NAME_NOT_RESOLVED')]
+SIM = 'Simulerade kurser – inte verkliga marknadsdata'
+# Påståenden om verkliga kurser som inte får synas i spelet eller på /traderider/
+REALCLAIM = [r'[Hh]istorisk', r'[Rr]iktiga (historiska )?(NVDA-)?kurser', r'äkta historiska', r'real historical', r'live (stock )?chart', r'NVIDIA', r'LiveTrend']
+# Värdar/filer som spelet aldrig får begära
+FORBIDDEN_REQ = re.compile(r'(?i)trycloudflare|yahoo|query[12]\.|alpaca|paper-api|nvda-fallback|/api/nvda|/api/broker')
 BANNED = [r'DemoFrame', r'RiderDesk', r'Övningskapital', r'\$\s?100[,.\s]?000', r'100[\s\u00a0,.]000\s*USD', r'20-SMA',
           r'[Pp]aus\s*·\s*([Mm]ellanslag|Space)', r'[Aa]lla lägen', r'[Hh]ävstång\s*[–−+-]\s*(·|\[|\]|$)', r'[Hh]ävstång[^\n]{0,12}\[\s*\]',
           r'[Kk]onduktör', r'(?<![\wåäö])(Köp|Sälj|Platt|Övre|Undre)(?![\wåäö])', r'Fler lägen kommer', r'[Dd]iplom', r'[Ii]ntyg',
@@ -27,6 +33,9 @@ TRAIN = '''async()=>{const e=window.__trEngine;const s=()=>({x:e.train.x,y:e.tra
 def banned_hits(text):
     return [rx for rx in BANNED if re.search(rx, text, re.M)]
 
+def real_claims(text):
+    return [rx for rx in REALCLAIM if re.search(rx, text, re.M)]
+
 async def run_view(b, name, opt):
     ctx = await b.new_context(**opt)
     pg = await ctx.new_page()
@@ -35,6 +44,14 @@ async def run_view(b, name, opt):
     pg.on('pageerror', lambda e: log['pageerror'].append(str(e)[:300]))
     pg.on('response', lambda r: r.status >= 400 and log['http'].append(f'{r.status} {r.url}'))
     pg.on('requestfailed', lambda r: log['http'].append(f'FAILED {r.url} {r.failure}'))
+    reqs = []
+    pg.on('request', lambda r: reqs.append(r.url))
+    async def sim_label():
+        return await pg.evaluate('''()=>{const e=document.querySelector('.tr-sim');if(!e)return null;const r=e.getBoundingClientRect();
+          const cs=getComputedStyle(e);return {text:e.textContent,x:r.left,y:r.top,w:r.width,h:r.height,vis:cs.display!=='none'&&cs.visibility!=='hidden'&&+cs.opacity>0,
+          inView:r.left>=0&&r.top>=0&&r.right<=innerWidth&&r.bottom<=innerHeight}}''')
+    def label_ok(lb):
+        return bool(lb) and lb['text'] == SIM and lb['vis'] and lb['inView'] and lb['w'] > 100
     res = {'checks': {}, 'pages': {}}
     def ok(key, cond, detail=None):
         res['checks'][key] = {'ok': bool(cond), **({'detail': detail} if detail is not None else {})}
@@ -77,6 +94,8 @@ async def run_view(b, name, opt):
     ok('/traderider/ har tre kort: NVDA Rider, Raket, Akademin', hrefs == ['/traderider/spel/#nvda-rider', '/traderider/spel/#raket', '/traderider/spel/#akademin'], hrefs)
     ok('/traderider/ utan «Fler lägen kommer.» och utan spärrade ord', not banned_hits(t), banned_hits(t))
     ok('/traderider/ utan JS-fel', not unexpected(n0), unexpected(n0))
+    ok('/traderider/ visar «Simulerade kurser – inte verkliga marknadsdata» och påstår inga verkliga kurser', SIM in t and not real_claims(t), real_claims(t))
+    r0 = len(reqs)
     await pg.screenshot(path=S('01-traderider'), type='jpeg', quality=85, full_page=False)
     await pg.screenshot(path=S('01-traderider-helsida'), type='jpeg', quality=80, full_page=True)
 
@@ -110,6 +129,9 @@ async def run_view(b, name, opt):
     t = await page_text()
     res['pages']['nvda-rider'] = {'unexpected': unexpected(n0), 'banned': banned_hits(t)}
     ok('NVDA Rider utan spärrade ord i sidtexten', not banned_hits(t), banned_hits(t))
+    lb = await sim_label()
+    ok('NVDA Rider visar etiketten «Simulerade kurser – inte verkliga marknadsdata»', label_ok(lb), lb)
+    ok('NVDA Rider påstår inga verkliga kurser (historisk/NVIDIA/live)', not real_claims(t), real_claims(t))
 
     # 4. Helskärm
     await pg.click('.tr-skal button.tr-fs')
@@ -134,6 +156,8 @@ async def run_view(b, name, opt):
     t = await page_text()
     res['pages']['raket'] = {'banned': banned_hits(t), 'state': rk}
     ok('Raket utan spärrade ord i sidtexten', not banned_hits(t), banned_hits(t))
+    lb = await sim_label()
+    ok('Raket visar etiketten «Simulerade kurser – inte verkliga marknadsdata»', label_ok(lb) and not real_claims(t), {'label': lb, 'claims': real_claims(t)})
 
     # 6. Akademin via växeln
     await pg.get_by_role('button', name='Akademin', exact=True).click()
@@ -149,6 +173,8 @@ async def run_view(b, name, opt):
     res['pages']['akademin'] = {'banned': banned_hits(t)}
     ok('Akademin utan spärrade/förbjudna ord i sidtexten', not banned_hits(t), banned_hits(t))
     ok('Akademin kallar belöningen «utmärkelse»', 'utmärkelse' in t.lower())
+    lb = await sim_label()
+    ok('Akademin visar etiketten «Simulerade kurser – inte verkliga marknadsdata»', label_ok(lb) and not real_claims(t), {'label': lb, 'claims': real_claims(t)})
 
     # 7. Tillbaka till NVDA Rider via växeln
     await pg.get_by_role('button', name='NVDA Rider', exact=True).click()
@@ -156,6 +182,12 @@ async def run_view(b, name, opt):
     ok('Växeln tillbaka till NVDA Rider', await pg.evaluate('()=>window.__nvdaLineRsi.view()') == 'line')
     res['pages']['spel-alla-lagen'] = {'unexpected': unexpected(n0)}
     ok('Spelet (alla tre lägen) utan oväntade JS-fel', not unexpected(n0), unexpected(n0))
+    spel_reqs = reqs[r0:]
+    bad_req = [u for u in spel_reqs if FORBIDDEN_REQ.search(u)]
+    ext = sorted({u.split('/')[2] for u in spel_reqs if u.startswith('http') and not u.startswith(BASE)} - {'fonts.googleapis.com', 'fonts.gstatic.com'})  # bara typsnitt utifrån
+    res['spel_requests'] = {'antal': len(spel_reqs), 'forbjudna': bad_req, 'externa_vardar': ext}
+    ok('Spelet laddar bara simulerade kurser: simulerad-kurs.json hämtas, ingen extern kurs-API, ingen mäklar-API, ingen fil med verkliga kurser, ingen extern värd utom typsnitt',
+       any(u.endswith('/traderider/spel/data/simulerad-kurs.json') for u in spel_reqs) and not bad_req and not ext, res['spel_requests'])
 
     # 8. Direktlänkar med hash
     for h, v in [('#nvda-rider', 'line'), ('#raket', 'raket'), ('#akademin', 'akademin')]:

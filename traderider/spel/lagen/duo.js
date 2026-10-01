@@ -1,10 +1,11 @@
 /**
  * NVDA Line 2P (delad skärm, tillval). Två instanser av NVDA Lines EGEN motor (samma klass, samma ritning av
- * tåget, samma räls) på samma NVDA-data och samma period. Varje halva har egen position, hävstång och eget
+ * tåget, samma räls) på samma simulerade kurser och samma period. Varje halva har egen position, hävstång och eget
  * simulerat resultat (motorns befintliga P&L-logik). Spelare 1: WASD + mellanslag, spelare 2: pilar + 0; P/R gäller båda.
  * Vänster/höger på bred skärm, över/under på smal. Inget ändras i 1P-läget.
  */
 import { keyAction, PREVENT_DEFAULT, HINTS } from './keys.js'
+import { simTid } from './simtid.js'
 
 const css = `
 .nlr-duo{position:fixed;inset:0;z-index:45;display:none;background:#f3ede2;font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:#1c1915}
@@ -48,7 +49,7 @@ function fmtPrice(v) {
   return Number.isFinite(v) && v > 0 ? `$${v.toFixed(2)}` : '—'
 }
 function periodName(k) {
-  return { live: 'Live', '5d': '5D', '1mo': '1M', '6mo': '6M', '1y': '1Y', '5y': '5Y', max: 'Max' }[k] ?? k
+  return { live: '1D', '5d': '5D', '1mo': '1M', '6mo': '6M', '1y': '1Y', '5y': '5Y', max: 'Max' }[k] ?? k
 }
 
 export function createDuo({ engine: main, skinFrom }) {
@@ -197,7 +198,7 @@ export function createDuo({ engine: main, skinFrom }) {
     q('levDown').disabled = h.leverage <= 1
     q('levUp').disabled = h.leverage >= 10
     q('play').textContent = h.playing ? '❚❚' : '▶'
-    const d = h.date ? new Date(h.date * 1000).toLocaleDateString('sv-SE', { month: 'short', year: 'numeric' }) : ''
+    const d = h.date ? simTid(h.date, h.rangeKey) : ''
     q('info').innerHTML = `<b>${pos}</b> · ${fmtPrice(h.price)} · ${periodName(h.rangeKey)}${d ? ` · ${d}` : ''}`
     q('buy').className = BTN + (!h.flat && h.side === 'buy' ? ON_BUY : OFF_BUY)
     q('sell').className = BTN + (!h.flat && h.side === 'sell' ? ON_SELL : OFF)

@@ -1,12 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Blotter } from './Blotter'
-import { BrokerPanel } from './BrokerPanel'
 import { drawRide } from '../lib/drawRide'
-import {
-  loadBrokerSession,
-  shouldRelayToBroker,
-  type RelayKind,
-} from '../lib/brokerSession'
 import '../lib/controlsApi'
 import {
   commandBuy,
@@ -31,8 +25,6 @@ type DeskProps = {
   source: NvdaSource
   label: string
   autoRun?: boolean
-  /** Server desk can talk to `/api/broker`. Static GitHub Pages builds pass false. */
-  brokerEnabled?: boolean
 }
 
 function measure(canvas: HTMLCanvasElement | null, state: DeskState): DeskState {
@@ -44,7 +36,7 @@ function measure(canvas: HTMLCanvasElement | null, state: DeskState): DeskState 
   return { ...state, viewport: { width, height } }
 }
 
-export function Desk({ candles, source, label, autoRun = true, brokerEnabled = true }: DeskProps) {
+export function Desk({ candles, source, label, autoRun = true }: DeskProps) {
   const [snap, setSnap] = useState(() => createDesk(candles))
   const stateRef = useRef(snap)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -59,70 +51,21 @@ export function Desk({ candles, source, label, autoRun = true, brokerEnabled = t
   }
   applyRef.current = apply
 
-  async function relay(action: 'buy' | 'sell', qty: number, kind: RelayKind) {
-    if (!brokerEnabled) return
-    const session = loadBrokerSession(window.sessionStorage)
-    if (!session) return
-    if (!shouldRelayToBroker({ kind, env: session.env, liveAcknowledged: session.liveAcknowledged })) return
-    if (!Number.isInteger(qty) || qty < 1) return
-    try {
-      const res = await fetch('/api/broker', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          env: session.env,
-          keyId: session.keyId,
-          secret: session.secret,
-          liveAck: session.liveAcknowledged,
-          action: 'order',
-          order: { symbol: 'NVDA', side: action, qty, type: 'market' },
-        }),
-      })
-      const data = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null
-      if (!mounted.current) return
-      const status = data?.ok
-        ? `Broker ${session.env} accepted ${action} ${qty} NVDA market.`
-        : `Broker rejected (${data?.error ?? 'error'}). Local book was still updated.`
-      stateRef.current = { ...stateRef.current, status }
-      setSnap(stateRef.current)
-    } catch {
-      if (!mounted.current) return
-      stateRef.current = {
-        ...stateRef.current,
-        status: 'Broker unreachable. Local book was still updated.',
-      }
-      setSnap(stateRef.current)
-    }
-  }
-
   function run(cmd: Command) {
-    const before = stateRef.current.book.fills.length
     if (cmd === 'buy') apply(commandBuy)
     else if (cmd === 'sell') apply(commandSell)
     else if (cmd === 'flat') apply(commandFlatten)
     else if (cmd === 'lev_down') apply((state) => setDeskLeverage(state, state.leverage - 1))
     else if (cmd === 'lev_up') apply((state) => setDeskLeverage(state, state.leverage + 1))
     else apply(togglePause)
-
-    if (cmd === 'pause' || cmd === 'lev_down' || cmd === 'lev_up') return
-    const fills = stateRef.current.book.fills
-    if (fills.length === before) return
-    const fill = fills[fills.length - 1]
-    if (!fill || fill.note === 'rejected' || fill.note === 'liquidation') return
-    const kind: RelayKind = fill.reason === 'flatten' ? 'user_flatten' : 'user_order'
-    void relay(fill.action, fill.qty, kind)
+    // Bara lokal övning: ingen order lämnar webbläsaren (ingen mäklare, inga nycklar).
   }
   runRef.current = run
 
   function onReset() {
-    const session = brokerEnabled ? loadBrokerSession(window.sessionStorage) : null
-    const env = session?.env ?? 'off'
     const fresh = createDesk(candles)
     fresh.viewport = stateRef.current.viewport
-    fresh.status =
-      env === 'live'
-        ? 'Local book reset. Live broker position was not flattened.'
-        : 'Local book reset. Flat on the 20-SMA.'
+    fresh.status = 'Local book reset. Flat on the 20-SMA.'
     stateRef.current = fresh
     setSnap(fresh)
     drawRide(canvasRef.current, fresh)
@@ -254,16 +197,12 @@ export function Desk({ candles, source, label, autoRun = true, brokerEnabled = t
         </section>
         <aside className="flex min-w-0 flex-col gap-3">
           <Blotter state={snap} onReset={onReset} />
-          {brokerEnabled ? (
-            <BrokerPanel />
-          ) : (
-            <section className="armor-panel px-3 py-3">
-              <h2 className="font-display text-2xl leading-none">Paper book</h2>
-              <p className="mt-2 text-sm leading-snug">
-                Static paper book. Broker is off. Orders stay in this browser and are not sent to Alpaca.
-              </p>
-            </section>
-          )}
+          <section className="armor-panel px-3 py-3">
+            <h2 className="font-display text-2xl leading-none">Practice book</h2>
+            <p className="mt-2 text-sm leading-snug">
+              Local practice only. No broker, no keys, no orders leave this browser.
+            </p>
+          </section>
         </aside>
       </main>
     </div>

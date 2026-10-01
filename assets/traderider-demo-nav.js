@@ -1,8 +1,8 @@
 (function () {
   var titles = {
-    sv: 'Traderider: NVDA Rider, Raket och Akademin – övning på historiska NVDA-kurser. Inga riktiga pengar.',
-    en: 'Traderider: NVDA Rider, Raket and Akademin – practice on historical NVDA prices. No real money.',
-    uk: 'Traderider: NVDA Rider, Raket і Akademin – тренування на історичних курсах NVDA. Без справжніх грошей.',
+    sv: 'Traderider: NVDA Rider, Raket och Akademin – övning på simulerade kurser, inte verkliga marknadsdata. Inga riktiga pengar.',
+    en: 'Traderider: NVDA Rider, Raket and Akademin – practice on simulated prices, not real market data. No real money.',
+    uk: 'Traderider: NVDA Rider, Raket і Akademin – тренування на симульованих курсах, не реальні ринкові дані. Без справжніх грошей.',
   }
   function lang() {
     try {

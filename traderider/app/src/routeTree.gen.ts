@@ -10,17 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiBrokerRouteImport } from './routes/api/broker'
 import { Route as ApiNvdaRouteImport } from './routes/api/nvda'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiBrokerRoute = ApiBrokerRouteImport.update({
-  id: '/api/broker',
-  path: '/api/broker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiNvdaRoute = ApiNvdaRouteImport.update({
@@ -31,31 +25,27 @@ const ApiNvdaRoute = ApiNvdaRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/api/broker': typeof ApiBrokerRoute
   '/api/nvda': typeof ApiNvdaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/api/broker': typeof ApiBrokerRoute
   '/api/nvda': typeof ApiNvdaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/api/broker': typeof ApiBrokerRoute
   '/api/nvda': typeof ApiNvdaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/broker' | '/api/nvda'
+  fullPaths: '/' | '/api/nvda'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/broker' | '/api/nvda'
-  id: '__root__' | '/' | '/api/broker' | '/api/nvda'
+  to: '/' | '/api/nvda'
+  id: '__root__' | '/' | '/api/nvda'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ApiBrokerRoute: typeof ApiBrokerRoute
   ApiNvdaRoute: typeof ApiNvdaRoute
 }
 
@@ -66,13 +56,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/broker': {
-      id: '/api/broker'
-      path: '/api/broker'
-      fullPath: '/api/broker'
-      preLoaderRoute: typeof ApiBrokerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/nvda': {
@@ -87,7 +70,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ApiBrokerRoute: ApiBrokerRoute,
   ApiNvdaRoute: ApiNvdaRoute,
 }
 export const routeTree = rootRouteImport

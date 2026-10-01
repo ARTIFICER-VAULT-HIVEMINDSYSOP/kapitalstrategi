@@ -8,6 +8,7 @@
 import * as A from './akademin-logic.js'
 import { rsiAtPoints } from './rsi.js'
 import { isTypingTarget } from './keys.js'
+import { simTid } from './simtid.js'
 
 const PAPER = '#f3ede2'
 const INK = '#1c1915'
@@ -303,7 +304,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     }
     root.innerHTML = `<div class="nlr-ak-in">
       <aside>
-        <div class="nlr-ak-card sk"><span class="kick">NVDA Rider</span><h1>Akademin</h1><p class="muted">Guidade lektioner på samma NVDA-data som NVDA Rider.</p></div>
+        <div class="nlr-ak-card sk"><span class="kick">NVDA Rider</span><h1>Akademin</h1><p class="muted">Guidade lektioner på samma simulerade kurser som NVDA Rider.</p></div>
         <div class="nlr-ak-card sk nlr-ak-xp"><div class="row"><b>Nivå ${lv.level}</b><span>${xp} / ${A.XP_MAX} XP</span></div><div class="nlr-ak-bar"><i style="width:${lvPct}%"></i></div><p class="muted">XP ges bara för lärande — läsa, sätta risk, stopp och mål, markera band och RSI. Aldrig för simulerad vinst.</p></div>
         <ol class="nlr-ak-lessons">${[1, 2, 3, 4].map((l) => {
           const open = A.lessonUnlocked(l, prog.earned)
@@ -313,7 +314,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
         <div class="nlr-ak-card sk" data-k="awards"><div class="row" style="display:flex;justify-content:space-between"><h3>Dina utmärkelser</h3><span class="muted">${unlocked.size} / ${A.AWARDS.length}</span></div>
           <div class="nlr-ak-aw">${A.AWARDS.map((a) => `<figure class="${unlocked.has(a.id) ? '' : 'locked'}" title="${unlocked.has(a.id) ? a.learned : 'Inte upplåst än'}" data-award="${a.id}">${medalSvg(a, 'o' + a.id)}<figcaption>${a.title}</figcaption></figure>`).join('')}</div>
           <p class="muted">Sparas bara i den här webbläsaren (localStorage), utan inloggning. ${A.AWARD_NOTE}</p></div>
-        <p class="muted">Adaptiva övningsverktyg i Tradingskolan — inte en officiell licens, certifiering eller behörighet. Riktiga historiska priser och simulerade utfall: en affär kan ge vinst men lika gärna förlust, och här finns inget löfte om avkastning och ingen rådgivning.</p>
+        <p class="muted">Adaptiva övningsverktyg i Tradingskolan — inte en officiell licens, certifiering eller behörighet. Simulerade kurser (inte verkliga marknadsdata) och simulerade utfall: en affär kan ge vinst men lika gärna förlust, och här finns inget löfte om avkastning och ingen rådgivning.</p>
       </aside>
       <main>
         <section class="nlr-ak-card sk"><div style="display:flex;justify-content:space-between;align-items:center"><span class="kick">Lektion ${lesson} av 4</span><span class="muted">${[1, 2, 3, 4].map((l) => (A.lessonDone(l, prog.earned) ? '●' : l === lesson ? '◉' : '○')).join(' ')}</span></div>
@@ -414,8 +415,8 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     const q = (k) => root.querySelector(`[data-k="${k}"]`)
     if (!q('chartHead')) return
     const r = rsi[idx()]
-    const d = pt ? new Date(pt.t * 1000).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'
-    q('chartHead').innerHTML = `NVDA · historiska kurser · ${d}`
+    const d = pt ? simTid(pt.t, engine.spec?.key) : '—'
+    q('chartHead').innerHTML = `NVDA Rider · simulerade kurser · ${d}`
     q('chartFacts').innerHTML = `Kurs <b>${fmtP(pt?.price)}</b> · RSI <b>${r == null ? '—' : fmt1(r)}</b> · %B <b>${pt ? fmt2(A.percentB(pt.price, pt)) : '—'}</b>`
     q('playTxt').textContent = playing ? 'Paus' : 'Kör'
     q('tempoTxt').textContent = `Tempo ${tempo}× · ${playing ? 'spelas' : 'pausad'}${p >= pts.length - 1 ? ' · serien slut' : ''}`
@@ -631,7 +632,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
               ? 'Stop-loss träffades — förlusten stannade där du bestämt i förväg. Det är processen som ger XP.'
               : nx.closed.reason === 'target'
                 ? 'Take-profit träffades enligt plan. XP ges för att du följde processen, inte för utfallet.'
-                : 'Den historiska serien tog slut; affären stängdes på sista kursen.'
+                : 'Den simulerade serien tog slut; affären stängdes på sista kursen.'
             build()
           }
         }

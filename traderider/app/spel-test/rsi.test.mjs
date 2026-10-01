@@ -56,8 +56,8 @@ test('rsiAtPoints läser av via tidsstämpel, okänd punkt = null', () => {
   assert.deepEqual(rsiAtPoints(candles, pts), [null, 100, null])
 })
 
-test('riktiga NVDA-data i bundeln: alla perioder ger RSI inom 0–100', () => {
-  const data = JSON.parse(readFileSync(new URL('../../spel/data/nvda-fallback.json', import.meta.url), 'utf8'))
+test('den simulerade serien i bundeln: alla perioder ger RSI inom 0–100', () => {
+  const data = JSON.parse(readFileSync(new URL('../../spel/data/simulerad-kurs.json', import.meta.url), 'utf8'))
   for (const [key, series] of Object.entries(data)) {
     const r = rsi(series.candles.map((c) => c.c))
     const vals = r.filter((v) => v !== null)

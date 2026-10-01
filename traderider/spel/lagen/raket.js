@@ -1,6 +1,6 @@
 /**
  * Raket (ny, egen vy för NVDA Line – ingen kod eller grafik från andra Raket-/tågvarianter).
- * Samma riktiga NVDA-data och samma Bollinger-räls som NVDA Line (motorns track.points för vald period),
+ * Samma simulerade kurser och samma Bollinger-räls som NVDA Line (motorns track.points för vald period),
  * vriden på höjden: tiden går uppåt, högre pris åt höger. Grön BUY-räls till höger (övre bandet),
  * röd SELL-räls till vänster (undre bandet), streckad mittlinje. Raketen åker på vald sidas räls, nosen framåt;
  * flat (ingen position) = lugnt längs mittlinjen.
@@ -14,6 +14,7 @@
  * prefers-reduced-motion: ingen parallax, inga partiklar, statiska stjärnor och scanlines, ingen glitch.
  */
 import { keyAction, PREVENT_DEFAULT, HINTS } from './keys.js'
+import { simTid, SIM_ETIKETT } from './simtid.js'
 
 // HUD-palett (kontrast mot BG_PANEL kontrolleras i test/raket-stil.test.mjs – WCAG AA)
 const BG_TOP = '#0d1238' // djupt marinblå
@@ -150,13 +151,10 @@ function fmtPct(v) {
 }
 function fmtDate(t, key) {
   if (!Number.isFinite(t)) return '—'
-  const d = new Date(t * 1000)
-  if (key === 'live' || key === '5d') return d.toLocaleString('sv-SE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-  if (key === '1mo' || key === '6mo') return d.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short', year: 'numeric' })
-  return d.toLocaleDateString('sv-SE', { month: 'short', year: 'numeric' })
+  return simTid(t, key)
 }
 function periodName(k) {
-  return { live: 'Live', '5d': '5D', '1mo': '1M', '6mo': '6M', '1y': '1Y', '5y': '5Y', max: 'Max' }[k] ?? k
+  return { live: '1D', '5d': '5D', '1mo': '1M', '6mo': '6M', '1y': '1Y', '5y': '5Y', max: 'Max' }[k] ?? k
 }
 
 /* ---------- ren logik (testbar utan DOM) ---------- */
@@ -290,8 +288,8 @@ export function createRaket({ engine }) {
     <canvas aria-label="Raket: tiden går uppåt, högre pris åt höger. Grön BUY-räls till höger, röd SELL-räls till vänster, flat längs mittlinjen."></canvas>
     <div class="nlr-rk-scan" aria-hidden="true"></div>
     <div class="nlr-rk-div"></div>
-    <div class="nlr-rk-card nlr-rk-start"><h3>Raket</h3><p>Samma NVDA-data och räls som NVDA Rider, vriden: tiden uppåt, högre pris åt höger.</p><p data-k="keys"></p></div>
-    <div class="nlr-rk-card nlr-rk-end"><h3>Perioden slut</h3><p data-k="endTxt"></p><p>Övning på historiska kurser – samma rörelse kunde lika gärna ha gått emot dig.</p><button type="button" data-k="again">Åk igen</button></div>`
+    <div class="nlr-rk-card nlr-rk-start"><h3>Raket</h3><p>Samma simulerade kurser och räls som NVDA Rider, vriden: tiden uppåt, högre pris åt höger.</p><p data-k="keys"></p></div>
+    <div class="nlr-rk-card nlr-rk-end"><h3>Perioden slut</h3><p data-k="endTxt"></p><p>Övning på simulerade kurser – samma rörelse kunde lika gärna ha gått emot dig.</p><button type="button" data-k="again">Åk igen</button></div>`
   document.body.appendChild(root)
   const canvas = root.querySelector('canvas')
   const divider = root.querySelector('.nlr-rk-div')
@@ -328,7 +326,7 @@ export function createRaket({ engine }) {
     el.className = 'nlr-rk-pl'
     el.innerHTML = `
       <div class="nlr-rk-card nlr-rk-who" data-k="who" style="display:${mode === '2p' ? 'block' : 'none'}">Spelare ${i + 1}</div>
-      <div class="nlr-rk-card nlr-rk-quote"><small>NVDA · pris</small><b data-k="price">—</b><span data-k="when">—</span></div>
+      <div class="nlr-rk-card nlr-rk-quote"><small>Simulerad kurs</small><b data-k="price">—</b><span data-k="when">—</span></div>
       <div class="nlr-rk-card nlr-rk-pnl" data-k="pnlCard"><small data-k="pnlLabel">P&amp;L · 1×</small><b data-k="pnl">—</b><span data-k="pnlSub">av positionen · övning</span>
         <div class="nlr-rk-gas"><span data-k="gasLbl">BOOST</span><i><u data-k="gas"></u></i><span data-k="gasVal">0</span></div></div>
       <div class="nlr-rk-ctl">
@@ -344,7 +342,7 @@ export function createRaket({ engine }) {
           <span class="nlr-rk-info" data-k="info">—</span>
         </div>
         <div class="nlr-rk-prog"><i data-k="prog"></i></div>
-        <p class="nlr-rk-note" data-k="note">Övning på riktiga historiska NVDA-kurser · inga riktiga pengar · vinst och förlust är lika möjliga · ingen rådgivning</p>
+        <p class="nlr-rk-note" data-k="note">${SIM_ETIKETT} · inga riktiga pengar · vinst och förlust är lika möjliga · ingen rådgivning</p>
       </div>`
     root.appendChild(el)
     const q = (k) => el.querySelector(`[data-k="${k}"]`)

@@ -14,6 +14,7 @@ import { createRaket } from './raket.js'
 import { createDuo } from './duo.js'
 import { createAkademin } from './akademin.js'
 import { isTypingTarget } from './keys.js'
+import { SIM_ETIKETT } from './simtid.js'
 
 const INK = '#1c1915'
 const MUTED = '#8a8478'
@@ -39,6 +40,9 @@ html[data-nlr-view="raket"] .tr-skal a{color:#e8f4ff !important;font:600 12px "I
 html.tr-fs-css,html.tr-fs-css body{height:100dvh;overflow:hidden}
 html.tr-fs-css[data-nlr-view="akademin"],html.tr-fs-css[data-nlr-view="akademin"] body{overflow:auto}
 a[href="/login"]{display:none !important}
+.tr-sim{position:fixed;z-index:60;pointer-events:none;box-sizing:border-box;font:600 11px/1.25 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.02em;color:${INK};background:rgba(246,242,234,.94);border:1px solid rgba(28,25,21,.16);border-radius:999px;padding:4px 10px;white-space:nowrap;max-width:calc(100vw - 16px);overflow:hidden;text-overflow:ellipsis}
+html[data-nlr-view="raket"] .tr-sim{color:#e8f4ff;background:rgba(8,12,32,.85);border-color:rgba(64,224,255,.5);font:600 11px/1.25 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.04em}
+html[data-nlr-view="akademin"] .nlr-ak-in{padding-top:96px}
 @media (max-width:640px){.nlr-rsi-txt{min-width:64px}.nlr-rsi-txt b{font-size:14px}.nlr-toggle button{padding:0 9px;font-size:12px}.tr-skal{padding:3px}.tr-skal .tr-back{display:none}.tr-skal .tr-fs-txt{display:none}.tr-skal button{padding:0 9px}}
 `
 
@@ -65,7 +69,7 @@ function waitEngine() {
   return new Promise((resolve) => {
     const tick = () => {
       const e = window.__trEngine
-      if (e && e.track && e.track.points && e.track.points.length && findButton(/^Live$/)) return resolve(e)
+      if (e && e.track && e.track.points && e.track.points.length && findButton(/^(Live|1D)$/)) return resolve(e)
       setTimeout(tick, 100)
     }
     tick()
@@ -74,7 +78,7 @@ function waitEngine() {
 
 function periodLabel(eng) {
   const key = eng.spec?.key
-  return { live: 'Live', '5d': '5D', '1mo': '1M', '6mo': '6M', '1y': '1Y', '5y': '5Y', max: 'Max' }[key] ?? key ?? '—'
+  return { live: '1D', '5d': '5D', '1mo': '1M', '6mo': '6M', '1y': '1Y', '5y': '5Y', max: 'Max' }[key] ?? key ?? '—'
 }
 
 async function main() {
@@ -84,8 +88,8 @@ async function main() {
   style.textContent = css
   document.head.appendChild(style)
 
-  const periodPill = findButton(/^Live$/)?.parentElement ?? null
-  const titleEl = [...document.querySelectorAll('h1,h2,div,span')].find((x) => (x.textContent ?? '').trim() === 'NVDA Line')
+  const periodPill = findButton(/^(Live|1D)$/)?.parentElement ?? null
+  const titleEl = [...document.querySelectorAll('h1,h2,div,span')].find((x) => /^NVDA (Line|Rider)$/.test((x.textContent ?? '').trim()))
   const titlePill = titleEl?.closest('div[class*="rounded"]') ?? titleEl?.parentElement ?? null
 
   // ---------- 1. RSI-panel ----------
@@ -276,6 +280,18 @@ async function main() {
   copySkin(periodPill, skal)
   skal.style.zIndex = '60'
   document.body.appendChild(skal)
+
+  // ---------- 6. Synlig etikett: simulerade kurser, inte verkliga marknadsdata (i varje läge) ----------
+  const sim = el('div', 'tr-sim', SIM_ETIKETT)
+  sim.setAttribute('role', 'note')
+  sim.dataset.trSim = '1'
+  document.body.appendChild(sim)
+  function layoutSim() {
+    const r = toggle.getBoundingClientRect()
+    const w = sim.getBoundingClientRect().width
+    sim.style.left = `${Math.round(Math.min(Math.max(8, r.left), innerWidth - w - 8))}px`
+    sim.style.top = `${Math.round(r.bottom + 6)}px`
+  }
   const docEl = document.documentElement
   const fsApi = !!(docEl.requestFullscreen || docEl.webkitRequestFullscreen)
   const fsOn = () => !!(document.fullscreenElement || document.webkitFullscreenElement) || docEl.classList.contains('tr-fs-css')
@@ -430,6 +446,7 @@ async function main() {
     layoutPanel()
     layoutToggle()
     layoutMode()
+    layoutSim()
     if (view === 'line') drawPanel()
     setTimeout(() => requestAnimationFrame(loop), 90)
   }
