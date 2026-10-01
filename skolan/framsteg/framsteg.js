@@ -1,7 +1,7 @@
 import { COURSES } from "../coach/kursinnehall.js";
+import { STORAGE_KEY, awardsEarned, levelFromAwardCount, quizIdsFor } from "../niva.js";
 
-const KEY = "ks.skolan.framsteg.v1";
-const QUIZ_IDS = ["bank-01-riksbanken-1668", "bank-05-delreservsystemet", "mf-04-cbdc"];
+const KEY = STORAGE_KEY;
 
 function emptyState() {
   return { lessons: {}, quiz: {} };
@@ -35,7 +35,8 @@ function lessons() {
 }
 
 function quizItems() {
-  return QUIZ_IDS.map((id) => {
+  const ids = COURSES.flatMap((course) => quizIdsFor(course.id));
+  return ids.map((id) => {
     for (const course of COURSES) {
       const lesson = course.lessons.find((item) => item.id === id);
       if (lesson?.questions[0]) return { lesson, question: lesson.questions[0] };
@@ -71,7 +72,8 @@ function render(state) {
   const doneCount = all.filter((item) => state.lessons[item.lesson.id]).length;
   const steps = document.createElement("ol");
   steps.className = "stepper";
-  const flags = [lessonDone(state), quizDone(state), lessonDone(state) && quizDone(state)];
+  const earned = awardsEarned(state);
+  const flags = [lessonDone(state), quizDone(state), earned.length > 0];
   const labels = ["Lektioner", "Kunskapstest", "Utmärkelse"];
   labels.forEach((label, index) => {
     const step = document.createElement("li");
@@ -158,24 +160,33 @@ function render(state) {
   const awardTitle = document.createElement("h2");
   awardTitle.textContent = "Utmärkelse";
   award.append(awardTitle);
+  const levelLine = document.createElement("p");
+  levelLine.textContent = `Robban är på nivå ${levelFromAwardCount(earned.length)} i den här webbläsaren.`;
+  award.append(levelLine);
+  for (const course of COURSES) {
+    const row = document.createElement("p");
+    row.className = "status";
+    if (earned.includes(course.id)) {
+      const figure = document.createElement("figure");
+      figure.className = "award-figure";
+      const photo = document.createElement("img");
+      photo.src = "/brand/robban-portrait-transparent.png";
+      photo.alt = "Robban Robotsson";
+      photo.width = 96;
+      photo.height = 96;
+      const caption = document.createElement("figcaption");
+      caption.textContent = `Utmärkelsen för ${course.title} finns i den här webbläsaren.`;
+      figure.append(photo, caption);
+      award.append(figure);
+      row.textContent = `${course.title}: utmärkelsen finns här.`;
+    } else {
+      row.textContent = `${course.title}: utmärkelse saknas.`;
+    }
+    award.append(row);
+  }
   const status = document.createElement("p");
   status.className = "status";
-  if (lessonDone(state) && quizDone(state)) {
-    const figure = document.createElement("figure");
-    figure.className = "award-figure";
-    const photo = document.createElement("img");
-    photo.src = "/brand/robban-portrait.png";
-    photo.alt = "Robban Robotsson";
-    photo.width = 96;
-    photo.height = 96;
-    const caption = document.createElement("figcaption");
-    caption.textContent = "Utmärkelsen finns i den här webbläsaren.";
-    figure.append(photo, caption);
-    award.append(figure);
-    status.textContent = "Stegen lektioner, kunskapstest och utmärkelse är markerade här.";
-  } else {
-    status.textContent = "Utmärkelse: saknas.";
-  }
+  status.textContent = earned.length ? `${earned.length} utmärkelser är markerade här.` : "Utmärkelse: saknas.";
   award.append(status);
   root.append(award);
 

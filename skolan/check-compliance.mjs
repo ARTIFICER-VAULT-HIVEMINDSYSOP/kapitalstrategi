@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { answerCoach, FIXED_REFUSAL } from "./coach/coach.js";
 import { COACH_LLM_ENABLED } from "./coach/llm-adapter.js";
 import { formatWhen, outcomeSentence } from "./signal-card.js";
+import { awardsEarned, levelFromAwardCount, stateForAwards } from "./niva.js";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 const failures = [];
@@ -74,6 +75,9 @@ mustInclude("signaler/index.html", "EXEMPEL – inte en signal");
 mustInclude("signalhistorik/index.html", "saknas");
 mustInclude("coach/index.html", "Fråga Robban");
 mustInclude("coach/index.html", "Robban Robotsson");
+mustInclude("coach/index.html", "Varför svarar Robban så här?");
+mustInclude("coach/index.html", "Om Robban");
+mustInclude("coach/index.html", "Nästa nivå låses upp med nästa utmärkelse");
 mustInclude("coach/llm-adapter.js", "COACH_LLM_ENABLED = false");
 
 const data = JSON.parse(readFileSync(join(root, "data/signaler.json"), "utf8"));
@@ -96,6 +100,69 @@ if (!/Stockholms Banco|1668/.test(lesson.text)) {
 if (!/Nästa lektion/.test(lesson.text) || !/Kontrollfråga/.test(lesson.text)) {
   failures.push("Robban ställde inte kontrollfråga och nästa lektion");
 }
+
+for (const count of [0, 1, 2]) {
+  const earned = awardsEarned(stateForAwards(count));
+  if (earned.length !== count) failures.push(`utmärkelser för ${count} blev ${earned.length}`);
+  if (levelFromAwardCount(earned.length) !== (count === 0 ? 1 : count === 1 ? 2 : 3)) {
+    failures.push(`nivå för ${count} utmärkelser är fel`);
+  }
+}
+
+const depths = [0, 1, 2].map((awards) => answerCoach("Delreservsystemet", {}, { awards }));
+if (!(depths[0].text.length < depths[1].text.length && depths[1].text.length < depths[2].text.length)) {
+  failures.push(
+    `nivådjup skiljer sig inte: ${depths.map((reply) => reply.text.length).join(", ")}`,
+  );
+}
+if (depths[0].level !== 1 || depths[1].level !== 2 || depths[2].level !== 3) {
+  failures.push(`nivåfält: ${depths.map((reply) => reply.level).join(", ")}`);
+}
+if (depths[0].text === depths[1].text || depths[1].text === depths[2].text) {
+  failures.push("nivå 1, 2 och 3 gav samma svar");
+}
+if (/Koppling mellan kurserna|Fråga i två steg|Följdfråga|signalkort/i.test(depths[0].text)) {
+  failures.push("nivå 1 innehåller djupare lager");
+}
+if (!depths[1].text.includes("Koppling mellan kurserna") || !depths[1].text.includes("Fråga i två steg")) {
+  failures.push("nivå 2 saknar koppling eller fråga i två steg");
+}
+if (/Följdfråga|signalkort/i.test(depths[1].text)) {
+  failures.push("nivå 2 innehåller nivå 3");
+}
+if (!depths[2].text.includes("Följdfråga") || !/signalkort/i.test(depths[2].text) || !depths[2].text.includes("Koppling mellan kurserna")) {
+  failures.push("nivå 3 saknar följdfråga, signalkort eller koppling");
+}
+
+const refusals = [0, 1, 2].map((awards) => answerCoach("Ska jag köpa nu?", {}, { awards }));
+if (refusals.some((reply) => reply.text !== FIXED_REFUSAL || reply.source !== "guardrail")) {
+  failures.push("spärren skiljer sig mellan nivåerna");
+}
+if (new Set(refusals.map((reply) => reply.text)).size !== 1) {
+  failures.push("spärrtexten är inte identisk på varje nivå");
+}
+
+for (const reply of [...depths, ...refusals]) {
+  const info = reply.transparency;
+  if (!info) {
+    failures.push("transparenspanel saknas");
+    continue;
+  }
+  if (info.mode !== "kurskort" || info.llm !== false) failures.push("transparenspanel säger fel läge");
+  if (!info.levelWhy || !info.limits || !info.stored || !info.href) failures.push("transparenspanel saknar fält");
+  if (!/köpa eller sälja/.test(info.limits) || !/passar dig/.test(info.limits)) {
+    failures.push("transparenspanel saknar spärren");
+  }
+  if (!/webbläsaren/.test(info.stored)) failures.push("transparenspanel saknar webbläsaren");
+}
+
+const basic = answerCoach("Vad är inflation i kursen?", {}, { awards: 0 });
+const deeper = answerCoach("Vad är inflation i kursen?", {}, { awards: 1 });
+if (basic.text === deeper.text) failures.push("inflation gav samma svar på nivå 1 och 2");
+if (!basic.text.includes("Nästa nivå låses upp med nästa utmärkelse")) {
+  failures.push("nivå 1 låser inte upp nästa begrepp");
+}
+if (!/Riksbanken|inflation/i.test(deeper.text)) failures.push("nivå 2 förklarade inte inflation från kursen");
 
 const clock = formatWhen({ publishedDate: "2026-10-01", publishedTime: "09:15" });
 if (clock !== "1 oktober 2026 kl. 09:15") failures.push(`Klockslag blev «${clock}»`);

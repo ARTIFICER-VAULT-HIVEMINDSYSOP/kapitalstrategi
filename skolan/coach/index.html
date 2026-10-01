@@ -16,7 +16,7 @@
     <a class="skip" href="#innehall">Till innehållet</a>
     <header class="site-header">
       <a class="brand" href="/skolan/">
-        <img class="brand-avatar" src="/brand/robban-portrait.png" alt="" width="48" height="48" />
+        <img class="brand-avatar robban-avatar" src="/brand/robban-portrait-transparent.png" alt="" width="48" height="48" />
         <span><strong>Tradingskolan</strong><small>Kapital och Strategi</small></span>
       </a>
       <nav class="site-nav" aria-label="Skolsidor">
@@ -35,14 +35,27 @@
           <h1>Fråga Robban</h1>
           <p class="lede">Jag förklarar lektionerna i Bankernas historia och Marknadens framtid. Jag ställer en kontrollfråga och pekar på nästa lektion. Först förstå lektionen. Sedan nästa steg.</p>
         </div>
-        <img src="/brand/robban-wave.png" alt="Robban Robotsson vinkar" width="180" height="180" />
+        <figure class="hero-robban" id="hero-robban" data-level="1">
+          <img src="/brand/robban-wave-transparent.png" alt="Robban Robotsson vinkar" width="220" height="270" />
+          <figcaption class="level-badge" id="level-badge">Nivå 1</figcaption>
+        </figure>
       </div>
+      <p class="status" id="award-count">Utmärkelser i den här webbläsaren: 0.</p>
+      <p id="level-next">Nästa nivå låses upp med nästa utmärkelse. Den lägger till kopplingar mellan de två kurserna, begrepp som delreserv, inflation, likviditet, hävstång och stop-loss, och en fråga i två steg.</p>
       <ol class="chat-log" id="chat-log" aria-live="polite">
         <li class="msg msg-robban">
-          <img src="/brand/robban-portrait.png" alt="" width="36" height="36" />
+          <img class="robban-avatar is-level-1" src="/brand/robban-portrait-transparent.png" alt="" width="48" height="48" />
           <div>
             <p class="msg-name">Robban Robotsson</p>
             <p>Hej! Jag är Robban Robotsson. Fråga mig om en lektion, till exempel Riksbanken 1668 eller e-kronan. Jag svarar från kurskorten.</p>
+            <details class="why-panel">
+              <summary>Varför svarar Robban så här?</summary>
+              <p>Kurskort: saknas tills du frågar om en lektion. Hälsningen är den fasta öppningen.</p>
+              <p id="greet-level">Nivå 1 eftersom utmärkelser i den här webbläsaren är 0. Robban förklarar en lektion i taget och ställer en enkel kontrollfråga.</p>
+              <p>Robban kör från kurskorten. Det är regelkort, inte en fri språkmodell. COACH_LLM_ENABLED är av.</p>
+              <p>Robban säger inte om du ska köpa eller sälja, bedömer inte vad som passar dig, anpassar inte signaler till dig och låser inte upp handel med riktiga pengar. Det här är inte personlig investeringsrådgivning. Utmärkelsen är inte ett tillstånd att handla.</p>
+              <p>Framstegen ligger bara i den här webbläsaren.</p>
+            </details>
           </div>
         </li>
       </ol>
@@ -51,13 +64,24 @@
         <button type="button" data-ask="Delreservsystemet">Delreservsystemet</button>
         <button type="button" data-ask="E-kronan">E-kronan</button>
         <button type="button" data-ask="Ställ en kontrollfråga">Ställ en kontrollfråga</button>
+        <button type="button" data-ask="Inflation" data-min-level="2" hidden>Inflation</button>
+        <button type="button" data-ask="Likviditet" data-min-level="2" hidden>Likviditet</button>
+        <button type="button" data-ask="Hävstång" data-min-level="2" hidden>Hävstång</button>
+        <button type="button" data-ask="Stop-loss" data-min-level="2" hidden>Stop-loss</button>
+        <button type="button" data-ask="Hur läser jag ett signalkort?" data-min-level="3" hidden>Signalkort</button>
+        <button type="button" data-ask="Jämför historiska exempel" data-min-level="3" hidden>Jämförelse</button>
       </div>
       <form class="coach-form" id="coach-form">
         <label for="coach-input">Fråga Robban</label>
         <textarea id="coach-input" name="fraga" rows="3" required placeholder="Skriv om en lektion"></textarea>
         <button type="submit">Skicka</button>
       </form>
-      <p class="note">Robban svarar från kurskorten. Han säger inte om du ska köpa eller sälja, och han bedömer inte vad som passar dig.</p>
+      <section class="panel" id="om-robban">
+        <h2>Om Robban</h2>
+        <p>Robban Robotsson är pedagog i Tradingskolan. Han kör från kurskorten i Bankernas historia och Marknadens framtid. Det är regelkort, inte en fri språkmodell. COACH_LLM_ENABLED är av.</p>
+        <p>Nivån följer utmärkelserna i den här webbläsaren. Nivå 1 förklarar en lektion. Nivå 2 kopplar kurserna. Nivå 3 går djupare i samma kort, med signalkortets fält, jämförelse och följdfrågor. Nästa nivå låses upp med nästa utmärkelse. En högre nivå är mer kunskapsdjup. Den betyder inte råd, inte en bedömning av vad som passar dig, inte signaler anpassade till dig, och den låser inte upp handel med riktiga pengar.</p>
+        <p>Robban säger inte om du ska köpa eller sälja. Utmärkelsen är inte ett tillstånd att handla. Framstegen ligger bara i den här webbläsaren.</p>
+      </section>
     </main>
     <footer class="site-foot">
       <p>Det här är utbildning. Det är inte personlig investeringsrådgivning. Efter kursen kan du själv välja att handla med egna pengar hos en mäklare som du väljer. Skolan låser aldrig upp handel med riktiga pengar. <a href="/tradingskolan">Till kursen</a></p>
