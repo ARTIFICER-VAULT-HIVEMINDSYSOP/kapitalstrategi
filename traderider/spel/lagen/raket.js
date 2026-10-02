@@ -18,6 +18,7 @@ import { MODES } from './orientation.js'
 import { simTid } from './simtid.js'
 import { t, onLang } from './i18n.js'
 import { stepSide, readSide } from './styrmotor.js'
+import { positionFor } from './spar.js'
 import { mountEntrySnap, bindStepGestures } from './snapp.js'
 
 // HUD-palett (kontrast mot BG_PANEL kontrolleras i test/raket-stil.test.mjs – WCAG AA)
@@ -507,6 +508,7 @@ export function createRaket({ engine }) {
       canvas.height = Math.round(H * dpr)
     }
     const c = canvas.getContext('2d')
+    if (!c) return
     c.setTransform(dpr, 0, 0, dpr, 0, 0)
     const vps = splitViewports(W, H, mode)
     root.classList.toggle('narrow', mode === '2p' && W <= 700)
@@ -778,7 +780,9 @@ export function createRaket({ engine }) {
     // raket: vald sidas räls, eller mittlinjen när flat. Mjuk interpolation i sidled och lutning.
     const flat = isFlat(st)
     const f = flat ? 'mid' : st.side === 'buy' ? 'upper' : 'lower'
-    const targetX = col(priceAt(p, f))
+    const buyX = col(priceAt(p, 'upper'))
+    const sellX = col(priceAt(p, 'lower'))
+    const targetX = positionFor(flat ? 'flat' : st.side, buyX, sellX)
     const step = dt || 0.016
     pl.shownX = smoothTo(pl.shownX, targetX, step, 11)
     const x = pl.shownX

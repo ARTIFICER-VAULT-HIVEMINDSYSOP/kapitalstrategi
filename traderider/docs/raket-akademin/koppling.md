@@ -13,16 +13,16 @@ Varje spelläge är en övningsyta för samma steg, inte en egen väg förbi sko
 | Läge | Plats i flödet |
 | --- | --- |
 | Trend Rider (`#nvda-rider`) | Övning i att styra mellan SÄLJ, FLAT och KÖP och att ändra hävstång. Högre hävstång kan ge större vinst men också större förlust. |
-| Raket (`#raket`) | Samma övning, med rörelsen uppåt. |
+| RaceX (`#racex`, äldre `#raket`) | Samma övning, med rörelsen uppåt. |
 | Rabbit Hole (`#rabbit-hole`) | Samma övning, med rörelsen nedåt. Gränslandet ligger längst ned. |
-| Akademin (`#akademin`) | Lektionerna, frågan och utmärkelsen. Utmärkelsen låser inte upp riktig handel. |
+| Akademin (`#academy`, äldre `#akademin`) | Lektionerna, frågan och utmärkelsen, plus kapitlet Hansan – köpmännens riskskola. Utmärkelsen låser inte upp riktig handel. |
 
 ## Spelarvärdet
 
 | Läge | Vad spelaren övar |
 | --- | --- |
 | Trend Rider | Styrning ett steg i taget, hävstång, och att vinst och förlust hör till samma mening. Sedan Historia och Gränslandet. |
-| Raket | Samma styrning och hävstång, sedd uppifrån och ned. Sedan Historia och Gränslandet. |
+| RaceX | Samma styrning och hävstång, sedd uppifrån och ned. Sedan Historia och Gränslandet. |
 | Rabbit Hole | Samma styrning, med fallet nedåt. Gränslandet är hålets botten. |
 | Akademin | Risk och positionsstorlek, stop-loss och take-profit, Bollingerband, RSI. Klarat moment ger en utmärkelse för lärandet. Ett övningsutfall kan se ut som vinst, men risken för förlust hör till samma mening. |
 
@@ -35,7 +35,8 @@ Rekommendation, inte krav: ta skolans avsnitt och Akademins frågor först, så 
 | README.md | Pekar hit. Egen kursmodul: **OKÄND – att fylla i**. |
 | koppling.md | Den här kartan. |
 | Trend Rider | Akademin, lektion «Risk och positionsstorlek». Övrig kursmodul: **OKÄND – att fylla i**. |
-| Raket | Samma lektion. Rörelsen uppåt har ingen egen kursmodul: **OKÄND – att fylla i**. |
+| RaceX | Samma lektion. Rörelsen uppåt har ingen egen kursmodul: **OKÄND – att fylla i**. |
+| Hansan – köpmännens riskskola | Kapitlet i Akademin. Bron pekar på Marknadens historia, lektionen om guld och korsfarare. |
 | Rabbit Hole | Samma lektion. Rörelsen nedåt har ingen egen kursmodul: **OKÄND – att fylla i**. |
 | Historia och Gränslandet | **OKÄND – att fylla i**. |
 | Akademin, lektion 1 | «Risk och positionsstorlek» i Traderider. |

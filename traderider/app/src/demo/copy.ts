@@ -117,7 +117,7 @@ const SV: DemoCopy = {
     },
     raket: {
       kicker: 'Läge 3 · fart',
-      title: 'Raket',
+      title: 'RaceX',
       lines: [
         'Samma NVDA-historia, vänd på höjden: tiden går uppåt och priset går i sidled.',
         'Bollingerbanden är korridorväggar. RSI visar hur sträckt läget är.',
@@ -129,8 +129,8 @@ const SV: DemoCopy = {
     },
   },
   rocket: {
-    kicker: 'Läge 3 · Raket · övning på historiska NVDA-priser',
-    title: 'Raket',
+    kicker: 'Läge 3 · RaceX · övning på historiska NVDA-priser',
+    title: 'RaceX',
     sub: 'Samma graf och samma motor, vänd på höjden. Tiden rinner uppåt, priset går i sidled. Bollingerbanden är korridorväggar, RSI visar hur sträckt läget är.',
     close: 'NVDA stängning',
     vs: 'Mot föregående',
@@ -166,7 +166,7 @@ const SV: DemoCopy = {
     riding: 'åker',
     perSec: 'candles/s',
     series: 'medföljande historiska candles',
-    chartAria: 'Grafen vriden: tiden går uppåt, priset åt höger. Raketen följer kursen högst upp.',
+    chartAria: 'Grafen vriden: tiden går uppåt, priset åt höger. RaceX följer kursen högst upp.',
     hintWait: 'Väntar på band och RSI.',
     hintUpperHot: 'Nära högerväggen och RSI över 70: läget är sträckt. Öva: vänta eller stäng.',
     hintLowerHot: 'Nära vänsterväggen och RSI under 30: läget är sträckt nedåt. Öva: stå platt i stället för att jaga.',
@@ -228,7 +228,7 @@ const EN: DemoCopy = {
     },
     raket: {
       kicker: 'Mode 3 · speed',
-      title: 'Raket',
+      title: 'RaceX',
       lines: [
         'The same NVDA history, turned upright: time runs upward and price runs sideways.',
         'The Bollinger bands are corridor walls. RSI shows how stretched the level is.',
@@ -240,8 +240,8 @@ const EN: DemoCopy = {
     },
   },
   rocket: {
-    kicker: 'Mode 3 · Rocket · practice on historical NVDA prices',
-    title: 'Raket',
+    kicker: 'Mode 3 · RaceX · practice on historical NVDA prices',
+    title: 'RaceX',
     sub: 'Same chart and same engine, turned upright. Time runs upward, price runs sideways. The Bollinger bands are corridor walls, and RSI shows how stretched the level is.',
     close: 'NVDA close',
     vs: 'Versus previous',
@@ -339,7 +339,7 @@ const UK: DemoCopy = {
     },
     raket: {
       kicker: 'Режим 3 · швидкість',
-      title: 'Raket',
+      title: 'RaceX',
       lines: [
         'Та сама історія NVDA, повернута сторч: час іде вгору, ціна — вбік.',
         'Смуги Боллінджера — це стіни коридору. RSI показує, наскільки рівень розтягнутий.',
@@ -351,8 +351,8 @@ const UK: DemoCopy = {
     },
   },
   rocket: {
-    kicker: 'Режим 3 · Ракета · тренування на історичних цінах NVDA',
-    title: 'Raket',
+    kicker: 'Режим 3 · RaceX · тренування на історичних цінах NVDA',
+    title: 'RaceX',
     sub: 'Той самий графік і той самий рушій, повернуті сторч. Час тече вгору, ціна йде вбік. Смуги Боллінджера — стіни коридору, RSI показує, наскільки рівень розтягнутий.',
     close: 'Закриття NVDA',
     vs: 'До попереднього',
@@ -388,7 +388,7 @@ const UK: DemoCopy = {
     riding: 'рух',
     perSec: 'свічок/с',
     series: 'вкладені історичні свічки',
-    chartAria: 'Графік повернуто: час угору, ціна праворуч. Ракета йде за курсом угорі.',
+    chartAria: 'Графік повернуто: час угору, ціна праворуч. RaceX йде за курсом угорі.',
     hintWait: 'Очікування на смуги і RSI.',
     hintUpperHot: 'Біля правої стіни і RSI понад 70: рівень розтягнутий. Тренування: зачекати або закрити.',
     hintLowerHot: 'Біля лівої стіни і RSI нижче 30: рівень розтягнутий униз. Тренування: лишатися без позиції.',

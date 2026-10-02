@@ -1,8 +1,8 @@
 (function () {
   var titles = {
-    sv: 'Traderider: Trade Rider, Raket och Akademin – övning på simulerade kurser, inte verkliga marknadsdata. Inga riktiga pengar.',
-    en: 'Traderider: Trade Rider, Raket and Akademin – practice on simulated prices, not real market data. No real money.',
-    uk: 'Traderider: Trade Rider, Raket і Akademin – тренування на симульованих курсах, не реальні ринкові дані. Без справжніх грошей.',
+    sv: 'Traderider: Trade Rider, RaceX, Akademin och Rabbit Hole – övning på simulerade kurser, inte verkliga marknadsdata. Inga riktiga pengar.',
+    en: 'Traderider: Trade Rider, RaceX, Academy and Rabbit Hole – practice on simulated prices, not real market data. No real money.',
+    uk: 'Traderider: Trade Rider, RaceX, Академія і Rabbit Hole – тренування на симульованих курсах, не реальні ринкові дані. Без справжніх грошей.',
   }
   function lang() {
     try {

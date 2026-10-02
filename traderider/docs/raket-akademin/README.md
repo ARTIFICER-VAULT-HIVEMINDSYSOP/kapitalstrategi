@@ -1,13 +1,14 @@
 # Traderider (utkast)
 
-Tre övningslägen på samma sida, `/traderider/spel/`. Kurserna i övningen är märkta simulerade. Inga riktiga pengar och ingen inloggning.
+Fyra övningslägen på samma sida, `/traderider/spel/`. Kurserna i övningen är märkta simulerade. Inga riktiga pengar och ingen inloggning.
 
 | Adress | Vad |
 | --- | --- |
-| `/traderider/` | Ingången med tre kort. |
-| `/traderider/spel/#nvda-rider` | Första läget. Växeln högst upp byter läge. |
-| `/traderider/spel/#raket` | Raket. |
-| `/traderider/spel/#akademin` | Akademin: fyra lektioner med utmärkelser. |
+| `/traderider/` | Ingången med fyra kort. |
+| `/traderider/spel/#nvda-rider` | Trade Rider. Växeln högst upp byter läge. |
+| `/traderider/spel/#racex` | RaceX. Äldre adressen `#raket` öppnar samma läge. |
+| `/traderider/spel/#academy` | Akademin: fyra lektioner med utmärkelser, och kapitlet Hansan – köpmännens riskskola. Äldre adressen `#akademin` öppnar samma läge. |
+| `/traderider/spel/#rabbit-hole` | Rabbit Hole. |
 
 Etiketten «Simulerade kurser – inte verkliga marknadsdata» syns i övningen och på `/traderider/`.
 
@@ -21,6 +22,6 @@ Hur lägena hänger ihop med Tradingskolan, vad spelaren övar, och vilken lekti
 | --- | --- |
 | ![Ingång dator](01-traderider-desktop.jpg) | ![Ingång mobil](01-traderider-mobil.jpg) |
 | ![NVDA Rider dator](02-nvda-rider-desktop.jpg) | ![NVDA Rider mobil](02-nvda-rider-mobil.jpg) |
-| ![Raket dator](03-raket-desktop.jpg) | ![Raket mobil](03-raket-mobil.jpg) |
+| ![RaceX dator](03-raket-desktop.jpg) | ![RaceX mobil](03-raket-mobil.jpg) |
 | ![Akademin dator](04-akademin-desktop.jpg) | ![Akademin mobil](04-akademin-mobil.jpg) |
 | ![Loket framåt dator](loket-framat-desktop.jpg) | ![Loket framåt mobil](loket-framat-mobil.jpg) |

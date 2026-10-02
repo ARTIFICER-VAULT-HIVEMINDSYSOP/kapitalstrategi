@@ -10,9 +10,11 @@ import * as A from './akademin-logic.js'
 import { rsiAtPoints } from './rsi.js'
 import { isTypingTarget, HINTS, keyAction } from './keys.js'
 import { simTid } from './simtid.js'
-import { t, onLang } from './i18n.js'
+import { t, onLang, getLang } from './i18n.js'
 import { stepSide } from './styrmotor.js'
 import { bindStepGestures } from './snapp.js'
+import { positionFor } from './spar.js'
+import { chapterHtml, gradeAnswer, gradeLabel } from '../../../school/hansan-riskskola/text.js'
 
 const PAPER = '#f3ede2'
 const INK = '#1c1915'
@@ -120,6 +122,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
   let prog = A.loadProgress(storage)
   let lesson = [1, 2, 3, 4].find((l) => !A.lessonDone(l, prog.earned)) ?? 4
   let noteKey = ''
+  let hansaMsg = ''
   let noteVars = null
   let riskPct = null
   let sigma = 1.5
@@ -360,6 +363,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
           ${rd && done && lesson < 4 ? `<div style="margin-top:10px"><button type="button" class="nlr-ak-btn" data-act="pick" data-v="${lesson + 1}">${t('ak.next', { n: lesson + 1 })}</button></div>` : ''}
           ${allDone ? `<div class="nlr-ak-note">${t('ak.allDone')}</div>` : ''}
         </section>
+        <section class="nlr-ak-card sk" data-chapter="hansan">${chapterHtml(getLang())}${hansaMsg ? `<p data-k="hansaMsg">${hansaMsg}</p>` : ''}</section>
       </main></div>`
     if (skinFrom) {
       const cs = getComputedStyle(skinFrom)
@@ -417,6 +421,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     else if (act === 'tempoDown') tempo = Math.max(1, tempo - 1)
     else if (act === 'tempoUp') tempo = Math.min(4, tempo + 1)
     else if (act === 'rewind') return rewind()
+    else if (act === 'hansa') hansaMsg = gradeLabel(getLang(), gradeAnswer(b.dataset.lesson, Number(b.dataset.qi), Number(v)))
     build()
   })
 
@@ -481,6 +486,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
       cv.height = Math.round(H * dpr)
     }
     const c = cv.getContext('2d')
+    if (!c) return
     c.setTransform(dpr, 0, 0, dpr, 0, 0)
     c.clearRect(0, 0, W, H)
     const rsiH = 70
@@ -564,6 +570,14 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     c.beginPath()
     c.arc(x(i1), y(pt.price), 3.5, 0, Math.PI * 2)
     c.fill()
+    const railFlat = positionFor('flat', y(pt.upper), y(pt.lower))
+    c.strokeStyle = 'rgba(28,25,21,0.35)'
+    c.setLineDash([2, 3])
+    c.beginPath()
+    c.moveTo(x(i1) - 8, railFlat)
+    c.lineTo(x(i1) + 8, railFlat)
+    c.stroke()
+    c.setLineDash([])
     const tag = (txt, v, col) => {
       c.font = '600 11px "IBM Plex Sans", sans-serif'
       const tw = c.measureText(txt).width + 12
@@ -678,12 +692,12 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     if (visible) raf = requestAnimationFrame(frame)
   }
 
-  return {
-    onLang(() => {
-      root.setAttribute('aria-label', t('ak.aria'))
-      if (visible) build()
-    })
+  onLang(() => {
+    root.setAttribute('aria-label', t('ak.aria'))
+    if (visible) build()
+  })
 
+  return {
     show() {
       data()
       visible = true
@@ -706,6 +720,12 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
       playing = false
       p = Math.max(0, Math.min(pts.length - 1, i))
       build()
+    },
+    step(sec = 0.05) {
+      if (!pts.length) data()
+      visible = true
+      playing = true
+      frame((last || performance.now()) + sec * 1000)
     },
     find(kind) {
       for (let i = 20; i < pts.length; i++) {

@@ -18,10 +18,17 @@ export const MODES = {
   },
   raket: {
     id: 'raket',
-    hash: 'raket',
-    aliases: [],
+    hash: 'racex',
+    aliases: ['raket'],
     nameKey: 'mode.raket.name',
     orientation: { movement: 'up', highPriceSide: 'right' },
+  },
+  akademin: {
+    id: 'akademin',
+    hash: 'academy',
+    aliases: ['akademin'],
+    nameKey: 'mode.akademin.name',
+    orientation: { movement: 'right', highPriceSide: 'up' },
   },
   rabbitHole: {
     id: 'rabbit-hole',
@@ -164,17 +171,39 @@ export function createSteering(orientation) {
   }
 }
 
+export const MODE_ORDER = ['line', 'raket', 'akademin', 'rabbit']
+
 export function modeFromHash(hash) {
-  const h = String(hash || '').replace(/^#/, '')
-  if (h.includes('rabbit')) return 'rabbit'
-  if (h.includes('akademin')) return 'akademin'
-  if (h.includes('raket')) return 'raket'
+  const raw = String(hash || '').replace(/^#/, '').split('?')[0]
+  const h = raw.replace(/-2p$/, '')
+  if (h === '4' || h.includes('rabbit')) return 'rabbit'
+  if (h === '3' || h.includes('academy') || h.includes('akademin')) return 'akademin'
+  if (h === '2' || h.includes('racex') || h.includes('raket')) return 'raket'
   return 'line'
 }
 
 export function hashForView(view) {
   if (view === 'rabbit') return 'rabbit-hole'
-  if (view === 'raket') return 'raket'
-  if (view === 'akademin') return 'akademin'
+  if (view === 'raket') return 'racex'
+  if (view === 'akademin') return 'academy'
   return 'nvda-rider'
+}
+
+/** Ett ställe för klick (1–4), tangent och hash, så testerna inte beror på DOM. */
+export function selectMode({ via, value } = {}) {
+  if (via === 'click' || via === 'index') {
+    const n = Number(value)
+    const i = n >= 1 && n <= MODE_ORDER.length ? n - 1 : n
+    return MODE_ORDER[i] || null
+  }
+  if (via === 'key') {
+    const digit = String(value || '').replace(/^Digit|^Numpad/, '')
+    if (digit === '1') return 'line'
+    if (digit === '2') return 'raket'
+    if (digit === '3') return 'akademin'
+    if (digit === '4') return 'rabbit'
+    return null
+  }
+  if (via === 'hash') return modeFromHash(value)
+  return null
 }

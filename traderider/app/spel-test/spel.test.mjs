@@ -66,11 +66,13 @@ test('loket kör framåt: plog och skorsten fram (+x, färdriktningen), hytten b
   assert.match(r, /x:this\.train\.x\+\(24\*Math\.cos/) // röken ur skorstenen, inte ur hytten
 })
 
-test('växeln: Trend Rider | Raket | Rabbit Hole, hashlänkar, helskärm och väg tillbaka', () => {
+test('växeln: Trade Rider | RaceX | Akademin | Rabbit Hole, hashlänkar, helskärm och väg tillbaka', () => {
   const p = read('spel/lagen/panel.js')
   assert.match(p, /MODES\.trendRider\.nameKey/)
   assert.match(p, /MODES\.raket\.nameKey/)
+  assert.match(p, /MODES\.akademin\.nameKey/)
   assert.match(p, /MODES\.rabbitHole\.nameKey/)
+  assert.match(p, /selectMode/)
   assert.match(p, /hashForView/)
   assert.match(p, /modeFromHash/)
   assert.match(p, /requestFullscreen/)
@@ -85,15 +87,16 @@ test('ingen inloggning: sessionsfrågan besvaras lokalt och inloggningslänken �
   assert.ok(!read('index.html').includes('/login'))
 })
 
-test('ingången /traderider/ länkar till alla tre lägen och lovar inga fler', () => {
+test('ingången /traderider/ länkar till alla fyra lägen och lovar inga fler', () => {
   const t = read('index.html')
-  for (const h of ['/traderider/spel/#nvda-rider', '/traderider/spel/#raket', '/traderider/spel/#akademin']) assert.ok(t.includes(`href="${h}"`), h)
+  for (const h of ['/traderider/spel/#nvda-rider', '/traderider/spel/#racex', '/traderider/spel/#academy', '/traderider/spel/#rabbit-hole']) assert.ok(t.includes(`href="${h}"`), h)
   assert.ok(!t.includes('Fler lägen kommer'))
+  assert.ok(!t.includes('>Raket<') && !t.includes('>Rocket<'))
 })
 
 test('gamla demoadresser leder till de nya lägena, inte till demoramen', () => {
   const map = JSON.parse(read('app/scripts/demo-redirects.json'))
-  const expect = { 'index.html': '/traderider/', 'tag/index.html': '/traderider/spel/#nvda-rider', 'raket/index.html': '/traderider/spel/#raket', 'akademin/index.html': '/traderider/spel/#akademin' }
+  const expect = { 'index.html': '/traderider/', 'tag/index.html': '/traderider/spel/#nvda-rider', 'raket/index.html': '/traderider/spel/#racex', 'akademin/index.html': '/traderider/spel/#academy' }
   for (const [page, mal] of Object.entries(expect)) {
     assert.equal(map[page].mal, mal)
     const html = read(`demo/${page}`)
