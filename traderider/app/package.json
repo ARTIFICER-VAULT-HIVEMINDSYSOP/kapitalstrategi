@@ -14,7 +14,8 @@
     "preview:static": "vite preview --config vite.static.config.ts --port 3019 --host",
     "start": "node .output/server/index.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "bildgranskning": "node scripts/bildgranskning.mjs"
   },
   "dependencies": {
     "@fontsource/fraunces": "^5.2.9",

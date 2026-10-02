@@ -1,0 +1,148 @@
+{
+  "undantag": [
+    {
+      "path": "traderider/app/docs/",
+      "motiv": "Publiceras inte. GitHub Pages tar bort traderider/app före uppladdning (.github/workflows/pages.yml). Mappen är intern utvecklingsdokumentation och ingår inte i granskningen."
+    }
+  ],
+  "bilder": [
+    {
+      "path": "traderider/art/akademin.jpg",
+      "md5": "7c4df6e832a58b6c90a9fed33a6e7410",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/art/raket.jpg",
+      "md5": "e5cf6aecd4d57092bc8ae6614e855167",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/art/rider-cover.jpg",
+      "md5": "ecfe7c147ddc5e47dce8bb4afd8c587f",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/docs/raket-akademin/01-traderider-desktop.jpg",
+      "md5": "20b582c37dc5e6e8d29c94690bc03238",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/docs/raket-akademin/01-traderider-mobil.jpg",
+      "md5": "b5a6c8bf9a47af4be7219d72b9f2dba6",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/docs/raket-akademin/02-trade-rider-desktop.jpg",
+      "md5": "1b82461e54da03a4bcf05d3db8a7c723",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/docs/raket-akademin/02-trade-rider-mobil.jpg",
+      "md5": "e7317e019eb1e255ca76f47504bcb8e6",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/docs/raket-akademin/03-raket-desktop.jpg",
+      "md5": "3daccc12b7142b3f7d7ae6ba7b14a358",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/docs/raket-akademin/03-raket-mobil.jpg",
+      "md5": "67986ec279cb860c765bf2a42d5c3230",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/docs/raket-akademin/04-akademin-desktop.jpg",
+      "md5": "8628de9e92c45ecb8df49701f8341b34",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/docs/raket-akademin/04-akademin-mobil.jpg",
+      "md5": "89ef4c15f17881e27e33fee955851dcd",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/docs/raket-akademin/loket-framat-desktop.jpg",
+      "md5": "bf4049c80e0e4a9293873bf3075139f2",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/docs/raket-akademin/loket-framat-mobil.jpg",
+      "md5": "189ba3f72b30e359dabf211a73d911a2",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/spel/favicon.svg",
+      "md5": "e5666c2ab2237dbb261a851226024237",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/spel/og.jpg",
+      "md5": "ecfe7c147ddc5e47dce8bb4afd8c587f",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/spel/sprites/crash-1.png",
+      "md5": "ad471b6d613629b70e4a371be16f35f3",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/spel/sprites/crash-2.png",
+      "md5": "28b35534e782f031e1e55186048826a0",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/spel/sprites/crash-3.png",
+      "md5": "bac967dd358ea8162df177098f47f4ff",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/spel/sprites/crash-4.png",
+      "md5": "c78f7696d5abc369f733ad271c26390c",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/spel/sprites/ride-1.png",
+      "md5": "47e5c6f1e979624f59fc9b3fc5f62734",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/spel/sprites/ride-2.png",
+      "md5": "16b3dc9a57c7485c6785351fad75e111",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/spel/sprites/ride-3.png",
+      "md5": "87517712cbccbdf4c041c8d4c29ea6a6",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "traderider/spel/sprites/ride-4.png",
+      "md5": "db866a4d3f4d7928fe0253cf447394ee",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    }
+  ]
+}

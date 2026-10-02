@@ -48,7 +48,7 @@ export function mountInstruction(host, opts) {
   reopen.hidden = true
   host.append(root, reopen)
 
-  let open = true
+  let open = false
   const starters = new Set()
 
   function paint() {

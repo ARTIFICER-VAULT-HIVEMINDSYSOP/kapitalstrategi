@@ -10,6 +10,7 @@ import {
   createSteering,
   modeFromHash,
   hashForView,
+  selectMode,
   travelVector,
 } from '../../spel/lagen/orientation.js'
 import { stepSide } from '../../spel/lagen/styrmotor.js'
@@ -84,12 +85,14 @@ test('90 grader byter både tangentkarta och instruktion utan annan kod', () => 
   assert.equal(keyToIntent('ArrowUp', ORIENTATIONS.down), 'BACKWARD')
 })
 
-test('de tre lägena delar stepSide och har ingen egen styrmotor i källan', () => {
+test('de fyra lägena delar stepSide och har ingen egen styrmotor i källan', () => {
   const a = createSteering(MODES.raket.orientation)
   const b = createSteering(MODES.trendRider.orientation)
   const c = createSteering(MODES.rabbitHole.orientation)
+  const d = createSteering(MODES.akademin.orientation)
   assert.equal(a.stepSide, b.stepSide)
   assert.equal(b.stepSide, c.stepSide)
+  assert.equal(c.stepSide, d.stepSide)
   assert.equal(a.stepSide, stepSide)
   for (const file of ['raket.js', 'panel.js', 'duo.js', 'akademin.js']) {
     const src = readFileSync(new URL(`../../spel/lagen/${file}`, import.meta.url), 'utf8')
@@ -99,15 +102,49 @@ test('de tre lägena delar stepSide och har ingen egen styrmotor i källan', () 
   assert.equal(/\bgas\b|\bbroms\b|\bbrake\b/i.test(joined), false)
 })
 
-test('hash: #nvda-rider är kanonisk, alias och de andra lägena', () => {
+test('hash: #nvda-rider, #racex, #academy och #rabbit-hole, med äldre alias', () => {
   assert.equal(modeFromHash('#nvda-rider'), 'line')
   assert.equal(modeFromHash('#trend-rider'), 'line')
   assert.equal(modeFromHash('#line-rider'), 'line')
+  assert.equal(modeFromHash('#racex'), 'raket')
   assert.equal(modeFromHash('#raket'), 'raket')
+  assert.equal(modeFromHash('#academy'), 'akademin')
+  assert.equal(modeFromHash('#akademin'), 'akademin')
   assert.equal(modeFromHash('#rabbit-hole'), 'rabbit')
+  assert.equal(modeFromHash('#2'), 'raket')
+  assert.equal(modeFromHash('#3'), 'akademin')
   assert.equal(hashForView('line'), 'nvda-rider')
+  assert.equal(hashForView('raket'), 'racex')
+  assert.equal(hashForView('akademin'), 'academy')
   assert.equal(hashForView('rabbit'), 'rabbit-hole')
   assert.equal(travelVector(MODES.rabbitHole.orientation).y, 1)
   assert.equal(travelVector(MODES.raket.orientation).y, -1)
   assert.equal(travelVector(MODES.trendRider.orientation).x, 1)
+  assert.equal(selectMode({ via: 'click', value: 2 }), 'raket')
+  assert.equal(selectMode({ via: 'key', value: 'Digit3' }), 'akademin')
+  assert.equal(selectMode({ via: 'hash', value: '#racex' }), 'raket')
+  assert.equal(selectMode({ via: 'hash', value: '#raket' }), 'raket')
+  assert.equal(selectMode({ via: 'key', value: '4' }), 'rabbit')
+})
+
+test('klick, tangent 1–4 och hash i alla fyra lägen, med alias', () => {
+  const cases = [
+    ['line', 1, '#nvda-rider', null],
+    ['raket', 2, '#racex', '#raket'],
+    ['akademin', 3, '#academy', '#akademin'],
+    ['rabbit', 4, '#rabbit-hole', null],
+  ]
+  for (const [mode, n, hash, alias] of cases) {
+    assert.equal(selectMode({ via: 'click', value: n }), mode, `click ${n}`)
+    assert.equal(selectMode({ via: 'index', value: n }), mode, `index ${n}`)
+    assert.equal(selectMode({ via: 'key', value: `Digit${n}` }), mode, `Digit${n}`)
+    assert.equal(selectMode({ via: 'key', value: `Numpad${n}` }), mode, `Numpad${n}`)
+    assert.equal(selectMode({ via: 'key', value: String(n) }), mode, `key ${n}`)
+    assert.equal(selectMode({ via: 'hash', value: hash }), mode, hash)
+    assert.equal(modeFromHash(hash), mode, hash)
+    if (alias) {
+      assert.equal(selectMode({ via: 'hash', value: alias }), mode, alias)
+      assert.equal(modeFromHash(alias), mode, alias)
+    }
+  }
 })

@@ -17,10 +17,13 @@ import { createAkademin } from './akademin.js'
 import { isTypingTarget } from './keys.js'
 import { t, onLang, mountSwitcher } from './i18n.js'
 import { readSide, cycleIndex, stepSide, ENTRY_SIDE } from './styrmotor.js'
-import { MODES, modeFromHash, hashForView } from './orientation.js'
+import { MODES, modeFromHash, hashForView, selectMode } from './orientation.js'
 import { mountEntrySnap, bindStepGestures, mountRatt } from './snapp.js'
 import { mountInstruction } from './instruktion.js'
 import { mountFas } from './faser.js'
+import { scrubVisibleNames } from './synlig.js'
+
+const bootHash = typeof window !== 'undefined' ? window.__trBootHash || '' : ''
 
 const INK = '#1c1915'
 const MUTED = '#8a8478'
@@ -99,8 +102,20 @@ async function main() {
   document.head.appendChild(style)
 
   const periodPill = findButton(/^(Live|1D)$/)?.parentElement ?? null
-  const titleEl = [...document.querySelectorAll('h1,h2,div,span')].find((x) => /^NVDA (Line|Rider)$/.test((x.textContent ?? '').trim()))
-  const titlePill = titleEl?.closest('div[class*="rounded"]') ?? titleEl?.parentElement ?? null
+  let titleEl = [...document.querySelectorAll('h1,h2,div,span')].find((x) => /^NVDA (Line|Rider)$/.test((x.textContent ?? '').trim()))
+  let titlePill = titleEl?.closest('div[class*="rounded"]') ?? titleEl?.parentElement ?? null
+
+  function refreshTitle() {
+    const name = t(MODES.trendRider.nameKey)
+    const fresh = [...document.querySelectorAll('h1,h2,div,span')].find((x) => /^NVDA (Line|Rider)$/.test((x.textContent ?? '').trim()))
+    if (fresh) titleEl = fresh
+    if (titleEl?.isConnected) {
+      if ((titleEl.textContent ?? '').trim() !== name) titleEl.textContent = name
+      titleEl.dataset.trTradeTitle = '1'
+      titlePill = titleEl.closest('div[class*="rounded"]') ?? titleEl.parentElement ?? titlePill
+    }
+    scrubVisibleNames(document, name)
+  }
 
   // ---------- 1. RSI-panel ----------
   const panel = el('div', 'nlr-pill nlr-rsi')
@@ -233,9 +248,10 @@ async function main() {
   toggle.setAttribute('aria-label', t('mode.aria'))
   const bLine = el('button', '', t(MODES.trendRider.nameKey))
   const bRaket = el('button', '', t(MODES.raket.nameKey))
-  const bAk = el('button', '', t(MODES.rabbitHole.nameKey))
-  bLine.type = bRaket.type = bAk.type = 'button'
-  toggle.append(bLine, bRaket, bAk)
+  const bAcademy = el('button', '', t(MODES.akademin.nameKey))
+  const bRabbit = el('button', '', t(MODES.rabbitHole.nameKey))
+  bLine.type = bRaket.type = bAcademy.type = bRabbit.type = 'button'
+  toggle.append(bLine, bRaket, bAcademy, bRabbit)
   copySkin(periodPill, toggle)
   toggle.style.zIndex = '60'
   document.body.appendChild(toggle)
@@ -273,12 +289,12 @@ async function main() {
   }
   const instr = mountInstruction(document.body, {
     getOrientation: () => orientationFor(),
-    isActive: () => view !== 'akademin',
+    isActive: () => true,
   })
   const fas = mountFas(document.body, {
     getOrientation: () => orientationFor(),
     getPlace: () => (view === 'rabbit' ? 'bottom' : 'chart'),
-    isActive: () => view !== 'akademin' && !instr.isOpen(),
+    isActive: () => !instr.isOpen(),
     onFreeze: (frozen) => (frozen ? rabbit.freeze() : rabbit.resume()),
   })
   instr.onStart(() => {
@@ -369,7 +385,9 @@ async function main() {
     document.documentElement.dataset.nlrView = view // Raket-läget får HUD-stil på växlarna (CSS i raket.js)
     bLine.setAttribute('aria-pressed', String(view === 'line'))
     bRaket.setAttribute('aria-pressed', String(view === 'raket'))
-    bAk.setAttribute('aria-pressed', String(view === 'rabbit'))
+    bAcademy.setAttribute('aria-pressed', String(view === 'akademin'))
+    bRabbit.setAttribute('aria-pressed', String(view === 'rabbit'))
+    document.title = viewTitle()
     modeToggle.style.display = view === 'akademin' || view === 'rabbit' ? 'none' : ''
     b1.setAttribute('aria-pressed', String(mode === '1p'))
     b2.setAttribute('aria-pressed', String(mode === '2p'))
@@ -426,6 +444,12 @@ async function main() {
       }
     }
   }
+  function viewTitle() {
+    if (view === 'raket') return t(MODES.raket.nameKey)
+    if (view === 'akademin') return t(MODES.akademin.nameKey)
+    if (view === 'rabbit') return t(MODES.rabbitHole.nameKey)
+    return t(MODES.trendRider.nameKey)
+  }
   function setView(v, push = true) {
     if (v === view) return
     view = v
@@ -438,27 +462,43 @@ async function main() {
   }
   bLine.setAttribute('aria-pressed', 'true')
   bRaket.setAttribute('aria-pressed', 'false')
-  bAk.setAttribute('aria-pressed', 'false')
+  bAcademy.setAttribute('aria-pressed', 'false')
+  bRabbit.setAttribute('aria-pressed', 'false')
   b1.setAttribute('aria-pressed', 'true')
   b2.setAttribute('aria-pressed', 'false')
-  bLine.onclick = () => setView('line')
-  bRaket.onclick = () => setView('raket')
-  bAk.onclick = () => setView('rabbit')
+  bLine.onclick = () => setView(selectMode({ via: 'click', value: 1 }))
+  bRaket.onclick = () => setView(selectMode({ via: 'click', value: 2 }))
+  bAcademy.onclick = () => setView(selectMode({ via: 'click', value: 3 }))
+  bRabbit.onclick = () => setView(selectMode({ via: 'click', value: 4 }))
   b1.onclick = () => setMode('1p')
   b2.onclick = () => setMode('2p')
-  const fromHash = () => {
-    const h = location.hash
+  let hashBooted = false
+  const fromHash = (source) => {
+    const h = source == null ? location.hash : source
     view = modeFromHash(h)
-    mode = h.includes('2p') ? '2p' : '1p'
-    apply(false)
+    mode = String(h).includes('2p') ? '2p' : '1p'
+    const slug = hashForView(view) + (mode === '2p' && view !== 'akademin' && view !== 'rabbit' ? '-2p' : '')
+    apply(location.hash !== `#${slug}`)
   }
-  addEventListener('hashchange', fromHash)
+  addEventListener('hashchange', () => fromHash(location.hash))
+  addEventListener(
+    'keydown',
+    (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || isTypingTarget(e.target)) return
+      const next = selectMode({ via: 'key', value: e.code })
+      if (!next) return
+      e.preventDefault()
+      setView(next)
+    },
+    true,
+  )
 
   function labelChrome() {
     toggle.setAttribute('aria-label', t('mode.aria'))
     bLine.textContent = t(MODES.trendRider.nameKey)
     bRaket.textContent = t(MODES.raket.nameKey)
-    bAk.textContent = t(MODES.rabbitHole.nameKey)
+    bAcademy.textContent = t(MODES.akademin.nameKey)
+    bRabbit.textContent = t(MODES.rabbitHole.nameKey)
     modeToggle.setAttribute('aria-label', t('players.aria'))
     b1.textContent = t('players.1')
     b2.textContent = t('players.2')
@@ -467,7 +507,8 @@ async function main() {
     skal.setAttribute('aria-label', t('shell.aria'))
     back.textContent = t('shell.back')
     sim.textContent = t('sim.label')
-    document.title = t('page.title')
+    document.title = viewTitle()
+    refreshTitle()
     instr.sync()
     fas.sync()
     const meta = document.querySelector('meta[name="description"]')
@@ -550,6 +591,7 @@ async function main() {
   }
 
   const loop = () => {
+    refreshTitle()
     layoutPanel()
     layoutToggle()
     layoutMode()
@@ -558,8 +600,12 @@ async function main() {
     setTimeout(() => requestAnimationFrame(loop), 90)
   }
   loop()
-  if (location.hash) fromHash()
-  else apply(true)
+  const firstHash = location.hash || bootHash
+  if (!hashBooted) {
+    hashBooted = true
+    if (firstHash) fromHash(firstHash)
+    else apply(true)
+  }
   syncSnap()
 
   window.__nvdaLineRsi = {

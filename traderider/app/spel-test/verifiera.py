@@ -93,7 +93,7 @@ async def run_view(b, name, opt):
     t = await page_text()
     hrefs = await pg.eval_on_selector_all('a.mode', 'els=>els.map(e=>e.getAttribute("href"))')
     res['pages']['/traderider/'] = {'status': r.status, 'hrefs': hrefs, 'unexpected': unexpected(n0), 'banned': banned_hits(t)}
-    ok('/traderider/ har tre kort: NVDA Rider, Raket, Akademin', hrefs == ['/traderider/spel/#nvda-rider', '/traderider/spel/#raket', '/traderider/spel/#akademin'], hrefs)
+    ok('/traderider/ har fyra kort: Trade Rider, RaceX, Akademin, Rabbit Hole', hrefs == ['/traderider/spel/#nvda-rider', '/traderider/spel/#racex', '/traderider/spel/#academy', '/traderider/spel/#rabbit-hole'], hrefs)
     ok('/traderider/ utan «Fler lägen kommer.» och utan spärrade ord', not banned_hits(t), banned_hits(t))
     ok('/traderider/ utan JS-fel', not unexpected(n0), unexpected(n0))
     ok('/traderider/ visar «Simulerade kurser – inte verkliga marknadsdata» och påstår inga verkliga kurser', SIM in t and not real_claims(t), real_claims(t))
@@ -127,7 +127,7 @@ async def run_view(b, name, opt):
     w, h = 150 * z, 110 * z
     clip = {'x': max(0, sx - w / 2), 'y': max(0, sy - h * 0.62), 'width': min(w, vw - max(0, sx - w / 2)), 'height': min(h, vh - max(0, sy - h * 0.62))}
     await pg.screenshot(path=OUT + f'loket-zoom-{name}.png', clip=clip)
-    await pg.screenshot(path=S('02-nvda-rider'), type='jpeg', quality=85)
+    await pg.screenshot(path=S('02-trade-rider'), type='jpeg', quality=85)
     t = await page_text()
     res['pages']['nvda-rider'] = {'unexpected': unexpected(n0), 'banned': banned_hits(t)}
     ok('NVDA Rider utan spärrade ord i sidtexten', not banned_hits(t), banned_hits(t))
@@ -145,10 +145,10 @@ async def run_view(b, name, opt):
     ok('Helskärmsknappen går in och ur helskärm', (fs_on['api'] or fs_on['css']) and not (fs_off['api'] or fs_off['css']), {'på': fs_on, 'av': fs_off})
 
     # 5. Raket via växeln
-    await pg.get_by_role('button', name='Raket', exact=True).click()
+    await pg.get_by_role('button', name='RaceX', exact=True).click()
     await pg.wait_for_timeout(1200)
     st = await pg.evaluate('()=>({view:window.__nvdaLineRsi.view(),hash:location.hash,linePaused:!window.__trEngine.playing})')
-    ok('Växeln byter till Raket (#raket, NVDA Rider pausas)', st['view'] == 'raket' and st['hash'] == '#raket' and st['linePaused'], st)
+    ok('Växeln byter till RaceX (#racex, Trade Rider pausas)', st['view'] == 'raket' and st['hash'] == '#racex' and st['linePaused'], st)
     await pg.keyboard.press('r'); await pg.wait_for_timeout(200)
     await pg.keyboard.press('w'); await pg.wait_for_timeout(2600)
     rk = await pg.evaluate('()=>{const s=window.__nvdaLineRsi.raket.state();return {p:s.p,side:s.side,playing:s.playing,lev:s.lev}}')
@@ -166,7 +166,7 @@ async def run_view(b, name, opt):
     await pg.wait_for_timeout(1200)
     st = await pg.evaluate('()=>({view:window.__nvdaLineRsi.view(),hash:location.hash})')
     t = await page_text()
-    ok('Växeln byter till Akademin (#akademin, lektioner och utmärkelser syns)', st['view'] == 'akademin' and st['hash'] == '#akademin' and 'Dina utmärkelser' in t and 'Lektion 1 av 4' in t.replace('LEKTION', 'Lektion').replace(' AV ', ' av '), st)
+    ok('Växeln byter till Akademin (#academy, lektioner och utmärkelser syns)', st['view'] == 'akademin' and st['hash'] == '#academy' and 'Dina utmärkelser' in t and 'Lektion 1 av 4' in t.replace('LEKTION', 'Lektion').replace(' AV ', ' av '), st)
     rd = pg.get_by_role('button', name=re.compile('Jag har läst'))
     if await rd.count():
         await rd.first.click(); await pg.wait_for_timeout(900)
@@ -183,7 +183,7 @@ async def run_view(b, name, opt):
     await pg.wait_for_timeout(800)
     ok('Växeln tillbaka till NVDA Rider', await pg.evaluate('()=>window.__nvdaLineRsi.view()') == 'line')
     res['pages']['spel-alla-lagen'] = {'unexpected': unexpected(n0)}
-    ok('Spelet (alla tre lägen) utan oväntade JS-fel', not unexpected(n0), unexpected(n0))
+    ok('Spelet (alla fyra lägen) utan oväntade JS-fel', not unexpected(n0), unexpected(n0))
     spel_reqs = reqs[r0:]
     bad_req = [u for u in spel_reqs if FORBIDDEN_REQ.search(u)]
     ext = sorted({u.split('/')[2] for u in spel_reqs if u.startswith('http') and not u.startswith(BASE)} - {'fonts.googleapis.com', 'fonts.gstatic.com'})  # bara typsnitt utifrån
@@ -192,7 +192,7 @@ async def run_view(b, name, opt):
        any(u.endswith('/traderider/spel/data/simulerad-kurs.json') for u in spel_reqs) and not bad_req and not ext, res['spel_requests'])
 
     # 8. Direktlänkar med hash
-    for h, v in [('#nvda-rider', 'line'), ('#raket', 'raket'), ('#akademin', 'akademin')]:
+    for h, v in [('#nvda-rider', 'line'), ('#racex', 'raket'), ('#raket', 'raket'), ('#academy', 'akademin'), ('#akademin', 'akademin'), ('#rabbit-hole', 'rabbit')]:
         await pg.goto(BASE + '/traderider/')
         r, n0 = await visit('h', '/traderider/spel/' + h, 300)
         await pg.wait_for_function('()=>window.__nvdaLineRsi', timeout=20000)
@@ -202,7 +202,7 @@ async def run_view(b, name, opt):
 
     # 9. Gamla demoadresser
     for old, target, v in [('/traderider/demo/', '/traderider/', None), ('/traderider/demo/tag/', '/traderider/spel/#nvda-rider', 'line'),
-                           ('/traderider/demo/raket/', '/traderider/spel/#raket', 'raket'), ('/traderider/demo/akademin/', '/traderider/spel/#akademin', 'akademin')]:
+                           ('/traderider/demo/raket/', '/traderider/spel/#racex', 'raket'), ('/traderider/demo/akademin/', '/traderider/spel/#academy', 'akademin')]:
         r, n0 = await visit('old', old, 600)
         if v:
             await pg.wait_for_function('()=>window.__nvdaLineRsi', timeout=20000)

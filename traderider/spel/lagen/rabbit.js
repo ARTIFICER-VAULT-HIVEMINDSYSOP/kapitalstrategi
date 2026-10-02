@@ -6,12 +6,13 @@ import { keyAction, PREVENT_DEFAULT } from './keys.js'
 import { MODES, createSteering, wheelToIntent } from './orientation.js'
 import { t, onLang } from './i18n.js'
 import { createGestureLock } from './styrmotor.js'
+import { positionFor, steerLanes } from './spar.js'
 
 const O = MODES.rabbitHole.orientation
 const steering = createSteering(O)
 
 const css = `
-.nlr-rh{display:none;position:fixed;inset:0;z-index:25;background:#140e0c;color:#f4efe6}
+.nlr-rh{display:none;position:fixed;inset:0;z-index:50;background:#140e0c;color:#f4efe6}
 .nlr-rh.on{display:block}
 .nlr-rh canvas{width:100%;height:100%;display:block}
 .nlr-rh-hud{position:absolute;left:12px;right:12px;top:64px;display:flex;justify-content:space-between;gap:12px;pointer-events:none;font:600 12px/1.35 "IBM Plex Sans",sans-serif}
@@ -90,6 +91,7 @@ export function createRabbit() {
   let y = 40
   let side = 'flat'
   let leverage = 1
+  let lastX = null
   const lock = createGestureLock(480)
   const candles = Array.from({ length: 18 }, (_, i) => (i % 3 === 0 ? -1 : 1))
 
@@ -102,6 +104,7 @@ export function createRabbit() {
     canvas.width = Math.round(w * dpr)
     canvas.height = Math.round(h * dpr)
     const c = canvas.getContext('2d')
+    if (!c) return
     c.setTransform(dpr, 0, 0, dpr, 0, 0)
     c.fillStyle = '#140e0c'
     c.fillRect(0, 0, w, h)
@@ -123,14 +126,17 @@ export function createRabbit() {
       if (dir > 0) carrot(c, x, cy)
       else chili(c, x, cy)
     })
+    const lanes = steerLanes(w, 'right')
+    const xPos = positionFor(side, lanes.buy, lanes.sell)
+    lastX = xPos
     c.fillStyle = '#f7f4ef'
     c.beginPath()
-    c.ellipse(w / 2, h * 0.42, 26, 34, 0, 0, Math.PI * 2)
+    c.ellipse(xPos, h * 0.42, 26, 34, 0, 0, Math.PI * 2)
     c.fill()
-    c.fillRect(w / 2 - 16, h * 0.42 - 8, 32, 8)
+    c.fillRect(xPos - 16, h * 0.42 - 8, 32, 8)
     c.fillStyle = '#1a1a1a'
-    c.fillRect(w / 2 - 14, h * 0.42 - 6, 10, 5)
-    c.fillRect(w / 2 + 4, h * 0.42 - 6, 10, 5)
+    c.fillRect(xPos - 14, h * 0.42 - 6, 10, 5)
+    c.fillRect(xPos + 4, h * 0.42 - 6, 10, 5)
     battery(c, w - 64, 72)
   }
 
@@ -194,5 +200,17 @@ export function createRabbit() {
       }
     },
     anchor: () => 'bottom',
+    step(n = 1) {
+      const ticks = Math.max(1, Math.min(12, Math.round(Number(n) / 0.016) || 1))
+      for (let i = 0; i < ticks; i++) {
+        y += 1.2 * Math.max(0.4, leverage / 4)
+        paint()
+      }
+    },
+    state() {
+      const w = root.clientWidth || 800
+      const lanes = steerLanes(w, 'right')
+      return { side, leverage, y, x: positionFor(side, lanes.buy, lanes.sell), ...lanes }
+    },
   }
 }
