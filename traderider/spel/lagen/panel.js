@@ -38,6 +38,11 @@ const css = `
 .nlr-rsi-txt b{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15}
 .nlr-rsi-txt span{font-size:10px;color:${MUTED}}
 .nlr-rsi canvas{flex:1;min-width:0;height:40px;max-height:52px;display:block}
+.nlr-rsi.compact{padding:2px 8px;gap:8px;align-items:center}
+.nlr-rsi.compact .nlr-rsi-txt{flex-direction:row;align-items:baseline;gap:6px;min-width:0}
+.nlr-rsi.compact .nlr-rsi-txt span{display:none}
+.nlr-rsi.compact .nlr-rsi-txt b{font-size:13px}
+.nlr-rsi.compact canvas{height:16px;max-height:16px}
 .nlr-toggle{display:flex;gap:2px;padding:4px}
 .nlr-toggle button{border:0;background:transparent;border-radius:999px;padding:0 14px;height:100%;font:500 13px "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:${INK};cursor:pointer;white-space:nowrap}
 .nlr-toggle button[aria-pressed="true"]{background:${INK};color:#f3ede2}
@@ -104,6 +109,43 @@ function waitEngine() {
   })
 }
 
+const BAND_LABEL = /^(Övning|Practice|Тренування|På grafen|On chart|На графіку|När|When|Коли|Band|Bands|Смуги|1D|5D|1M|6M|1Y|5Y|Max|Maks|Live)$/
+
+function shownBox(el) {
+  if (!el) return null
+  const cs = getComputedStyle(el)
+  if (cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0) return null
+  const r = el.getBoundingClientRect()
+  if (r.width < 2 || r.height < 2) return null
+  return r
+}
+
+/** Underkanten på sidhuvudet och korten som ligger i den övre delen av spelplanen. */
+function bandFloor(pane) {
+  let floor = pane.top
+  const topLimit = pane.top + pane.height * 0.62
+  const take = (r) => {
+    if (!r || r.height > pane.height * 0.7) return
+    if (r.bottom <= pane.top + 1 || r.top > topLimit) return
+    floor = Math.max(floor, r.bottom)
+  }
+  take(shownBox(document.querySelector('header.pointer-events-none')))
+  for (const node of document.querySelectorAll('div, span, small, p, button')) {
+    if (node.closest('.nlr-rsi, .tr-chrome, [data-tr-splash], .nlr-raket, .nlr-duo, .nlr-rh, .nlr-ak')) continue
+    if (node.children.length) continue
+    const text = (node.textContent || '').trim()
+    if (!BAND_LABEL.test(text)) continue
+    let tile = node
+    for (let n = node.parentElement; n && n !== document.body; n = n.parentElement) {
+      const r = n.getBoundingClientRect()
+      if (r.height > 140 || r.height < 8) break
+      tile = n
+    }
+    take(shownBox(tile))
+  }
+  return floor
+}
+
 function periodLabel(eng) {
   const key = eng.spec?.key
   return { live: '1D', '5d': '5D', '1mo': '1M', '6mo': '6M', '1y': '1Y', '5y': '5Y', max: t('period.max') }[key] ?? key ?? '—'
@@ -158,8 +200,8 @@ async function main() {
 
   function layoutPanel() {
     const mobile = innerWidth <= 640
-    const h = mobile ? 50 : 58
-    const canvasH = h - 12
+    let h = mobile ? 50 : 58
+    let canvasH = h - 12
     const park = () => {
       panel.style.top = `${innerHeight + 16}px`
       panel.style.height = `${h}px`
@@ -175,12 +217,27 @@ async function main() {
     const anchor = row.height > innerHeight * 0.45 ? buy.getBoundingClientRect() : row
     const pane = document.querySelector('div.relative.h-dvh')?.getBoundingClientRect()
     if (!pane || anchor.width < 2 || anchor.top > pane.bottom - 8 || anchor.bottom < pane.top + 8) return park()
-    const minTop = Math.round(pane.top)
-    const maxTop = Math.round(pane.bottom - h - 4)
-    if (maxTop < minTop) return park()
+    const minTop = Math.round(bandFloor(pane) + 4)
+    const aboveMax = Math.round(anchor.top - h - 4)
     let top = Math.round(anchor.top - h - 8)
-    if (top > maxTop) top = maxTop
-    if (top < minTop) top = minTop
+    if (top > aboveMax) top = aboveMax
+    panel.classList.remove('compact')
+    if (top < minTop) {
+      let low = anchor.bottom
+      for (const el of document.querySelectorAll('button')) {
+        if (el.closest('.tr-chrome, header.pointer-events-none, [data-tr-splash], .nlr-raket, .nlr-duo, .nlr-rh, .nlr-ak')) continue
+        const r = el.getBoundingClientRect()
+        if (r.width < 8 || r.height < 8 || r.bottom > pane.bottom + 2 || r.top < anchor.top - 8) continue
+        if (r.bottom > low) low = r.bottom
+      }
+      const compactH = 28
+      const below = Math.round(low + 4)
+      if (below + compactH > pane.bottom - 2) return park()
+      top = below
+      h = compactH
+      canvasH = 16
+      panel.classList.add('compact')
+    }
     panel.style.left = `${Math.round(Math.max(pane.left, anchor.left))}px`
     panel.style.width = `${Math.round(Math.min(anchor.width, pane.width, innerWidth))}px`
     panel.style.top = `${top}px`

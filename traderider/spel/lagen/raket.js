@@ -146,6 +146,9 @@ html[data-nlr-view="raket"] .nlr-toggle button:focus-visible{outline:2px solid $
 .nlr-raket.short .nlr-rk-start [data-k="startBody"]{display:none}
 .nlr-raket.short:not(.nlr-rk-2p) .nlr-rk-quote{top:8px;max-width:148px}
 .nlr-raket.short:not(.nlr-rk-2p) .nlr-rk-pnl{display:none}
+.nlr-raket.short.live:not(.nlr-rk-2p) .nlr-rk-pnl{display:block;top:8px;right:auto;bottom:auto;left:12px;text-align:left;min-width:0;max-width:min(220px,46%);padding:4px 8px}
+.nlr-raket.short.live:not(.nlr-rk-2p) .nlr-rk-pnl b,.nlr-raket.short.live:not(.nlr-rk-2p) .nlr-rk-pnl .nlr-rk-boost{display:none}
+.nlr-raket.short.live:not(.nlr-rk-2p) .nlr-rk-pnl small{font-size:11px;letter-spacing:.04em;text-transform:none}
 .nlr-raket.short .nlr-rk-start{top:12px;left:12px;transform:none;text-align:left;max-width:min(340px,calc(100% - 200px))}
 .nlr-raket.short.nlr-rk-2p .nlr-rk-pnl{max-width:min(148px,34%);max-height:44px;overflow:hidden}
 .nlr-raket.short.nlr-rk-2p .nlr-rk-who{max-height:32px;overflow:hidden}
@@ -275,6 +278,33 @@ export const STAR_LAYERS = [
   { n: 40, speed: 0.3, size: 1.6, alpha: 0.6 },
   { n: 16, speed: 0.6, size: 2.2, alpha: 0.8 },
 ]
+/** Rektangel för en HUD-etikett. y är mitten, textWidth är utan utfyllnad. */
+export function labelBox(x, y, textWidth, { size = 13, align = 'left', W = Infinity } = {}) {
+  const tw = textWidth + 16
+  const h = size + 11
+  let lx = align === 'center' ? x - tw / 2 : align === 'right' ? x - tw : x
+  if (Number.isFinite(W)) lx = Math.max(4, Math.min(W - tw - 4, lx))
+  return { x: lx, y: y - h / 2, w: tw, h }
+}
+
+export function boxesOverlap(a, b) {
+  const iw = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)
+  const ih = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y)
+  return iw > 1 && ih > 1
+}
+
+/** Flytta ENTRY tills rutan är fri. Hindren (SKJUTS, pris) lämnas orörda. */
+export function dodgeEntryY(boxAt, obstacles, { minY, maxY, startY }) {
+  const clear = (y) => y >= minY && y <= maxY && obstacles.every((o) => !boxesOverlap(boxAt(y), o))
+  if (clear(startY)) return startY
+  const reach = Math.ceil(Math.max(0, maxY - minY)) + 2
+  for (let d = 2; d <= reach; d += 2) {
+    if (clear(startY - d)) return startY - d
+    if (clear(startY + d)) return startY + d
+  }
+  return null
+}
+
 export function makeStars(seed = 7) {
   let s = seed
   const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647)
@@ -573,6 +603,7 @@ export function createRaket({ engine }) {
     const vps = splitViewports(W, H, mode)
     root.classList.toggle('narrow', mode === '2p' && W <= 700)
     root.classList.toggle('short', H < 520)
+    root.classList.toggle('live', clock.started)
     const calm = reduced()
     const now = performance.now() / 1000
     players.forEach((pl, i) => {
@@ -726,25 +757,22 @@ export function createRaket({ engine }) {
 
   function hudLabel(c, text, x, y, { color = TEXT, border = 'rgba(46,230,255,0.7)', bg = 'rgba(10,15,46,0.92)', size = 13, align = 'left', W = Infinity } = {}) {
     c.font = `600 ${size}px ${MONO}`
-    const tw = c.measureText(text).width + 16
-    const h = size + 11
-    let lx = align === 'center' ? x - tw / 2 : align === 'right' ? x - tw : x
-    lx = Math.max(4, Math.min(W - tw - 4, lx))
+    const box = labelBox(x, y, c.measureText(text).width, { size, align, W })
     c.fillStyle = bg
-    c.fillRect(lx, y - h / 2, tw, h)
+    c.fillRect(box.x, box.y, box.w, box.h)
     c.strokeStyle = border
     c.lineWidth = 1
-    c.strokeRect(lx + 0.5, y - h / 2 + 0.5, tw - 1, h - 1)
+    c.strokeRect(box.x + 0.5, box.y + 0.5, box.w - 1, box.h - 1)
     c.fillStyle = border
-    c.fillRect(lx, y - h / 2, 5, 1.5)
-    c.fillRect(lx, y - h / 2, 1.5, 5)
-    c.fillRect(lx + tw - 5, y + h / 2 - 1.5, 5, 1.5)
-    c.fillRect(lx + tw - 1.5, y + h / 2 - 5, 1.5, 5)
+    c.fillRect(box.x, box.y, 5, 1.5)
+    c.fillRect(box.x, box.y, 1.5, 5)
+    c.fillRect(box.x + box.w - 5, box.y + box.h - 1.5, 5, 1.5)
+    c.fillRect(box.x + box.w - 1.5, box.y + box.h - 5, 1.5, 5)
     c.fillStyle = color
     c.textBaseline = 'middle'
     c.textAlign = 'left'
-    c.fillText(text, lx + 8, y + 0.5)
-    return { x: lx, w: tw, h }
+    c.fillText(text, box.x + 8, y + 0.5)
+    return box
   }
 
   function renderPlayer(c, pl, i, vp, dt, calm, now) {
@@ -883,6 +911,28 @@ export function createRaket({ engine }) {
     pl.tilt = smoothTo(pl.tilt, rocketTilt(dx, pxPer), step, 7)
     const tilt = pl.tilt
     const accentRGB = st.side === 'buy' ? '140,240,60' : '255,90,106'
+    const tagTxt = fx.boost > 0.01 ? t('rk.boost') : fx.loss > 0.01 ? t('rk.rocks') : flat && st.traded ? t('pos.flat') : ''
+    const price = priceAt(p)
+    const priceText = fmtPrice(price)
+    c.font = `600 13px ${MONO}`
+    const priceMeasure = c.measureText(priceText).width
+    const priceOuter = priceMeasure + 16
+    let priceX = x + (flat || st.side === 'buy' ? -priceOuter - 28 : 28)
+    if (priceX < 4) priceX = x + 28
+    if (priceX + priceOuter > W - 4) priceX = x - priceOuter - 28
+    const fixedLabels = []
+    if (tagTxt) {
+      c.font = `600 11px ${MONO}`
+      fixedLabels.push(labelBox(x, rocketY + 56, c.measureText(tagTxt).width, { size: 11, align: 'center', W }))
+    }
+    fixedLabels.push(labelBox(priceX, rocketY, priceMeasure, { size: 13, align: 'left', W }))
+    const alert = fx.move <= -GLITCH_AT
+    const alertY = Math.max(twoP ? 110 : 86, rocketY - (compact ? 120 : 150))
+    const alertSize = compact ? 10 : 12
+    if (alert) {
+      c.font = `600 ${alertSize}px ${MONO}`
+      fixedLabels.push(labelBox(W / 2, alertY, c.measureText(t('rk.warn', { pct: fmtPct(fx.move) })).width, { size: alertSize, align: 'center', W }))
+    }
 
     // ingångslinje (befintligt ingångspris – ingen ny logik)
     if (!flat) {
@@ -898,11 +948,21 @@ export function createRaket({ engine }) {
         c.setLineDash([])
         const ctlTop = pl.dom.el.querySelector('.nlr-rk-ctl')?.getBoundingClientRect()
         let entryY = rocketY + (compact ? 78 : 92)
+        let maxY = H - 16
         if (ctlTop) {
           const limit = ctlTop.top - paneTop - 16
           if (entryY > limit) entryY = limit
+          maxY = Math.min(maxY, limit)
         }
-        if (entryY > rocketY + 20) hudLabel(c, `ENTRY ${fmtPrice(st.entry)}`, ex, entryY, { size: 11, align: 'center', color: TEXT, border: `rgba(${accentRGB},0.8)`, W })
+        const entryText = `ENTRY ${fmtPrice(st.entry)}`
+        c.font = `600 11px ${MONO}`
+        const entryW = c.measureText(entryText).width
+        const placed = dodgeEntryY((yy) => labelBox(ex, yy, entryW, { size: 11, align: 'center', W }), fixedLabels, {
+          minY: rocketY + 21,
+          maxY,
+          startY: entryY,
+        })
+        if (placed != null) hudLabel(c, entryText, ex, placed, { size: 11, align: 'center', color: TEXT, border: `rgba(${accentRGB},0.8)`, W })
       }
     }
 
@@ -1094,26 +1154,15 @@ export function createRaket({ engine }) {
       c.fillRect(0, 0, W, H)
     }
 
-    // etikett under raketen: läge + öppet resultat (riktiga tal)
-    const tagTxt = fx.boost > 0.01 ? t('rk.boost') : fx.loss > 0.01 ? t('rk.rocks') : flat && st.traded ? t('pos.flat') : ''
+    // etikett under raketen: läge + öppet resultat (riktiga tal). Rutan är redan räknad så ENTRY kan väja.
     if (tagTxt) {
       const plus = fx.boost > 0.01
       const minus = fx.loss > 0.01
       hudLabel(c, tagTxt, x, rocketY + 56, { size: 11, align: 'center', W, color: plus || minus ? ON_DARK : TEXT, bg: plus ? BUY : minus ? SELL : 'rgba(10,15,46,0.92)', border: plus ? BUY : minus ? SELL : CYAN })
     }
-    // varning vid förlust ≥ GLITCH_AT % (statisk text även vid reducerad rörelse)
-    const alert = fx.move <= -GLITCH_AT
-    if (alert) hudLabel(c, t('rk.warn', { pct: fmtPct(fx.move) }), W / 2, Math.max(twoP ? 110 : 86, rocketY - (compact ? 120 : 150)), { size: compact ? 10 : 12, align: 'center', W, color: TEXT, border: SELL, bg: 'rgba(40,8,28,0.92)' })
+    if (alert) hudLabel(c, t('rk.warn', { pct: fmtPct(fx.move) }), W / 2, alertY, { size: alertSize, align: 'center', W, color: TEXT, border: SELL, bg: 'rgba(40,8,28,0.92)' })
 
-    // prisbricka vid raketen
-    const price = priceAt(p)
-    const label = fmtPrice(price)
-    c.font = `600 13px ${MONO}`
-    const tw = c.measureText(label).width + 16
-    let lx = x + (flat || st.side === 'buy' ? -tw - 28 : 28)
-    if (lx < 4) lx = x + 28
-    if (lx + tw > W - 4) lx = x - tw - 28
-    hudLabel(c, label, lx, rocketY, { size: 13, W, color: TEXT, border: 'rgba(46,230,255,0.8)' })
+    hudLabel(c, priceText, priceX, rocketY, { size: 13, W, color: TEXT, border: 'rgba(46,230,255,0.8)' })
 
     // glitch vid stor förlust (inte vid reducerad rörelse)
     const gl = glitchLevel(fx, calm)
@@ -1136,7 +1185,8 @@ export function createRaket({ engine }) {
     const ts = priceAt(p, 't')
     q('price').textContent = fmtPrice(price)
     q('when').textContent = fmtDate(ts, key)
-    q('pnlLabel').textContent = !st.traded ? t('hud.result') : flat ? t('rk.pnlFlat') : t('rk.pnlOpen', { lev: st.lev })
+    const practiceBadge = mode !== '2p' && root.classList.contains('short') && root.classList.contains('live')
+    q('pnlLabel').textContent = practiceBadge ? t('hud.practiceBadge') : !st.traded ? t('hud.result') : flat ? t('rk.pnlFlat') : t('rk.pnlOpen', { lev: st.lev })
     const pnlEl = q('pnl')
     pnlEl.textContent = !st.traded ? '—' : t('hud.resultNote')
     pnlEl.style.color = TEXT

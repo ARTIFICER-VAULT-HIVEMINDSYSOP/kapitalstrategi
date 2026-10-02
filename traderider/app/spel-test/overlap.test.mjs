@@ -21,6 +21,8 @@ const VIEWPORTS = [
   { w: 390, h: 844, dpr: 3, name: '390x844-dpr3' },
   { w: 768, h: 1024, dpr: 1, name: '768x1024' },
   { w: 844, h: 390, dpr: 1, name: '844x390' },
+  { w: 740, h: 360, dpr: 1, name: '740x360' },
+  { w: 667, h: 375, dpr: 1, name: '667x375' },
   { w: 1280, h: 800, dpr: 1, name: '1280x800' },
   { w: 1440, h: 900, dpr: 1, name: '1440x900' },
 ]
@@ -60,7 +62,7 @@ function collect() {
     'Kurs', 'Price', 'Курс',
   ]
   const captions = new Set(['Simulerad kurs', 'Simulated price', 'Симульований курс', 'Kurs', 'Price', 'Курс'])
-  const widget = '.tr-snap, .nlr-rk-quote, .nlr-rk-pnl, .nlr-rk-who, .nlr-rk-start, .nlr-duo-who, .nlr-duo-pnl, .nlr-rh-hud, .tr-sim, [data-tr-badge]'
+  const widget = '.tr-snap, .nlr-rk-quote, .nlr-rk-pnl, .nlr-rk-who, .nlr-rk-start, .nlr-duo-who, .nlr-duo-pnl, .nlr-rh-hud, .nlr-rsi, .tr-sim, [data-tr-badge]'
   const nodes = [...document.querySelectorAll(`button, a, input, select, textarea, h1, h2, h3, ${widget}, [data-tr-trade-title], .tr-chrome *`)]
   const kicker = document.querySelector('[data-tr-splash] p')
   if (kicker) nodes.push(kicker)
@@ -299,12 +301,44 @@ function collect() {
     giants.push(`${el.tagName}.${String(el.className).slice(0, 48)} ${Math.round(r.height)}`)
     if (giants.length >= 6) break
   }
+  function claimShown(el) {
+    if (!painted(el)) return false
+    const where = layer(el)
+    if (where !== active && !(splashOn && el.closest('[data-tr-splash]'))) return false
+    const r = el.getBoundingClientRect()
+    const slop = 0.5
+    if (r.width < 8 || r.height < 8) return false
+    if (r.top < slop || r.left < slop || r.bottom > innerHeight - slop || r.right > innerWidth - slop) return false
+    const clips = (v) => v === 'auto' || v === 'scroll' || v === 'hidden' || v === 'clip'
+    for (let n = el.parentElement; n; n = n.parentElement) {
+      const cs = getComputedStyle(n)
+      const clipsY = clips(cs.overflowY)
+      const clipsX = clips(cs.overflowX)
+      if (!clipsY && !clipsX) continue
+      const c = n.getBoundingClientRect()
+      if (clipsY && (r.top < c.top - slop || r.bottom > c.bottom + slop)) return false
+      if (clipsX && (r.left < c.left - slop || r.right > c.right + slop)) return false
+    }
+    const self = getComputedStyle(el)
+    if (clips(self.overflowY) && el.scrollHeight > el.clientHeight + 2) return false
+    if (clips(self.overflowX) && el.scrollWidth > el.clientWidth + 2) return false
+    const pad = Math.min(2, r.width / 4, r.height / 4)
+    const points = [
+      [r.left + r.width / 2, r.top + r.height / 2],
+      [r.left + pad, r.top + pad],
+      [r.right - pad, r.top + pad],
+      [r.left + pad, r.bottom - pad],
+      [r.right - pad, r.bottom - pad],
+    ]
+    for (const [px, py] of points) {
+      const hit = document.elementFromPoint(px, py)
+      if (!hit || (hit !== el && !el.contains(hit))) return false
+    }
+    return true
+  }
   const claims = []
   for (const el of document.querySelectorAll('[data-tr-claim]')) {
-    if (!painted(el)) continue
-    const r = el.getBoundingClientRect()
-    const onScreen = r.height > 2 && r.bottom > 1 && r.top < innerHeight - 1 && r.right > 1 && r.left < innerWidth - 1
-    claims.push({ text: (el.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 220), onScreen })
+    claims.push({ text: (el.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 220), onScreen: claimShown(el) })
   }
   return { pairs, outside, priceLabels, badgeText, playHits, simClip, missed, giants, claims }
 }
