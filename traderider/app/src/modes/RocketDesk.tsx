@@ -139,10 +139,10 @@ export function RocketDesk({ candles, label }: { candles: Candle[]; label: strin
 
           <div className="rk-glass rk-chart">
             <div className="rk-chart-head">
-              <span>NVDA · 1h · {label.startsWith('Fallback') || label === '' ? ui.series : label}</span>
+              <span>{label.startsWith('Fallback') || label === '' ? ui.series : label}</span>
               <span>{when}</span>
             </div>
-            <canvas ref={canvasRef} className="rk-canvas" aria-label="NVDA-grafen roterad: tiden flödar uppåt, pris åt höger. Raketen följer aktuell kurs högst upp i flödet." />
+            <canvas ref={canvasRef} className="rk-canvas" aria-label={ui.chartAria} />
             <FacePortrait
               theme="raket"
               className="rk-face"

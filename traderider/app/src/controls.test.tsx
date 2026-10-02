@@ -3,7 +3,6 @@ import { afterEach, expect, test } from 'vitest'
 import { Desk } from './components/Desk'
 import { createDesk, markFromCandles, priceScale, sampleBand, trainDrawScale, trainScreenY } from './lib/deskState'
 import { commandFromKey } from './lib/keys'
-import { SESSION_KEY } from './lib/brokerSession'
 import type { Candle } from './lib/types'
 
 function fixture(): Candle[] {
@@ -82,22 +81,18 @@ test('fallback data is labelled on the desk', () => {
     <Desk
       candles={fixture()}
       source="fallback"
-      label="Fallback data — Yahoo unavailable"
+      label="Medföljande kursserie"
       autoRun={false}
     />,
   )
-  expect(view.getByText(/Fallback data — Yahoo unavailable/)).toBeTruthy()
+  expect(view.getByText(/Medföljande kursserie/)).toBeTruthy()
 })
 
-test('reset does not call the broker when the session is live', async () => {
+test('desk is local practice only: no broker panel and no network calls on orders or reset', async () => {
+  // En gammal nyckel från den borttagna mäklarpanelen får inte väcka något.
   sessionStorage.setItem(
-    SESSION_KEY,
-    JSON.stringify({
-      env: 'live',
-      keyId: 'key-test-id',
-      secret: 'secret-test-value',
-      liveAcknowledged: true,
-    }),
+    'traderider.alpaca.session.v1',
+    JSON.stringify({ env: 'live', keyId: 'key-test-id', secret: 'secret-test-value', liveAcknowledged: true }),
   )
   const calls: string[] = []
   const original = globalThis.fetch
@@ -106,58 +101,23 @@ test('reset does not call the broker when the session is live', async () => {
     return new Response('{}', { status: 500 })
   }) as typeof fetch
   try {
-    const view = render(<Desk candles={fixture()} source="yahoo" label="Yahoo NVDA" autoRun={false} />)
+    const view = render(<Desk candles={fixture()} source="fallback" label="Simulated" autoRun={false} />)
+    expect(view.queryByRole('heading', { name: 'Broker' })).toBeNull()
+    expect(view.getByText(/Local practice only\. No broker, no keys/)).toBeTruthy()
+    for (const name of [/Buy/, /Sell/, /Flat/]) {
+      await act(async () => {
+        view.getByRole('button', { name }).click()
+      })
+    }
     await act(async () => {
       view.getByRole('button', { name: 'Reset book' }).click()
     })
     expect(calls).toEqual([])
-    expect(view.getByText(/Live broker position was not flattened/)).toBeTruthy()
-    expect(document.body.textContent ?? '').not.toContain('secret-test-value')
-  } finally {
-    globalThis.fetch = original
-  }
-})
-
-test('static desk hides the broker and does not call /api/broker', async () => {
-  sessionStorage.setItem(
-    SESSION_KEY,
-    JSON.stringify({
-      env: 'live',
-      keyId: 'key-test-id',
-      secret: 'secret-test-value',
-      liveAcknowledged: true,
-    }),
-  )
-  const calls: string[] = []
-  const original = globalThis.fetch
-  globalThis.fetch = (async (input: RequestInfo | URL) => {
-    calls.push(String(input))
-    return new Response('{}', { status: 500 })
-  }) as typeof fetch
-  try {
-    const view = render(
-      <Desk
-        candles={fixture()}
-        source="fallback"
-        label="Fallback data — Yahoo unavailable"
-        autoRun={false}
-        brokerEnabled={false}
-      />,
-    )
-    expect(view.queryByRole('heading', { name: 'Broker' })).toBeNull()
-    expect(view.getByText(/Static paper book\. Broker is off/)).toBeTruthy()
-    await act(async () => {
-      view.getByRole('button', { name: /Buy/ }).click()
-    })
-    expect(calls.filter((url) => url.includes('/api/broker'))).toEqual([])
-    await act(async () => {
-      view.getByRole('button', { name: 'Reset book' }).click()
-    })
     expect(view.getByText(/Local book reset\. Flat on the 20-SMA/)).toBeTruthy()
-    expect(view.queryByText(/Live broker position was not flattened/)).toBeNull()
     expect(document.body.textContent ?? '').not.toContain('secret-test-value')
   } finally {
     globalThis.fetch = original
+    sessionStorage.clear()
   }
 })
 

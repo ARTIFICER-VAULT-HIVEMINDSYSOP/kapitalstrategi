@@ -1,8 +1,8 @@
 (function () {
   var titles = {
-    sv: 'Traderider: NVDA Rider – övning på historiska NVDA-kurser. Inga riktiga pengar.',
-    en: 'Traderider: NVDA Rider – practice on historical NVDA prices. No real money.',
-    uk: 'Traderider: NVDA Rider – тренування на історичних курсах NVDA. Без справжніх грошей.',
+    sv: 'Traderider: Trade Rider, Raket och Akademin – övning på simulerade kurser, inte verkliga marknadsdata. Inga riktiga pengar.',
+    en: 'Traderider: Trade Rider, Raket and Akademin – practice on simulated prices, not real market data. No real money.',
+    uk: 'Traderider: Trade Rider, Raket і Akademin – тренування на симульованих курсах, не реальні ринкові дані. Без справжніх грошей.',
   }
   function lang() {
     try {
@@ -19,7 +19,7 @@
       var nav = document.querySelector('nav.main-nav')
       if (!nav) return
       // En enda Traderider-post: den gamla «Trade Rider» (/trade-rider) döljs i huvudmenyn och
-      // «Traderider» tar dess plats och leder till ingången /traderider/ (tills vidare bara NVDA Rider).
+      // «Traderider» tar dess plats och leder till ingången /traderider/ (Trade Rider, Raket och Akademin).
       var old = nav.querySelector('a.main-nav-link[href="/trade-rider"]')
       if (old && old.style.display !== 'none') {
         // .main-nav-link sätter display:inline-flex, så hidden-attributet räcker inte

@@ -1,5 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, relative } from 'node:path'
+import { demoRedirects, renderRedirect } from './demo-redirect.mjs'
 
 const root = join(import.meta.dirname, '../../demo')
 const banned = [
@@ -16,6 +17,16 @@ const banned = [
   'Paper book',
   'Gå live',
   'GÅ LIVE',
+  // spärrad demoram (permanent): inga rester får ligga under /traderider/demo/
+  'DemoFrame',
+  'RiderDesk',
+  'Övningskapital',
+  '$100,000',
+  '20-SMA',
+  'Paus · mellanslag',
+  'Alla lägen',
+  'Hävstång − · [',
+  'Hävstång + · ]',
 ]
 
 async function files(dir) {
@@ -40,25 +51,27 @@ if (found.length) {
   process.exit(1)
 }
 
-// Spärrad variant: varje ingång under /traderider/demo/ ska vara omdirigeringen till /nvda-rider/
-// (se REDIRECTED_TO_NVDA_RIDER i vite.demo.config.ts). Faller om ett bygge har återställt demoramen.
-const redirect = await readFile(join(import.meta.dirname, 'nvda-rider-redirect.html'), 'utf8')
-const entries = []
-async function htmlEntries(dir) {
+// Spärrad demoram: varje fil under /traderider/demo/ ska vara exakt omdirigeringen i demo-redirects.json
+// (se DEMO_REDIRECTS i vite.demo.config.ts). Faller om ett bygge har återställt demoramen eller lämnat bundlar kvar.
+const expected = demoRedirects()
+const present = []
+async function allFiles(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const path = join(dir, entry.name)
-    if (entry.isDirectory()) await htmlEntries(path)
-    else if (entry.name.endsWith('.html')) entries.push(path)
+    if (entry.isDirectory()) await allFiles(path)
+    else present.push(relative(root, path).split('\\').join('/'))
   }
 }
-await htmlEntries(root)
-const notRedirected = []
-for (const path of entries) {
-  if ((await readFile(path, 'utf8')) !== redirect) notRedirected.push(path)
+await allFiles(root)
+const problems = []
+for (const rel of present) {
+  if (!(rel in expected)) problems.push(`${rel}: not a redirect entry (demo bundles must not be deployed)`)
+  else if ((await readFile(join(root, rel), 'utf8')) !== renderRedirect(expected[rel])) problems.push(`${rel}: not the redirect to ${expected[rel].mal}`)
 }
-if (notRedirected.length) {
-  console.error('demo entries must redirect to /nvda-rider/ (blocked variant):\n' + notRedirected.join('\n'))
+for (const rel of Object.keys(expected)) if (!present.includes(rel)) problems.push(`${rel}: missing redirect`)
+if (problems.length) {
+  console.error('blocked demo frame: every /traderider/demo/ entry must be a redirect and nothing else may remain:\n' + problems.join('\n'))
   process.exit(1)
 }
 console.log('demo bundle has no broker or external desk links')
-console.log(`all ${entries.length} demo entries redirect to /nvda-rider/`)
+console.log(`all ${present.length} demo files are redirects (${Object.entries(expected).map(([k, v]) => `${k} -> ${v.mal}`).join(', ')})`)

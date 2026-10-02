@@ -1,0 +1,756 @@
+{
+ "desktop": {
+  "checks": {
+   "/ laddar (200) utan JS-fel": {
+    "ok": true
+   },
+   "/traderider/ har tre kort: NVDA Rider, Raket, Akademin": {
+    "ok": true,
+    "detail": [
+     "/traderider/spel/#nvda-rider",
+     "/traderider/spel/#raket",
+     "/traderider/spel/#akademin"
+    ]
+   },
+   "/traderider/ utan «Fler lägen kommer.» och utan spärrade ord": {
+    "ok": true,
+    "detail": []
+   },
+   "/traderider/ utan JS-fel": {
+    "ok": true,
+    "detail": []
+   },
+   "/traderider/ visar «Simulerade kurser – inte verkliga marknadsdata» och påstår inga verkliga kurser": {
+    "ok": true,
+    "detail": []
+   },
+   "NVDA Rider öppnas från kortet (vy line, «NVDA Rider» aktiv)": {
+    "ok": true,
+    "detail": {
+     "view": "line",
+     "pressed": [
+      "NVDA Rider",
+      "1P"
+     ],
+     "url": "http://127.0.0.1:18931/traderider/spel/#nvda-rider"
+    }
+   },
+   "Loket kör framåt (x ökar, lokets +x = plog/skorsten pekar i färdriktningen, vinkel följer rälsen)": {
+    "ok": true,
+    "detail": {
+     "dx": 224.72678643842391,
+     "cosAngle": 0.9788952615372458,
+     "angleMinusTrack": 0.3141150725785283
+    }
+   },
+   "NVDA Rider utan spärrade ord i sidtexten": {
+    "ok": true,
+    "detail": []
+   },
+   "NVDA Rider visar etiketten «Simulerade kurser – inte verkliga marknadsdata»": {
+    "ok": true,
+    "detail": {
+     "text": "Simulerade kurser – inte verkliga marknadsdata",
+     "x": 378,
+     "y": 66,
+     "w": 277.3125,
+     "h": 23.75,
+     "vis": true,
+     "inView": true
+    }
+   },
+   "NVDA Rider påstår inga verkliga kurser (historisk/NVIDIA/live)": {
+    "ok": true,
+    "detail": []
+   },
+   "Helskärmsknappen går in och ur helskärm": {
+    "ok": true,
+    "detail": {
+     "på": {
+      "api": true,
+      "css": false,
+      "label": "Avsluta helskärm (Esc)"
+     },
+     "av": {
+      "api": false,
+      "css": false,
+      "label": "Helskärm"
+     }
+    }
+   },
+   "Växeln byter till Raket (#raket, NVDA Rider pausas)": {
+    "ok": true,
+    "detail": {
+     "view": "raket",
+     "hash": "#raket",
+     "linePaused": true
+    }
+   },
+   "Raket spelar (BUY, positionen rör sig)": {
+    "ok": true,
+    "detail": {
+     "p": 13.083000000000002,
+     "side": "buy",
+     "playing": true,
+     "lev": 1
+    }
+   },
+   "Raket utan spärrade ord i sidtexten": {
+    "ok": true,
+    "detail": []
+   },
+   "Raket visar etiketten «Simulerade kurser – inte verkliga marknadsdata»": {
+    "ok": true,
+    "detail": {
+     "label": {
+      "text": "Simulerade kurser – inte verkliga marknadsdata",
+      "x": 378,
+      "y": 66,
+      "w": 345.84375,
+      "h": 23.75,
+      "vis": true,
+      "inView": true
+     },
+     "claims": []
+    }
+   },
+   "Växeln byter till Akademin (#akademin, lektioner och utmärkelser syns)": {
+    "ok": true,
+    "detail": {
+     "view": "akademin",
+     "hash": "#akademin"
+    }
+   },
+   "Akademin utan spärrade/förbjudna ord i sidtexten": {
+    "ok": true,
+    "detail": []
+   },
+   "Akademin kallar belöningen «utmärkelse»": {
+    "ok": true
+   },
+   "Akademin visar etiketten «Simulerade kurser – inte verkliga marknadsdata»": {
+    "ok": true,
+    "detail": {
+     "label": {
+      "text": "Simulerade kurser – inte verkliga marknadsdata",
+      "x": 399,
+      "y": 56,
+      "w": 277.3125,
+      "h": 23.75,
+      "vis": true,
+      "inView": true
+     },
+     "claims": []
+    }
+   },
+   "Växeln tillbaka till NVDA Rider": {
+    "ok": true
+   },
+   "Spelet (alla tre lägen) utan oväntade JS-fel": {
+    "ok": true,
+    "detail": []
+   },
+   "Spelet laddar bara simulerade kurser: simulerad-kurs.json hämtas, ingen extern kurs-API, ingen mäklar-API, ingen fil med verkliga kurser, ingen extern värd utom typsnitt": {
+    "ok": true,
+    "detail": {
+     "antal": 42,
+     "forbjudna": [],
+     "externa_vardar": []
+    }
+   },
+   "Direktlänk /traderider/spel/#nvda-rider öppnar rätt läge": {
+    "ok": true,
+    "detail": {
+     "view": "line",
+     "unexpected": []
+    }
+   },
+   "Direktlänk /traderider/spel/#raket öppnar rätt läge": {
+    "ok": true,
+    "detail": {
+     "view": "raket",
+     "unexpected": []
+    }
+   },
+   "Direktlänk /traderider/spel/#akademin öppnar rätt läge": {
+    "ok": true,
+    "detail": {
+     "view": "akademin",
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/ -> /traderider/": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/",
+     "view": null,
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/tag/ -> /traderider/spel/#nvda-rider": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/spel/#nvda-rider",
+     "view": "line",
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/raket/ -> /traderider/spel/#raket": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/spel/#raket",
+     "view": "raket",
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/akademin/ -> /traderider/spel/#akademin": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/spel/#akademin",
+     "view": "akademin",
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "SPA-rutt /tradingskolan renderar (404) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 404,
+     "chars": 5683,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "SPA-rutt /nyheter renderar (200) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 200,
+     "chars": 22353,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "SPA-rutt /player-value renderar (404) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 404,
+     "chars": 615,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "SPA-rutt /om-modellen/ renderar (200) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 200,
+     "chars": 2525,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "/nvda-rider/ (oförändrad) laddar 200 utan oväntade JS-fel": {
+    "ok": true,
+    "detail": {
+     "unexpected": [],
+     "not": "befintligt: /nvda-rider/ frågar /api/auth/get-session (404 på Pages)"
+    }
+   }
+  },
+  "pages": {
+   "/": {
+    "status": 200,
+    "unexpected": [],
+    "banned": [
+     "Logga in"
+    ]
+   },
+   "/traderider/": {
+    "status": 200,
+    "hrefs": [
+     "/traderider/spel/#nvda-rider",
+     "/traderider/spel/#raket",
+     "/traderider/spel/#akademin"
+    ],
+    "unexpected": [],
+    "banned": []
+   },
+   "nvda-rider": {
+    "unexpected": [],
+    "banned": []
+   },
+   "raket": {
+    "banned": [],
+    "state": {
+     "p": 13.083000000000002,
+     "side": "buy",
+     "playing": true,
+     "lev": 1
+    }
+   },
+   "akademin": {
+    "banned": []
+   },
+   "spel-alla-lagen": {
+    "unexpected": []
+   }
+  },
+  "train": {
+   "a": {
+    "x": 2083.827826076713,
+    "y": 812.3084914711541,
+    "a": 0.0700291398493264,
+    "flat": false,
+    "side": "buy",
+    "playing": true
+   },
+   "b": {
+    "x": 2308.554612515137,
+    "y": 842.3657202574823,
+    "a": 0.20581250742033322,
+    "flat": false,
+    "side": "buy",
+    "playing": true
+   },
+   "dx": 224.72678643842391,
+   "cosAngle": 0.9788952615372458,
+   "angleMinusTrack": 0.3141150725785283,
+   "screen": {
+    "x": 359.98930157085147,
+    "y": 329.10225668736575,
+    "z": 0.9200000009457425
+   }
+  },
+  "spel_requests": {
+   "antal": 42,
+   "forbjudna": [],
+   "externa_vardar": []
+  },
+  "log": {
+   "console": [
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED"
+   ],
+   "pageerror": [],
+   "http": [
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/health net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/robban/status net::ERR_NAME_NOT_RESOLVED",
+    "404 http://127.0.0.1:18931/tradingskolan",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/tradingskolan/media/hist-01-skepp-till-aktier net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/tradingskolan/voiceover/hist-01-skepp-till-aktier?lang=sv&speaker=robban net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/health net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/robban/status net::ERR_NAME_NOT_RESOLVED",
+    "404 http://127.0.0.1:18931/newsletters/2026-10-01.json",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/newsletter/today net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/health net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/robban/status net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/news net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/newsletter/2026-09-08 net::ERR_NAME_NOT_RESOLVED",
+    "404 http://127.0.0.1:18931/player-value",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/health net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/robban/status net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/robban/status net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/health net::ERR_NAME_NOT_RESOLVED",
+    "404 http://127.0.0.1:18931/api/auth/get-session",
+    "FAILED https://deployment-cbs-modular-ruby.trycloudflare.com/api/nvda?range=1y&interval=1d net::ERR_NAME_NOT_RESOLVED"
+   ]
+  }
+ },
+ "mobil": {
+  "checks": {
+   "/ laddar (200) utan JS-fel": {
+    "ok": true
+   },
+   "/traderider/ har tre kort: NVDA Rider, Raket, Akademin": {
+    "ok": true,
+    "detail": [
+     "/traderider/spel/#nvda-rider",
+     "/traderider/spel/#raket",
+     "/traderider/spel/#akademin"
+    ]
+   },
+   "/traderider/ utan «Fler lägen kommer.» och utan spärrade ord": {
+    "ok": true,
+    "detail": []
+   },
+   "/traderider/ utan JS-fel": {
+    "ok": true,
+    "detail": []
+   },
+   "/traderider/ visar «Simulerade kurser – inte verkliga marknadsdata» och påstår inga verkliga kurser": {
+    "ok": true,
+    "detail": []
+   },
+   "NVDA Rider öppnas från kortet (vy line, «NVDA Rider» aktiv)": {
+    "ok": true,
+    "detail": {
+     "view": "line",
+     "pressed": [
+      "NVDA Rider",
+      "1P"
+     ],
+     "url": "http://127.0.0.1:18931/traderider/spel/#nvda-rider"
+    }
+   },
+   "Loket kör framåt (x ökar, lokets +x = plog/skorsten pekar i färdriktningen, vinkel följer rälsen)": {
+    "ok": true,
+    "detail": {
+     "dx": 229.0697893424849,
+     "cosAngle": 0.9799813842038276,
+     "angleMinusTrack": 0.3087309338384698
+    }
+   },
+   "NVDA Rider utan spärrade ord i sidtexten": {
+    "ok": true,
+    "detail": []
+   },
+   "NVDA Rider visar etiketten «Simulerade kurser – inte verkliga marknadsdata»": {
+    "ok": true,
+    "detail": {
+     "text": "Simulerade kurser – inte verkliga marknadsdata",
+     "x": 12,
+     "y": 192,
+     "w": 277.3125,
+     "h": 23.75,
+     "vis": true,
+     "inView": true
+    }
+   },
+   "NVDA Rider påstår inga verkliga kurser (historisk/NVIDIA/live)": {
+    "ok": true,
+    "detail": []
+   },
+   "Helskärmsknappen går in och ur helskärm": {
+    "ok": true,
+    "detail": {
+     "på": {
+      "api": true,
+      "css": false,
+      "label": "Avsluta helskärm (Esc)"
+     },
+     "av": {
+      "api": false,
+      "css": false,
+      "label": "Helskärm"
+     }
+    }
+   },
+   "Växeln byter till Raket (#raket, NVDA Rider pausas)": {
+    "ok": true,
+    "detail": {
+     "view": "raket",
+     "hash": "#raket",
+     "linePaused": true
+    }
+   },
+   "Raket spelar (BUY, positionen rör sig)": {
+    "ok": true,
+    "detail": {
+     "p": 13.083000000000009,
+     "side": "buy",
+     "playing": true,
+     "lev": 1
+    }
+   },
+   "Raket utan spärrade ord i sidtexten": {
+    "ok": true,
+    "detail": []
+   },
+   "Raket visar etiketten «Simulerade kurser – inte verkliga marknadsdata»": {
+    "ok": true,
+    "detail": {
+     "label": {
+      "text": "Simulerade kurser – inte verkliga marknadsdata",
+      "x": 12,
+      "y": 158,
+      "w": 345.84375,
+      "h": 23.75,
+      "vis": true,
+      "inView": true
+     },
+     "claims": []
+    }
+   },
+   "Växeln byter till Akademin (#akademin, lektioner och utmärkelser syns)": {
+    "ok": true,
+    "detail": {
+     "view": "akademin",
+     "hash": "#akademin"
+    }
+   },
+   "Akademin utan spärrade/förbjudna ord i sidtexten": {
+    "ok": true,
+    "detail": []
+   },
+   "Akademin kallar belöningen «utmärkelse»": {
+    "ok": true
+   },
+   "Akademin visar etiketten «Simulerade kurser – inte verkliga marknadsdata»": {
+    "ok": true,
+    "detail": {
+     "label": {
+      "text": "Simulerade kurser – inte verkliga marknadsdata",
+      "x": 64,
+      "y": 52,
+      "w": 277.3125,
+      "h": 23.75,
+      "vis": true,
+      "inView": true
+     },
+     "claims": []
+    }
+   },
+   "Växeln tillbaka till NVDA Rider": {
+    "ok": true
+   },
+   "Spelet (alla tre lägen) utan oväntade JS-fel": {
+    "ok": true,
+    "detail": []
+   },
+   "Spelet laddar bara simulerade kurser: simulerad-kurs.json hämtas, ingen extern kurs-API, ingen mäklar-API, ingen fil med verkliga kurser, ingen extern värd utom typsnitt": {
+    "ok": true,
+    "detail": {
+     "antal": 42,
+     "forbjudna": [],
+     "externa_vardar": []
+    }
+   },
+   "Direktlänk /traderider/spel/#nvda-rider öppnar rätt läge": {
+    "ok": true,
+    "detail": {
+     "view": "line",
+     "unexpected": []
+    }
+   },
+   "Direktlänk /traderider/spel/#raket öppnar rätt läge": {
+    "ok": true,
+    "detail": {
+     "view": "raket",
+     "unexpected": []
+    }
+   },
+   "Direktlänk /traderider/spel/#akademin öppnar rätt läge": {
+    "ok": true,
+    "detail": {
+     "view": "akademin",
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/ -> /traderider/": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/",
+     "view": null,
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/tag/ -> /traderider/spel/#nvda-rider": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/spel/#nvda-rider",
+     "view": "line",
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/raket/ -> /traderider/spel/#raket": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/spel/#raket",
+     "view": "raket",
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "/traderider/demo/akademin/ -> /traderider/spel/#akademin": {
+    "ok": true,
+    "detail": {
+     "url": "/traderider/spel/#akademin",
+     "view": "akademin",
+     "banned": [],
+     "unexpected": []
+    }
+   },
+   "SPA-rutt /tradingskolan renderar (404) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 404,
+     "chars": 5573,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "SPA-rutt /nyheter renderar (200) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 200,
+     "chars": 22275,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "SPA-rutt /player-value renderar (404) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 404,
+     "chars": 615,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "SPA-rutt /om-modellen/ renderar (200) utan JS-fel": {
+    "ok": true,
+    "detail": {
+     "status": 200,
+     "chars": 2525,
+     "unexpected": [],
+     "not": "befintligt: Pages svarar 404 för okända rutter (404.html = SPA) och /nyheter frågar efter dagens nyhetsbrev-JSON"
+    }
+   },
+   "/nvda-rider/ (oförändrad) laddar 200 utan oväntade JS-fel": {
+    "ok": true,
+    "detail": {
+     "unexpected": [],
+     "not": "befintligt: /nvda-rider/ frågar /api/auth/get-session (404 på Pages)"
+    }
+   }
+  },
+  "pages": {
+   "/": {
+    "status": 200,
+    "unexpected": [],
+    "banned": [
+     "Logga in"
+    ]
+   },
+   "/traderider/": {
+    "status": 200,
+    "hrefs": [
+     "/traderider/spel/#nvda-rider",
+     "/traderider/spel/#raket",
+     "/traderider/spel/#akademin"
+    ],
+    "unexpected": [],
+    "banned": []
+   },
+   "nvda-rider": {
+    "unexpected": [],
+    "banned": []
+   },
+   "raket": {
+    "banned": [],
+    "state": {
+     "p": 13.083000000000009,
+     "side": "buy",
+     "playing": true,
+     "lev": 1
+    }
+   },
+   "akademin": {
+    "banned": []
+   },
+   "spel-alla-lagen": {
+    "unexpected": []
+   }
+  },
+  "train": {
+   "a": {
+    "x": 2068.5058593102294,
+    "y": 811.2290349661794,
+    "a": 0.06469498676745211,
+    "flat": false,
+    "side": "buy",
+    "playing": true
+   },
+   "b": {
+    "x": 2297.5756486527143,
+    "y": 840.0128498840385,
+    "a": 0.20042836868027472,
+    "flat": false,
+    "side": "buy",
+    "playing": true
+   },
+   "dx": 229.0697893424849,
+   "cosAngle": 0.9799813842038276,
+   "angleMinusTrack": 0.3087309338384698,
+   "screen": {
+    "x": 65.30509687963885,
+    "y": 350.831399501845,
+    "z": 0.9200000010940158
+   }
+  },
+  "spel_requests": {
+   "antal": 42,
+   "forbjudna": [],
+   "externa_vardar": []
+  },
+  "log": {
+   "console": [
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: net::ERR_NAME_NOT_RESOLVED"
+   ],
+   "pageerror": [],
+   "http": [
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/health net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/robban/status net::ERR_NAME_NOT_RESOLVED",
+    "404 http://127.0.0.1:18931/tradingskolan",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/tradingskolan/voiceover/hist-01-skepp-till-aktier?lang=sv&speaker=robban net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/tradingskolan/media/hist-01-skepp-till-aktier net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/health net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/robban/status net::ERR_NAME_NOT_RESOLVED",
+    "404 http://127.0.0.1:18931/newsletters/2026-10-01.json",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/newsletter/today net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/news net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/health net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/robban/status net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/newsletter/2026-09-08 net::ERR_NAME_NOT_RESOLVED",
+    "404 http://127.0.0.1:18931/player-value",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/health net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/robban/status net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/health net::ERR_NAME_NOT_RESOLVED",
+    "FAILED https://area-daily-affair-operated.trycloudflare.com/api/robban/status net::ERR_NAME_NOT_RESOLVED",
+    "404 http://127.0.0.1:18931/api/auth/get-session",
+    "FAILED https://deployment-cbs-modular-ruby.trycloudflare.com/api/nvda?range=1y&interval=1d net::ERR_NAME_NOT_RESOLVED"
+   ]
+  }
+ }
+}

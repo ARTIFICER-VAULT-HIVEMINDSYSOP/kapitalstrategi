@@ -1,18 +1,23 @@
-import { copyFileSync, mkdirSync, renameSync, rmSync } from 'node:fs'
+import { mkdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { defineConfig, type Plugin } from 'vite'
 import viteReact from '@vitejs/plugin-react'
+// @ts-expect-error plain ESM helper shared with scripts/check-demo.mjs
+import { demoRedirects, renderRedirect } from './scripts/demo-redirect.mjs'
 
 const pages = resolve(__dirname, 'pages')
 
 /**
- * Spärrad demovariant: ägaren har stängt demoramen (pixeltåget med konduktörsporträtt, 20-SMA-mittfilen,
- * «Övningskapital (sim.)», «Alla lägen» m.m.). Alla ingångar under /traderider/demo/ skrivs därför över
- * efter bygget med en enkel omdirigering till /nvda-rider/. Källkoden och bundlarna finns kvar i repot,
- * men ingen sida laddar dem. Ta bort en rad här först när ägaren uttryckligen har öppnat läget igen.
+ * Spärrad demoram: ägaren har stängt demoramen i src/demo/ permanent. Alla ingångar under /traderider/demo/
+ * skrivs därför över efter bygget med en enkel omdirigering (scripts/demo-redirects.json):
+ *   /traderider/demo/          -> /traderider/
+ *   /traderider/demo/tag/      -> /traderider/spel/#nvda-rider
+ *   /traderider/demo/raket/    -> /traderider/spel/#raket
+ *   /traderider/demo/akademin/ -> /traderider/spel/#akademin
+ * De byggda demobundlarna (assets/) tas bort efter bygget så att ingenting av demoramen hamnar på Pages.
+ * scripts/check-demo.mjs fallerar om något annat än omdirigeringarna finns kvar i ../demo/.
  */
-export const REDIRECTED_TO_NVDA_RIDER = ['index.html', 'tag/index.html', 'akademin/index.html', 'raket/index.html']
-const redirectPage = resolve(__dirname, 'scripts/nvda-rider-redirect.html')
+export const DEMO_REDIRECTS: Record<string, { namn: string; mal: string }> = demoRedirects()
 
 function hoistPages(): Plugin {
   return {
@@ -32,7 +37,8 @@ function hoistPages(): Plugin {
         renameSync(resolve(out, from), dest)
       }
       rmSync(resolve(out, 'pages'), { recursive: true, force: true })
-      for (const page of REDIRECTED_TO_NVDA_RIDER) copyFileSync(redirectPage, resolve(out, page))
+      rmSync(resolve(out, 'assets'), { recursive: true, force: true })
+      for (const [page, target] of Object.entries(DEMO_REDIRECTS)) writeFileSync(resolve(out, page), renderRedirect(target))
     },
   }
 }
