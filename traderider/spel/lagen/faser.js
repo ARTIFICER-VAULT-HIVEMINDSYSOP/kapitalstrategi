@@ -203,9 +203,44 @@ export function mountFas(host, opts) {
   let timer = 0
   let covering = false
   const lock = createGestureLock(480)
+  const shots = []
+  function shown(el) {
+    let node = el
+    while (node) {
+      if (node.hidden) return false
+      if (node.style && node.style.display === 'none') return false
+      node = node.parentElement
+    }
+    return !!el
+  }
+  function sampleMarks() {
+    const badgeOn = !root.hidden && shown(badge)
+    const nodes = [
+      ...document.querySelectorAll('[data-tr-splash], .tr-sim, [data-tr-sim]'),
+    ]
+    for (const el of document.querySelectorAll('span, p, div, button, a')) {
+      const text = (el.childNodes.length === 1 ? el.textContent : '').trim()
+      if (text === t('sim.badge') || text === t('sim.label') || text === t('splash.board')) nodes.push(el)
+    }
+    return { badgeOn, simOn: nodes.some(shown) }
+  }
+  // Under Historia får den simulerade pillen och startkortet inte ligga kvar.
+  function hideSimulatedMarks(on) {
+    for (const el of document.querySelectorAll('[data-tr-splash], .tr-sim, [data-tr-sim]')) {
+      if (on) {
+        el.dataset.trHistoriaHide = '1'
+        el.style.setProperty('display', 'none', 'important')
+      } else if (el.dataset.trHistoriaHide === '1') {
+        delete el.dataset.trHistoriaHide
+        el.style.removeProperty('display')
+      }
+    }
+  }
   const playback = createPlayback(HISTORIA.bars, {
     onIndex(index) {
       drawBars(canvas, HISTORIA.bars, index)
+      paint()
+      if (phases.phase() === 'historia') shots.push(sampleMarks())
     },
     onEnd() {
       phases.endHistoria()
@@ -255,6 +290,7 @@ export function mountFas(host, opts) {
     card.hidden = !showCard
     canvas.hidden = showCard && reducedMotion()
     root.hidden = !covering || opts.isActive?.() === false
+    hideSimulatedMarks(historia && covering && !root.hidden)
   }
 
   function stop() {
@@ -301,9 +337,16 @@ export function mountFas(host, opts) {
   replay.addEventListener('click', () => play())
   onLang(paint)
 
+  function step() {
+    stop()
+    playback.tick()
+  }
+
   return {
     root,
     play,
+    step,
+    shots,
     sync: paint,
     isCovering: () => covering && !root.hidden,
     phases,

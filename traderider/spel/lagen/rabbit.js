@@ -114,9 +114,21 @@ export function createRabbit() {
     const price = priceAt(priceIndex)
     if (entry == null && price != null) entry = price
   }
-  function advancePrice() {
+  let priceDebt = 0
+  let lastFrame = 0
+  // Samma takttid som Historiens staplar, inte en stapel per bildruta.
+  const BAR_SEC = 0.28
+  function advancePrice(dt) {
     if (!series().length) return
-    priceIndex = (priceIndex + 1) % series().length
+    priceDebt += Math.max(0, Number(dt) || 0)
+    let guard = 0
+    let moved = false
+    while (priceDebt >= BAR_SEC && guard++ < 4) {
+      priceDebt -= BAR_SEC
+      priceIndex = (priceIndex + 1) % series().length
+      moved = true
+    }
+    if (!moved) return
     const price = priceAt(priceIndex)
     if (price == null || side === 'flat' || entry == null || entry === 0) return
     const sign = side === 'buy' ? 1 : -1
@@ -207,10 +219,13 @@ export function createRabbit() {
     apply(intent)
   }, { passive: false })
 
-  function frame() {
+  function frame(now) {
     if (!visible || frozen) return
+    const t = typeof now === 'number' ? now : performance.now()
+    const dt = lastFrame ? Math.min(0.05, (t - lastFrame) / 1000) : 0.016
+    lastFrame = t
     y += 1.2 * Math.max(0.4, leverage / 4)
-    advancePrice()
+    advancePrice(dt)
     paint()
     raf = requestAnimationFrame(frame)
   }
@@ -242,12 +257,11 @@ export function createRabbit() {
     },
     anchor: () => 'bottom',
     step(n = 1) {
-      const ticks = Math.max(1, Math.min(12, Math.round(Number(n) / 0.016) || 1))
-      for (let i = 0; i < ticks; i++) {
-        y += 1.2 * Math.max(0.4, leverage / 4)
-        advancePrice()
-        paint()
-      }
+      const dt = Math.max(0, Number(n) || 0)
+      const ticks = Math.max(1, Math.min(12, Math.round((dt || 0.016) / 0.016) || 1))
+      for (let i = 0; i < ticks; i++) y += 1.2 * Math.max(0.4, leverage / 4)
+      advancePrice(dt)
+      paint()
     },
     state() {
       const w = root.clientWidth || 800

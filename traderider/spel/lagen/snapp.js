@@ -17,7 +17,7 @@ html[data-nlr-view="raket"] .tr-snap-opt{color:#e8f4ff;font-family:"IBM Plex Mon
 html[data-nlr-view="raket"] .tr-snap-help{color:#b9c9ea}
 .tr-ratt{position:fixed;z-index:80;width:28px;height:28px;margin:0;pointer-events:none;display:none;color:#1c1915}
 @media (prefers-reduced-motion:reduce){.tr-snap-view{scroll-behavior:auto}}
-@media (max-width:520px){.tr-snap{top:236px;bottom:auto;height:168px;left:12px;right:auto;width:min(148px,42vw)}}
+@media (max-width:520px){.tr-snap{top:168px;bottom:auto;height:132px;left:auto;right:8px;width:min(120px,34vw)}}
 `
 
 let styled = false

@@ -57,7 +57,7 @@ a[href="/login"]{display:none !important}
 html[data-nlr-view="raket"] .tr-sim{color:#e8f4ff;background:rgba(8,12,32,.85);border-color:rgba(64,224,255,.5);font:600 11px/1.25 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.04em}
 html[data-nlr-view="akademin"] .nlr-ak-in{padding-top:96px}
 @media (max-width:640px){.nlr-rsi-txt{min-width:64px}.nlr-rsi-txt b{font-size:14px}.nlr-toggle button{padding:0 9px;font-size:12px}.tr-skal{padding:3px}.tr-skal .tr-back{display:none}.tr-skal .tr-fs-txt{display:none}.tr-skal button{padding:0 9px}}
-@media (max-width:520px){.nlr-toggle{max-width:calc(100vw - 16px);overflow-x:auto}.nlr-toggle button{padding:0 8px;font-size:11px}}
+@media (max-width:520px){.nlr-toggle{max-width:calc(100vw - 16px);overflow-x:auto}.nlr-toggle button{padding:0 8px;font-size:11px}header.pointer-events-none{flex-wrap:wrap}header.pointer-events-none>.pointer-events-auto:first-child{min-width:0;max-width:100%;flex:1 1 100%}header.pointer-events-none .overflow-x-auto{max-width:100%}header.pointer-events-none .overflow-x-auto button{min-width:0;padding-left:6px;padding-right:6px;font-size:11px;height:32px}}
 `
 
 function el(tag, cls, html) {
@@ -339,7 +339,7 @@ async function main() {
   sim.dataset.trSim = '1'
   document.body.appendChild(sim)
   function layoutSim() {
-    const anchor = innerWidth <= 520 && modeToggle.style.display !== 'none' ? modeToggle : toggle
+    const anchor = innerWidth <= 520 ? skal : modeToggle.style.display !== 'none' ? modeToggle : toggle
     const r = anchor.getBoundingClientRect()
     const w = sim.getBoundingClientRect().width
     sim.style.left = `${Math.round(Math.min(Math.max(8, r.left), innerWidth - w - 8))}px`
@@ -549,7 +549,8 @@ async function main() {
     entrySnap.root.style.display = 'none'
   }
   function syncSnap() {
-    const show = view === 'line' && mode === '1p' && !entryDone
+    const splash = document.querySelector('[data-tr-splash]')
+    const show = view === 'line' && mode === '1p' && !entryDone && !splash
     entrySnap.root.style.display = show ? '' : 'none'
   }
   bindStepGestures(document.body, {
@@ -625,6 +626,7 @@ async function main() {
     layoutSim()
     syncGameHeader()
     sim.style.display = fas.isCovering() ? 'none' : ''
+    syncSnap()
     if (view === 'line') drawPanel()
     setTimeout(() => requestAnimationFrame(loop), 90)
   }

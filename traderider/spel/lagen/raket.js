@@ -114,7 +114,7 @@ const css = `
 .nlr-rk-start{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);text-align:center;padding:14px 18px;max-width:calc(100% - 32px);z-index:2}
 .nlr-rk-start p{margin:3px 0;font:500 12px ${MONO};color:${TEXT2}}
 .nlr-rk-div{position:absolute;background:${MAGENTA};box-shadow:0 0 10px ${MAGENTA};display:none}
-@media (max-width:640px){.nlr-rk-kbd{display:none}.nlr-rk-quote{top:auto;bottom:196px;right:12px;min-width:0}.nlr-rk-pnl{top:auto;bottom:196px;right:auto;left:12px;text-align:left;min-width:0}.nlr-rk-pnl .nlr-rk-boost{justify-content:flex-start}.nlr-rk-card b{font-size:16px}.nlr-rk-pnl b{font-size:18px}.nlr-rk-info{font-size:11px}.nlr-rk-side{font-size:14px;letter-spacing:.08em}.nlr-rk-boost i{width:44px}.nlr-rk-note{font-size:10px}.nlr-rk-card span{font-size:10px}}
+@media (max-width:640px){.nlr-rk-kbd{display:none}.nlr-rk-quote{top:auto;bottom:196px;right:12px;min-width:0}.nlr-rk-pnl{top:auto;bottom:196px;right:auto;left:12px;text-align:left;min-width:0}.nlr-rk-pnl .nlr-rk-boost{justify-content:flex-start}.nlr-rk-card b{font-size:16px}.nlr-rk-pnl b{font-size:18px}.nlr-rk-info{font-size:11px}.nlr-rk-side{font-size:14px;letter-spacing:.08em}.nlr-rk-boost i{width:44px}.nlr-rk-note{font-size:10px}.nlr-rk-card span{font-size:10px}.nlr-rk-start{top:18%;left:12px;right:auto;transform:none;max-width:calc(100% - 148px);text-align:left}}
 /* 2P: kompakta halvor */
 .nlr-rk-2p .nlr-rk-quote{display:none}
 .nlr-rk-2p .nlr-rk-pnl{top:12px;bottom:auto;right:12px;left:auto;text-align:right;min-width:0}

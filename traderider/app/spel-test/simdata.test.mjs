@@ -85,6 +85,26 @@ test('den publicerade fallback-filen och live-hämtningen är borta', () => {
   assert.match(txt(join(SPEL, 'lagen/i18n.js')), /VERKLIG · HISTORISK/)
 })
 
+test('publicerade filer saknar tunnel, orderpost och mäklarnycklar', () => {
+  const banned = ['trycloudflare', '/orders', 'alpaca']
+  // Samma kataloger som Pages tar bort före uppladdning (.github/workflows/pages.yml).
+  const unpublished = ['traderider/app/', 'traderider/docs/raket-akademin/_intern/', 'nvda-rider/data/']
+  const hits = []
+  for (const p of upload) {
+    const rel = relative(REPO, p)
+    if (unpublished.some((prefix) => rel.startsWith(prefix))) continue
+    if (!/\.(html|js|mjs|css|json|md|svg)$/.test(p)) continue
+    let text = ''
+    try {
+      text = txt(p).toLowerCase()
+    } catch {
+      continue
+    }
+    for (const word of banned) if (text.includes(word)) hits.push(`${rel}: ${word}`)
+  }
+  assert.deepEqual(hits, [])
+})
+
 test('Pages-uppladdningen i den här grenen: ingen mäklarkod i det som grenen publicerar under traderider/', () => {
   const rx = /alpaca|paper-api|\/api\/broker|BrokerPanel/i
   const hits = upload.filter((p) => relative(REPO, p).startsWith('traderider/') && /\.(html|js|json|css|md)$/.test(p) && rx.test(txt(p))).map((p) => relative(REPO, p))
