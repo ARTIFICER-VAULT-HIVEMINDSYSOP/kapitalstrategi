@@ -124,6 +124,8 @@ const css = `
 .nlr-rk-2p .nlr-rk-side{height:44px;font-size:13px}
 .nlr-rk-2p .nlr-rk-bar{padding:4px 8px;gap:6px}
 .nlr-rk-2p .nlr-rk-bar .play{width:34px;height:34px}
+.nlr-rk-2p.narrow .nlr-rk-who{left:8px;right:auto;max-width:42%}
+.nlr-rk-2p.narrow .nlr-rk-pnl{left:auto;right:8px;max-width:50%;min-width:0}
 .nlr-rk-2p.narrow .nlr-rk-side{height:38px}
 .nlr-rk-2p.narrow .nlr-rk-kbd{display:inline}
 .nlr-rk-2p.narrow .nlr-rk-card b{font-size:15px}
@@ -524,8 +526,31 @@ export function createRaket({ engine }) {
       for (const sel of ['.nlr-rk-who', '.nlr-rk-pnl']) {
         const cEl = pl.dom.el.querySelector(sel)
         const chromeB = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tr-chrome-b')) || 56
-        cEl.style.top = mode === '2p' ? (vp.y === 0 ? `${Math.round(chromeB + 8)}px` : '12px') : ''
-        cEl.style.bottom = mode === '2p' ? 'auto' : ''
+        const cardTop = vp.y === 0 ? Math.round(chromeB + 8) : 12
+        const tight = mode === '2p' && W <= 700
+        if (mode !== '2p') {
+          cEl.style.top = ''
+          cEl.style.bottom = ''
+          cEl.style.left = ''
+          cEl.style.right = ''
+          cEl.style.maxWidth = ''
+          continue
+        }
+        cEl.style.bottom = 'auto'
+        cEl.style.top = `${cardTop}px`
+        if (tight && sel === '.nlr-rk-who') {
+          cEl.style.left = '8px'
+          cEl.style.right = 'auto'
+          cEl.style.maxWidth = '42%'
+        } else if (tight) {
+          cEl.style.left = 'auto'
+          cEl.style.right = '8px'
+          cEl.style.maxWidth = '50%'
+        } else {
+          cEl.style.left = ''
+          cEl.style.right = ''
+          cEl.style.maxWidth = ''
+        }
       }
       c.save()
       c.beginPath()

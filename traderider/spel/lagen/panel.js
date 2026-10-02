@@ -58,8 +58,9 @@ html[data-nlr-view="raket"] .tr-sim{color:#e8f4ff;background:rgba(8,12,32,.85);b
 html[data-nlr-view="akademin"] .nlr-ak-in{padding-top:calc(var(--tr-chrome-b, 72px) + 16px)}
 .tr-chrome{position:fixed;z-index:70;display:flex;flex-wrap:wrap;align-items:center;gap:6px;box-sizing:border-box;pointer-events:none;max-width:calc(100vw - 16px)}
 .tr-chrome>.nlr-pill,.tr-chrome>.tr-sim,.tr-chrome>.tr-instr-open{position:relative !important;inset:auto !important;pointer-events:auto;flex:0 1 auto;margin:0}
-.tr-chrome>.nlr-toggle{max-width:100%;overflow-x:auto}
-.tr-chrome>.tr-sim{flex:1 1 100%;max-width:100%}
+.tr-chrome>.nlr-toggle{max-width:100% !important;overflow:visible !important;flex-wrap:wrap;height:auto;align-items:center}
+.tr-chrome .nlr-toggle button{height:28px}
+.tr-chrome>.tr-sim{flex:0 1 auto;max-width:100%}
 html[data-nlr-solo="0"] header.pointer-events-none,html[data-nlr-solo="0"] [data-tr-linebar]{display:none !important}
 @media (max-width:640px){.nlr-rsi-txt{min-width:64px}.nlr-rsi-txt b{font-size:14px}.nlr-toggle button{padding:0 9px;font-size:12px}.tr-skal{padding:3px}.tr-skal .tr-back{display:none}.tr-skal .tr-fs-txt{display:none}.tr-skal button{padding:0 9px}}
 @media (max-width:520px){.nlr-toggle{max-width:calc(100vw - 16px);overflow-x:auto}.nlr-toggle button{padding:0 8px;font-size:11px}header.pointer-events-none{flex-wrap:wrap}header.pointer-events-none>.pointer-events-auto:first-child{min-width:0;max-width:100%;flex:1 1 100%}header.pointer-events-none .overflow-x-auto{max-width:100%}header.pointer-events-none .overflow-x-auto button{min-width:0;padding-left:6px;padding-right:6px;font-size:11px;height:32px}}
@@ -666,35 +667,67 @@ async function main() {
     const solo = view === 'line' && mode === '1p'
     document.documentElement.dataset.nlrSolo = solo ? '1' : '0'
     document.documentElement.dataset.nlrMode = mode
-    const hpx = narrow ? 32 : 40
-    for (const pill of [toggle, modeToggle, skal]) pill.style.height = `${hpx}px`
+    const hpx = narrow ? 32 : solo ? 34 : 40
+    for (const pill of [toggle, modeToggle, skal]) {
+      pill.style.height = narrow ? 'auto' : `${hpx}px`
+      pill.style.minHeight = `${hpx}px`
+    }
     for (const node of [toggle, modeToggle, skal, sim]) {
       node.style.left = ''
       node.style.top = ''
       node.style.right = ''
       node.style.bottom = ''
     }
+    const splashEl = document.querySelector('[data-tr-splash]')
+    const splashOn = !!(splashEl && getComputedStyle(splashEl).display !== 'none' && !splashEl.hidden)
+    if (!fas.isCovering()) sim.style.display = splashOn && narrow && solo ? 'none' : ''
+    sim.style.flex = solo && !narrow ? '0 1 auto' : '1 1 100%'
+    sim.style.maxWidth = solo && !narrow ? '220px' : '100%'
     let left = 8
     let top = 8
     let maxW = innerWidth - 16
-    if (view === 'raket' && !narrow) maxW = innerWidth - 200
-    if (solo) {
+    const header = document.querySelector('header.pointer-events-none')
+    const headerShown = !!(header && getComputedStyle(header).display !== 'none' && header.getBoundingClientRect().height > 2)
+    if (solo && !narrow) {
+      const title = document.querySelector('[data-tr-trade-title]')
       const tile = linePriceTile()
-      const header = document.querySelector('header.pointer-events-none')
-      if (tile && narrow) {
-        const r = tile.getBoundingClientRect()
-        left = Math.round(r.right + 8)
-        top = Math.round(r.top)
-        maxW = Math.max(140, Math.round(innerWidth - left - 8))
-      } else if (header) {
-        left = 8
-        top = Math.round(header.getBoundingClientRect().bottom + 8)
-        maxW = innerWidth - 16
+      let anchorRight = 16
+      if (title) anchorRight = Math.max(anchorRight, title.getBoundingClientRect().right)
+      if (headerShown) {
+        for (const button of header.querySelectorAll('button')) {
+          const r = button.getBoundingClientRect()
+          if (r.width > 2 && r.top < 140) anchorRight = Math.max(anchorRight, r.right)
+        }
       }
+      left = Math.round(anchorRight + 10)
+      top = Math.round(title ? title.getBoundingClientRect().top : 12)
+      let limitLeft = tile ? tile.getBoundingClientRect().left : innerWidth - 8
+      const resultNames = new Set([STRINGS.sv['hud.result'], STRINGS.en['hud.result'], STRINGS.uk['hud.result']])
+      const headerEl = headerShown ? header : null
+      if (headerEl) {
+        for (const node of headerEl.querySelectorAll('div')) {
+          if (node.children.length) continue
+          const text = (node.textContent || '').trim()
+          if (![...resultNames].some((name) => text === name || text.startsWith(`${name} ·`) || text.startsWith(`${name} `))) continue
+          const r = node.parentElement.getBoundingClientRect()
+          if (r.width > 2 && r.top < 240) limitLeft = Math.min(limitLeft, r.left)
+        }
+      }
+      maxW = Math.max(280, Math.round(limitLeft - left - 12))
+    } else if (solo && narrow && headerShown) {
+      left = 8
+      top = Math.round(header.getBoundingClientRect().bottom + 8)
+      maxW = innerWidth - 16
+    } else if (view === 'raket' && !narrow) {
+      maxW = innerWidth - 200
     }
+    if (left < 8) left = 8
+    if (left + 120 > innerWidth) left = 8
+    maxW = Math.min(maxW, innerWidth - left - 8)
     chrome.style.left = `${left}px`
     chrome.style.top = `${top}px`
     chrome.style.maxWidth = `${Math.round(maxW)}px`
+    chrome.style.gap = solo && !narrow ? '4px' : '6px'
     const bottom = Math.round(chrome.getBoundingClientRect().bottom)
     document.documentElement.style.setProperty('--tr-chrome-b', `${bottom}px`)
     const buy = document.querySelector('button[data-tr="buy"]')
@@ -718,7 +751,7 @@ async function main() {
     refreshTitle()
     layoutPanel()
     syncGameHeader()
-    sim.style.display = fas.isCovering() ? 'none' : ''
+    if (fas.isCovering()) sim.style.display = 'none'
     layoutChrome()
     syncSnap()
     if (view === 'line' && mode === '1p') drawPanel()
