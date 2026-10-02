@@ -3,6 +3,7 @@
  * (sv | en | uk). Svenska är standard. All synlig text hämtas härifrån.
  */
 import { HINTS } from './keys.js'
+import { MODES, instructionText } from './orientation.js'
 
 export const LANG_KEY = 'app.language'
 export const LANGS = ['sv', 'en', 'uk']
@@ -69,17 +70,26 @@ const sv = {
   'shell.fsShort': ' Helskärm',
   'btn.buy': 'KÖP',
   'btn.sell': 'SÄLJ',
-  'btn.flat': 'STÄNG',
+  'btn.flat': 'FLAT',
   'btn.leverage': 'HÄVSTÅNG',
   'btn.playPause': 'Kör eller paus (P)',
   'btn.reset': 'Börja om (R)',
-  'btn.lower': 'Minska hävstång ({key})',
-  'btn.raise': 'Öka hävstång ({key})',
+  'btn.lower': 'Minska hävstång ({key}). Högre hävstång kan öka både vinst och förlust.',
+  'btn.raise': 'Öka hävstång ({key}). Högre hävstång kan öka både vinst och förlust.',
+  'instr.steer': '{high} / {low} eller scrollhjulet: styr ett steg i taget mellan {sell}, {flat} och {buy}',
+  'instr.space': 'Mellanslag: {flat}',
+  'instr.forward': '{keys}: framåt i rörelseriktningen, ökar hävstången',
+  'instr.backward': '{keys}: bakåt, minskar hävstången',
+  'instr.risk': 'Högre hävstång kan ge större vinst men också större förlust.',
+  'lev.risk': 'Högre hävstång kan öka både vinst och förlust.',
+  'mode.trendRider.name': 'Trend Rider',
+  'mode.raket.name': 'Raket',
+  'mode.rabbitHole.name': 'Rabbit Hole',
   'flat.closed': 'STÄNG – ingen öppen position',
   'flat.open': 'STÄNG – avsluta positionen (mellanslag)',
   'flat.already': 'Du har redan stängt – ingen öppen position',
   'flat.close': 'Avsluta positionen',
-  'pos.flat': 'Stängd',
+  'pos.flat': 'FLAT',
   'snap.aria': 'Riktning, ett steg i taget',
   'snap.help': 'Rulla eller svep ett steg. Uppåt går mot köp, nedåt mot sälj. Vid köp stannar upp, vid sälj stannar ned.',
   'ak.err.side': 'Välj KÖP eller SÄLJ, ett steg i taget, innan du öppnar.',
@@ -367,8 +377,17 @@ const en = {
   'btn.leverage': 'LEVERAGE',
   'btn.playPause': 'Run or pause (P)',
   'btn.reset': 'Start over (R)',
-  'btn.lower': 'Decrease leverage ({key})',
-  'btn.raise': 'Increase leverage ({key})',
+  'btn.lower': 'Decrease leverage ({key}). Higher leverage can increase both a gain and a loss.',
+  'btn.raise': 'Increase leverage ({key}). Higher leverage can increase both a gain and a loss.',
+  'instr.steer': '{high} / {low} or the scroll wheel: steer one step at a time between {sell}, {flat} and {buy}',
+  'instr.space': 'Space: {flat}',
+  'instr.forward': '{keys}: forward along the movement, increases leverage',
+  'instr.backward': '{keys}: backward, decreases leverage',
+  'instr.risk': 'Higher leverage can bring a larger gain but also a larger loss.',
+  'lev.risk': 'Higher leverage can increase both a gain and a loss.',
+  'mode.trendRider.name': 'Trend Rider',
+  'mode.raket.name': 'Rocket',
+  'mode.rabbitHole.name': 'Rabbit Hole',
   'flat.closed': 'FLAT – no open position',
   'flat.open': 'FLAT – close the position (space)',
   'flat.already': 'You are already flat – no open position',
@@ -661,8 +680,17 @@ const uk = {
   'btn.leverage': 'ПЛЕЧЕ',
   'btn.playPause': 'Хід або пауза (P)',
   'btn.reset': 'Спочатку (R)',
-  'btn.lower': 'Зменшити плече ({key})',
-  'btn.raise': 'Збільшити плече ({key})',
+  'btn.lower': 'Зменшити плече ({key}). Вище плече може збільшити і прибуток, і збиток.',
+  'btn.raise': 'Збільшити плече ({key}). Вище плече може збільшити і прибуток, і збиток.',
+  'instr.steer': '{high} / {low} або коліщатко: один крок між {sell}, {flat} і {buy}',
+  'instr.space': 'Пробіл: {flat}',
+  'instr.forward': '{keys}: уперед за рухом, збільшує плече',
+  'instr.backward': '{keys}: назад, зменшує плече',
+  'instr.risk': 'Вище плече може дати більший прибуток, але й більший збиток.',
+  'lev.risk': 'Вище плече може збільшити і прибуток, і збиток.',
+  'mode.trendRider.name': 'Trend Rider',
+  'mode.raket.name': 'Ракета',
+  'mode.rabbitHole.name': 'Rabbit Hole',
   'flat.closed': 'ЗАКРИТИ – немає відкритої позиції',
   'flat.open': 'ЗАКРИТИ – закрити позицію (пробіл)',
   'flat.already': 'Ви вже закрили – немає відкритої позиції',
@@ -945,19 +973,9 @@ export function t(key, vars) {
   return s
 }
 
-export function helpLine(mode) {
-  const buyW = t('btn.buy')
-  const sellW = t('btn.sell')
-  const levW = t('btn.leverage')
-  const flatW = t('btn.flat')
-  const pause = t('help.pause')
-  if (mode === '2p') {
-    const a = HINTS.p1
-    const b = HINTS.p2
-    return t('help.2p', { b1: a.buy, s1: a.sell, d1: a.levDown, u1: a.levUp, f1: a.flat, b2: b.buy, s2: b.sell, d2: b.levDown, u2: b.levUp, f2: b.flat, buyW, sellW, levW, flatW, pause, reset: t('help.reset') })
-  }
-  const h = HINTS['1p']
-  return t('help.1p', { buy: h.buy, sell: h.sell, down: h.levDown, up: h.levUp, flat: h.flat, buyW, sellW, levW, flatW, pause })
+export function helpLine(mode, orientation) {
+  const o = orientation || (mode === 'raket' ? MODES.raket.orientation : mode === 'rabbit' ? MODES.rabbitHole.orientation : MODES.trendRider.orientation)
+  return instructionText(o, t)
 }
 
 export function applyHtmlLang() {

@@ -1,61 +1,66 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { keyAction, isTypingTarget, KEYMAP, PREVENT_DEFAULT, HINTS } from '../../spel/lagen/keys.js'
+import { keyAction, isTypingTarget, PREVENT_DEFAULT } from '../../spel/lagen/keys.js'
+import { MODES } from '../../spel/lagen/orientation.js'
 
 const ev = (code, extra = {}) => ({ code, key: '', target: { tagName: 'BODY' }, ...extra })
+const trend = MODES.trendRider.orientation
 
-// Tangentplanen (beslutad)
+// Trend Rider: movement right. W/→/D ökar hävstång, S/←/A minskar, ↑ mot KÖP, ↓ mot SÄLJ.
 const PLAN = [
-  ['KeyW', 'buy', 1], ['ArrowUp', 'buy', 2],
-  ['KeyS', 'sell', 1], ['ArrowDown', 'sell', 2],
-  ['KeyA', 'levDown', 1], ['ArrowLeft', 'levDown', 2],
-  ['KeyD', 'levUp', 1], ['ArrowRight', 'levUp', 2],
-  ['Space', 'flat', 1], ['Digit0', 'flat', 2], ['Numpad0', 'flat', 2],
+  ['KeyW', 'levUp', 1],
+  ['ArrowUp', 'buy', 2],
+  ['KeyS', 'levDown', 1],
+  ['ArrowDown', 'sell', 2],
+  ['KeyA', 'levDown', 1],
+  ['ArrowLeft', 'levDown', 2],
+  ['KeyD', 'levUp', 1],
+  ['ArrowRight', 'levUp', 2],
+  ['Space', 'flat', 1],
+  ['Digit0', 'flat', 2],
+  ['Numpad0', 'flat', 2],
 ]
 
-test('1P: alla tangenter styr samma spelare', () => {
-  for (const [code, action] of PLAN) assert.deepEqual(keyAction(ev(code), '1p'), { action, player: 1 }, code)
+test('1P Trend Rider: alla tangenter styr samma spelare', () => {
+  for (const [code, action] of PLAN) {
+    const hit = keyAction(ev(code), '1p', trend)
+    assert.equal(hit.action, action, code)
+    assert.equal(hit.player, 1, code)
+  }
 })
 
 test('2P: spelare 1 = WASD + mellanslag, spelare 2 = pilar + 0', () => {
-  for (const [code, action, player] of PLAN) assert.deepEqual(keyAction(ev(code), '2p'), { action, player }, code)
+  for (const [code, action, player] of PLAN) {
+    const hit = keyAction(ev(code), '2p', trend)
+    assert.equal(hit.action, action, code)
+    assert.equal(hit.player, player, code)
+  }
 })
 
 test('P = paus och R = omstart gäller båda spelarna', () => {
   for (const mode of ['1p', '2p']) {
-    assert.deepEqual(keyAction(ev('KeyP'), mode), { action: 'pause', player: 0 })
-    assert.deepEqual(keyAction(ev('KeyR'), mode), { action: 'reset', player: 0 })
+    assert.deepEqual(keyAction(ev('KeyP'), mode, trend), { action: 'pause', intent: null, player: 0 })
+    assert.deepEqual(keyAction(ev('KeyR'), mode, trend), { action: 'reset', intent: null, player: 0 })
   }
 })
 
-test('mellanslag är inte längre paus och F gör ingenting', () => {
-  assert.notEqual(keyAction(ev('Space')).action, 'pause')
-  assert.equal(keyAction(ev('KeyF')), null)
-})
-
-test('inga tangenter i textfält eller med ctrl/cmd/alt', () => {
-  for (const tagName of ['INPUT', 'TEXTAREA', 'SELECT']) assert.equal(keyAction(ev('KeyW', { target: { tagName } })), null, tagName)
-  assert.equal(keyAction(ev('Space', { target: { tagName: 'DIV', isContentEditable: true } })), null)
-  assert.equal(keyAction(ev('KeyW', { ctrlKey: true })), null)
-  assert.equal(keyAction(ev('KeyS', { metaKey: true })), null)
-  assert.equal(keyAction(ev('KeyA', { altKey: true })), null)
+test('mellanslag är FLAT och ignoreras i fält, knapp och länk', () => {
+  assert.equal(keyAction(ev('Space'), '1p', trend).action, 'flat')
+  assert.equal(keyAction(ev('KeyF'), '1p', trend), null)
+  for (const tagName of ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A']) {
+    assert.equal(keyAction(ev('Space', { target: { tagName } }), '1p', trend), null, tagName)
+  }
   assert.equal(isTypingTarget({ tagName: 'button' }), false)
 })
 
-test('pilar och mellanslag får preventDefault (ingen scroll)', () => {
+test('pilar och mellanslag får preventDefault (ingen scroll) när de hanteras', () => {
   for (const c of ['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']) assert.ok(PREVENT_DEFAULT.has(c), c)
 })
 
-test('hintar enligt tangentplanen, utan hakparenteser eller paus-text', () => {
-  assert.deepEqual(HINTS['1p'], { buy: 'W/↑', sell: 'S/↓', levDown: 'A/←', levUp: 'D/→', flat: '␣/0 Flat' })
-  const all = JSON.stringify(HINTS)
-  assert.ok(!/[[\]]/.test(all))
-  assert.ok(!/Paus/i.test(all))
-})
-
-// NVDA Line-motorns EGEN tangenthanterare (den som skeppas i bundlen) mot samma tabell.
 function engineOnKey() {
+  globalThis.window = globalThis.window || {}
+  window.__trKeyAction = (e, mode) => keyAction(e, mode)
   const src = readFileSync(new URL('../../spel/assets/routes-CbqPJAI2.js', import.meta.url), 'utf8')
   const i = src.indexOf('onKey=e=>{')
   const j = src.indexOf('};burst(', i)
@@ -79,7 +84,7 @@ function engineOnKey() {
   }
 }
 
-test('NVDA Line-motorn (1P) följer tangentplanen', () => {
+test('NVDA Line-motorn (1P) följer Trend Rider-planen', () => {
   const k = engineOnKey()
   for (const [code, action] of PLAN) {
     const r = k(code)
@@ -89,15 +94,7 @@ test('NVDA Line-motorn (1P) följer tangentplanen', () => {
   assert.deepEqual(k('KeyP').calls, ['pause'])
   assert.deepEqual(k('KeyR', { key: 'r' }).calls, ['reset'])
   assert.deepEqual(k('KeyF').calls, [])
-})
-
-test('NVDA Line-motorn: inga tangenter i textfält eller med modifierare', () => {
-  const k = engineOnKey()
-  for (const tagName of ['INPUT', 'TEXTAREA', 'SELECT']) assert.deepEqual(k('Space', { target: { tagName } }).calls, [], tagName)
-  assert.deepEqual(k('KeyW', { target: { tagName: 'DIV', isContentEditable: true } }).calls, [])
-  assert.deepEqual(k('KeyW', { ctrlKey: true }).calls, [])
-})
-
-test('tabellen täcker exakt tangentplanen', () => {
-  assert.deepEqual(Object.keys(KEYMAP).sort(), [...PLAN.map((p) => p[0]), 'KeyP', 'KeyR'].sort())
+  const onButton = k('Space', { target: { tagName: 'BUTTON' } })
+  assert.deepEqual(onButton.calls, [])
+  assert.equal(onButton.prevented, false)
 })

@@ -66,13 +66,13 @@ test('loket kör framåt: plog och skorsten fram (+x, färdriktningen), hytten b
   assert.match(r, /x:this\.train\.x\+\(24\*Math\.cos/) // röken ur skorstenen, inte ur hytten
 })
 
-test('växeln: NVDA Rider | Raket | Akademin, hashlänkar, helskärm och väg tillbaka', () => {
+test('växeln: Trend Rider | Raket | Rabbit Hole, hashlänkar, helskärm och väg tillbaka', () => {
   const p = read('spel/lagen/panel.js')
-  assert.match(p, /el\('button', '', 'NVDA Rider'\)/)
-  assert.match(p, /el\('button', '', 'Raket'\)/)
-  assert.match(p, /el\('button', '', 'Akademin'\)/)
-  assert.match(p, /h\.includes\('akademin'\)/)
-  assert.match(p, /h\.includes\('raket'\)/)
+  assert.match(p, /MODES\.trendRider\.nameKey/)
+  assert.match(p, /MODES\.raket\.nameKey/)
+  assert.match(p, /MODES\.rabbitHole\.nameKey/)
+  assert.match(p, /hashForView/)
+  assert.match(p, /modeFromHash/)
   assert.match(p, /requestFullscreen/)
   assert.match(p, /webkitRequestFullscreen/)
   assert.match(p, /back\.href = '\/traderider\/'/)

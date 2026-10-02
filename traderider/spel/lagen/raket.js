@@ -14,6 +14,7 @@
  * prefers-reduced-motion: ingen parallax, inga partiklar, statiska stjärnor och scanlines, ingen glitch.
  */
 import { keyAction, PREVENT_DEFAULT, HINTS } from './keys.js'
+import { MODES } from './orientation.js'
 import { simTid } from './simtid.js'
 import { t, onLang, helpLine } from './i18n.js'
 import { stepSide, readSide } from './styrmotor.js'
@@ -306,7 +307,7 @@ export function createRaket({ engine }) {
     const body = startCard.querySelector('[data-k="startBody"]')
     if (body) body.textContent = t('rk.startBody')
     const keys = root.querySelector('[data-k="keys"]')
-    if (keys) keys.textContent = helpLine(mode)
+    if (keys) keys.textContent = helpLine(mode, MODES.raket.orientation)
     endCard.querySelector('[data-k="endTitle"]').textContent = t('rk.endTitle')
     endCard.querySelector('[data-k="again"]').textContent = t('rk.again')
     if (endCard.classList.contains('on')) endCard.querySelector('[data-k="endTxt"]').textContent = t('end.body')
@@ -481,7 +482,7 @@ export function createRaket({ engine }) {
 
   function onKey(e) {
     if (!visible) return
-    const a = keyAction(e, mode)
+    const a = keyAction(e, mode, MODES.raket.orientation)
     if (!a) return
     e.preventDefault()
     e.stopImmediatePropagation() // NVDA Lines egna tangenter ska inte styra det dolda tåget
@@ -492,7 +493,7 @@ export function createRaket({ engine }) {
   addEventListener(
     'keyup',
     (e) => {
-      if (visible && PREVENT_DEFAULT.has(e.code) && keyAction(e, mode)) e.preventDefault()
+      if (visible && PREVENT_DEFAULT.has(e.code) && keyAction(e, mode, MODES.raket.orientation)) e.preventDefault()
     },
     true,
   )

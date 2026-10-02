@@ -11,11 +11,13 @@
  */
 import { rsiAtPoints, rsiZone, RSI_HIGH, RSI_LOW, RSI_PERIOD } from './rsi.js'
 import { createRaket } from './raket.js'
+import { createRabbit } from './rabbit.js'
 import { createDuo } from './duo.js'
 import { createAkademin } from './akademin.js'
 import { isTypingTarget } from './keys.js'
 import { t, onLang, mountSwitcher } from './i18n.js'
 import { readSide, cycleIndex, stepSide, ENTRY_SIDE } from './styrmotor.js'
+import { MODES, modeFromHash, hashForView } from './orientation.js'
 import { mountEntrySnap, bindStepGestures, mountRatt } from './snapp.js'
 
 const INK = '#1c1915'
@@ -227,9 +229,9 @@ async function main() {
   const toggle = el('div', 'nlr-pill nlr-toggle')
   toggle.setAttribute('role', 'group')
   toggle.setAttribute('aria-label', t('mode.aria'))
-  const bLine = el('button', '', t('mode.nvda'))
-  const bRaket = el('button', '', t('mode.raket'))
-  const bAk = el('button', '', t('mode.akademin'))
+  const bLine = el('button', '', t(MODES.trendRider.nameKey))
+  const bRaket = el('button', '', t(MODES.raket.nameKey))
+  const bAk = el('button', '', t(MODES.rabbitHole.nameKey))
   bLine.type = bRaket.type = bAk.type = 'button'
   toggle.append(bLine, bRaket, bAk)
   copySkin(periodPill, toggle)
@@ -257,6 +259,7 @@ async function main() {
   const raket = createRaket({ engine: eng, skinFrom: periodPill })
   const duo = createDuo({ engine: eng, skinFrom: periodPill })
   const akademin = createAkademin({ engine: eng, skinFrom: periodPill })
+  const rabbit = createRabbit()
   let view = 'line'
   let mode = '1p'
   let resumeLine = false
@@ -344,8 +347,8 @@ async function main() {
     document.documentElement.dataset.nlrView = view // Raket-läget får HUD-stil på växlarna (CSS i raket.js)
     bLine.setAttribute('aria-pressed', String(view === 'line'))
     bRaket.setAttribute('aria-pressed', String(view === 'raket'))
-    bAk.setAttribute('aria-pressed', String(view === 'akademin'))
-    modeToggle.style.display = view === 'akademin' ? 'none' : ''
+    bAk.setAttribute('aria-pressed', String(view === 'rabbit'))
+    modeToggle.style.display = view === 'akademin' || view === 'rabbit' ? 'none' : ''
     b1.setAttribute('aria-pressed', String(mode === '1p'))
     b2.setAttribute('aria-pressed', String(mode === '2p'))
     if (!lineSolo) {
@@ -358,18 +361,27 @@ async function main() {
     if (view === 'akademin') {
       duo.hide()
       raket.hide()
+      rabbit.hide()
       akademin.show()
+    } else if (view === 'rabbit') {
+      akademin.hide()
+      duo.hide()
+      raket.hide()
+      rabbit.show()
     } else if (view === 'raket') {
       akademin.hide()
+      rabbit.hide()
       duo.hide()
       raket.setMode(mode)
       raket.show()
     } else if (mode === '2p') {
       akademin.hide()
+      rabbit.hide()
       raket.hide()
       duo.visible() || duo.show()
     } else {
       akademin.hide()
+      rabbit.hide()
       raket.hide()
       duo.hide()
       panel.style.display = ''
@@ -378,8 +390,8 @@ async function main() {
     }
     syncSnap()
     if (push) {
-      const slug = view === 'akademin' ? 'akademin' : view === 'raket' ? 'raket' : 'nvda-rider'
-      const h = slug + (mode === '2p' && view !== 'akademin' ? '-2p' : '')
+      const slug = hashForView(view)
+      const h = slug + (mode === '2p' && view !== 'akademin' && view !== 'rabbit' ? '-2p' : '')
       try {
         history.replaceState(history.state, '', `#${h}`)
       } catch {
@@ -404,12 +416,12 @@ async function main() {
   b2.setAttribute('aria-pressed', 'false')
   bLine.onclick = () => setView('line')
   bRaket.onclick = () => setView('raket')
-  bAk.onclick = () => setView('akademin')
+  bAk.onclick = () => setView('rabbit')
   b1.onclick = () => setMode('1p')
   b2.onclick = () => setMode('2p')
   const fromHash = () => {
     const h = location.hash
-    view = h.includes('akademin') ? 'akademin' : h.includes('raket') ? 'raket' : 'line'
+    view = modeFromHash(h)
     mode = h.includes('2p') ? '2p' : '1p'
     apply(false)
   }
@@ -417,9 +429,9 @@ async function main() {
 
   function labelChrome() {
     toggle.setAttribute('aria-label', t('mode.aria'))
-    bLine.textContent = t('mode.nvda')
-    bRaket.textContent = t('mode.raket')
-    bAk.textContent = t('mode.akademin')
+    bLine.textContent = t(MODES.trendRider.nameKey)
+    bRaket.textContent = t(MODES.raket.nameKey)
+    bAk.textContent = t(MODES.rabbitHole.nameKey)
     modeToggle.setAttribute('aria-label', t('players.aria'))
     b1.textContent = t('players.1')
     b2.textContent = t('players.2')
