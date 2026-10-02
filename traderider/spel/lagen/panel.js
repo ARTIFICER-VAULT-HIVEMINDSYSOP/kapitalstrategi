@@ -21,6 +21,7 @@ import { MODES, modeFromHash, hashForView, selectMode } from './orientation.js'
 import { mountEntrySnap, bindStepGestures, mountRatt } from './snapp.js'
 import { mountInstruction } from './instruktion.js'
 import { mountFas } from './faser.js'
+import { scrubVisibleNames } from './synlig.js'
 
 const bootHash = typeof window !== 'undefined' ? window.__trBootHash || '' : ''
 
@@ -101,8 +102,20 @@ async function main() {
   document.head.appendChild(style)
 
   const periodPill = findButton(/^(Live|1D)$/)?.parentElement ?? null
-  const titleEl = [...document.querySelectorAll('h1,h2,div,span')].find((x) => /^NVDA (Line|Rider)$/.test((x.textContent ?? '').trim()))
-  const titlePill = titleEl?.closest('div[class*="rounded"]') ?? titleEl?.parentElement ?? null
+  let titleEl = [...document.querySelectorAll('h1,h2,div,span')].find((x) => /^NVDA (Line|Rider)$/.test((x.textContent ?? '').trim()))
+  let titlePill = titleEl?.closest('div[class*="rounded"]') ?? titleEl?.parentElement ?? null
+
+  function refreshTitle() {
+    const name = t(MODES.trendRider.nameKey)
+    const fresh = [...document.querySelectorAll('h1,h2,div,span')].find((x) => /^NVDA (Line|Rider)$/.test((x.textContent ?? '').trim()))
+    if (fresh) titleEl = fresh
+    if (titleEl?.isConnected) {
+      if ((titleEl.textContent ?? '').trim() !== name) titleEl.textContent = name
+      titleEl.dataset.trTradeTitle = '1'
+      titlePill = titleEl.closest('div[class*="rounded"]') ?? titleEl.parentElement ?? titlePill
+    }
+    scrubVisibleNames(document, name)
+  }
 
   // ---------- 1. RSI-panel ----------
   const panel = el('div', 'nlr-pill nlr-rsi')
@@ -495,6 +508,7 @@ async function main() {
     back.textContent = t('shell.back')
     sim.textContent = t('sim.label')
     document.title = viewTitle()
+    refreshTitle()
     instr.sync()
     fas.sync()
     const meta = document.querySelector('meta[name="description"]')
@@ -577,6 +591,7 @@ async function main() {
   }
 
   const loop = () => {
+    refreshTitle()
     layoutPanel()
     layoutToggle()
     layoutMode()

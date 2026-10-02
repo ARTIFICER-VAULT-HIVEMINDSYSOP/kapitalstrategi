@@ -22,7 +22,12 @@ test('panelen renderas i varje läge med text från orientation', () => {
     })
     const body = ui.root.querySelector('[data-tr-instr-body]')
     assert.equal(body.textContent, instructionText(mode.orientation, t), mode.id)
-    assert.equal(ui.root.hidden, false)
+    assert.equal(ui.root.hidden, true, mode.id)
+    assert.equal(ui.reopen.hidden, false, mode.id)
+    ui.show()
+    assert.equal(ui.root.hidden, false, mode.id)
+    ui.hide()
+    assert.equal(ui.root.hidden, true, mode.id)
     ui.root.remove()
     ui.reopen.remove()
   }

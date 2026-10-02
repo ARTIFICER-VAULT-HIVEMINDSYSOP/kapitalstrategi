@@ -126,3 +126,25 @@ test('hash: #nvda-rider, #racex, #academy och #rabbit-hole, med äldre alias', (
   assert.equal(selectMode({ via: 'hash', value: '#raket' }), 'raket')
   assert.equal(selectMode({ via: 'key', value: '4' }), 'rabbit')
 })
+
+test('klick, tangent 1–4 och hash i alla fyra lägen, med alias', () => {
+  const cases = [
+    ['line', 1, '#nvda-rider', null],
+    ['raket', 2, '#racex', '#raket'],
+    ['akademin', 3, '#academy', '#akademin'],
+    ['rabbit', 4, '#rabbit-hole', null],
+  ]
+  for (const [mode, n, hash, alias] of cases) {
+    assert.equal(selectMode({ via: 'click', value: n }), mode, `click ${n}`)
+    assert.equal(selectMode({ via: 'index', value: n }), mode, `index ${n}`)
+    assert.equal(selectMode({ via: 'key', value: `Digit${n}` }), mode, `Digit${n}`)
+    assert.equal(selectMode({ via: 'key', value: `Numpad${n}` }), mode, `Numpad${n}`)
+    assert.equal(selectMode({ via: 'key', value: String(n) }), mode, `key ${n}`)
+    assert.equal(selectMode({ via: 'hash', value: hash }), mode, hash)
+    assert.equal(modeFromHash(hash), mode, hash)
+    if (alias) {
+      assert.equal(selectMode({ via: 'hash', value: alias }), mode, alias)
+      assert.equal(modeFromHash(alias), mode, alias)
+    }
+  }
+})
