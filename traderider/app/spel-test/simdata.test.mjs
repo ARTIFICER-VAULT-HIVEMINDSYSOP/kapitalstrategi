@@ -55,8 +55,8 @@ test('den simulerade serien är deterministisk, märkt och inte verklig', () => 
 
 test('synlig etikett i alla lägen och inga påståenden om verkliga kurser', () => {
   const SIM = 'Simulerade kurser – inte verkliga marknadsdata'
-  assert.ok(txt(join(SPEL, 'lagen/simtid.js')).includes(SIM))
-  assert.match(txt(join(SPEL, 'lagen/panel.js')), /el\('div', 'tr-sim', SIM_ETIKETT\)/)
+  assert.ok(txt(join(SPEL, 'lagen/i18n.js')).includes(SIM))
+  assert.match(txt(join(SPEL, 'lagen/panel.js')), /el\('div', 'tr-sim', t\('sim\.label'\)\)/)
   assert.ok(txt(join(TR, 'index.html')).includes(SIM))
   const claim = /[Hh]istorisk|[Rr]iktiga (historiska )?(NVDA-)?kurser|äkta historiska|real historical|live (stock )?chart|LiveTrend|NVIDIA/
   const files = [join(TR, 'index.html'), join(REPO, 'assets/traderider-demo-nav.js'), ...spelFiles.filter((p) => /\.(html|js)$/.test(p))]

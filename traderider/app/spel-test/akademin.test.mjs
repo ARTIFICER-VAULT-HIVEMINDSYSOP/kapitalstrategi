@@ -63,11 +63,11 @@ test('okända nycklar i lagringen ignoreras', () => {
 })
 
 test('utmärkelsernas texter: rätt ordval, inga pengar/vinst/licens-löften', () => {
-  const txt = JSON.stringify(A.AWARDS) + A.AWARD_NOTE
+  const txt = JSON.stringify(A.AWARDS) + A.awardNote()
   for (const bad of [/diplom/i, /intyg/i, /godkänd för signaler/i, /redo att handla/i, /förstått riskerna/i, /\$/, /kronor/i, /vinst/i]) {
     assert.ok(!bad.test(JSON.stringify(A.AWARDS)), String(bad))
   }
-  assert.match(A.AWARD_NOTE, /ingen licens och inget råd/)
+  assert.match(A.awardNote(), /ingen licens och inget råd/)
   assert.match(txt, /utmärkelse/i)
 })
 
