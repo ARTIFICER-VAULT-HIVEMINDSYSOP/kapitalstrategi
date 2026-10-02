@@ -127,7 +127,7 @@ async def run_view(b, name, opt):
     w, h = 150 * z, 110 * z
     clip = {'x': max(0, sx - w / 2), 'y': max(0, sy - h * 0.62), 'width': min(w, vw - max(0, sx - w / 2)), 'height': min(h, vh - max(0, sy - h * 0.62))}
     await pg.screenshot(path=OUT + f'loket-zoom-{name}.png', clip=clip)
-    await pg.screenshot(path=S('02-nvda-rider'), type='jpeg', quality=85)
+    await pg.screenshot(path=S('02-trade-rider'), type='jpeg', quality=85)
     t = await page_text()
     res['pages']['nvda-rider'] = {'unexpected': unexpected(n0), 'banned': banned_hits(t)}
     ok('NVDA Rider utan spärrade ord i sidtexten', not banned_hits(t), banned_hits(t))

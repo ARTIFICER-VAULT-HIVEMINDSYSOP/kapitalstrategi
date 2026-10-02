@@ -21,7 +21,7 @@ Hur lägena hänger ihop med Tradingskolan, vad spelaren övar, och vilken lekti
 | Dator | Mobil |
 | --- | --- |
 | ![Ingång dator](01-traderider-desktop.jpg) | ![Ingång mobil](01-traderider-mobil.jpg) |
-| ![Trade Rider dator](02-nvda-rider-desktop.jpg) | ![Trade Rider mobil](02-nvda-rider-mobil.jpg) |
+| ![Trade Rider dator](02-trade-rider-desktop.jpg) | ![Trade Rider mobil](02-trade-rider-mobil.jpg) |
 | ![RaceX dator](03-raket-desktop.jpg) | ![RaceX mobil](03-raket-mobil.jpg) |
 | ![Akademin dator](04-akademin-desktop.jpg) | ![Akademin mobil](04-akademin-mobil.jpg) |
 | ![Loket framåt dator](loket-framat-desktop.jpg) | ![Loket framåt mobil](loket-framat-mobil.jpg) |

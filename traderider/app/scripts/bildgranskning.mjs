@@ -7,7 +7,7 @@
  * utvecklingsdokumentation. Den återställs från origin/main och diffas inte.
  */
 import { createHash } from 'node:crypto'
-import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
 import { spawnSync } from 'node:child_process'
@@ -54,19 +54,27 @@ function tesseract(file, psm) {
   return run.stdout || ''
 }
 
-function boost(file) {
-  const dest = join(tmpdir(), 'bildgranskning-boost.png')
+/**
+ * Vit text på svart botten syns för Tesseract först när bilden inverteras
+ * och förstoras. Varje rasterbild läses därför normalt och inverterat,
+ * i 2× och 3×, med psm 3, 6 och 11.
+ */
+function variants(file) {
+  const dest = mkdtempSync(join(tmpdir(), 'bildgranskning-'))
   const run = spawnSync(
     'python3',
     [
       '-c',
-      'from PIL import Image, ImageOps, ImageEnhance; import sys; im=Image.open(sys.argv[1]).convert("L"); im=ImageEnhance.Contrast(ImageOps.autocontrast(im)).enhance(2); im.save(sys.argv[2])',
+      'from PIL import Image, ImageOps; import sys; im=Image.open(sys.argv[1]).convert("RGB"); dest=sys.argv[2]\n'
+        + 'for scale in (2, 3):\n'
+        + '    up=im.resize((im.width*scale, im.height*scale), Image.Resampling.LANCZOS)\n'
+        + '    up.save(f"{dest}/n{scale}.png"); ImageOps.invert(up).save(f"{dest}/i{scale}.png")\n',
       file,
       dest,
     ],
     { encoding: 'utf8' },
   )
-  if (run.status !== 0) throw new Error(run.stderr || 'kontrastbild misslyckades')
+  if (run.status !== 0) throw new Error(run.stderr || 'förstoring misslyckades')
   return dest
 }
 
@@ -87,9 +95,18 @@ for (const file of files) {
     const text = readFileSync(file.path, 'utf8')
     if (BANNED.test(text)) failures.push(`${file.rel}: svg`)
   } else {
+    const dir = variants(file.path)
     const found = []
-    for (const psm of ['6', '11']) found.push(...hitsIn(tesseract(file.path, psm)))
-    found.push(...hitsIn(tesseract(boost(file.path), '6')))
+    try {
+      for (const tag of ['n2', 'n3', 'i2', 'i3']) {
+        for (const psm of ['3', '6', '11']) {
+          const lines = hitsIn(tesseract(join(dir, `${tag}.png`), psm))
+          for (const line of lines) found.push(`${tag} psm ${psm}: ${line}`)
+        }
+      }
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
     if (found.length) failures.push(`${file.rel}: ${found.join(' | ')}`)
   }
   const md5 = createHash('md5').update(readFileSync(file.path)).digest('hex')
