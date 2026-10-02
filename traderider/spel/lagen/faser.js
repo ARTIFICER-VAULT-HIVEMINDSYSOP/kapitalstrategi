@@ -248,7 +248,10 @@ export function mountFas(host, opts) {
         card.appendChild(button)
       } else cross.textContent = t('grans.cross')
     } else if (cross) cross.remove()
-    const showCard = phases.phase() !== 'historia'
+    const historia = phases.phase() === 'historia'
+    badge.hidden = !historia
+    range.hidden = !historia
+    const showCard = !historia
     card.hidden = !showCard
     canvas.hidden = showCard && reducedMotion()
     root.hidden = !covering || opts.isActive?.() === false

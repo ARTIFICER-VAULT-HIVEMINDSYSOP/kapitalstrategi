@@ -1,8 +1,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { keyAction, isTypingTarget, PREVENT_DEFAULT } from '../../spel/lagen/keys.js'
-import { MODES } from '../../spel/lagen/orientation.js'
+import { keyAction, isTypingTarget, PREVENT_DEFAULT, HINTS } from '../../spel/lagen/keys.js'
+import { MODES, controlHints } from '../../spel/lagen/orientation.js'
 
 const ev = (code, extra = {}) => ({ code, key: '', target: { tagName: 'BODY' }, ...extra })
 const trend = MODES.trendRider.orientation
@@ -52,6 +52,29 @@ test('mellanslag är FLAT och ignoreras i fält, knapp och länk', () => {
     assert.equal(keyAction(ev('Space', { target: { tagName } }), '1p', trend), null, tagName)
   }
   assert.equal(isTypingTarget({ tagName: 'button' }), false)
+})
+
+test('spelare 1 har KÖP och SÄLJ i liggande Trade Rider 2P, och tipsen saknar undefined', () => {
+  const buy = keyAction(ev('KeyE'), '2p', trend)
+  const sell = keyAction(ev('KeyQ'), '2p', trend)
+  assert.equal(buy.action, 'buy')
+  assert.equal(buy.player, 1)
+  assert.equal(sell.action, 'sell')
+  assert.equal(sell.player, 1)
+  const fields = ['buy', 'sell', 'levUp', 'levDown', 'flat']
+  for (const player of ['1p', 'p1', 'p2']) {
+    for (const orientation of [trend, MODES.raket.orientation]) {
+      const hints = controlHints(orientation, player)
+      for (const field of fields) {
+        assert.equal(typeof hints[field], 'string', `${player} ${field}`)
+        assert.ok(hints[field].length > 0, `${player} ${field}`)
+        assert.equal(hints[field].includes('undefined'), false, `${player} ${field}`)
+      }
+    }
+    const line = HINTS[player]
+    const visible = `${line.buy} ${line.sell} ${line.flat} ${line.levDown} ${line.levUp}`
+    assert.equal(visible.includes('undefined'), false, player)
+  }
 })
 
 test('pilar och mellanslag får preventDefault (ingen scroll) när de hanteras', () => {

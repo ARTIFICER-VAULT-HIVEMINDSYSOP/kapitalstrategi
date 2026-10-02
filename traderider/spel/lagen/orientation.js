@@ -11,8 +11,8 @@ export const INTENTS = ['FORWARD', 'BACKWARD', 'STEER_TOWARD_HIGH', 'STEER_TOWAR
 export const MODES = {
   trendRider: {
     id: 'trend-rider',
-    hash: 'nvda-rider',
-    aliases: ['trend-rider', 'line-rider'],
+    hash: 'trade-rider',
+    aliases: ['nvda-rider', 'trend-rider', 'line-rider'],
     nameKey: 'mode.trendRider.name',
     orientation: { movement: 'right', highPriceSide: 'up' },
   },
@@ -90,6 +90,8 @@ export function keyToIntent(code, orientation) {
   if (code === 'KeyS') return 'BACKWARD'
   if (code === 'KeyD') return arrows.ArrowRight
   if (code === 'KeyA') return arrows.ArrowLeft
+  if (code === 'KeyE') return 'STEER_TOWARD_HIGH'
+  if (code === 'KeyQ') return 'STEER_TOWARD_LOW'
   return null
 }
 
@@ -147,6 +149,47 @@ export function glyphs(orientation) {
   }
 }
 
+const HINT_LETTER = {
+  KeyW: 'W',
+  KeyA: 'A',
+  KeyS: 'S',
+  KeyD: 'D',
+  KeyQ: 'Q',
+  KeyE: 'E',
+  Space: '␣',
+  ArrowUp: '↑',
+  ArrowDown: '↓',
+  ArrowLeft: '←',
+  ArrowRight: '→',
+  Digit0: '0',
+  Numpad0: '0',
+}
+const HINT_P1 = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE', 'Space']
+const HINT_P2 = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Digit0', 'Numpad0']
+
+/** Korta tangenttips som matchar keyToIntent. buy/sell/levUp/levDown är samma avsikter som glyphs. */
+export function controlHints(orientation, player = '1p') {
+  const codes = player === 'p1' ? HINT_P1 : player === 'p2' ? HINT_P2 : HINT_P1.concat(HINT_P2)
+  const bucket = { buy: [], sell: [], levUp: [], levDown: [], flat: [] }
+  const seen = new Set()
+  for (const code of codes) {
+    const action = intentToAction(keyToIntent(code, orientation))
+    const letter = HINT_LETTER[code]
+    if (!action || !bucket[action] || !letter || seen.has(action + letter)) continue
+    seen.add(action + letter)
+    bucket[action].push(letter)
+  }
+  const g = glyphs(orientation)
+  return {
+    ...g,
+    buy: bucket.buy.join('/'),
+    sell: bucket.sell.join('/'),
+    levUp: bucket.levUp.join('/'),
+    levDown: bucket.levDown.join('/'),
+    flat: bucket.flat.join('/'),
+  }
+}
+
 export function instructionText(orientation, translate) {
   const g = glyphs(orientation)
   const sell = translate('btn.sell')
@@ -186,7 +229,7 @@ export function hashForView(view) {
   if (view === 'rabbit') return 'rabbit-hole'
   if (view === 'raket') return 'racex'
   if (view === 'akademin') return 'academy'
-  return 'nvda-rider'
+  return 'trade-rider'
 }
 
 /** Ett ställe för klick (1–4), tangent och hash, så testerna inte beror på DOM. */

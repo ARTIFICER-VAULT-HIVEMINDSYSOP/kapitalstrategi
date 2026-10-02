@@ -7,6 +7,630 @@
   ],
   "bilder": [
     {
+      "path": "apple-touch-icon.png",
+      "md5": "9038e09b584c20ace5a9656d2811bebe",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "art/cover.jpg",
+      "md5": "e480ed78b138bfb051cffd01d7ed185c",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/lina-portrait.png",
+      "md5": "7a73ca15560718b7f452a7ccfc0806e5",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/lina-present.png",
+      "md5": "93b55717734e2a6cd1492e3bf0422cff",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/logo-ks-backup.png",
+      "md5": "f01b30baa6039284b08072669c2f3105",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/logo-shield.png",
+      "md5": "914d5baf535f67c86cfcc8a7014d7bb7",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/logo-trial.png",
+      "md5": "c295562f30e500429d41a616cc95e15a",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/logo-vi.png",
+      "md5": "c295562f30e500429d41a616cc95e15a",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/logo.png",
+      "md5": "c295562f30e500429d41a616cc95e15a",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/robban-cover.jpg",
+      "md5": "bc72ec4255c3f55f51608b72755dd432",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/robban-info-bors.jpg",
+      "md5": "039908fd1adb4bb807bb5272e78f93ee",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/robban-info-ipo.jpg",
+      "md5": "d64b7ad7ac7c4d4ad43514cb54c90b10",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/robban-info-makro.jpg",
+      "md5": "ddd1e932a4b23560dfb224444753f521",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/robban-info-ravaror.jpg",
+      "md5": "03a23e6978f951e98fa3b62584836786",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/robban-niva-1-initiate.jpg",
+      "md5": "25ef2b02d188d4828f61564cbd02a5ee",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/robban-niva-2-operator.jpg",
+      "md5": "81ea859a41cb2f3c1f6cc4dea8b9c73a",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/robban-portrait.jpg",
+      "md5": "5297798f93f8c25e1c03370889a5bdd0",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/robban-portrait.png",
+      "md5": "b5f8dbf594bb59e57ebb55d577445c88",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/robban-wave.jpg",
+      "md5": "7ba94c2e7735301808626f90802a8b03",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "brand/robban-wave.png",
+      "md5": "f83433a21a38a278edf13b8feb8320ab",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "favicon-16.png",
+      "md5": "4c899fa9ec92f0d66dc4b9fec0c8ab5f",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "favicon-32.png",
+      "md5": "c188e204c71be664fe9cf92d907cc80a",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "favicon-48.png",
+      "md5": "c8baa98c59c2c25899cd46115d4c6832",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "favicon.png",
+      "md5": "a835a88559e7696c48ee1728ef1941e0",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "favicon.svg",
+      "md5": "b9966b020246194614d6b5282a947f36",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "icon-192.png",
+      "md5": "ba8623dc4b54380964aacf888b2bdc30",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "icon-512.png",
+      "md5": "d34288bc44963925b5fa10b672e33b1b",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "icons.svg",
+      "md5": "3b4fcfcf393eca4d264dca4a4663bc37",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "kampanjer/rider-hero.jpg",
+      "md5": "6b454160a9fc0085960fb9f87ca9471d",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "kampanjer/skola-hero.jpg",
+      "md5": "29952f5e754e3babc61f5b9db1b1c671",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "nvda-rider/favicon.svg",
+      "md5": "e5666c2ab2237dbb261a851226024237",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "nvda-rider/og.jpg",
+      "md5": "e480ed78b138bfb051cffd01d7ed185c",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/account-risk.svg",
+      "md5": "5a309d980adf9bd1d9e64aa9f3b49490",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/actual.svg",
+      "md5": "f1358684c9a07e2725fb7cc46ce7ec32",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/calendar.svg",
+      "md5": "a79d9179d436e3c72f8cfa5ce6e2d12a",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/capital.svg",
+      "md5": "4602d262fc7ed6e2309ee0bf5b7b059b",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/checklist.svg",
+      "md5": "0b14482e941a0d545efd8c3d7fe212d7",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/cost.svg",
+      "md5": "e0bf189d39276bcfbb62c8ea2181f615",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/discipline.svg",
+      "md5": "4c758e404855a8864ed797dbdff817f4",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/forecast.svg",
+      "md5": "4b130a9d92cbd6e4419b93d27b14fbd8",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/fundamental.svg",
+      "md5": "df7ddb9f40e6d1501c7464448d79a433",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/gap.svg",
+      "md5": "c4a733b948981c1cb268cb84933c11f0",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/governance.svg",
+      "md5": "5902b025dfb6d8c3c78e1d5514450415",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/impact.svg",
+      "md5": "a1759b16732a29bbc2a4c9d4032c861e",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/ipo.svg",
+      "md5": "1a5fc9fff2e47adbb5a92072f8dc0488",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/leverage.svg",
+      "md5": "290d25c7bd3be333ba61b7997f5a3448",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/liquidation.svg",
+      "md5": "ad2eec36eaef3caa29dbfb0abc79e184",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/margin-call.svg",
+      "md5": "bd14f8896cb29e1c51aa784f08b0d209",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/margin.svg",
+      "md5": "e6e3dda2c5ce2d87f5ec1c87dd9cce4a",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/owners.svg",
+      "md5": "a37b30b7eb49c6b1bf07369820558879",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/partial.svg",
+      "md5": "30eb95110bb6a2e64ca8ca7a7266cc67",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/position.svg",
+      "md5": "60e6d33b367972e89017870353254c72",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/private.svg",
+      "md5": "82eaec08dae3de972b50e97924ec13d8",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/public.svg",
+      "md5": "5755038b349e30557ce53ba92e439e47",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/risk-reward.svg",
+      "md5": "eea10cf91ca138aa74445a59d21822dd",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/scam.svg",
+      "md5": "f8ae35e75a1cb5eae3341f0544f805a9",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/signal-auto.svg",
+      "md5": "c6f065ef1a4531078cfa5407d443ea7b",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/signal-fund.svg",
+      "md5": "627f48170c7e192904baee9bf279a199",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/signal-tech.svg",
+      "md5": "919fef19c61520043ea3ea635420a099",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/stop-loss.svg",
+      "md5": "8bf204afe5069004c58a1745632b298c",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/support.svg",
+      "md5": "5b962ec39ee300189fb08c902a9034a8",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/take-profit.svg",
+      "md5": "ea086b5fec5021ca3355ffa6e8f332ba",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/technical.svg",
+      "md5": "9e2fc53fd16a3606fc8508ec6faade5a",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/concepts/transparency.svg",
+      "md5": "958f5d046e27c8752cd1987ca051e2c3",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/courses/ai-risk.jpg",
+      "md5": "dcca0c08e055633c1867926327de2f3f",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/courses/bankernas-historia.jpg",
+      "md5": "1699f983e67a207b94a60020b7b927b6",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/courses/basics-sprak.jpg",
+      "md5": "5ddde8be2b2c116a4957d28c19785a18",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/courses/historia.jpg",
+      "md5": "3ed4fa3e9fee92a2e83980aa27021cc8",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/courses/ico.jpg",
+      "md5": "3147cfcec80a9a38d95a6ed50482b811",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/courses/ipo.jpg",
+      "md5": "3238bfc1377926cae2881b376add5bba",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/courses/marknadens-framtid.jpg",
+      "md5": "7ca11a06836c6f932eab77e0480438f9",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/courses/portfolj-pv.jpg",
+      "md5": "4a68bd7e07ec39a42b4cb942ee4a50cf",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/courses/trading-grund.jpg",
+      "md5": "17eb3582eec6a349239b9b36703265de",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/courses/utr-skatt.jpg",
+      "md5": "54b1ab6e93f182c2cdbd176fbfb9e0fd",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/glossary/diversify.svg",
+      "md5": "24b0a5c560268d1520a5c2da6b890e3f",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/glossary/liquidity.svg",
+      "md5": "333938736d7b5d0df027bc6186b470a8",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/glossary/playervalue.svg",
+      "md5": "a5080afca7fcfd0f1a4d05a8b12d3fa4",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/glossary/portfolio.svg",
+      "md5": "c343814d39942496413617b4b60531c6",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/glossary/position.svg",
+      "md5": "c9e1e9e4c1eec007d2510b49226434f9",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/glossary/price.svg",
+      "md5": "240eb501f497231a4f9221b9770da7e6",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/glossary/return.svg",
+      "md5": "66d9556bc0359e6e37ee9b12e11b4ac1",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/glossary/risk.svg",
+      "md5": "9e416ac127aaa799fcd8d252c8cfff13",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/invest/bonds.svg",
+      "md5": "b81f24f655fc25d578b0a05620d97818",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/invest/commodities.svg",
+      "md5": "db4167f46c546b515471103b3d99efd6",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/invest/crypto.svg",
+      "md5": "76222cff3c84f4bd9023ad24e5dc87f2",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/invest/funds.svg",
+      "md5": "2046cb01416ff53b2713aeac48200d95",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/invest/fx.svg",
+      "md5": "753f1fb4e9f6f4b23f524280fc9ab881",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/invest/realestate.svg",
+      "md5": "3f69b1c4fd68f9c4621a60baf1ccee96",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/invest/stocks.svg",
+      "md5": "874646f91d3af697b9c25867c4f7623d",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/compound-growth.svg",
+      "md5": "5eb50bfe2cbf8f4a9f6145f83744d923",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/economic-calendar.svg",
+      "md5": "11a0d0437758aa2e56a3d133fdb99327",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/ipo-public.svg",
+      "md5": "e238a232ac3edf9b505093084b9a711d",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/leverage-magnify.svg",
+      "md5": "ae34302ad5ca3d6f5dd1a80ec06dabef",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/order-types.svg",
+      "md5": "5c48eec85a3444225a8175ec6cc55fec",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/risk-reward.svg",
+      "md5": "74c3c15ad3ca8def5283754187ff561f",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/robban-orders-teacher.jpg",
+      "md5": "0bee03c3eeef8c5fe4ea21d841b8204e",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/robban/robban-learn-compound.jpg",
+      "md5": "dc7c9da7c226648a7dab2bc684483cc8",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/robban/robban-learn-history.jpg",
+      "md5": "158cff93a8e159ee48901b4c315bd8a1",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/safety-kit.svg",
+      "md5": "db07833fca565ea0a64ac11547c72501",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/signal-checklist.svg",
+      "md5": "163ab84a7b147f9f62cb9487918ed9d2",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/stock-share.svg",
+      "md5": "4570741918d2d8b9afc423e5c04b659c",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/stop-loss-diagram.svg",
+      "md5": "058190ce3e18d483754562cb924c2ccd",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/take-profit-diagram.svg",
+      "md5": "54c6c193e42b0375f55236da903ab18f",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
+      "path": "school/lessons/tech-vs-fund.svg",
+      "md5": "21d4599390a4f8460589d3153ef22509",
+      "ocr": "ren",
+      "datum": "2026-10-02"
+    },
+    {
       "path": "traderider/art/akademin.jpg",
       "md5": "7c4df6e832a58b6c90a9fed33a6e7410",
       "ocr": "ren",

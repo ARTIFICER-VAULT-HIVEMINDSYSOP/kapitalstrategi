@@ -75,13 +75,15 @@ test('hash och id får bära namnet, övrigt synligt byts och hittas', () => {
   assert.equal(hasBannedVisible('se #nvda-rider'), false)
 })
 
-test('panelen skriver om bundelns rubrik i loopen', () => {
+test('panelen skriver om en planterad rubrik, och bundeln säger redan Trade Rider', () => {
   const panel = readFileSync(new URL('../../spel/lagen/panel.js', import.meta.url), 'utf8')
   const loop = panel.slice(panel.indexOf('const loop'))
   assert.match(loop, /refreshTitle\(\)/)
   assert.match(panel, /scrubVisibleNames/)
+  assert.match(panel, /Trade Rider/)
   const bundle = readFileSync(new URL('../../spel/assets/routes-CbqPJAI2.js', import.meta.url), 'utf8')
-  assert.match(bundle, /children:`NVDA Rider`/)
+  assert.match(bundle, /children:`Trade Rider`/)
+  assert.equal(bundle.includes('NVDA Rider'), false)
   const doc = page('traderider/spel/index.html')
   const span = doc.createElement('span')
   span.textContent = 'NVDA Rider'
@@ -89,6 +91,17 @@ test('panelen skriver om bundelns rubrik i loopen', () => {
   scrubVisibleNames(doc, STRINGS.sv['mode.trendRider.name'])
   assert.equal(span.textContent, 'Trade Rider')
   assert.deepEqual(visibleNameHits(doc), [])
+})
+
+test('document.title är Trade Rider redan vid laddning, före synlig.js', () => {
+  const html = readFileSync(join(REPO, 'traderider/spel/index.html')).toString('utf8').replace(/\0/g, '')
+  const window = new Window({ url: 'https://kapitalstrategi.example/traderider/spel/' })
+  window.document.write(html.replace(/<script[\s\S]*?<\/script>/gi, ''))
+  assert.equal(window.document.title, 'Trade Rider')
+  const head = readFileSync(join(REPO, 'traderider/spel/assets/index-CjseGLmu.js'), 'utf8')
+  assert.match(head, /Qh=`Trade Rider`/)
+  assert.equal(head.includes('NVDA Rider'), false)
+  assert.match(head, /Trade Rider – övning på simulerade kurser/)
 })
 
 function visibleImageUrls(doc) {

@@ -13,8 +13,8 @@
  * Raketen själv är i metall (guldgradient med högdager, färger från KS guldknappar).
  * prefers-reduced-motion: ingen parallax, inga partiklar, statiska stjärnor och scanlines, ingen glitch.
  */
-import { keyAction, PREVENT_DEFAULT, HINTS } from './keys.js'
-import { MODES } from './orientation.js'
+import { keyAction, PREVENT_DEFAULT } from './keys.js'
+import { MODES, controlHints } from './orientation.js'
 import { simTid } from './simtid.js'
 import { t, onLang } from './i18n.js'
 import { stepSide, readSide } from './styrmotor.js'
@@ -349,7 +349,8 @@ export function createRaket({ engine }) {
   const sprites = new Map()
 
   function hintSet(i) {
-    return mode === '2p' ? HINTS[i === 0 ? 'p1' : 'p2'] : HINTS['1p']
+    const player = mode === '2p' ? (i === 0 ? 'p1' : 'p2') : '1p'
+    return controlHints(MODES.raket.orientation, player)
   }
 
   function buildPlayerDom(i) {

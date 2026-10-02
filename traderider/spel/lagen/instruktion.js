@@ -14,6 +14,7 @@ const css = `
 .tr-instr button:focus-visible,.tr-instr-open:focus-visible{outline:2px solid #76b900;outline-offset:2px}
 .tr-instr-open{position:fixed;z-index:66;top:58px;right:12px}
 .tr-instr-open[hidden]{display:none !important}
+@media (max-width:520px){.tr-instr{top:auto;bottom:12px;left:12px;right:12px;width:auto;transform:none;max-height:42vh;overflow:auto}.tr-instr-open{top:auto;bottom:12px;left:12px;right:auto}}
 @media (prefers-reduced-motion: reduce){.tr-instr,.tr-instr-open{transition:none;animation:none}}
 `
 

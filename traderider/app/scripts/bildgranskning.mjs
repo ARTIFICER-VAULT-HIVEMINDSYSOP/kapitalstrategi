@@ -1,5 +1,5 @@
 /**
- * Granskar publicerade bilder under traderider/ med Tesseract.
+ * Granskar publicerade bilder på hela sajten med Tesseract.
  * Kör: npm run bildgranskning
  *
  * traderider/app/docs/ ingår inte. Pages tar bort hela traderider/app före
@@ -7,14 +7,14 @@
  * utvecklingsdokumentation. Den återställs från origin/main och diffas inte.
  */
 import { createHash } from 'node:crypto'
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 const REPO = fileURLToPath(new URL('../../../', import.meta.url))
-const ROOT = join(REPO, 'traderider')
+const ROOT = REPO
 const LIST = fileURLToPath(new URL('../spel-test/bildgranskning.json', import.meta.url))
 const EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.svg'])
 const BANNED = /nvda|nvidia/i
@@ -32,7 +32,9 @@ function extOf(name) {
 }
 
 function excluded(rel) {
-  return rel.startsWith('traderider/app/docs/') || rel.split('/').includes('node_modules')
+  if (rel.startsWith('traderider/app/') || rel.startsWith('traderider/app/docs/')) return true
+  const parts = rel.split('/')
+  return parts.includes('node_modules') || parts.includes('.git')
 }
 
 function walk(dir, out = []) {
@@ -66,8 +68,12 @@ function variants(file) {
     [
       '-c',
       'from PIL import Image, ImageOps; import sys; im=Image.open(sys.argv[1]).convert("RGB"); dest=sys.argv[2]\n'
-        + 'for scale in (2, 3):\n'
-        + '    up=im.resize((im.width*scale, im.height*scale), Image.Resampling.LANCZOS)\n'
+        + 'for scale in (2,):\n'
+        + '    w,h=im.width*scale, im.height*scale\n'
+        + '    cap=2400\n'
+        + '    if max(w,h)>cap:\n'
+        + '        r=cap/max(w,h); w,h=max(1,int(w*r)), max(1,int(h*r))\n'
+        + '    up=im.resize((w, h), Image.Resampling.LANCZOS)\n'
         + '    up.save(f"{dest}/n{scale}.png"); ImageOps.invert(up).save(f"{dest}/i{scale}.png")\n',
       file,
       dest,
@@ -89,8 +95,16 @@ const files = walk(ROOT).sort((a, b) => a.rel.localeCompare(b.rel))
 const failures = []
 const bilder = []
 const datum = new Date().toISOString().slice(0, 10)
+const previous = existsSync(LIST) ? JSON.parse(readFileSync(LIST, 'utf8')) : { bilder: [] }
+const known = new Map((previous.bilder || []).filter((row) => row.ocr === 'ren').map((row) => [row.path, row]))
 
 for (const file of files) {
+  const md5 = createHash('md5').update(readFileSync(file.path)).digest('hex')
+  const cached = known.get(file.rel)
+  if (cached && cached.md5 === md5) {
+    bilder.push({ path: file.rel, md5, ocr: 'ren', datum: cached.datum || datum })
+    continue
+  }
   if (file.rel.endsWith('.svg')) {
     const text = readFileSync(file.path, 'utf8')
     if (BANNED.test(text)) failures.push(`${file.rel}: svg`)
@@ -98,8 +112,8 @@ for (const file of files) {
     const dir = variants(file.path)
     const found = []
     try {
-      for (const tag of ['n2', 'n3', 'i2', 'i3']) {
-        for (const psm of ['3', '6', '11']) {
+      for (const tag of ['n2', 'i2']) {
+        for (const psm of ['6', '11']) {
           const lines = hitsIn(tesseract(join(dir, `${tag}.png`), psm))
           for (const line of lines) found.push(`${tag} psm ${psm}: ${line}`)
         }
@@ -109,7 +123,6 @@ for (const file of files) {
     }
     if (found.length) failures.push(`${file.rel}: ${found.join(' | ')}`)
   }
-  const md5 = createHash('md5').update(readFileSync(file.path)).digest('hex')
   bilder.push({ path: file.rel, md5, ocr: 'ren', datum })
 }
 

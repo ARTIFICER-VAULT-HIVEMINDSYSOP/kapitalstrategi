@@ -90,7 +90,7 @@
           <a href="/tradingskolan" data-i18n="land.school">Öppna Tradingskolan →</a></p>
 
         <div class="grid">
-          <a class="mode" href="/traderider/spel/#nvda-rider">
+          <a class="mode" href="/traderider/spel/#trade-rider">
             <div class="art cover" role="img" data-i18n-aria="mode.nvda" aria-label="Trade Rider"></div>
             <div class="body">
               <p class="tag" data-i18n="land.mode1">Läge 1 · åk på rälsen</p>
@@ -141,7 +141,7 @@
       addEventListener('keydown', (e) => {
         const tag = (e.target && e.target.tagName) || ''
         if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
-        const hash = { Digit1: '#nvda-rider', Digit2: '#racex', Digit3: '#academy', Digit4: '#rabbit-hole' }[e.code]
+        const hash = { Digit1: '#trade-rider', Digit2: '#racex', Digit3: '#academy', Digit4: '#rabbit-hole' }[e.code]
         if (!hash) return
         e.preventDefault()
         location.href = '/traderider/spel/' + hash

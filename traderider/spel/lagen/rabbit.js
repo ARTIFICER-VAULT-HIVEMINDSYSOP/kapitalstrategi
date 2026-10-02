@@ -12,10 +12,10 @@ const O = MODES.rabbitHole.orientation
 const steering = createSteering(O)
 
 const css = `
-.nlr-rh{display:none;position:fixed;inset:0;z-index:50;background:#140e0c;color:#f4efe6}
+.nlr-rh{display:none;position:fixed;inset:0;z-index:55;background:#140e0c;color:#f4efe6}
 .nlr-rh.on{display:block}
 .nlr-rh canvas{width:100%;height:100%;display:block}
-.nlr-rh-hud{position:absolute;left:12px;right:12px;top:64px;display:flex;justify-content:space-between;gap:12px;pointer-events:none;font:600 12px/1.35 "IBM Plex Sans",sans-serif}
+.nlr-rh-hud{position:absolute;left:12px;right:12px;top:120px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 12px;pointer-events:none;font:600 12px/1.35 "IBM Plex Sans",sans-serif}
 .nlr-rh-hud b{color:#e7b15a}
 .nlr-rh-note{position:absolute;left:12px;bottom:16px;max-width:min(520px,92vw);font:500 12px/1.4 "IBM Plex Sans",sans-serif;color:#f4efe6}
 .nlr-rh-bat{width:28px;height:14px}
@@ -92,12 +92,48 @@ export function createRabbit() {
   let side = 'flat'
   let leverage = 1
   let lastX = null
+  let priceIndex = 0
+  let entry = null
+  let result = null
   const lock = createGestureLock(480)
-  const candles = Array.from({ length: 18 }, (_, i) => (i % 3 === 0 ? -1 : 1))
+  const decorations = Array.from({ length: 18 }, (_, i) => (i % 3 === 0 ? -1 : 1))
+
+  function series() {
+    const candles = window.__trEngine?.quote?.candles
+    return Array.isArray(candles) ? candles : []
+  }
+  function priceAt(index) {
+    const candles = series()
+    if (!candles.length) return null
+    const candle = candles[((index % candles.length) + candles.length) % candles.length]
+    const value = Number(candle?.c ?? candle?.close)
+    return Number.isFinite(value) ? value : null
+  }
+  function markEntry() {
+    if (side === 'flat') return
+    const price = priceAt(priceIndex)
+    if (entry == null && price != null) entry = price
+  }
+  function advancePrice() {
+    if (!series().length) return
+    priceIndex = (priceIndex + 1) % series().length
+    const price = priceAt(priceIndex)
+    if (price == null || side === 'flat' || entry == null || entry === 0) return
+    const sign = side === 'buy' ? 1 : -1
+    result = sign * (price / entry - 1) * leverage * 100
+  }
+  function fmtPrice(price) {
+    return price == null ? '—' : price.toFixed(2)
+  }
+  function fmtResult(value) {
+    if (!Number.isFinite(value)) return '—'
+    return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`
+  }
 
   function paint() {
     root.setAttribute('aria-label', t('mode.rabbitHole.name'))
-    hud.innerHTML = `<span><b>${t('sim.label')}</b></span><span>${side === 'buy' ? t('btn.buy') : side === 'sell' ? t('btn.sell') : t('btn.flat')} · ${t('lev.risk')}</span>`
+    const price = priceAt(priceIndex)
+    hud.innerHTML = `<span><b>${t('sim.price')}</b> ${fmtPrice(price)}</span><span><b>${t('hud.result')}</b> ${fmtResult(result)}</span><span>${side === 'buy' ? t('btn.buy') : side === 'sell' ? t('btn.sell') : t('btn.flat')} · ${t('lev.risk')}</span>`
     const w = root.clientWidth || 800
     const h = root.clientHeight || 600
     const dpr = Math.min(2, devicePixelRatio || 1)
@@ -120,7 +156,7 @@ export function createRabbit() {
         c.fillRect(w - 80, py + 6, 10, 10)
       }
     }
-    candles.forEach((dir, i) => {
+    decorations.forEach((dir, i) => {
       const x = 80 + (i % 6) * ((w - 160) / 6)
       const cy = ((i * 70 + y * travel) % (h + 40)) - 10
       if (dir > 0) carrot(c, x, cy)
@@ -142,8 +178,12 @@ export function createRabbit() {
 
   function apply(intent) {
     const next = steering.applyIntent({ side, leverage }, intent)
+    const was = side
     side = next.side
     leverage = next.leverage
+    if (side === 'flat') entry = null
+    else if (was !== side) entry = priceAt(priceIndex)
+    else markEntry()
     paint()
   }
 
@@ -170,6 +210,7 @@ export function createRabbit() {
   function frame() {
     if (!visible || frozen) return
     y += 1.2 * Math.max(0.4, leverage / 4)
+    advancePrice()
     paint()
     raf = requestAnimationFrame(frame)
   }
@@ -204,6 +245,7 @@ export function createRabbit() {
       const ticks = Math.max(1, Math.min(12, Math.round(Number(n) / 0.016) || 1))
       for (let i = 0; i < ticks; i++) {
         y += 1.2 * Math.max(0.4, leverage / 4)
+        advancePrice()
         paint()
       }
     },

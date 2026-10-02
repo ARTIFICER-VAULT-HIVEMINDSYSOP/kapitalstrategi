@@ -5,7 +5,7 @@
  * Pilar vinner om en kod skulle kunna betyda två saker: arrowMap läses före WASD.
  * Mellanslag = FLAT, utom när fokus ligger i fält, knapp eller länk.
  */
-import { MODES, keyToIntent, intentToAction, glyphs } from './orientation.js'
+import { MODES, keyToIntent, intentToAction, controlHints } from './orientation.js'
 
 export const KEY_SCHEME = 'relative'
 
@@ -26,6 +26,8 @@ const GROUP = {
   KeyA: 1,
   KeyS: 1,
   KeyD: 1,
+  KeyQ: 1,
+  KeyE: 1,
   Space: 1,
   ArrowUp: 2,
   ArrowDown: 2,
@@ -51,9 +53,9 @@ export function keyAction(e, mode = '1p', orientation = MODES.trendRider.orienta
 }
 
 export const HINTS = {
-  '1p': glyphs(MODES.trendRider.orientation),
-  p1: glyphs(MODES.trendRider.orientation),
-  p2: glyphs(MODES.trendRider.orientation),
+  '1p': controlHints(MODES.trendRider.orientation, '1p'),
+  p1: controlHints(MODES.trendRider.orientation, 'p1'),
+  p2: controlHints(MODES.trendRider.orientation, 'p2'),
 }
 
 export const PREVENT_DEFAULT = new Set(['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'])
