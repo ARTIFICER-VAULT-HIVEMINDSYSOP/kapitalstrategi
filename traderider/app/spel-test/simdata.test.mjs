@@ -55,18 +55,32 @@ test('den simulerade serien är deterministisk, märkt och inte verklig', () => 
 
 test('synlig etikett i alla lägen och inga påståenden om verkliga kurser', () => {
   const SIM = 'Simulerade kurser – inte verkliga marknadsdata'
-  assert.ok(txt(join(SPEL, 'lagen/i18n.js')).includes(SIM))
+  const BADGE = 'VERKLIG · HISTORISK'
+  const i18n = txt(join(SPEL, 'lagen/i18n.js'))
+  assert.ok(i18n.includes(SIM))
+  assert.ok(i18n.includes(BADGE))
   assert.match(txt(join(SPEL, 'lagen/panel.js')), /el\('div', 'tr-sim', t\('sim\.label'\)\)/)
   assert.ok(txt(join(TR, 'index.html')).includes(SIM))
-  const claim = /[Hh]istorisk|[Rr]iktiga (historiska )?(NVDA-)?kurser|äkta historiska|real historical|live (stock )?chart|LiveTrend|NVIDIA/
+  const claim = /[Rr]iktiga (historiska )?(NVDA-)?kurser|äkta historiska|real historical|live (stock )?chart|LiveTrend|NVIDIA/
   const files = [join(TR, 'index.html'), join(REPO, 'assets/traderider-demo-nav.js'), ...spelFiles.filter((p) => /\.(html|js)$/.test(p))]
   const hits = []
   for (const p of files) {
     // bara synlig text: hoppa över kommentarer i våra egna moduler
-    const t = txt(p).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
-    if (claim.test(t)) hits.push(relative(REPO, p))
+    const t = txt(p).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '').replaceAll(BADGE, '')
+    if (claim.test(t) || /[Hh]istorisk/.test(t)) hits.push(relative(REPO, p))
   }
   assert.deepEqual(hits, [])
+})
+
+test('den publicerade fallback-filen och live-hämtningen är borta', () => {
+  assert.ok(!existsSync(join(REPO, 'nvda-rider/data/nvda-fallback.json')))
+  const rider = txt(join(REPO, 'nvda-rider/assets/routes-CbqPJAI2.js'))
+  assert.equal(rider.includes('nvda-fallback'), false)
+  assert.equal(rider.includes('query1.finance'), false)
+  const historia = txt(join(SPEL, 'lagen/historia-data.js'))
+  assert.match(historia, /export const HISTORIA/)
+  assert.equal(historia.includes('fetch('), false)
+  assert.match(txt(join(SPEL, 'lagen/i18n.js')), /VERKLIG · HISTORISK/)
 })
 
 test('Pages-uppladdningen i den här grenen: ingen mäklarkod i det som grenen publicerar under traderider/', () => {

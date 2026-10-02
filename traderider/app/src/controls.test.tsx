@@ -81,11 +81,11 @@ test('fallback data is labelled on the desk', () => {
     <Desk
       candles={fixture()}
       source="fallback"
-      label="Fallback data — Yahoo unavailable"
+      label="Medföljande kursserie"
       autoRun={false}
     />,
   )
-  expect(view.getByText(/Fallback data — Yahoo unavailable/)).toBeTruthy()
+  expect(view.getByText(/Medföljande kursserie/)).toBeTruthy()
 })
 
 test('desk is local practice only: no broker panel and no network calls on orders or reset', async () => {

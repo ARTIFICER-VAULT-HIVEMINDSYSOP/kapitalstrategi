@@ -1,7 +1,7 @@
 {
   "_note": "Spärrad demoram: varje ingång under /traderider/demo/ är en omdirigering (mall: demo-redirect.html). Läses av vite.demo.config.ts och check-demo.mjs.",
   "index.html": { "namn": "Traderider", "mal": "/traderider/" },
-  "tag/index.html": { "namn": "NVDA Rider", "mal": "/traderider/spel/#nvda-rider" },
+  "tag/index.html": { "namn": "Trade Rider", "mal": "/traderider/spel/#nvda-rider" },
   "raket/index.html": { "namn": "Raket", "mal": "/traderider/spel/#raket" },
   "akademin/index.html": { "namn": "Akademin", "mal": "/traderider/spel/#akademin" }
 }

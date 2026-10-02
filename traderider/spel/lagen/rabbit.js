@@ -4,7 +4,7 @@
  */
 import { keyAction, PREVENT_DEFAULT } from './keys.js'
 import { MODES, createSteering, wheelToIntent } from './orientation.js'
-import { t, onLang, helpLine } from './i18n.js'
+import { t, onLang } from './i18n.js'
 import { createGestureLock } from './styrmotor.js'
 
 const O = MODES.rabbitHole.orientation
@@ -81,12 +81,11 @@ export function createRabbit() {
   const canvas = document.createElement('canvas')
   const hud = document.createElement('div')
   hud.className = 'nlr-rh-hud'
-  const note = document.createElement('p')
-  note.className = 'nlr-rh-note'
-  root.append(canvas, hud, note)
+  root.append(canvas, hud)
   document.body.appendChild(root)
 
   let visible = false
+  let frozen = false
   let raf = 0
   let y = 40
   let side = 'flat'
@@ -97,7 +96,6 @@ export function createRabbit() {
   function paint() {
     root.setAttribute('aria-label', t('mode.rabbitHole.name'))
     hud.innerHTML = `<span><b>${t('sim.label')}</b></span><span>${side === 'buy' ? t('btn.buy') : side === 'sell' ? t('btn.sell') : t('btn.flat')} · ${t('lev.risk')}</span>`
-    note.textContent = helpLine('rabbit')
     const w = root.clientWidth || 800
     const h = root.clientHeight || 600
     const dpr = Math.min(2, devicePixelRatio || 1)
@@ -164,7 +162,7 @@ export function createRabbit() {
   }, { passive: false })
 
   function frame() {
-    if (!visible) return
+    if (!visible || frozen) return
     y += 1.2 * Math.max(0.4, leverage / 4)
     paint()
     raf = requestAnimationFrame(frame)
@@ -183,6 +181,17 @@ export function createRabbit() {
       visible = false
       root.classList.remove('on')
       cancelAnimationFrame(raf)
+    },
+    freeze() {
+      frozen = true
+      cancelAnimationFrame(raf)
+    },
+    resume() {
+      frozen = false
+      if (visible) {
+        cancelAnimationFrame(raf)
+        raf = requestAnimationFrame(frame)
+      }
     },
     anchor: () => 'bottom',
   }

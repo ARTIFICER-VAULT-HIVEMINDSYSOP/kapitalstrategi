@@ -50,6 +50,7 @@ type RocketCopy = {
   riding: string
   perSec: string
   series: string
+  chartAria: string
   hintWait: string
   hintUpperHot: string
   hintLowerHot: string
@@ -165,6 +166,7 @@ const SV: DemoCopy = {
     riding: 'åker',
     perSec: 'candles/s',
     series: 'medföljande historiska candles',
+    chartAria: 'Grafen vriden: tiden går uppåt, priset åt höger. Raketen följer kursen högst upp.',
     hintWait: 'Väntar på band och RSI.',
     hintUpperHot: 'Nära högerväggen och RSI över 70: läget är sträckt. Öva: vänta eller stäng.',
     hintLowerHot: 'Nära vänsterväggen och RSI under 30: läget är sträckt nedåt. Öva: stå platt i stället för att jaga.',
@@ -275,6 +277,7 @@ const EN: DemoCopy = {
     riding: 'riding',
     perSec: 'candles/s',
     series: 'bundled historical candles',
+    chartAria: 'The chart turned: time goes up, price to the right. The rocket follows the price at the top.',
     hintWait: 'Waiting for the bands and RSI.',
     hintUpperHot: 'Near the right wall and RSI above 70: the level is stretched. Practice: wait or close.',
     hintLowerHot: 'Near the left wall and RSI below 30: the level is stretched downward. Practice: stay flat instead of chasing.',
@@ -385,6 +388,7 @@ const UK: DemoCopy = {
     riding: 'рух',
     perSec: 'свічок/с',
     series: 'вкладені історичні свічки',
+    chartAria: 'Графік повернуто: час угору, ціна праворуч. Ракета йде за курсом угорі.',
     hintWait: 'Очікування на смуги і RSI.',
     hintUpperHot: 'Біля правої стіни і RSI понад 70: рівень розтягнутий. Тренування: зачекати або закрити.',
     hintLowerHot: 'Біля лівої стіни і RSI нижче 30: рівень розтягнутий униз. Тренування: лишатися без позиції.',
@@ -467,6 +471,7 @@ export function collectCopyStrings(): string[] {
       r.riding,
       r.perSec,
       r.series,
+      r.chartAria,
       r.hintWait,
       r.hintUpperHot,
       r.hintLowerHot,

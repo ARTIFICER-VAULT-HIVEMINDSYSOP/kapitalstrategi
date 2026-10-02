@@ -152,11 +152,11 @@ export function Desk({ candles, source, label, autoRun = true }: DeskProps) {
     <div data-desk="traderider" className="min-h-screen overflow-x-clip bg-paper text-ink">
       <header className="mx-auto flex max-w-[1100px] flex-wrap items-end justify-between gap-3 border-b border-brass px-3 py-4">
         <div className="min-w-0">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-ink/60">Paper desk · NVDA</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-ink/60">Trade Rider</p>
           <h1 className="font-display text-4xl font-medium leading-none">Traderider</h1>
         </div>
         <div className="min-w-0 text-left sm:text-right">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-ink/60">NVDA close</p>
+          <p className="text-[11px] uppercase tracking-[0.16em] text-ink/60">Close</p>
           <p className="font-display text-3xl tabular-nums leading-none">{formatPx(marked.close)}</p>
           <p className={`mt-1 text-sm tabular-nums ${pctTone}`}>{formatPct(marked.pct)} vs previous close</p>
         </div>
@@ -166,7 +166,7 @@ export function Desk({ candles, source, label, autoRun = true }: DeskProps) {
         <section className="min-w-0">
           {source === 'fallback' ? (
             <p className="mb-2 border border-brick/40 px-3 py-2 text-sm text-brick" role="status">
-              {label}. Bundled NVDA candles, not a live Yahoo fetch.
+              {label}. Medföljande kursserie, inte en livehämtning.
             </p>
           ) : (
             <p className="mb-2 text-[11px] uppercase tracking-[0.16em] text-ink/55">{label} candles · 1h</p>
@@ -174,7 +174,7 @@ export function Desk({ candles, source, label, autoRun = true }: DeskProps) {
           <canvas
             ref={canvasRef}
             className="ride-canvas"
-            aria-label="NVDA chart. The train sits on railroad tracks along the active Bollinger rail."
+            aria-label="Chart. The train sits on railroad tracks along the active Bollinger rail."
           />
           <p className="mt-2 text-sm leading-snug">{snap.status}</p>
           <p className="mt-1 text-xs tabular-nums text-ink/60">

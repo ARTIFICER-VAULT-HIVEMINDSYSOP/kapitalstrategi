@@ -9,14 +9,14 @@
  *
  * Stil (bara Raket-läget): cyber-HUD – djupt marinblå/lila bakgrund (inte svart), neon i cyan och magenta,
  * tunna ramlinjer med hörnmarkeringar, monospace-siffror, diskreta scanlines, neonhorisont i perspektiv,
- * stjärnor i tre lager med parallax, avgaspartiklar, asteroider med splitter och glitch vid förlust ≥ GLITCH_AT %.
+ * stjärnor i tre lager med parallax, partiklar, asteroider med splitter och glitch vid förlust ≥ GLITCH_AT %.
  * Raketen själv är i metall (guldgradient med högdager, färger från KS guldknappar).
  * prefers-reduced-motion: ingen parallax, inga partiklar, statiska stjärnor och scanlines, ingen glitch.
  */
 import { keyAction, PREVENT_DEFAULT, HINTS } from './keys.js'
 import { MODES } from './orientation.js'
 import { simTid } from './simtid.js'
-import { t, onLang, helpLine } from './i18n.js'
+import { t, onLang } from './i18n.js'
 import { stepSide, readSide } from './styrmotor.js'
 import { mountEntrySnap, bindStepGestures } from './snapp.js'
 
@@ -72,9 +72,9 @@ const css = `
 .nlr-rk-quote{right:14px;top:12px;text-align:right;min-width:150px}
 .nlr-rk-pnl{right:14px;top:104px;text-align:right;min-width:150px}
 .nlr-rk-pnl b{font-size:24px}
-.nlr-rk-gas{display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-top:4px}
-.nlr-rk-gas i{display:block;width:64px;height:5px;border-radius:1px;background:rgba(147,168,212,.22);overflow:hidden}
-.nlr-rk-gas i u{display:block;height:100%;width:0;background:${CYAN};box-shadow:0 0 8px ${CYAN}}
+.nlr-rk-boost{display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-top:4px}
+.nlr-rk-boost i{display:block;width:64px;height:5px;border-radius:1px;background:rgba(147,168,212,.22);overflow:hidden}
+.nlr-rk-boost i u{display:block;height:100%;width:0;background:${CYAN};box-shadow:0 0 8px ${CYAN}}
 .nlr-rk-pnl.alert{border-color:rgba(255,90,106,.85);box-shadow:0 0 22px rgba(255,90,106,.35),inset 0 0 18px rgba(255,90,106,.10)}
 .nlr-rk-pnl.glitch{animation:nlrRkGlitch .18s steps(2,end) 1}
 @keyframes nlrRkGlitch{0%{transform:translate(0,0);clip-path:inset(0 0 0 0)}25%{transform:translate(-3px,1px);clip-path:inset(10% 0 35% 0)}50%{transform:translate(3px,-1px);clip-path:inset(40% 0 8% 0)}75%{transform:translate(-2px,0);clip-path:inset(0 0 60% 0)}100%{transform:translate(0,0);clip-path:inset(0 0 0 0)}}
@@ -113,11 +113,11 @@ const css = `
 .nlr-rk-start{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);text-align:center;padding:14px 18px;max-width:calc(100% - 32px);z-index:2}
 .nlr-rk-start p{margin:3px 0;font:500 12px ${MONO};color:${TEXT2}}
 .nlr-rk-div{position:absolute;background:${MAGENTA};box-shadow:0 0 10px ${MAGENTA};display:none}
-@media (max-width:640px){.nlr-rk-kbd{display:none}.nlr-rk-quote{top:auto;bottom:196px;right:12px;min-width:0}.nlr-rk-pnl{top:auto;bottom:196px;right:auto;left:12px;text-align:left;min-width:0}.nlr-rk-pnl .nlr-rk-gas{justify-content:flex-start}.nlr-rk-card b{font-size:16px}.nlr-rk-pnl b{font-size:18px}.nlr-rk-info{font-size:11px}.nlr-rk-side{font-size:14px;letter-spacing:.08em}.nlr-rk-gas i{width:44px}.nlr-rk-note{font-size:10px}.nlr-rk-card span{font-size:10px}}
+@media (max-width:640px){.nlr-rk-kbd{display:none}.nlr-rk-quote{top:auto;bottom:196px;right:12px;min-width:0}.nlr-rk-pnl{top:auto;bottom:196px;right:auto;left:12px;text-align:left;min-width:0}.nlr-rk-pnl .nlr-rk-boost{justify-content:flex-start}.nlr-rk-card b{font-size:16px}.nlr-rk-pnl b{font-size:18px}.nlr-rk-info{font-size:11px}.nlr-rk-side{font-size:14px;letter-spacing:.08em}.nlr-rk-boost i{width:44px}.nlr-rk-note{font-size:10px}.nlr-rk-card span{font-size:10px}}
 /* 2P: kompakta halvor */
 .nlr-rk-2p .nlr-rk-quote{display:none}
 .nlr-rk-2p .nlr-rk-pnl{top:12px;bottom:auto;right:12px;left:auto;text-align:right;min-width:0}
-.nlr-rk-2p .nlr-rk-pnl .nlr-rk-gas{justify-content:flex-end}
+.nlr-rk-2p .nlr-rk-pnl .nlr-rk-boost{justify-content:flex-end}
 .nlr-rk-2p .nlr-rk-who{top:12px}
 .nlr-rk-2p .nlr-rk-ctl{bottom:10px;gap:6px}
 .nlr-rk-2p .nlr-rk-side{height:44px;font-size:13px}
@@ -127,7 +127,7 @@ const css = `
 .nlr-rk-2p.narrow .nlr-rk-kbd{display:inline}
 .nlr-rk-2p.narrow .nlr-rk-card b{font-size:15px}
 .nlr-rk-2p.narrow .nlr-rk-card{padding:5px 10px}
-.nlr-rk-2p.narrow .nlr-rk-gas{display:none}
+.nlr-rk-2p.narrow .nlr-rk-boost{display:none}
 .nlr-rk-2p.narrow .nlr-rk-ctl{bottom:6px;gap:4px}
 .nlr-rk-2p.narrow .nlr-rk-bar .play{width:30px;height:30px}
 .nlr-rk-2p.narrow .nlr-rk-bar button{height:28px;min-width:28px}
@@ -245,7 +245,7 @@ export function glitchLevel(fx, calm = false) {
   if (calm || !fx || !(fx.move <= -GLITCH_AT)) return 0
   return Math.min(1, 0.5 + (-fx.move - GLITCH_AT) / 6)
 }
-/** Avgaspartiklar per sekund: följer boost; 0 vid reducerad rörelse. */
+/** Partiklar per sekund: följer boost; 0 vid reducerad rörelse. */
 export function exhaustRate(fx, burning, calm) {
   if (calm) return 0
   const b = fx?.boost ?? 0
@@ -307,7 +307,7 @@ export function createRaket({ engine }) {
     const body = startCard.querySelector('[data-k="startBody"]')
     if (body) body.textContent = t('rk.startBody')
     const keys = root.querySelector('[data-k="keys"]')
-    if (keys) keys.textContent = helpLine(mode, MODES.raket.orientation)
+    if (keys) keys.textContent = ''
     endCard.querySelector('[data-k="endTitle"]').textContent = t('rk.endTitle')
     endCard.querySelector('[data-k="again"]').textContent = t('rk.again')
     if (endCard.classList.contains('on')) endCard.querySelector('[data-k="endTxt"]').textContent = t('end.body')
@@ -359,7 +359,7 @@ export function createRaket({ engine }) {
       <div class="nlr-rk-card nlr-rk-who" data-k="who" style="display:${mode === '2p' ? 'block' : 'none'}"></div>
       <div class="nlr-rk-card nlr-rk-quote"><small data-k="quoteLbl"></small><b data-k="price">—</b><span data-k="when">—</span></div>
       <div class="nlr-rk-card nlr-rk-pnl" data-k="pnlCard"><small data-k="pnlLabel"></small><b data-k="pnl">—</b><span data-k="pnlSub"></span>
-        <div class="nlr-rk-gas"><span data-k="gasLbl"></span><i><u data-k="gas"></u></i><span data-k="gasVal">0</span></div></div>
+        <div class="nlr-rk-boost"><span data-k="boostLbl"></span><i><u data-k="boost"></u></i><span data-k="boostVal">0</span></div></div>
       <div class="nlr-rk-ctl">
         <div class="nlr-rk-row">
           <button type="button" class="nlr-rk-side buy" data-k="buy">${ICON_UP}<span data-k="buyLbl"></span><kbd class="nlr-rk-kbd">${h.buy}</kbd></button>
@@ -677,7 +677,7 @@ export function createRaket({ engine }) {
     if (!pts.length) {
       c.fillStyle = TEXT2
       c.font = `500 14px ${MONO}`
-      c.fillText('Kursdata saknas för perioden.', 20, 40)
+      c.fillText(t('rk.missing'), 20, 40)
       return
     }
     const rocketY = Math.round(H * (twoP ? (H < 500 ? 0.42 : 0.5) : W <= 640 ? 0.52 : 0.6))
@@ -839,7 +839,7 @@ export function createRaket({ engine }) {
       c.stroke()
     }
 
-    // avgaser: partiklar ur munstycket (bak), följer boost; ingen vid reducerad rörelse
+    // partiklar: partiklar ur munstycket (bak), följer boost; ingen vid reducerad rörelse
     const S = 1.15
     const nozzle = 29 * S
     const nx = x - Math.sin(tilt) * nozzle
@@ -1039,15 +1039,15 @@ export function createRaket({ engine }) {
     pnlEl.style.color = TEXT
     q('pnlSub').textContent = !st.traded ? t('rk.pnlSubNone') : flat ? t('rk.pnlSubFlat') : t('rk.pnlSubOpen', { pct: fmtPct(openPct(st, price)) })
     const lvl = fx.loss > 0.01 ? fx.loss : fx.boost
-    q('gasLbl').textContent = fx.loss > 0.01 ? t('rk.rocks') : t('rk.boost')
-    const gasKey = `${Math.round(lvl * 100)}|${fx.loss > 0.01}`
-    if (pl.gasKey !== gasKey) {
-      pl.gasKey = gasKey
-      const gas = q('gas')
-      gas.style.width = `${Math.round(lvl * 100)}%`
-      gas.style.background = fx.loss > 0.01 ? SELL : CYAN
-      gas.style.boxShadow = `0 0 8px ${fx.loss > 0.01 ? SELL : CYAN}`
-      q('gasVal').textContent = String(Math.round(lvl * 100))
+    q('boostLbl').textContent = fx.loss > 0.01 ? t('rk.rocks') : t('rk.boost')
+    const boostKey = `${Math.round(lvl * 100)}|${fx.loss > 0.01}`
+    if (pl.boostKey !== boostKey) {
+      pl.boostKey = boostKey
+      const boostBar = q('boost')
+      boostBar.style.width = `${Math.round(lvl * 100)}%`
+      boostBar.style.background = fx.loss > 0.01 ? SELL : CYAN
+      boostBar.style.boxShadow = `0 0 8px ${fx.loss > 0.01 ? SELL : CYAN}`
+      q('boostVal').textContent = String(Math.round(lvl * 100))
     }
     q('lev').textContent = `${st.lev}×`
     q('levDown').disabled = st.lev <= LEV_MIN

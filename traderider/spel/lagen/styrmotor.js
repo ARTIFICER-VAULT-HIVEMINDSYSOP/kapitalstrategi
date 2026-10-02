@@ -1,8 +1,8 @@
 /**
- * Styrmotor: en gemensam positionscykel för NVDA Rider, Raket, Duo och Akademin.
+ * Styrmotor: en gemensam positionscykel för Trade Rider, Raket, Duo och Akademin.
  * Ordning nedifrån och upp: SÄLJ (0) ↔ stängd (1) ↔ KÖP (2).
- * dir > 0 (↑ / W / rulla upp) tar ett steg mot KÖP.
- * dir < 0 (↓ / S / rulla ned) tar ett steg mot SÄLJ.
+ * dir > 0 tar ett steg mot KÖP.
+ * dir < 0 tar ett steg mot SÄLJ.
  * Ingen rundgång: ↑ på KÖP och ↓ på SÄLJ stannar. Motorn föds på KÖP-rälsen
  * (side buy, flat false). Raket föds stängd (entry null). Ingångens snäpplista
  * börjar i mitten (stängd) tills användaren tar ett steg.

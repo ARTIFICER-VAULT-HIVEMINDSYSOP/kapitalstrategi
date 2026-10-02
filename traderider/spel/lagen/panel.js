@@ -1,11 +1,11 @@
 /**
- * NVDA Rider – tillägg på samma sida:
+ * Trade Rider – tillägg på samma sida:
  *  1. RSI(14)-panel under grafen, på exakt samma riktiga kursdata som spelet visar (motorns quote.candles),
  *     följer vald period och tågets position. Saknas data visas «saknas».
  *  2. Växel «NVDA Line | Raket». Raket är en ny, egen vy (se raket.js) på samma data och samma Bollinger-räls.
  *  4. Akademin (akademin.js): KS Akademins lektioner i NVDA Line-stil, med utmärkelser.
  *  3. Tillval «1P | 2P»: delad skärm i både NVDA Line (duo.js, två instanser av NVDA Lines egen motor) och Raket.
- *  5. KS /traderider/spel/ (utkast 2026-10-01): växelns första knapp heter «NVDA Rider», hash #nvda-rider/#raket/#akademin,
+ *  5. KS /traderider/spel/ (utkast 2026-10-01): växelns första knapp heter «Trade Rider», hash #nvda-rider/#raket/#akademin,
  *     plus en liten skalrad med «← Traderider» (dator) och helskärmsknapp (Fullscreen API, CSS-reserv där API:t saknas).
  * Inget i NVDA Lines design, styrning eller mekanik ändras. Motorn läses via window.__trEngine (satt i exposeQa).
  */
@@ -19,6 +19,8 @@ import { t, onLang, mountSwitcher } from './i18n.js'
 import { readSide, cycleIndex, stepSide, ENTRY_SIDE } from './styrmotor.js'
 import { MODES, modeFromHash, hashForView } from './orientation.js'
 import { mountEntrySnap, bindStepGestures, mountRatt } from './snapp.js'
+import { mountInstruction } from './instruktion.js'
+import { mountFas } from './faser.js'
 
 const INK = '#1c1915'
 const MUTED = '#8a8478'
@@ -181,7 +183,7 @@ async function main() {
       c.fillStyle = MUTED
       c.font = '500 12px "IBM Plex Sans", sans-serif'
       c.textBaseline = 'middle'
-      c.fillText(`RSI saknas – för få candles i perioden (minst ${RSI_PERIOD + 1}).`, 6, H / 2)
+      c.fillText(t('rsi.missing', { n: RSI_PERIOD + 1 }), 6, H / 2)
     } else {
       // linje, med luckor där RSI saknas; passerad del mörkare
       for (const part of ['past', 'future']) {
@@ -263,6 +265,26 @@ async function main() {
   let view = 'line'
   let mode = '1p'
   let resumeLine = false
+
+  function orientationFor(v = view) {
+    if (v === 'raket') return MODES.raket.orientation
+    if (v === 'rabbit') return MODES.rabbitHole.orientation
+    return MODES.trendRider.orientation
+  }
+  const instr = mountInstruction(document.body, {
+    getOrientation: () => orientationFor(),
+    isActive: () => view !== 'akademin',
+  })
+  const fas = mountFas(document.body, {
+    getOrientation: () => orientationFor(),
+    getPlace: () => (view === 'rabbit' ? 'bottom' : 'chart'),
+    isActive: () => view !== 'akademin' && !instr.isOpen(),
+    onFreeze: (frozen) => (frozen ? rabbit.freeze() : rabbit.resume()),
+  })
+  instr.onStart(() => {
+    if (eng.playing) eng.pause()
+    fas.play()
+  })
 
   // ---------- 3. Växel 1P | 2P ----------
   const modeToggle = el('div', 'nlr-pill nlr-toggle')
@@ -385,8 +407,13 @@ async function main() {
       raket.hide()
       duo.hide()
       panel.style.display = ''
-      if (resumeLine) eng.play()
+      if (resumeLine && !instr.isOpen() && !fas.isCovering()) eng.play()
       resumeLine = false
+    }
+    instr.sync()
+    fas.sync()
+    if (instr.isOpen() || fas.isCovering()) {
+      if (eng.playing) eng.pause()
     }
     syncSnap()
     if (push) {
@@ -441,6 +468,8 @@ async function main() {
     back.textContent = t('shell.back')
     sim.textContent = t('sim.label')
     document.title = t('page.title')
+    instr.sync()
+    fas.sync()
     const meta = document.querySelector('meta[name="description"]')
     if (meta) meta.content = t('page.desc')
     fsLabel()

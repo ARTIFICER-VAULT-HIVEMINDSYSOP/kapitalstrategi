@@ -14,6 +14,7 @@ VIEWS = {
 KNOWN = [re.compile(r'trycloudflare\.com'), re.compile(r'net::ERR_NAME_NOT_RESOLVED')]
 SIM = 'Simulerade kurser – inte verkliga marknadsdata'
 # Påståenden om verkliga kurser som inte får synas i spelet eller på /traderider/
+BADGE = 'VERKLIG · HISTORISK'
 REALCLAIM = [r'[Hh]istorisk', r'[Rr]iktiga (historiska )?(NVDA-)?kurser', r'äkta historiska', r'real historical', r'live (stock )?chart', r'NVIDIA', r'LiveTrend']
 # Värdar/filer som spelet aldrig får begära
 FORBIDDEN_REQ = re.compile(r'(?i)trycloudflare|yahoo|query[12]\.|alpaca|paper-api|nvda-fallback|/api/nvda|/api/broker')
@@ -34,7 +35,8 @@ def banned_hits(text):
     return [rx for rx in BANNED if re.search(rx, text, re.M)]
 
 def real_claims(text):
-    return [rx for rx in REALCLAIM if re.search(rx, text, re.M)]
+    cleaned = text.replace(BADGE, '')
+    return [rx for rx in REALCLAIM if re.search(rx, cleaned, re.M)]
 
 async def run_view(b, name, opt):
     ctx = await b.new_context(**opt)
@@ -106,7 +108,7 @@ async def run_view(b, name, opt):
     n0 = (len(log['console']), len(log['pageerror']), len(log['http']))
     view = await pg.evaluate('()=>window.__nvdaLineRsi.view()')
     pressed = await pg.evaluate('()=>[...document.querySelectorAll(".nlr-toggle button")].filter(b=>b.getAttribute("aria-pressed")==="true").map(b=>b.textContent)')
-    ok('NVDA Rider öppnas från kortet (vy line, «NVDA Rider» aktiv)', view == 'line' and 'NVDA Rider' in pressed, {'view': view, 'pressed': pressed, 'url': pg.url})
+    ok('Trade Rider öppnas från kortet (vy line, «Trade Rider» aktiv)', view == 'line' and 'Trade Rider' in pressed, {'view': view, 'pressed': pressed, 'url': pg.url})
     btn = pg.get_by_role('button', name='Board the train')
     if await btn.count():
         await btn.first.click()
@@ -177,7 +179,7 @@ async def run_view(b, name, opt):
     ok('Akademin visar etiketten «Simulerade kurser – inte verkliga marknadsdata»', label_ok(lb) and not real_claims(t), {'label': lb, 'claims': real_claims(t)})
 
     # 7. Tillbaka till NVDA Rider via växeln
-    await pg.get_by_role('button', name='NVDA Rider', exact=True).click()
+    await pg.get_by_role('button', name='Trade Rider', exact=True).click()
     await pg.wait_for_timeout(800)
     ok('Växeln tillbaka till NVDA Rider', await pg.evaluate('()=>window.__nvdaLineRsi.view()') == 'line')
     res['pages']['spel-alla-lagen'] = {'unexpected': unexpected(n0)}
