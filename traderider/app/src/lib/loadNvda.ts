@@ -1,10 +1,7 @@
 import fallbackFile from '../data/nvda-fallback.json'
 import type { Candle, NvdaPayload } from './types'
 
-const YAHOO_URL =
-  'https://query1.finance.yahoo.com/v8/finance/chart/NVDA?interval=1h&range=1mo&includePrePost=false'
-
-export const FALLBACK_LABEL = 'Fallback data — Yahoo unavailable'
+export const FALLBACK_LABEL = 'Medföljande kursserie'
 
 type YahooQuote = {
   open?: Array<number | null>
@@ -23,11 +20,12 @@ type YahooPayload = {
   }
 }
 
+/** Parser for a chart payload. The desk never calls a live host. */
 export function parseYahooChart(payload: unknown): Candle[] {
   const result = (payload as YahooPayload).chart?.result?.[0]
   const timestamps = result?.timestamp
   const quote = result?.indicators?.quote?.[0]
-  if (!timestamps || !quote) throw new Error('yahoo_empty')
+  if (!timestamps || !quote) throw new Error('chart_empty')
 
   const candles: Candle[] = []
   for (let i = 0; i < timestamps.length; i++) {
@@ -40,7 +38,7 @@ export function parseYahooChart(payload: unknown): Candle[] {
     if (![o, h, l, c].every((n) => typeof n === 'number' && Number.isFinite(n) && n > 0)) continue
     candles.push({ t: timestamps[i], o, h, l, c, v })
   }
-  if (candles.length < 20) throw new Error('yahoo_short')
+  if (candles.length < 20) throw new Error('chart_short')
   return candles
 }
 
@@ -55,61 +53,19 @@ export function fallbackPayload(): NvdaPayload {
   }
 }
 
-/** Try-it package. The bundled snapshot only — no Yahoo request, so file:// and offline opens do not fail on CORS. */
+/** Bundled snapshot only. No live request. */
 export function loadNvdaOffline(): Promise<NvdaPayload> {
   return Promise.resolve(fallbackPayload())
 }
 
-/** Pages static build may try Yahoo. The folder package passes offline=true and never fetches. */
-export function loadNvdaForDesk(offline: boolean, fetchImpl: typeof fetch = fetch): Promise<NvdaPayload> {
-  if (offline) return loadNvdaOffline()
-  return loadNvdaForStatic(fetchImpl)
+export function loadNvdaForDesk(_offline?: boolean, _fetchImpl?: typeof fetch): Promise<NvdaPayload> {
+  return loadNvdaOffline()
 }
 
-/** Browser fetch for the static build. No User-Agent header (browsers forbid it). CORS or network failure uses the bundle. */
-export async function loadNvdaForStatic(fetchImpl: typeof fetch = fetch): Promise<NvdaPayload> {
-  try {
-    const res = await fetchImpl(YAHOO_URL, {
-      headers: { accept: 'application/json' },
-      signal: AbortSignal.timeout(8000),
-    })
-    if (!res.ok) throw new Error('yahoo_http')
-    const json: unknown = await res.json()
-    const candles = parseYahooChart(json)
-    return {
-      source: 'yahoo',
-      fallback: false,
-      label: 'Yahoo NVDA',
-      symbol: 'NVDA',
-      interval: '1h',
-      candles,
-    }
-  } catch {
-    return fallbackPayload()
-  }
+export function loadNvdaForStatic(_fetchImpl?: typeof fetch): Promise<NvdaPayload> {
+  return loadNvdaOffline()
 }
 
-export async function loadNvdaCandles(fetchImpl: typeof fetch = fetch): Promise<NvdaPayload> {
-  try {
-    const res = await fetchImpl(YAHOO_URL, {
-      headers: {
-        accept: 'application/json',
-        'user-agent': 'Traderider/1.0',
-      },
-      signal: AbortSignal.timeout(8000),
-    })
-    if (!res.ok) throw new Error('yahoo_http')
-    const json: unknown = await res.json()
-    const candles = parseYahooChart(json)
-    return {
-      source: 'yahoo',
-      fallback: false,
-      label: 'Yahoo NVDA',
-      symbol: 'NVDA',
-      interval: '1h',
-      candles,
-    }
-  } catch {
-    return fallbackPayload()
-  }
+export function loadNvdaCandles(_fetchImpl?: typeof fetch): Promise<NvdaPayload> {
+  return loadNvdaOffline()
 }

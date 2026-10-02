@@ -9,7 +9,7 @@ export const Route = createRootRoute({
       { title: 'Traderider' },
       {
         name: 'description',
-        content: 'Paper desk. A train rides NVDA Bollinger rails.',
+        content: 'Trade Rider. Övning på en bana.',
       },
     ],
     links: [{ rel: 'stylesheet', href: appCss }],
@@ -19,7 +19,7 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <html lang="en">
+    <html lang="sv">
       <head>
         <HeadContent />
       </head>
