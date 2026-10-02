@@ -9,7 +9,7 @@ export const Route = createRootRoute({
       { title: 'Traderider' },
       {
         name: 'description',
-        content: 'Paper desk. A train rides NVDA Bollinger rails.',
+        content: 'Utkastdisk. A train rides NVDA Bollinger rails.',
       },
     ],
     links: [{ rel: 'stylesheet', href: appCss }],
