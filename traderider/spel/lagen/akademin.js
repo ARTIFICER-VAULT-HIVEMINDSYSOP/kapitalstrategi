@@ -678,12 +678,12 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     if (visible) raf = requestAnimationFrame(frame)
   }
 
-  return {
-    onLang(() => {
-      root.setAttribute('aria-label', t('ak.aria'))
-      if (visible) build()
-    })
+  onLang(() => {
+    root.setAttribute('aria-label', t('ak.aria'))
+    if (visible) build()
+  })
 
+  return {
     show() {
       data()
       visible = true
