@@ -17,7 +17,7 @@ const css = `
 .nlr-rh canvas{width:100%;height:100%;display:block}
 .nlr-rh-hud{position:absolute;left:12px;right:12px;top:calc(var(--tr-chrome-b, 96px) + 12px);display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 12px;pointer-events:none;font:600 12px/1.35 "IBM Plex Sans",sans-serif}
 .nlr-rh-hud b{color:#e7b15a}
-.nlr-rh-note{position:absolute;left:12px;bottom:16px;max-width:min(520px,92vw);font:500 12px/1.4 "IBM Plex Sans",sans-serif;color:#f4efe6}
+.nlr-rh-note{position:absolute;left:12px;right:12px;bottom:12px;max-width:min(520px,calc(100% - 24px));font:500 12px/1.35 "IBM Plex Sans",sans-serif;color:#f4efe6;pointer-events:none;text-shadow:0 1px 2px #140e0c}
 .nlr-rh-bat{width:28px;height:14px}
 `
 
@@ -82,7 +82,10 @@ export function createRabbit() {
   const canvas = document.createElement('canvas')
   const hud = document.createElement('div')
   hud.className = 'nlr-rh-hud'
-  root.append(canvas, hud)
+  const note = document.createElement('p')
+  note.className = 'nlr-rh-note'
+  note.setAttribute('data-tr-claim', '1')
+  root.append(canvas, hud, note)
   document.body.appendChild(root)
 
   let visible = false
@@ -146,6 +149,7 @@ export function createRabbit() {
     root.setAttribute('aria-label', t('mode.rabbitHole.name'))
     const price = priceAt(priceIndex)
     hud.innerHTML = `<span><b>${t('sim.price')}</b> ${fmtPrice(price)}</span><span><b>${t('hud.result')}</b> ${fmtResult(result)}</span><span>${side === 'buy' ? t('btn.buy') : side === 'sell' ? t('btn.sell') : t('btn.flat')} · ${t('lev.risk')}</span>`
+    note.textContent = t('sim.claim')
     const w = root.clientWidth || 800
     const h = root.clientHeight || 600
     const dpr = Math.min(2, devicePixelRatio || 1)

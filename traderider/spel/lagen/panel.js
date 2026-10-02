@@ -32,12 +32,12 @@ const RED = '#9a3b2a'
 
 const css = `
 .nlr-pill{position:fixed;z-index:30;box-sizing:border-box;font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:${INK}}
-.nlr-rsi{display:flex;align-items:stretch;gap:10px;padding:6px 10px 6px 12px;pointer-events:none}
+.nlr-rsi{display:flex;align-items:stretch;gap:10px;padding:6px 10px 6px 12px;pointer-events:none;max-height:64px;overflow:hidden}
 .nlr-rsi-txt{display:flex;flex-direction:column;justify-content:center;min-width:78px}
 .nlr-rsi-txt small{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:${MUTED};font-weight:600}
 .nlr-rsi-txt b{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15}
 .nlr-rsi-txt span{font-size:10px;color:${MUTED}}
-.nlr-rsi canvas{flex:1;min-width:0;height:100%;display:block}
+.nlr-rsi canvas{flex:1;min-width:0;height:40px;max-height:52px;display:block}
 .nlr-toggle{display:flex;gap:2px;padding:4px}
 .nlr-toggle button{border:0;background:transparent;border-radius:999px;padding:0 14px;height:100%;font:500 13px "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:${INK};cursor:pointer;white-space:nowrap}
 .nlr-toggle button[aria-pressed="true"]{background:${INK};color:#f3ede2}
@@ -62,12 +62,14 @@ html[data-nlr-view="akademin"] .nlr-ak-in{padding-top:calc(var(--tr-chrome-b, 72
 .tr-chrome .nlr-toggle button{height:28px}
 .tr-chrome>.tr-sim{flex:0 1 auto;max-width:none;overflow:visible;text-overflow:clip}
 html[data-nlr-solo="0"] header.pointer-events-none,html[data-nlr-solo="0"] [data-tr-linebar]{display:none !important}
-html[data-tr-dock="top"] div.relative.h-dvh{position:fixed;left:0;right:0;width:100%;top:var(--tr-chrome-b,0px);height:calc(100dvh - var(--tr-chrome-b,0px))}
+html[data-tr-dock="top"],html[data-tr-dock="top"] body{height:100%;overflow:hidden}
+html[data-tr-dock="top"] div.relative.h-dvh{margin-top:var(--tr-chrome-b,0px);height:calc(100dvh - var(--tr-chrome-b,0px));max-height:calc(100dvh - var(--tr-chrome-b,0px))}
 html[data-tr-dock="top"] .nlr-duo.on,html[data-tr-dock="top"] .nlr-raket.on,html[data-tr-dock="top"] .nlr-rh.on,html[data-tr-dock="top"] .nlr-ak.on{top:var(--tr-chrome-b,0px);bottom:auto;height:calc(100dvh - var(--tr-chrome-b,0px))}
 html[data-tr-dock="top"] [data-tr-splash] .min-h-dvh{min-height:100%}
 html[data-tr-dock="top"][data-nlr-view="akademin"] .nlr-ak-in{padding-top:16px}
 html[data-tr-dock="top"] .nlr-rh-hud{top:12px}
 html[data-tr-dock="top"] .tr-fas{top:calc(var(--tr-header-b, var(--tr-chrome-b, 72px)) + 8px);max-height:calc(100dvh - var(--tr-header-b, 72px) - 16px);overflow:auto}
+@media (max-height:560px){div.relative.h-dvh>.absolute.top-36{display:none !important}}
 @media (max-width:640px){.nlr-rsi-txt{min-width:64px}.nlr-rsi-txt b{font-size:14px}.nlr-toggle button{padding:0 9px;font-size:12px}.tr-skal{padding:3px}.tr-skal .tr-back{display:none}.tr-skal .tr-fs-txt{display:none}.tr-skal button{padding:0 9px}}
 @media (max-width:520px){.nlr-toggle{max-width:calc(100vw - 16px);overflow-x:auto}.nlr-toggle button{padding:0 8px;font-size:11px}header.pointer-events-none{flex-wrap:wrap}header.pointer-events-none>.pointer-events-auto:first-child{min-width:0;max-width:100%;flex:1 1 100%}header.pointer-events-none .overflow-x-auto{max-width:100%}header.pointer-events-none .overflow-x-auto button{min-width:0;padding-left:6px;padding-right:6px;font-size:11px;height:32px}}
 `
@@ -155,26 +157,51 @@ async function main() {
   }
 
   function layoutPanel() {
-    const buy = document.querySelector('button[data-tr="buy"]')
-    const grid = buy?.parentElement
-    if (!grid) return
-    const r = grid.getBoundingClientRect()
     const mobile = innerWidth <= 640
     const h = mobile ? 50 : 58
-    panel.style.left = `${Math.round(r.left)}px`
-    panel.style.width = `${Math.round(r.width)}px`
-    panel.style.top = `${Math.round(r.top - h - 8)}px`
+    const canvasH = h - 12
+    const park = () => {
+      panel.style.top = `${innerHeight + 16}px`
+      panel.style.height = `${h}px`
+      panel.style.maxHeight = '64px'
+      panel.style.overflow = 'hidden'
+      cv.style.height = `${canvasH}px`
+      cv.style.maxHeight = '52px'
+    }
+    const buy = document.querySelector('button[data-tr="buy"]')
+    const grid = buy?.parentElement
+    if (!grid) return park()
+    const row = grid.getBoundingClientRect()
+    const anchor = row.height > innerHeight * 0.45 ? buy.getBoundingClientRect() : row
+    const pane = document.querySelector('div.relative.h-dvh')?.getBoundingClientRect()
+    if (!pane || anchor.width < 2 || anchor.top > pane.bottom - 8 || anchor.bottom < pane.top + 8) return park()
+    const minTop = Math.round(pane.top)
+    const maxTop = Math.round(pane.bottom - h - 4)
+    if (maxTop < minTop) return park()
+    let top = Math.round(anchor.top - h - 8)
+    if (top > maxTop) top = maxTop
+    if (top < minTop) top = minTop
+    panel.style.left = `${Math.round(Math.max(pane.left, anchor.left))}px`
+    panel.style.width = `${Math.round(Math.min(anchor.width, pane.width, innerWidth))}px`
+    panel.style.top = `${top}px`
     panel.style.height = `${h}px`
+    panel.style.maxHeight = '64px'
+    panel.style.overflow = 'hidden'
+    cv.style.height = `${canvasH}px`
+    cv.style.maxHeight = '52px'
+    cv.style.width = '100%'
   }
 
   function drawPanel() {
     recompute()
     const dpr = Math.min(2, devicePixelRatio || 1)
-    const W = Math.max(10, cv.clientWidth)
-    const H = Math.max(10, cv.clientHeight)
-    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) {
-      cv.width = Math.round(W * dpr)
-      cv.height = Math.round(H * dpr)
+    const W = Math.min(innerWidth, Math.max(10, cv.clientWidth || 10))
+    const H = Math.min(52, Math.max(10, parseFloat(cv.style.height) || 40))
+    const bw = Math.min(2048, Math.round(W * dpr))
+    const bh = Math.min(128, Math.round(H * dpr))
+    if (cv.width !== bw || cv.height !== bh) {
+      cv.width = bw
+      cv.height = bh
     }
     const c = cv.getContext('2d')
     c.setTransform(dpr, 0, 0, dpr, 0, 0)
@@ -675,7 +702,7 @@ async function main() {
     document.documentElement.dataset.nlrMode = mode
     const hpx = narrow ? 32 : solo ? 34 : 40
     for (const pill of [toggle, modeToggle, skal]) {
-      pill.style.height = narrow ? 'auto' : `${hpx}px`
+      pill.style.height = 'auto'
       pill.style.minHeight = `${hpx}px`
     }
     for (const node of [toggle, modeToggle, skal, sim]) {
@@ -689,7 +716,8 @@ async function main() {
     if (!fas.isCovering()) sim.style.display = splashOn && narrow && solo ? 'none' : ''
     sim.style.flex = '0 1 auto'
     sim.style.maxWidth = 'none'
-    const dock = narrow || !(view === 'line' && mode === '1p')
+    const tight = innerWidth <= 1024 || innerHeight <= 520
+    const dock = tight || !(view === 'line' && mode === '1p')
     document.documentElement.dataset.trDock = dock ? 'top' : 'band'
     let left = 8
     let top = 8
@@ -763,10 +791,31 @@ async function main() {
     }
   }
 
+  function pinClaim(splash) {
+    const inner = splash?.querySelector('p')?.parentElement
+    if (!inner) return null
+    let line = inner.querySelector('[data-tr-claim-line]')
+    const kicker = inner.querySelector('p:not([data-tr-claim-line])')
+    if (!line) {
+      line = document.createElement('p')
+      line.setAttribute('data-tr-claim', '1')
+      line.setAttribute('data-tr-claim-line', '1')
+      line.style.cssText = 'margin:8px 0;font:600 13px/1.35 "IBM Plex Sans",sans-serif'
+      if (kicker) kicker.insertAdjacentElement('afterend', line)
+      else inner.prepend(line)
+    }
+    const text = t('sim.claim')
+    if (line.textContent !== text) line.textContent = text
+    return inner
+  }
+
   function placeSplash(chromeBottom) {
     const splash = document.querySelector('[data-tr-splash]')
-    const kicker = splash?.querySelector('p')
-    const inner = kicker?.parentElement
+    const innerFromClaim = pinClaim(splash)
+    const kicker = splash?.querySelector('p:not([data-tr-claim-line])')
+    const body = splash?.querySelectorAll('p')[2]
+    if (body) body.setAttribute('data-tr-claim', '1')
+    const inner = innerFromClaim || kicker?.parentElement
     if (!inner) return
     if (!inner.dataset.trPadBase) inner.dataset.trPadBase = String(parseFloat(getComputedStyle(inner).paddingTop) || 0)
     const base = Number(inner.dataset.trPadBase) || 0

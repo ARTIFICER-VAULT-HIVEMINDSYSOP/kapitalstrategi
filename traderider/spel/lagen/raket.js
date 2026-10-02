@@ -80,7 +80,7 @@ const css = `
 .nlr-rk-pnl.glitch{animation:nlrRkGlitch .18s steps(2,end) 1}
 @keyframes nlrRkGlitch{0%{transform:translate(0,0);clip-path:inset(0 0 0 0)}25%{transform:translate(-3px,1px);clip-path:inset(10% 0 35% 0)}50%{transform:translate(3px,-1px);clip-path:inset(40% 0 8% 0)}75%{transform:translate(-2px,0);clip-path:inset(0 0 60% 0)}100%{transform:translate(0,0);clip-path:inset(0 0 0 0)}}
 .nlr-rk-who{left:14px;top:64px;font:600 12px ${MONO};letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;color:${CYAN}}
-.nlr-rk-ctl{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;width:min(616px,calc(100% - 24px));display:flex;flex-direction:column;gap:8px}
+.nlr-rk-ctl{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;width:min(616px,calc(100% - 24px));display:flex;flex-direction:column;gap:8px;z-index:5}
 .nlr-rk-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .nlr-rk-side{height:52px;border-radius:4px;border:1px solid rgba(46,230,255,.35);background:rgba(10,15,46,.86);color:${TEXT};font:600 15px ${MONO};letter-spacing:.14em;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;padding:0 6px;min-width:0;box-shadow:inset 0 0 14px rgba(46,230,255,.06)}
 .nlr-rk-side svg{width:18px;height:18px;flex:none}
@@ -114,7 +114,7 @@ const css = `
 .nlr-rk-start{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);text-align:center;padding:14px 18px;max-width:calc(100% - 32px);z-index:2}
 .nlr-rk-start p{margin:3px 0;font:500 12px ${MONO};color:${TEXT2}}
 .nlr-rk-div{position:absolute;background:${MAGENTA};box-shadow:0 0 10px ${MAGENTA};display:none}
-@media (max-width:640px){.nlr-rk-kbd{display:none}.nlr-rk-quote{top:auto;bottom:196px;right:12px;min-width:0;max-width:132px}.nlr-rk-pnl{top:auto;bottom:196px;right:auto;left:12px;text-align:left;min-width:0;max-width:calc(100% - 160px)}.nlr-rk-pnl .nlr-rk-boost{justify-content:flex-start}.nlr-rk-card b{font-size:16px}.nlr-rk-pnl b{font-size:18px}.nlr-rk-info{font-size:11px}.nlr-rk-side{font-size:14px;letter-spacing:.08em}.nlr-rk-boost i{width:44px}.nlr-rk-note{font-size:10px}.nlr-rk-card span{font-size:10px}.nlr-rk-start{top:max(18%, calc(var(--tr-chrome-b, 72px) + 12px));left:12px;right:auto;transform:none;max-width:calc(100% - 148px);text-align:left}}
+@media (max-width:640px){.nlr-rk-kbd{display:none}.nlr-rk-quote{top:auto;bottom:196px;right:12px;min-width:0;max-width:132px}.nlr-rk-pnl{top:auto;bottom:196px;right:auto;left:12px;text-align:left;min-width:0;max-width:calc(100% - 160px)}.nlr-rk-pnl .nlr-rk-boost{justify-content:flex-start}.nlr-rk-card b{font-size:16px}.nlr-rk-pnl b{font-size:18px}.nlr-rk-info{font-size:11px}.nlr-rk-side{font-size:14px;letter-spacing:.08em}.nlr-rk-boost i{width:44px}.nlr-rk-note{font-size:10px}.nlr-rk-card span{font-size:10px}.nlr-rk-start{top:12%;left:12px;right:auto;transform:none;max-width:calc(100% - 148px);text-align:left}}
 /* 2P: kompakta halvor */
 .nlr-rk-2p .nlr-rk-quote{display:none}
 .nlr-rk-2p .nlr-rk-pnl{top:12px;bottom:auto;right:12px;left:auto;text-align:right;min-width:0;max-width:min(220px,46%)}
@@ -141,6 +141,15 @@ html[data-nlr-view="raket"] .nlr-toggle button:focus-visible{outline:2px solid $
 .nlr-rk-2p .nlr-rk-start{left:50%;right:auto;transform:translateX(-50%);text-align:center;top:46%;max-width:min(480px,calc(100% - 24px))}
 .nlr-rk-2p.narrow .nlr-rk-start{top:40%}
 .nlr-rk-2p.narrow .nlr-rk-start p{display:none}
+.nlr-raket.short .nlr-rk-boost,.nlr-raket.short .nlr-rk-note,.nlr-raket.short .nlr-rk-pnl span{display:none}
+.nlr-raket.short.nlr-rk-2p.narrow .nlr-rk-note{display:block}
+.nlr-raket.short .nlr-rk-start [data-k="startBody"]{display:none}
+.nlr-raket.short:not(.nlr-rk-2p) .nlr-rk-quote{top:8px;max-width:148px}
+.nlr-raket.short:not(.nlr-rk-2p) .nlr-rk-pnl{display:none}
+.nlr-raket.short .nlr-rk-start{top:12px;left:12px;transform:none;text-align:left;max-width:min(340px,calc(100% - 200px))}
+.nlr-raket.short.nlr-rk-2p .nlr-rk-pnl{max-width:min(148px,34%);max-height:44px;overflow:hidden}
+.nlr-raket.short.nlr-rk-2p .nlr-rk-who{max-height:32px;overflow:hidden}
+.nlr-raket.short.nlr-rk-2p .nlr-rk-start{left:50%;transform:translateX(-50%);text-align:center;top:52px;max-width:min(220px,34%)}
 `
 
 const ICON_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>'
@@ -296,7 +305,7 @@ export function createRaket({ engine }) {
     <canvas></canvas>
     <div class="nlr-rk-scan" aria-hidden="true"></div>
     <div class="nlr-rk-div"></div>
-    <div class="nlr-rk-card nlr-rk-start"><h3></h3><p data-k="startBody"></p><p data-k="keys"></p></div>
+    <div class="nlr-rk-card nlr-rk-start"><h3></h3><p data-k="startClaim" data-tr-claim="1"></p><p data-k="startBody"></p><p data-k="keys"></p></div>
     <div class="nlr-rk-card nlr-rk-end"><h3 data-k="endTitle"></h3><p data-k="endTxt"></p><button type="button" data-k="again"></button></div>`
   document.body.appendChild(root)
   const canvas = root.querySelector('canvas')
@@ -308,6 +317,8 @@ export function createRaket({ engine }) {
     root.setAttribute('aria-label', t('rk.aria'))
     canvas.setAttribute('aria-label', t('rk.canvas'))
     startCard.querySelector('h3').textContent = t('mode.raket')
+    const claim = startCard.querySelector('[data-k="startClaim"]')
+    if (claim) claim.textContent = t('sim.claim')
     const body = startCard.querySelector('[data-k="startBody"]')
     if (body) body.textContent = t('rk.startBody')
     const keys = root.querySelector('[data-k="keys"]')
@@ -378,7 +389,7 @@ export function createRaket({ engine }) {
           <span class="nlr-rk-info" data-k="info">—</span>
         </div>
         <div class="nlr-rk-prog"><i data-k="prog"></i></div>
-        <p class="nlr-rk-note" data-k="note"></p>
+        <p class="nlr-rk-note" data-k="note" data-tr-claim="1"></p>
       </div>`
     root.appendChild(el)
     const q = (k) => el.querySelector(`[data-k="${k}"]`)
@@ -503,6 +514,51 @@ export function createRaket({ engine }) {
     true,
   )
 
+  function intersects(a, b) {
+    const iw = Math.min(a.right, b.right) - Math.max(a.left, b.left)
+    const ih = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top)
+    return iw > 1 && ih > 1
+  }
+
+  function placeStartCard() {
+    if (startCard.style.display === 'none') return
+    const rootBox = root.getBoundingClientRect()
+    startCard.style.maxHeight = ''
+    startCard.style.overflow = ''
+    startCard.style.width = ''
+    const blocks = [...root.querySelectorAll('.nlr-rk-ctl, .nlr-rk-who, .nlr-rk-pnl, .nlr-rk-quote')]
+      .filter((el) => getComputedStyle(el).display !== 'none')
+      .map((el) => el.getBoundingClientRect())
+      .filter((r) => r.width > 2 && r.height > 2)
+    const ctlBoxes = [...root.querySelectorAll('.nlr-rk-ctl')]
+      .map((el) => el.getBoundingClientRect())
+      .filter((r) => r.width > 2 && r.height > 2)
+    if (!ctlBoxes.length) return
+    const card = startCard.getBoundingClientRect()
+    if (!blocks.some((r) => intersects(card, r))) return
+    const ctlTop = Math.min(...ctlBoxes.map((r) => r.top))
+    const sides = [...root.querySelectorAll('.nlr-rk-who, .nlr-rk-pnl, .nlr-rk-quote')]
+      .filter((el) => getComputedStyle(el).display !== 'none')
+      .map((el) => el.getBoundingClientRect())
+      .filter((r) => r.width > 2 && r.height > 2 && r.top < ctlTop)
+    const floor = sides.length ? Math.max(...sides.map((r) => r.bottom)) + 8 : rootBox.top + 8
+    const gap = ctlTop - 8 - floor
+    startCard.style.left = '12px'
+    startCard.style.right = 'auto'
+    startCard.style.transform = 'none'
+    startCard.style.width = `${Math.max(120, Math.round(rootBox.width - 24))}px`
+    startCard.style.maxWidth = `${Math.max(120, Math.round(rootBox.width - 24))}px`
+    if (gap >= 44) {
+      startCard.style.top = `${Math.max(8, Math.round(floor - rootBox.top))}px`
+      startCard.style.maxHeight = `${Math.floor(gap)}px`
+      startCard.style.overflow = 'hidden'
+      return
+    }
+    startCard.style.top = '8px'
+    startCard.style.maxHeight = `${Math.max(36, Math.round(ctlTop - rootBox.top - 16))}px`
+    startCard.style.overflow = 'hidden'
+  }
+
   function render(dt = 0) {
     const W = root.clientWidth
     const H = root.clientHeight
@@ -516,6 +572,7 @@ export function createRaket({ engine }) {
     c.setTransform(dpr, 0, 0, dpr, 0, 0)
     const vps = splitViewports(W, H, mode)
     root.classList.toggle('narrow', mode === '2p' && W <= 700)
+    root.classList.toggle('short', H < 520)
     const calm = reduced()
     const now = performance.now() / 1000
     players.forEach((pl, i) => {
@@ -555,29 +612,7 @@ export function createRaket({ engine }) {
       renderPlayer(c, pl, i, vp, dt, calm, now)
       c.restore()
     })
-    if (mode === '2p' && startCard.style.display !== 'none' && root.classList.contains('narrow')) {
-      const pane = players[0]?.dom.el
-      const ctl = pane?.querySelector('.nlr-rk-ctl')
-      const cards = pane ? [...pane.querySelectorAll('.nlr-rk-who, .nlr-rk-pnl')] : []
-      const rootTop = root.getBoundingClientRect().top
-      if (ctl && cards.length) {
-        const ctlTop = ctl.getBoundingClientRect().top - rootTop
-        const band = Math.max(...cards.map((el) => el.getBoundingClientRect().bottom - rootTop))
-        const cardH = startCard.offsetHeight || 36
-        const y = Math.round(band + 10)
-        startCard.style.top = `${Math.max(8, y)}px`
-        startCard.style.left = '50%'
-        startCard.style.right = 'auto'
-        startCard.style.transform = 'translateX(-50%)'
-        startCard.style.visibility = y + cardH > ctlTop - 4 ? 'hidden' : ''
-      }
-    } else {
-      startCard.style.visibility = ''
-      startCard.style.top = ''
-      startCard.style.left = ''
-      startCard.style.right = ''
-      startCard.style.transform = ''
-    }
+    placeStartCard()
     if (mode === '2p') {
       const v = vps[1]
       Object.assign(divider.style, v.x > 0 ? { display: 'block', left: `${v.x}px`, top: '0', width: '1px', height: '100%' } : { display: 'block', left: '0', top: `${v.y}px`, width: '100%', height: '1px' })
@@ -861,7 +896,13 @@ export function createRaket({ engine }) {
         c.lineTo(ex + 0.5, H)
         c.stroke()
         c.setLineDash([])
-        hudLabel(c, `ENTRY ${fmtPrice(st.entry)}`, ex, rocketY + (compact ? 78 : 92), { size: 11, align: 'center', color: TEXT, border: `rgba(${accentRGB},0.8)`, W })
+        const ctlTop = pl.dom.el.querySelector('.nlr-rk-ctl')?.getBoundingClientRect()
+        let entryY = rocketY + (compact ? 78 : 92)
+        if (ctlTop) {
+          const limit = ctlTop.top - paneTop - 16
+          if (entryY > limit) entryY = limit
+        }
+        if (entryY > rocketY + 20) hudLabel(c, `ENTRY ${fmtPrice(st.entry)}`, ex, entryY, { size: 11, align: 'center', color: TEXT, border: `rgba(${accentRGB},0.8)`, W })
       }
     }
 

@@ -59,6 +59,13 @@ test('synlig etikett i alla lägen och inga påståenden om verkliga kurser', ()
   const i18n = txt(join(SPEL, 'lagen/i18n.js'))
   assert.ok(i18n.includes(SIM))
   assert.ok(i18n.includes(BADGE))
+  assert.match(i18n, /'sim\.claim': 'Simulerade kurser – inte verkliga marknadsdata'/)
+  assert.match(i18n, /'sim\.claim': 'Simulated prices – not real market data'/)
+  assert.match(i18n, /'sim\.claim': 'Симульовані курси – не реальні ринкові дані'/)
+  assert.match(i18n, /'splash\.body':[\s\S]*?Simulerade kurser – inte verkliga marknadsdata/)
+  for (const file of ['duo.js', 'rabbit.js', 'raket.js', 'akademin.js', 'panel.js']) {
+    assert.match(txt(join(SPEL, 'lagen', file)), /data-tr-claim/, `${file} saknar egen synlig mening`)
+  }
   assert.match(txt(join(SPEL, 'lagen/panel.js')), /el\('div', 'tr-sim', t\('sim\.label'\)\)/)
   assert.ok(txt(join(TR, 'index.html')).includes(SIM))
   const claim = /[Rr]iktiga (historiska )?(NVDA-)?kurser|äkta historiska|real historical|live (stock )?chart|LiveTrend|NVIDIA/

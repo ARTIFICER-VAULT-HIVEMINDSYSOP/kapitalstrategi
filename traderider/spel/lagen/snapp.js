@@ -18,7 +18,7 @@ html[data-nlr-view="raket"] .tr-snap-help{color:#b9c9ea}
 .tr-ratt{position:fixed;z-index:80;width:28px;height:28px;margin:0;pointer-events:none;display:none;color:#1c1915}
 @media (prefers-reduced-motion:reduce){.tr-snap-view{scroll-behavior:auto}}
 @media (max-width:520px){.tr-snap{top:calc(var(--tr-chrome-b, 120px) + 8px);bottom:auto;height:132px;left:auto;right:8px;width:min(120px,34vw)}}
-@media (min-width:641px){html[data-nlr-view="raket"] .tr-snap{left:12px;right:auto;top:auto;bottom:168px;width:168px;height:168px}}
+html[data-nlr-view="raket"] .tr-snap,html[data-nlr-view="rabbit"] .tr-snap,html[data-nlr-view="akademin"] .tr-snap,html[data-nlr-mode="2p"] .tr-snap{display:none !important}
 `
 
 let styled = false

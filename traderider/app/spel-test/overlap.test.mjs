@@ -16,10 +16,20 @@ const require = createRequire(join(REPO, 'traderider/app/package.json'))
 const SHOTS = process.env.OVERLAP_SHOTS || join(tmpdir(), 'tr-overlap')
 
 const VIEWPORTS = [
-  { w: 390, h: 844, name: '390x844' },
-  { w: 1280, h: 800, name: '1280x800' },
-  { w: 1440, h: 900, name: '1440x900' },
+  { w: 390, h: 844, dpr: 1, name: '390x844' },
+  { w: 390, h: 844, dpr: 2, name: '390x844-dpr2' },
+  { w: 390, h: 844, dpr: 3, name: '390x844-dpr3' },
+  { w: 768, h: 1024, dpr: 1, name: '768x1024' },
+  { w: 844, h: 390, dpr: 1, name: '844x390' },
+  { w: 1280, h: 800, dpr: 1, name: '1280x800' },
+  { w: 1440, h: 900, dpr: 1, name: '1440x900' },
 ]
+
+const CLAIMS = {
+  sv: 'Simulerade kurser – inte verkliga marknadsdata',
+  en: 'Simulated prices – not real market data',
+  uk: 'Симульовані курси – не реальні ринкові дані',
+}
 
 const MODES = [
   { id: 'tr-1p', hash: '#trade-rider', start: 'splash' },
@@ -97,6 +107,29 @@ function collect() {
     kept.push(el)
   }
   const unique = [...new Set(kept)]
+  function visibleBox(el) {
+    const r = el.getBoundingClientRect()
+    let top = r.top
+    let left = r.left
+    let right = r.right
+    let bottom = r.bottom
+    for (let n = el.parentElement; n; n = n.parentElement) {
+      const cs = getComputedStyle(n)
+      const clipsY = ['auto', 'scroll', 'hidden', 'clip'].includes(cs.overflowY)
+      const clipsX = ['auto', 'scroll', 'hidden', 'clip'].includes(cs.overflowX)
+      if (!clipsY && !clipsX) continue
+      const c = n.getBoundingClientRect()
+      if (clipsY) {
+        top = Math.max(top, c.top)
+        bottom = Math.min(bottom, c.bottom)
+      }
+      if (clipsX) {
+        left = Math.max(left, c.left)
+        right = Math.min(right, c.right)
+      }
+    }
+    return { x: left, y: top, w: Math.max(0, right - left), h: Math.max(0, bottom - top) }
+  }
   function scrollableY(el) {
     for (let n = el.parentElement; n; n = n.parentElement) {
       const cs = getComputedStyle(n)
@@ -125,9 +158,9 @@ function collect() {
     outside.push(`${(el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 32)} @${Math.round(r.left)},${Math.round(r.top)} ${Math.round(r.width)}×${Math.round(r.height)}`)
   }
   const boxes = unique.map((el) => {
-    const r = el.getBoundingClientRect()
-    return { el, text: (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 48), x: r.x, y: r.y, w: r.width, h: r.height }
-  })
+    const r = visibleBox(el)
+    return { el, text: (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 48), x: r.x, y: r.y, w: r.w, h: r.h }
+  }).filter((b) => b.w >= 2 && b.h >= 2)
   const pairs = []
   for (let i = 0; i < boxes.length; i++) {
     for (let j = i + 1; j < boxes.length; j++) {
@@ -170,12 +203,14 @@ function collect() {
     let right = -Infinity
     let bottom = -Infinity
     for (const canvas of canvases) {
-      const r = canvas.getBoundingClientRect()
-      x = Math.min(x, r.left)
-      y = Math.min(y, r.top)
-      right = Math.max(right, r.right)
-      bottom = Math.max(bottom, r.bottom)
+      const r = visibleBox(canvas)
+      if (r.w < 2 || r.h < 2) continue
+      x = Math.min(x, r.x)
+      y = Math.min(y, r.y)
+      right = Math.max(right, r.x + r.w)
+      bottom = Math.max(bottom, r.y + r.h)
     }
+    if (!Number.isFinite(x)) return null
     if (viewName === 'line' && !duoOn) {
       const header = document.querySelector('header.pointer-events-none')
       if (header && painted(header)) {
@@ -206,7 +241,72 @@ function collect() {
   }
   const sim = document.querySelector('.tr-sim')
   const simClip = sim && painted(sim) && sim.scrollWidth > sim.clientWidth + 2 ? `sim avklippt (${sim.clientWidth}/${sim.scrollWidth})` : ''
-  return { pairs, outside, priceLabels, badgeText, playHits, simClip }
+  const splashEl = document.querySelector('[data-tr-splash]')
+  const splashOn = !!splashEl && painted(splashEl) && active === 'line'
+  const surface = active === 'raket'
+    ? document.querySelector('.nlr-raket.on')
+    : active === 'rabbit'
+      ? document.querySelector('.nlr-rh.on')
+      : active === 'akademin'
+        ? document.querySelector('.nlr-ak.on')
+        : active === 'duo'
+          ? document.querySelector('.nlr-duo.on')
+          : document.querySelector('div.relative.h-dvh')
+  const missed = []
+  for (const el of document.querySelectorAll('button, a, input')) {
+    if (!painted(el)) continue
+    const inChrome = !!el.closest('.tr-chrome')
+    const inSurface = !!(surface && surface.contains(el))
+    const inSplash = !!(splashOn && el.closest('[data-tr-splash]'))
+    if (!inChrome && !inSurface && !inSplash) continue
+    if (splashOn && inSurface && !inSplash) continue
+    const r = el.getBoundingClientRect()
+    const cx = r.left + r.width / 2
+    const cy = r.top + r.height / 2
+    if (cx < 1 || cy < 1 || cx > innerWidth - 1 || cy > innerHeight - 1) continue
+    let clip = false
+    for (let n = el.parentElement; n; n = n.parentElement) {
+      const cs = getComputedStyle(n)
+      if (cs.overflowY !== 'auto' && cs.overflowY !== 'scroll' && cs.overflow !== 'hidden') continue
+      const box = n.getBoundingClientRect()
+      if (cy < box.top + 1 || cy > box.bottom - 1 || cx < box.left + 1 || cx > box.right - 1) clip = true
+    }
+    if (clip) continue
+    const hit = document.elementFromPoint(cx, cy)
+    if (hit && (hit === el || el.contains(hit))) continue
+    const label = (el.innerText || el.getAttribute('aria-label') || el.tagName).replace(/\s+/g, ' ').trim().slice(0, 24)
+    const other = hit ? String(hit.innerText || hit.className || hit.tagName).replace(/\s+/g, ' ').trim().slice(0, 24) : 'tomt'
+    missed.push(`${label} → ${other}`)
+    if (missed.length >= 8) break
+  }
+  const giants = []
+  const cap = innerHeight * 3
+  for (const el of document.querySelectorAll('body *')) {
+    const r = el.getBoundingClientRect()
+    if (r.height <= cap) continue
+    const pos = getComputedStyle(el).position
+    if (pos !== 'fixed' && pos !== 'sticky') {
+      let held = false
+      for (let n = el.parentElement; n; n = n.parentElement) {
+        const oy = getComputedStyle(n).overflowY
+        if ((oy === 'auto' || oy === 'scroll' || oy === 'hidden') && n.clientHeight + 4 < r.height) {
+          held = true
+          break
+        }
+      }
+      if (held) continue
+    }
+    giants.push(`${el.tagName}.${String(el.className).slice(0, 48)} ${Math.round(r.height)}`)
+    if (giants.length >= 6) break
+  }
+  const claims = []
+  for (const el of document.querySelectorAll('[data-tr-claim]')) {
+    if (!painted(el)) continue
+    const r = el.getBoundingClientRect()
+    const onScreen = r.height > 2 && r.bottom > 1 && r.top < innerHeight - 1 && r.right > 1 && r.left < innerWidth - 1
+    claims.push({ text: (el.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 220), onScreen })
+  }
+  return { pairs, outside, priceLabels, badgeText, playHits, simClip, missed, giants, claims }
 }
 
 let browser
@@ -214,7 +314,7 @@ let server
 let base
 let puppeteer
 
-test('42 vyer: brickor, lägesrad och klickbara ytor håller sig isär och inne i fönstret', { timeout: 300000 }, async (t) => {
+test('vyer: brickor, lägesrad, klick och höjd håller sig inom fönstret', { timeout: 600000 }, async (t) => {
   const chrome = chromePath()
   if (!chrome) return t.skip('Chrome saknas (CHROME_PATH)')
   puppeteer = require('puppeteer-core')
@@ -253,7 +353,7 @@ test('42 vyer: brickor, lägesrad och klickbara ytor håller sig isär och inne 
           const page = await browser.newPage()
           try {
             await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }])
-            await page.setViewport({ width: vp.w, height: vp.h, deviceScaleFactor: 1 })
+            await page.setViewport({ width: vp.w, height: vp.h, deviceScaleFactor: vp.dpr || 1 })
             await page.goto(base + mode.hash, { waitUntil: 'domcontentloaded', timeout: 30000 })
             await page.waitForSelector('.tr-skal', { timeout: 20000 })
             await new Promise((r) => setTimeout(r, 700))
@@ -273,6 +373,12 @@ test('42 vyer: brickor, lägesrad och klickbara ytor håller sig isär och inne 
         if (result.outside.length) failures.push(`${mode.id} ${phase} ${vp.name} utanför: ${result.outside.join(' | ')}`)
         if (phase === 'after' && result.playHits.length) failures.push(`${mode.id} ${phase} ${vp.name} spelplan: ${result.playHits.join(' | ')}`)
         if (result.simClip) failures.push(`${mode.id} ${phase} ${vp.name}: ${result.simClip}`)
+        if (result.missed.length) failures.push(`${mode.id} ${phase} ${vp.name} klick: ${result.missed.join(' | ')}`)
+        if (result.giants.length) failures.push(`${mode.id} ${phase} ${vp.name} för hög: ${result.giants.join(' | ')}`)
+        if (phase === 'before') {
+          const shown = result.claims.some((c) => c.onScreen && c.text.includes(CLAIMS.sv))
+          if (!shown) failures.push(`${mode.id} ${phase} ${vp.name}: simuleringsmeningen syns inte`)
+        }
         if (mode.id === 'historia' && phase === 'after') {
           const simulated = result.priceLabels.filter((label) => /simuler|simulated|симульов/i.test(label))
           if (simulated.length) failures.push(`${mode.id} ${phase} ${vp.name}: kursbricka säger ${simulated.join(', ')}`)
@@ -283,7 +389,33 @@ test('42 vyer: brickor, lägesrad och klickbara ytor håller sig isär och inne 
       }
     }
   }
-  assert.equal(checked, 42)
+  for (const mode of MODES) {
+    for (const lang of [
+      { button: 'EN', phrase: CLAIMS.en },
+      { button: 'UA', phrase: CLAIMS.uk },
+    ]) {
+      checked += 1
+      const page = await browser.newPage()
+      try {
+        await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 })
+        await page.goto(base + mode.hash, { waitUntil: 'domcontentloaded', timeout: 30000 })
+        await page.waitForSelector('.tr-skal', { timeout: 20000 })
+        await new Promise((r) => setTimeout(r, 500))
+        const btn = await page.evaluateHandle((label) => [...document.querySelectorAll('.lang-switcher-btn')].find((el) => el.textContent.trim() === label), lang.button)
+        const box = await btn.asElement()?.boundingBox()
+        if (!box) throw new Error(`språkknapp ${lang.button} saknas`)
+        await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
+        await new Promise((r) => setTimeout(r, 300))
+        const result = await page.evaluate(collect)
+        const shown = result.claims.some((c) => c.onScreen && c.text.includes(lang.phrase))
+        if (!shown) failures.push(`${mode.id} before 390x844-dpr2 ${lang.button}: meningen syns inte`)
+        if (result.giants.length) failures.push(`${mode.id} ${lang.button} för hög: ${result.giants.join(' | ')}`)
+      } finally {
+        await page.close().catch(() => {})
+      }
+    }
+  }
+  assert.equal(checked, MODES.length * 2 * VIEWPORTS.length + MODES.length * 2)
   assert.deepEqual(failures, [], `${checked} kontroller, ${failures.length} fel`)
 })
 

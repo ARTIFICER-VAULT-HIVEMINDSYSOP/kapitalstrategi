@@ -332,7 +332,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     }
     root.innerHTML = `<div class="nlr-ak-in">
       <aside>
-        <div class="nlr-ak-card sk"><span class="kick">${t('ak.kicker')}</span><h1>${t('mode.akademin')}</h1><p class="muted">${t('ak.lead')}</p></div>
+        <div class="nlr-ak-card sk"><span class="kick">${t('ak.kicker')}</span><h1>${t('mode.akademin')}</h1><p class="muted" data-tr-claim="1">${t('sim.claim')}</p><p class="muted">${t('ak.lead')}</p></div>
         <div class="nlr-ak-card sk nlr-ak-xp"><div class="row"><b>${t('ak.level', { n: lv.level })}</b><span>${t('ak.xp', { xp, max: A.XP_MAX })}</span></div><div class="nlr-ak-bar"><i style="width:${lvPct}%"></i></div><p class="muted">${t('ak.xpNote')}</p></div>
         <ol class="nlr-ak-lessons">${[1, 2, 3, 4].map((l) => {
           const open = A.lessonUnlocked(l, prog.earned)
