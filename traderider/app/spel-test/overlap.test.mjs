@@ -52,6 +52,8 @@ function collect() {
   const captions = new Set(['Simulerad kurs', 'Simulated price', 'Симульований курс', 'Kurs', 'Price', 'Курс'])
   const widget = '.tr-snap, .nlr-rk-quote, .nlr-rk-pnl, .nlr-rk-who, .nlr-rk-start, .nlr-duo-who, .nlr-duo-pnl, .nlr-rh-hud, .tr-sim, [data-tr-badge]'
   const nodes = [...document.querySelectorAll(`button, a, input, select, textarea, h1, h2, h3, ${widget}, [data-tr-trade-title], .tr-chrome *`)]
+  const kicker = document.querySelector('[data-tr-splash] p')
+  if (kicker) nodes.push(kicker)
   for (const node of document.querySelectorAll('div')) {
     if (node.children.length) continue
     const text = (node.textContent || '').trim()
@@ -152,7 +154,59 @@ function collect() {
   }
   const badge = document.querySelector('[data-tr-badge]')
   const badgeText = badge && !badge.hidden && getComputedStyle(badge).display !== 'none' ? badge.textContent.trim() : ''
-  return { pairs, outside, priceLabels, badgeText }
+  function playBox() {
+    const viewName = document.documentElement.dataset.nlrView || 'line'
+    const duoOn = document.querySelector('.nlr-duo.on')
+    let canvases
+    if (duoOn) canvases = [...duoOn.querySelectorAll('canvas')]
+    else if (viewName === 'raket') canvases = [...document.querySelectorAll('.nlr-raket.on canvas')]
+    else if (viewName === 'rabbit') canvases = [...document.querySelectorAll('.nlr-rh.on canvas')]
+    else if (viewName === 'akademin') canvases = [...document.querySelectorAll('.nlr-ak.on canvas')]
+    else canvases = [...document.querySelectorAll('div.relative.h-dvh > canvas')]
+    canvases = canvases.filter((c) => painted(c))
+    if (!canvases.length) return null
+    let x = Infinity
+    let y = Infinity
+    let right = -Infinity
+    let bottom = -Infinity
+    for (const canvas of canvases) {
+      const r = canvas.getBoundingClientRect()
+      x = Math.min(x, r.left)
+      y = Math.min(y, r.top)
+      right = Math.max(right, r.right)
+      bottom = Math.max(bottom, r.bottom)
+    }
+    if (viewName === 'line' && !duoOn) {
+      const header = document.querySelector('header.pointer-events-none')
+      if (header && painted(header)) {
+        const h = header.getBoundingClientRect()
+        if (h.bottom > y && h.top < bottom) y = Math.max(y, h.bottom)
+      }
+      const linebar = document.querySelector('[data-tr-linebar]')
+      if (linebar && painted(linebar)) {
+        const b = linebar.getBoundingClientRect()
+        if (b.top > y && b.top < bottom) bottom = b.top
+      }
+    }
+    if (bottom - y < 20 || right - x < 20) return null
+    return { x, y, w: right - x, h: bottom - y }
+  }
+  const playHits = []
+  const play = playBox()
+  if (play) {
+    for (const el of document.querySelectorAll('.tr-chrome button, .tr-chrome a, .tr-chrome input, .tr-sim')) {
+      if (!painted(el)) continue
+      const r = el.getBoundingClientRect()
+      const iw = Math.min(r.right, play.x + play.w) - Math.max(r.left, play.x)
+      const ih = Math.min(r.bottom, play.y + play.h) - Math.max(r.top, play.y)
+      if (iw > 1 && ih > 1) {
+        playHits.push(`${(el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 32)} på spelplanen`)
+      }
+    }
+  }
+  const sim = document.querySelector('.tr-sim')
+  const simClip = sim && painted(sim) && sim.scrollWidth > sim.clientWidth + 2 ? `sim avklippt (${sim.clientWidth}/${sim.scrollWidth})` : ''
+  return { pairs, outside, priceLabels, badgeText, playHits, simClip }
 }
 
 let browser
@@ -217,6 +271,8 @@ test('42 vyer: brickor, lägesrad och klickbara ytor håller sig isär och inne 
         if (!result) throw lastErr
         if (result.pairs.length) failures.push(`${mode.id} ${phase} ${vp.name}: ${result.pairs.join(' | ')}`)
         if (result.outside.length) failures.push(`${mode.id} ${phase} ${vp.name} utanför: ${result.outside.join(' | ')}`)
+        if (phase === 'after' && result.playHits.length) failures.push(`${mode.id} ${phase} ${vp.name} spelplan: ${result.playHits.join(' | ')}`)
+        if (result.simClip) failures.push(`${mode.id} ${phase} ${vp.name}: ${result.simClip}`)
         if (mode.id === 'historia' && phase === 'after') {
           const simulated = result.priceLabels.filter((label) => /simuler|simulated|симульов/i.test(label))
           if (simulated.length) failures.push(`${mode.id} ${phase} ${vp.name}: kursbricka säger ${simulated.join(', ')}`)

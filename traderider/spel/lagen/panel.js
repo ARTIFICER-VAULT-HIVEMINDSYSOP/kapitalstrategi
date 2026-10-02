@@ -60,8 +60,14 @@ html[data-nlr-view="akademin"] .nlr-ak-in{padding-top:calc(var(--tr-chrome-b, 72
 .tr-chrome>.nlr-pill,.tr-chrome>.tr-sim,.tr-chrome>.tr-instr-open{position:relative !important;inset:auto !important;pointer-events:auto;flex:0 1 auto;margin:0}
 .tr-chrome>.nlr-toggle{max-width:100% !important;overflow:visible !important;flex-wrap:wrap;height:auto;align-items:center}
 .tr-chrome .nlr-toggle button{height:28px}
-.tr-chrome>.tr-sim{flex:0 1 auto;max-width:100%}
+.tr-chrome>.tr-sim{flex:0 1 auto;max-width:none;overflow:visible;text-overflow:clip}
 html[data-nlr-solo="0"] header.pointer-events-none,html[data-nlr-solo="0"] [data-tr-linebar]{display:none !important}
+html[data-tr-dock="top"] div.relative.h-dvh{position:fixed;left:0;right:0;width:100%;top:var(--tr-chrome-b,0px);height:calc(100dvh - var(--tr-chrome-b,0px))}
+html[data-tr-dock="top"] .nlr-duo.on,html[data-tr-dock="top"] .nlr-raket.on,html[data-tr-dock="top"] .nlr-rh.on,html[data-tr-dock="top"] .nlr-ak.on{top:var(--tr-chrome-b,0px);bottom:auto;height:calc(100dvh - var(--tr-chrome-b,0px))}
+html[data-tr-dock="top"] [data-tr-splash] .min-h-dvh{min-height:100%}
+html[data-tr-dock="top"][data-nlr-view="akademin"] .nlr-ak-in{padding-top:16px}
+html[data-tr-dock="top"] .nlr-rh-hud{top:12px}
+html[data-tr-dock="top"] .tr-fas{top:calc(var(--tr-header-b, var(--tr-chrome-b, 72px)) + 8px);max-height:calc(100dvh - var(--tr-header-b, 72px) - 16px);overflow:auto}
 @media (max-width:640px){.nlr-rsi-txt{min-width:64px}.nlr-rsi-txt b{font-size:14px}.nlr-toggle button{padding:0 9px;font-size:12px}.tr-skal{padding:3px}.tr-skal .tr-back{display:none}.tr-skal .tr-fs-txt{display:none}.tr-skal button{padding:0 9px}}
 @media (max-width:520px){.nlr-toggle{max-width:calc(100vw - 16px);overflow-x:auto}.nlr-toggle button{padding:0 8px;font-size:11px}header.pointer-events-none{flex-wrap:wrap}header.pointer-events-none>.pointer-events-auto:first-child{min-width:0;max-width:100%;flex:1 1 100%}header.pointer-events-none .overflow-x-auto{max-width:100%}header.pointer-events-none .overflow-x-auto button{min-width:0;padding-left:6px;padding-right:6px;font-size:11px;height:32px}}
 `
@@ -681,14 +687,30 @@ async function main() {
     const splashEl = document.querySelector('[data-tr-splash]')
     const splashOn = !!(splashEl && getComputedStyle(splashEl).display !== 'none' && !splashEl.hidden)
     if (!fas.isCovering()) sim.style.display = splashOn && narrow && solo ? 'none' : ''
-    sim.style.flex = solo && !narrow ? '0 1 auto' : '1 1 100%'
-    sim.style.maxWidth = solo && !narrow ? '220px' : '100%'
+    sim.style.flex = '0 1 auto'
+    sim.style.maxWidth = 'none'
+    const dock = narrow || !(view === 'line' && mode === '1p')
+    document.documentElement.dataset.trDock = dock ? 'top' : 'band'
     let left = 8
     let top = 8
     let maxW = innerWidth - 16
     const header = document.querySelector('header.pointer-events-none')
     const headerShown = !!(header && getComputedStyle(header).display !== 'none' && header.getBoundingClientRect().height > 2)
-    if (solo && !narrow) {
+    if (dock) {
+      left = 0
+      top = 0
+      maxW = innerWidth
+      chrome.style.width = '100%'
+      chrome.style.padding = '8px'
+      chrome.style.boxSizing = 'border-box'
+      chrome.style.background = view === 'raket' ? '#061022' : view === 'rabbit' ? '#140e0c' : '#f3ede2'
+    } else {
+      chrome.style.width = ''
+      chrome.style.padding = ''
+      chrome.style.boxSizing = ''
+      chrome.style.background = ''
+    }
+    if (!dock && solo) {
       const title = document.querySelector('[data-tr-trade-title]')
       const tile = linePriceTile()
       let anchorRight = 16
@@ -714,38 +736,66 @@ async function main() {
         }
       }
       maxW = Math.max(280, Math.round(limitLeft - left - 12))
-    } else if (solo && narrow && headerShown) {
-      left = 8
-      top = Math.round(header.getBoundingClientRect().bottom + 8)
-      maxW = innerWidth - 16
-    } else if (view === 'raket' && !narrow) {
-      maxW = innerWidth - 200
     }
-    if (left < 8) left = 8
-    if (left + 120 > innerWidth) left = 8
-    maxW = Math.min(maxW, innerWidth - left - 8)
+    if (!dock) {
+      if (left < 8) left = 8
+      if (left + 120 > innerWidth) left = 8
+      maxW = Math.min(maxW, innerWidth - left - 8)
+    }
     chrome.style.left = `${left}px`
     chrome.style.top = `${top}px`
     chrome.style.maxWidth = `${Math.round(maxW)}px`
     chrome.style.gap = solo && !narrow ? '4px' : '6px'
     const bottom = Math.round(chrome.getBoundingClientRect().bottom)
     document.documentElement.style.setProperty('--tr-chrome-b', `${bottom}px`)
+    const headerBottom = headerShown ? Math.round(header.getBoundingClientRect().bottom) : bottom
+    document.documentElement.style.setProperty('--tr-header-b', `${headerBottom}px`)
     const buy = document.querySelector('button[data-tr="buy"]')
     const shell = buy?.parentElement?.parentElement
     if (shell && !shell.closest('.nlr-duo, .nlr-raket')) shell.dataset.trLinebar = '1'
-    const splash = document.querySelector('[data-tr-splash] h1')
-    if (splash && solo) {
-      const box = splash.parentElement
-      const overlap = bottom + 8 - splash.getBoundingClientRect().top
-      if (box && overlap > 0 && box.dataset.trPadLock !== '1') {
-        const pb = parseFloat(getComputedStyle(box).paddingBottom) || 0
-        box.style.paddingBottom = `${Math.max(8, pb - overlap)}px`
-        box.dataset.trPadLock = '1'
-      }
-    }
+    placeSplash(bottom)
     syncPriceCaption()
-    if (view === 'line' && mode === '2p') duo.placeCards?.()
+    const sig = `${dock}:${bottom}:${innerWidth}`
+    if (sig !== layoutChrome.sig) {
+      layoutChrome.sig = sig
+      if (view === 'line' && mode === '2p') duo.layout?.()
+      else if (view === 'line' && mode === '1p') window.__trEngine?.resize?.()
+    }
   }
+
+  function placeSplash(chromeBottom) {
+    const splash = document.querySelector('[data-tr-splash]')
+    const kicker = splash?.querySelector('p')
+    const inner = kicker?.parentElement
+    if (!inner) return
+    if (!inner.dataset.trPadBase) inner.dataset.trPadBase = String(parseFloat(getComputedStyle(inner).paddingTop) || 0)
+    const base = Number(inner.dataset.trPadBase) || 0
+    const hidden = splash.hidden || getComputedStyle(splash).display === 'none'
+    const dock = document.documentElement.dataset.trDock === 'top'
+    if (hidden || !dock) {
+      inner.style.justifyContent = ''
+      inner.style.paddingBottom = ''
+      inner.style.paddingTop = `${base}px`
+      if (hidden) return
+      const overlap = chromeBottom + 8 - kicker.getBoundingClientRect().top
+      inner.style.paddingTop = `${base + Math.max(0, overlap)}px`
+      return
+    }
+    const splashHeader = document.querySelector('header.pointer-events-none')
+    const splashHeaderShown = !!(splashHeader && getComputedStyle(splashHeader).display !== 'none' && splashHeader.getBoundingClientRect().height > 2)
+    const splashTop = splash.getBoundingClientRect().top
+    let floor = chromeBottom + 8
+    if (splashHeaderShown) floor = Math.max(floor, splashHeader.getBoundingClientRect().bottom + 8)
+    inner.style.justifyContent = 'flex-start'
+    inner.style.paddingBottom = '16px'
+    inner.style.paddingTop = `${Math.max(base, Math.round(floor - splashTop))}px`
+  }
+
+  const watch = new ResizeObserver(() => layoutChrome())
+  const headerWatch = document.querySelector('header.pointer-events-none')
+  const splashWatch = document.querySelector('[data-tr-splash]')
+  if (headerWatch) watch.observe(headerWatch)
+  if (splashWatch) watch.observe(splashWatch)
 
   const loop = () => {
     refreshTitle()

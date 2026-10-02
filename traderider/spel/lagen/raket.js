@@ -117,15 +117,13 @@ const css = `
 @media (max-width:640px){.nlr-rk-kbd{display:none}.nlr-rk-quote{top:auto;bottom:196px;right:12px;min-width:0;max-width:132px}.nlr-rk-pnl{top:auto;bottom:196px;right:auto;left:12px;text-align:left;min-width:0;max-width:calc(100% - 160px)}.nlr-rk-pnl .nlr-rk-boost{justify-content:flex-start}.nlr-rk-card b{font-size:16px}.nlr-rk-pnl b{font-size:18px}.nlr-rk-info{font-size:11px}.nlr-rk-side{font-size:14px;letter-spacing:.08em}.nlr-rk-boost i{width:44px}.nlr-rk-note{font-size:10px}.nlr-rk-card span{font-size:10px}.nlr-rk-start{top:max(18%, calc(var(--tr-chrome-b, 72px) + 12px));left:12px;right:auto;transform:none;max-width:calc(100% - 148px);text-align:left}}
 /* 2P: kompakta halvor */
 .nlr-rk-2p .nlr-rk-quote{display:none}
-.nlr-rk-2p .nlr-rk-pnl{top:calc(var(--tr-chrome-b, 56px) + 8px);bottom:auto;right:12px;left:auto;text-align:right;min-width:0}
+.nlr-rk-2p .nlr-rk-pnl{top:12px;bottom:auto;right:12px;left:auto;text-align:right;min-width:0;max-width:min(220px,46%)}
 .nlr-rk-2p .nlr-rk-pnl .nlr-rk-boost{justify-content:flex-end}
-.nlr-rk-2p .nlr-rk-who{top:calc(var(--tr-chrome-b, 56px) + 8px)}
+.nlr-rk-2p .nlr-rk-who{top:12px;left:8px;max-width:42%}
 .nlr-rk-2p .nlr-rk-ctl{bottom:10px;gap:6px}
 .nlr-rk-2p .nlr-rk-side{height:44px;font-size:13px}
 .nlr-rk-2p .nlr-rk-bar{padding:4px 8px;gap:6px}
 .nlr-rk-2p .nlr-rk-bar .play{width:34px;height:34px}
-.nlr-rk-2p.narrow .nlr-rk-who{left:8px;right:auto;max-width:42%}
-.nlr-rk-2p.narrow .nlr-rk-pnl{left:auto;right:8px;max-width:50%;min-width:0}
 .nlr-rk-2p.narrow .nlr-rk-side{height:38px}
 .nlr-rk-2p.narrow .nlr-rk-kbd{display:inline}
 .nlr-rk-2p.narrow .nlr-rk-card b{font-size:15px}
@@ -140,8 +138,8 @@ html[data-nlr-view="raket"] .nlr-toggle{${HUD_BOX.replace(/;/g, ' !important;')}
 html[data-nlr-view="raket"] .nlr-toggle button{color:${TEXT} !important;font:600 12px ${MONO} !important;letter-spacing:.06em;border-radius:3px !important}
 html[data-nlr-view="raket"] .nlr-toggle button[aria-pressed="true"]{background:${CYAN} !important;color:${ON_DARK} !important;box-shadow:0 0 12px rgba(46,230,255,.55)}
 html[data-nlr-view="raket"] .nlr-toggle button:focus-visible{outline:2px solid ${MAGENTA} !important}
-.nlr-rk-2p .nlr-rk-start{left:50%;right:auto;transform:translateX(-50%);text-align:center;top:calc(var(--tr-chrome-b, 56px) + 150px);max-width:min(480px,calc(100% - 24px))}
-.nlr-rk-2p.narrow .nlr-rk-start{top:calc(var(--tr-chrome-b, 56px) + 92px)}
+.nlr-rk-2p .nlr-rk-start{left:50%;right:auto;transform:translateX(-50%);text-align:center;top:46%;max-width:min(480px,calc(100% - 24px))}
+.nlr-rk-2p.narrow .nlr-rk-start{top:40%}
 .nlr-rk-2p.narrow .nlr-rk-start p{display:none}
 `
 
@@ -525,9 +523,6 @@ export function createRaket({ engine }) {
       Object.assign(pl.dom.el.style, { left: `${vp.x}px`, top: `${vp.y}px`, width: `${vp.w}px`, height: `${vp.h}px` })
       for (const sel of ['.nlr-rk-who', '.nlr-rk-pnl']) {
         const cEl = pl.dom.el.querySelector(sel)
-        const chromeB = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tr-chrome-b')) || 56
-        const cardTop = vp.y === 0 ? Math.round(chromeB + 8) : 12
-        const tight = mode === '2p' && W <= 700
         if (mode !== '2p') {
           cEl.style.top = ''
           cEl.style.bottom = ''
@@ -537,15 +532,15 @@ export function createRaket({ engine }) {
           continue
         }
         cEl.style.bottom = 'auto'
-        cEl.style.top = `${cardTop}px`
-        if (tight && sel === '.nlr-rk-who') {
+        cEl.style.top = '12px'
+        if (W <= 700 && sel === '.nlr-rk-who') {
           cEl.style.left = '8px'
           cEl.style.right = 'auto'
           cEl.style.maxWidth = '42%'
-        } else if (tight) {
+        } else if (W <= 700) {
           cEl.style.left = 'auto'
           cEl.style.right = '8px'
-          cEl.style.maxWidth = '50%'
+          cEl.style.maxWidth = '46%'
         } else {
           cEl.style.left = ''
           cEl.style.right = ''
@@ -560,6 +555,29 @@ export function createRaket({ engine }) {
       renderPlayer(c, pl, i, vp, dt, calm, now)
       c.restore()
     })
+    if (mode === '2p' && startCard.style.display !== 'none' && root.classList.contains('narrow')) {
+      const pane = players[0]?.dom.el
+      const ctl = pane?.querySelector('.nlr-rk-ctl')
+      const cards = pane ? [...pane.querySelectorAll('.nlr-rk-who, .nlr-rk-pnl')] : []
+      const rootTop = root.getBoundingClientRect().top
+      if (ctl && cards.length) {
+        const ctlTop = ctl.getBoundingClientRect().top - rootTop
+        const band = Math.max(...cards.map((el) => el.getBoundingClientRect().bottom - rootTop))
+        const cardH = startCard.offsetHeight || 36
+        const y = Math.round(band + 10)
+        startCard.style.top = `${Math.max(8, y)}px`
+        startCard.style.left = '50%'
+        startCard.style.right = 'auto'
+        startCard.style.transform = 'translateX(-50%)'
+        startCard.style.visibility = y + cardH > ctlTop - 4 ? 'hidden' : ''
+      }
+    } else {
+      startCard.style.visibility = ''
+      startCard.style.top = ''
+      startCard.style.left = ''
+      startCard.style.right = ''
+      startCard.style.transform = ''
+    }
     if (mode === '2p') {
       const v = vps[1]
       Object.assign(divider.style, v.x > 0 ? { display: 'block', left: `${v.x}px`, top: '0', width: '1px', height: '100%' } : { display: 'block', left: '0', top: `${v.y}px`, width: '100%', height: '1px' })
@@ -712,7 +730,17 @@ export function createRaket({ engine }) {
       c.fillText(t('rk.missing'), 20, 40)
       return
     }
-    const rocketY = Math.round(H * (twoP ? (H < 500 ? 0.42 : 0.5) : W <= 640 ? 0.52 : 0.6))
+    const paneTop = pl.dom.el.getBoundingClientRect().top
+    let cardBand = 0
+    if (twoP) {
+      for (const sel of ['.nlr-rk-who', '.nlr-rk-pnl']) {
+        const card = pl.dom.el.querySelector(sel)
+        if (!card || getComputedStyle(card).display === 'none') continue
+        cardBand = Math.max(cardBand, card.getBoundingClientRect().bottom - paneTop)
+      }
+    }
+    let rocketY = Math.round(H * (twoP ? (H < 500 ? 0.42 : 0.5) : W <= 640 ? 0.52 : 0.6))
+    if (twoP) rocketY = Math.max(rocketY, Math.round(cardBand + 28))
     const p = clock.p
     const row = (k) => rocketY - (k - p) * pxPer
     const ahead = Math.ceil(rocketY / pxPer) + 2
