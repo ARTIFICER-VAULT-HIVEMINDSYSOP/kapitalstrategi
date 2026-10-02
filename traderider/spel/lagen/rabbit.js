@@ -15,7 +15,7 @@ const css = `
 .nlr-rh{display:none;position:fixed;inset:0;z-index:55;background:#140e0c;color:#f4efe6}
 .nlr-rh.on{display:block}
 .nlr-rh canvas{width:100%;height:100%;display:block}
-.nlr-rh-hud{position:absolute;left:12px;right:12px;top:120px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 12px;pointer-events:none;font:600 12px/1.35 "IBM Plex Sans",sans-serif}
+.nlr-rh-hud{position:absolute;left:12px;right:12px;top:calc(var(--tr-chrome-b, 96px) + 12px);display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 12px;pointer-events:none;font:600 12px/1.35 "IBM Plex Sans",sans-serif}
 .nlr-rh-hud b{color:#e7b15a}
 .nlr-rh-note{position:absolute;left:12px;bottom:16px;max-width:min(520px,92vw);font:500 12px/1.4 "IBM Plex Sans",sans-serif;color:#f4efe6}
 .nlr-rh-bat{width:28px;height:14px}

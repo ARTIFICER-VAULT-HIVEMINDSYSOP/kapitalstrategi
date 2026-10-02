@@ -89,6 +89,7 @@ const sv = {
   'instr.start': 'Starta',
   'instr.open': 'Visa styrning',
   'hist.badge': 'VERKLIG · HISTORISK',
+  'hist.price': 'Kurs',
   'hist.range': 'Index 100 vid start, {from}–{to}. Komprimerad tid, liten skala, ingen valuta.',
   'grans.title': 'Gränslandet',
   'grans.summary': 'Du valde {side} med hävstång {lev}: högre hävstång kan ge större vinst men också större förlust.',
@@ -412,6 +413,7 @@ const en = {
   'instr.start': 'Start',
   'instr.open': 'Show steering',
   'hist.badge': 'REAL · HISTORICAL',
+  'hist.price': 'Price',
   'hist.range': 'Index 100 at the start, {from}–{to}. Compressed time, tiny scale, no currency.',
   'grans.title': 'The borderland',
   'grans.summary': 'You chose {side} with leverage {lev}: higher leverage can bring a larger gain but also a larger loss.',
@@ -735,6 +737,7 @@ const uk = {
   'instr.start': 'Старт',
   'instr.open': 'Показати керування',
   'hist.badge': 'РЕАЛЬНЕ · ІСТОРИЧНЕ',
+  'hist.price': 'Курс',
   'hist.range': 'Індекс 100 на старті, {from}–{to}. Стиснутий час, малий масштаб, без валюти.',
   'grans.title': 'Межа',
   'grans.summary': 'Ви обрали {side} з плечем {lev}: вище плече може дати більший прибуток, але й більший збиток.',
@@ -980,6 +983,12 @@ const uk = {
 export const STRINGS = { sv, en, uk }
 
 const listeners = new Set()
+let priceKey = null
+
+/** Under Historia byts sim.price mot en neutral etikett. null återställer. */
+export function setPriceKey(key) {
+  priceKey = key || null
+}
 
 function readStored() {
   try {
@@ -1025,6 +1034,7 @@ export function onLang(fn) {
 }
 
 export function t(key, vars) {
+  if (key === 'sim.price' && priceKey) key = priceKey
   const lang = getLang()
   let s = STRINGS[lang]?.[key] ?? STRINGS.sv[key] ?? key
   if (vars) {

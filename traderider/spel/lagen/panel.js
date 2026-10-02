@@ -15,7 +15,7 @@ import { createRabbit } from './rabbit.js'
 import { createDuo } from './duo.js'
 import { createAkademin } from './akademin.js'
 import { isTypingTarget } from './keys.js'
-import { t, onLang, mountSwitcher } from './i18n.js'
+import { t, onLang, mountSwitcher, setPriceKey, STRINGS } from './i18n.js'
 import { readSide, cycleIndex, stepSide, ENTRY_SIDE } from './styrmotor.js'
 import { MODES, modeFromHash, hashForView, selectMode } from './orientation.js'
 import { mountEntrySnap, bindStepGestures, mountRatt } from './snapp.js'
@@ -55,7 +55,12 @@ html.tr-fs-css[data-nlr-view="akademin"],html.tr-fs-css[data-nlr-view="akademin"
 a[href="/login"]{display:none !important}
 .tr-sim{position:fixed;z-index:60;pointer-events:none;box-sizing:border-box;font:600 11px/1.25 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.02em;color:${INK};background:rgba(246,242,234,.94);border:1px solid rgba(28,25,21,.16);border-radius:999px;padding:4px 10px;white-space:nowrap;max-width:calc(100vw - 16px);overflow:hidden;text-overflow:ellipsis}
 html[data-nlr-view="raket"] .tr-sim{color:#e8f4ff;background:rgba(8,12,32,.85);border-color:rgba(64,224,255,.5);font:600 11px/1.25 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.04em}
-html[data-nlr-view="akademin"] .nlr-ak-in{padding-top:96px}
+html[data-nlr-view="akademin"] .nlr-ak-in{padding-top:calc(var(--tr-chrome-b, 72px) + 16px)}
+.tr-chrome{position:fixed;z-index:70;display:flex;flex-wrap:wrap;align-items:center;gap:6px;box-sizing:border-box;pointer-events:none;max-width:calc(100vw - 16px)}
+.tr-chrome>.nlr-pill,.tr-chrome>.tr-sim,.tr-chrome>.tr-instr-open{position:relative !important;inset:auto !important;pointer-events:auto;flex:0 1 auto;margin:0}
+.tr-chrome>.nlr-toggle{max-width:100%;overflow-x:auto}
+.tr-chrome>.tr-sim{flex:1 1 100%;max-width:100%}
+html[data-nlr-solo="0"] header.pointer-events-none,html[data-nlr-solo="0"] [data-tr-linebar]{display:none !important}
 @media (max-width:640px){.nlr-rsi-txt{min-width:64px}.nlr-rsi-txt b{font-size:14px}.nlr-toggle button{padding:0 9px;font-size:12px}.tr-skal{padding:3px}.tr-skal .tr-back{display:none}.tr-skal .tr-fs-txt{display:none}.tr-skal button{padding:0 9px}}
 @media (max-width:520px){.nlr-toggle{max-width:calc(100vw - 16px);overflow-x:auto}.nlr-toggle button{padding:0 8px;font-size:11px}header.pointer-events-none{flex-wrap:wrap}header.pointer-events-none>.pointer-events-auto:first-child{min-width:0;max-width:100%;flex:1 1 100%}header.pointer-events-none .overflow-x-auto{max-width:100%}header.pointer-events-none .overflow-x-auto button{min-width:0;padding-left:6px;padding-right:6px;font-size:11px;height:32px}}
 `
@@ -618,16 +623,105 @@ async function main() {
     skal.style.top = toggle.style.top
   }
 
+  const chrome = el('div', 'tr-chrome')
+  chrome.append(toggle, modeToggle, skal, sim, instr.reopen)
+  document.body.appendChild(chrome)
+
+  function linePriceTile() {
+    const captions = new Set([
+      STRINGS.sv['sim.price'], STRINGS.en['sim.price'], STRINGS.uk['sim.price'],
+      STRINGS.sv['hist.price'], STRINGS.en['hist.price'], STRINGS.uk['hist.price'],
+    ])
+    for (const node of document.querySelectorAll('header div')) {
+      if (node.children.length) continue
+      const text = (node.textContent || '').trim()
+      if (!captions.has(text) || !String(node.className).includes('uppercase')) continue
+      return node.parentElement
+    }
+    return null
+  }
+
+  function syncPriceCaption() {
+    const historia = fas.isCovering() && fas.phases.phase() === 'historia'
+    setPriceKey(historia ? 'hist.price' : null)
+    const simLabels = new Set([STRINGS.sv['sim.price'], STRINGS.en['sim.price'], STRINGS.uk['sim.price']])
+    if (!historia) {
+      for (const node of document.querySelectorAll('[data-tr-price-swap]')) {
+        node.textContent = t('sim.price')
+        delete node.dataset.trPriceSwap
+      }
+      return
+    }
+    const want = t('hist.price')
+    for (const node of document.querySelectorAll('div, small, span, b')) {
+      if (node.childNodes.length !== 1 || node.childNodes[0].nodeType !== 3) continue
+      if (!simLabels.has((node.textContent || '').trim())) continue
+      node.textContent = want
+      node.dataset.trPriceSwap = '1'
+    }
+  }
+
+  function layoutChrome() {
+    const narrow = innerWidth <= 640
+    const solo = view === 'line' && mode === '1p'
+    document.documentElement.dataset.nlrSolo = solo ? '1' : '0'
+    document.documentElement.dataset.nlrMode = mode
+    const hpx = narrow ? 32 : 40
+    for (const pill of [toggle, modeToggle, skal]) pill.style.height = `${hpx}px`
+    for (const node of [toggle, modeToggle, skal, sim]) {
+      node.style.left = ''
+      node.style.top = ''
+      node.style.right = ''
+      node.style.bottom = ''
+    }
+    let left = 8
+    let top = 8
+    let maxW = innerWidth - 16
+    if (view === 'raket' && !narrow) maxW = innerWidth - 200
+    if (solo) {
+      const tile = linePriceTile()
+      const header = document.querySelector('header.pointer-events-none')
+      if (tile && narrow) {
+        const r = tile.getBoundingClientRect()
+        left = Math.round(r.right + 8)
+        top = Math.round(r.top)
+        maxW = Math.max(140, Math.round(innerWidth - left - 8))
+      } else if (header) {
+        left = 8
+        top = Math.round(header.getBoundingClientRect().bottom + 8)
+        maxW = innerWidth - 16
+      }
+    }
+    chrome.style.left = `${left}px`
+    chrome.style.top = `${top}px`
+    chrome.style.maxWidth = `${Math.round(maxW)}px`
+    const bottom = Math.round(chrome.getBoundingClientRect().bottom)
+    document.documentElement.style.setProperty('--tr-chrome-b', `${bottom}px`)
+    const buy = document.querySelector('button[data-tr="buy"]')
+    const shell = buy?.parentElement?.parentElement
+    if (shell && !shell.closest('.nlr-duo, .nlr-raket')) shell.dataset.trLinebar = '1'
+    const splash = document.querySelector('[data-tr-splash] h1')
+    if (splash && solo) {
+      const box = splash.parentElement
+      const overlap = bottom + 8 - splash.getBoundingClientRect().top
+      if (box && overlap > 0 && box.dataset.trPadLock !== '1') {
+        const pb = parseFloat(getComputedStyle(box).paddingBottom) || 0
+        box.style.paddingBottom = `${Math.max(8, pb - overlap)}px`
+        box.dataset.trPadLock = '1'
+      }
+    }
+    syncPriceCaption()
+    if (view === 'line' && mode === '2p') duo.placeCards?.()
+  }
+
   const loop = () => {
     refreshTitle()
     layoutPanel()
-    layoutToggle()
-    layoutMode()
-    layoutSim()
     syncGameHeader()
     sim.style.display = fas.isCovering() ? 'none' : ''
+    layoutChrome()
     syncSnap()
-    if (view === 'line') drawPanel()
+    if (view === 'line' && mode === '1p') drawPanel()
     setTimeout(() => requestAnimationFrame(loop), 90)
   }
   loop()

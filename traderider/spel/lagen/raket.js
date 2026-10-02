@@ -71,7 +71,7 @@ const css = `
 .nlr-rk-card b{display:block;font:600 20px ${MONO};font-variant-numeric:tabular-nums;color:${TEXT};text-shadow:0 0 10px rgba(46,230,255,.35)}
 .nlr-rk-card span{font:500 11px ${MONO};color:${TEXT2}}
 .nlr-rk-quote{right:14px;top:12px;text-align:right;min-width:150px}
-.nlr-rk-pnl{right:14px;top:104px;text-align:right;min-width:150px}
+.nlr-rk-pnl{right:14px;top:104px;text-align:right;min-width:150px;max-width:min(280px,calc(100% - 180px))}
 .nlr-rk-pnl b{font-size:24px}
 .nlr-rk-boost{display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-top:4px}
 .nlr-rk-boost i{display:block;width:64px;height:5px;border-radius:1px;background:rgba(147,168,212,.22);overflow:hidden}
@@ -114,12 +114,12 @@ const css = `
 .nlr-rk-start{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);text-align:center;padding:14px 18px;max-width:calc(100% - 32px);z-index:2}
 .nlr-rk-start p{margin:3px 0;font:500 12px ${MONO};color:${TEXT2}}
 .nlr-rk-div{position:absolute;background:${MAGENTA};box-shadow:0 0 10px ${MAGENTA};display:none}
-@media (max-width:640px){.nlr-rk-kbd{display:none}.nlr-rk-quote{top:auto;bottom:196px;right:12px;min-width:0}.nlr-rk-pnl{top:auto;bottom:196px;right:auto;left:12px;text-align:left;min-width:0}.nlr-rk-pnl .nlr-rk-boost{justify-content:flex-start}.nlr-rk-card b{font-size:16px}.nlr-rk-pnl b{font-size:18px}.nlr-rk-info{font-size:11px}.nlr-rk-side{font-size:14px;letter-spacing:.08em}.nlr-rk-boost i{width:44px}.nlr-rk-note{font-size:10px}.nlr-rk-card span{font-size:10px}.nlr-rk-start{top:18%;left:12px;right:auto;transform:none;max-width:calc(100% - 148px);text-align:left}}
+@media (max-width:640px){.nlr-rk-kbd{display:none}.nlr-rk-quote{top:auto;bottom:196px;right:12px;min-width:0;max-width:132px}.nlr-rk-pnl{top:auto;bottom:196px;right:auto;left:12px;text-align:left;min-width:0;max-width:calc(100% - 160px)}.nlr-rk-pnl .nlr-rk-boost{justify-content:flex-start}.nlr-rk-card b{font-size:16px}.nlr-rk-pnl b{font-size:18px}.nlr-rk-info{font-size:11px}.nlr-rk-side{font-size:14px;letter-spacing:.08em}.nlr-rk-boost i{width:44px}.nlr-rk-note{font-size:10px}.nlr-rk-card span{font-size:10px}.nlr-rk-start{top:max(18%, calc(var(--tr-chrome-b, 72px) + 12px));left:12px;right:auto;transform:none;max-width:calc(100% - 148px);text-align:left}}
 /* 2P: kompakta halvor */
 .nlr-rk-2p .nlr-rk-quote{display:none}
-.nlr-rk-2p .nlr-rk-pnl{top:12px;bottom:auto;right:12px;left:auto;text-align:right;min-width:0}
+.nlr-rk-2p .nlr-rk-pnl{top:calc(var(--tr-chrome-b, 56px) + 8px);bottom:auto;right:12px;left:auto;text-align:right;min-width:0}
 .nlr-rk-2p .nlr-rk-pnl .nlr-rk-boost{justify-content:flex-end}
-.nlr-rk-2p .nlr-rk-who{top:12px}
+.nlr-rk-2p .nlr-rk-who{top:calc(var(--tr-chrome-b, 56px) + 8px)}
 .nlr-rk-2p .nlr-rk-ctl{bottom:10px;gap:6px}
 .nlr-rk-2p .nlr-rk-side{height:44px;font-size:13px}
 .nlr-rk-2p .nlr-rk-bar{padding:4px 8px;gap:6px}
@@ -138,6 +138,9 @@ html[data-nlr-view="raket"] .nlr-toggle{${HUD_BOX.replace(/;/g, ' !important;')}
 html[data-nlr-view="raket"] .nlr-toggle button{color:${TEXT} !important;font:600 12px ${MONO} !important;letter-spacing:.06em;border-radius:3px !important}
 html[data-nlr-view="raket"] .nlr-toggle button[aria-pressed="true"]{background:${CYAN} !important;color:${ON_DARK} !important;box-shadow:0 0 12px rgba(46,230,255,.55)}
 html[data-nlr-view="raket"] .nlr-toggle button:focus-visible{outline:2px solid ${MAGENTA} !important}
+.nlr-rk-2p .nlr-rk-start{left:50%;right:auto;transform:translateX(-50%);text-align:center;top:calc(var(--tr-chrome-b, 56px) + 150px);max-width:min(480px,calc(100% - 24px))}
+.nlr-rk-2p.narrow .nlr-rk-start{top:calc(var(--tr-chrome-b, 56px) + 92px)}
+.nlr-rk-2p.narrow .nlr-rk-start p{display:none}
 `
 
 const ICON_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>'
@@ -520,7 +523,8 @@ export function createRaket({ engine }) {
       Object.assign(pl.dom.el.style, { left: `${vp.x}px`, top: `${vp.y}px`, width: `${vp.w}px`, height: `${vp.h}px` })
       for (const sel of ['.nlr-rk-who', '.nlr-rk-pnl']) {
         const cEl = pl.dom.el.querySelector(sel)
-        cEl.style.top = mode === '2p' ? (vp.y === 0 ? '60px' : '12px') : '' // plats för växlarna överst
+        const chromeB = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tr-chrome-b')) || 56
+        cEl.style.top = mode === '2p' ? (vp.y === 0 ? `${Math.round(chromeB + 8)}px` : '12px') : ''
         cEl.style.bottom = mode === '2p' ? 'auto' : ''
       }
       c.save()

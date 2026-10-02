@@ -19,8 +19,8 @@ const css = `
 .nlr-duo-card{position:absolute;box-sizing:border-box;padding:6px 12px;border-radius:16px}
 .nlr-duo-card small{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8a8478;font-weight:600}
 .nlr-duo-card b{display:block;font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
-.nlr-duo-who{left:12px;top:12px}
-.nlr-duo-pnl{right:12px;top:12px;text-align:right}
+.nlr-duo-who{left:12px;top:12px;max-width:42%}
+.nlr-duo-pnl{right:12px;top:12px;text-align:right;max-width:calc(100% - 128px)}
 .nlr-duo-ctl{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;width:min(560px,calc(100% - 20px));display:flex;flex-direction:column;gap:6px}
 .nlr-duo-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .nlr-duo-row button{min-width:0;padding:0 6px}
@@ -93,7 +93,8 @@ export function createDuo({ engine: main, skinFrom }) {
     halves.forEach((hv, i) => {
       Object.assign(hv.el.style, { left: `${rs[i].x}px`, top: `${rs[i].y}px`, width: `${rs[i].w}px`, height: `${rs[i].h}px` })
       // halvor som börjar överst lämnar plats för växlarna (centrerade överst)
-      const top = rs[i].y === 0 ? '60px' : '12px'
+      const chromeB = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tr-chrome-b')) || 60
+      const top = rs[i].y === 0 ? `${Math.round(chromeB + 8)}px` : '12px'
       hv.el.querySelectorAll('.nlr-duo-card').forEach((c) => (c.style.top = top))
     })
     const r = rs[1]
@@ -298,6 +299,17 @@ export function createDuo({ engine: main, skinFrom }) {
       destroy()
     },
     visible: () => visible,
+    placeCards() {
+      if (!halves.length) return
+      const rs = rects()
+      const chromeB = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tr-chrome-b')) || 60
+      halves.forEach((hv, i) => {
+        const top = rs[i].y === 0 ? `${Math.round(chromeB + 8)}px` : '12px'
+        hv.el.querySelectorAll('.nlr-duo-card').forEach((c) => {
+          c.style.top = top
+        })
+      })
+    },
     engines: () => halves.map((h) => h.eng),
     hud: (i) => halves[i]?.hud ?? null,
     act,

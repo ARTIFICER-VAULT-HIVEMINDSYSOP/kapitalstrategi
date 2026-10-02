@@ -104,7 +104,7 @@ function reducedMotion() {
 }
 
 const css = `
-.tr-fas{position:fixed;z-index:70;left:50%;top:88px;transform:translateX(-50%);width:min(440px,calc(100vw - 24px));box-sizing:border-box;background:rgba(246,242,234,.97);color:#1c1915;border:1px solid rgba(28,25,21,.16);border-radius:16px;padding:14px 16px 16px;font:500 14px/1.45 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;box-shadow:0 10px 30px rgba(28,25,21,.12)}
+.tr-fas{position:fixed;z-index:70;left:50%;top:calc(var(--tr-chrome-b, 72px) + 10px);transform:translateX(-50%);width:min(440px,calc(100vw - 24px));box-sizing:border-box;background:rgba(246,242,234,.97);color:#1c1915;border:1px solid rgba(28,25,21,.16);border-radius:16px;padding:14px 16px 16px;font:500 14px/1.45 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;box-shadow:0 10px 30px rgba(28,25,21,.12)}
 .tr-fas[data-place="bottom"]{top:auto;bottom:12px;left:12px;right:12px;width:auto;transform:none}
 .tr-fas[hidden]{display:none !important}
 .tr-fas-badge{margin:0 0 4px;font:700 12px/1.2 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.08em}
