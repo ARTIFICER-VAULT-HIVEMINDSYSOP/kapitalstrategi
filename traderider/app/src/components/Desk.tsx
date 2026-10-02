@@ -209,7 +209,7 @@ export function Desk({ candles, source, label, autoRun = true, brokerEnabled = t
     <div data-desk="traderider" className="min-h-screen overflow-x-clip bg-paper text-ink">
       <header className="mx-auto flex max-w-[1100px] flex-wrap items-end justify-between gap-3 border-b border-brass px-3 py-4">
         <div className="min-w-0">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-ink/60">Paper desk · NVDA</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-ink/60">Utkastdisk · NVDA</p>
           <h1 className="font-display text-4xl font-medium leading-none">Traderider</h1>
         </div>
         <div className="min-w-0 text-left sm:text-right">

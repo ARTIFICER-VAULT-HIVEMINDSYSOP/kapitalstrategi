@@ -39,7 +39,7 @@ export function Blotter({ state, onReset }: { state: DeskState; onReset: () => v
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="font-display text-2xl leading-none">Book</h2>
-          <p className="mt-1 text-xs text-ink/60">Paper account. Whole shares. Fills at the touch plus slippage.</p>
+          <p className="mt-1 text-xs text-ink/60">Utkast. Whole shares. Fills at the touch plus slippage.</p>
         </div>
         <button
           type="button"
