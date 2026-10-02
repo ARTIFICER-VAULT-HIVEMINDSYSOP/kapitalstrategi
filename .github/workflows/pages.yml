@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Omit practice app source from the Pages upload
-        run: rm -rf traderider/app
+        run: rm -rf traderider/app traderider/docs/raket-akademin/_intern
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
