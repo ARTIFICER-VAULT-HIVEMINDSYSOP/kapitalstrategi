@@ -1,0 +1,29 @@
+{
+  "edition": "2026-10-01",
+  "date": "2026-10-01",
+  "dateLabel": {
+    "sv": "1 oktober 2026"
+  },
+  "slug": "guld",
+  "order": 3,
+  "translations": {
+    "sv": {
+      "title": "Guld",
+      "ingress": "DI spot (1 okt, visad tid 12:23): 4 162,47 dollar/uns (+0,13 %; −2,60 % på en vecka).",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "DI spot (1 okt, visad tid **12:23**): **4 162,47 dollar/uns** (**+0,13 %**; **−2,60 %** på en vecka)."
+        },
+        {
+          "type": "p",
+          "text": "Reuters (kl **06:17**): spot **4 175,19 dollar/uns** (**+0,5 %**) efter ett fall på över **6 %** i september. Drivkraft: amerikansk inflation för augusti steg mindre än väntat, och enligt Reuters uppdatering kl **13:59** prissätter marknaden **37 %** sannolikhet för en Fed-höjning i oktober och **89 %** för en höjning i december. Nästa hållpunkt: USA:s jobbrapport för september på fredag."
+        },
+        {
+          "type": "p",
+          "text": "Källor: [DI råvaror 1 okt](https://www.di.se/ravaror/) · [Reuters/MarketScreener 1 okt: guldet och Fed](https://se.marketscreener.com/nyheter/guldpriset-stiger-n-got-efter-dampad-usa-inflation-2013266048-forvantningar-p-fed-hojning-i-okt-ce785ad3dd88fe2c)"
+        }
+      ]
+    }
+  }
+}

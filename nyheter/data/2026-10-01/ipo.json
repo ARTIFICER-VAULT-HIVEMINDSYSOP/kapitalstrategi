@@ -1,0 +1,85 @@
+{
+  "edition": "2026-10-01",
+  "date": "2026-10-01",
+  "dateLabel": {
+    "sv": "1 oktober 2026"
+  },
+  "slug": "ipo",
+  "order": 1,
+  "translations": {
+    "sv": {
+      "title": "IPO / nytt på börsen",
+      "ingress": "NordAmps (NRDAMP) — första handelsdag 30 sep (First North).",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "**NordAmps (NRDAMP)** — första handelsdag **30 sep** (First North). Teckningskurs **15,50 kr**. Under premiärdagen handlades aktien mellan **8,22** och **13,95 kr** och stängde på **12,00 kr**, drygt 20 procent under teckningskursen (CNBC; EFN rapporterade fall på upp till 40 procent under förmiddagen). I dag kl **12:05**: **10,72 kr** (**−10,67 %**). Utfall (**23 sep**): **4 424 678** nya aktier (**91,2 %** av erbjudandet), ca **68,6 MSEK** brutto, cirka **520** nya aktieägare. Halvledare / Lund. Premiären visar hur snabbt en nyintroduktion kan röra sig: samma rörelse som kan ge vinst kan också ge förlust redan första timmen."
+        },
+        {
+          "type": "p",
+          "text": "Källa: [EFN 30 sep](https://efn.se/fiaskodebut-for-svenska-halvledarbolaget-rasar-40-procent) · [CNBC NRDAMP](https://www.cnbc.com/quotes/NRDAMP-SE) · [MFN NordAmps utfall 23 sep](https://mfn.se/all/a/nordamps/nordamps-welcomes-new-shareholders-ahead-of-the-planned-listing-at-nasdaq-first-north-growth-market)"
+        },
+        {
+          "type": "p",
+          "text": "**Foremont Group (FOMO)** — **teckningsperioden slutar i morgon 2 okt** (NGM Growth Market). Teckningskurs **10 kr**; erbjudandet ger **54,6 MSEK** vid full teckning (upp till ca **66,6 MSEK** med utökning). Teckningsförbindelser ca **40,8 MSEK** (**61,3 %**). Utfall väntas **5 okt**, likviddag **8 okt**, preliminär första handelsdag **14 okt**. Investeringar i småbolag och emissionsdata (äger bland annat Nyemissioner.se)."
+        },
+        {
+          "type": "p",
+          "text": "Källa: [MFN Foremont 18 sep](https://mfn.se/all/a/foremont/foremont-group-avser-att-notera-bolagets-aktier-pa-ngm-growth-market-och-offentliggor-informationsmemorandum)"
+        },
+        {
+          "type": "p",
+          "text": "**Avionero** — noteringen på Spotlight, planerad till **13 okt**, är avbruten. Emissionen nådde under miniminivån **6 MSEK** (erbjudandet var **7,2 MSEK**, hälften säkrat genom teckningsförbindelser). Anmälda investerare slipper betala."
+        },
+        {
+          "type": "p",
+          "text": "Källa: [Dagens PS 1 okt](https://www.dagensps.se/bors-finans/borsnoteringar/avionero-staller-in-borsnoteringen-fick-inte-in-pengarna/)"
+        },
+        {
+          "type": "p",
+          "text": "**Linjemontage (LMGAB)** — handel pågår sedan **25 sep** (Nasdaq Stockholm Mid Cap). Erbjudandepris **46 kr**. I dag kl **12:07** (DI, 15 min fördröjt): **48,25 kr** (**+3,88 %**), dagens intervall **46,50–48,35 kr**; aktien ligger alltså över erbjudandepriset just nu, och en nykomlings kurs kan lika snabbt gå under det igen. Stängning 30 sep: **saknas**."
+        },
+        {
+          "type": "p",
+          "text": "Källa: [DI Linjemontage](https://www.di.se/bors/aktier/linjemontage-i-grastorp-8837447/) · [MFN Linjemontage första handelsdag](https://mfn.se/all/a/linjemontage/forsta-dag-for-handel-i-linjemontages-aktier-pa-nasdaq-stockholm)"
+        },
+        {
+          "type": "p",
+          "text": "**Dormy (DORMY)** — handel sedan **24 sep** (First North Premier). Erbjudandepris **70 kr**. I dag kl **12:00** (DI, 15 min fördröjt): **70,70 kr** (**±0,00 %**), nära erbjudandepriset — utrymme för både uppgång och nedgång."
+        },
+        {
+          "type": "p",
+          "text": "Källa: [DI Dormy](https://www.di.se/bors/aktier/dormy-8836011/) · [Affärsvärlden 24 sep](https://www.affarsvarlden.se/artikel/dormy-overtecknat-infor-borsdebut--borjar-handlas-idag)"
+        },
+        {
+          "type": "p",
+          "text": "**Svevik Industri (SVEVIK)** — handel sedan **23 sep** (First North Premier). Teckningskurs **55 kr**. Föregående stängning **53,00 kr**; i dag kl **12:22**: **52,60 kr** (**−0,75 %**)."
+        },
+        {
+          "type": "p",
+          "text": "Källa: [CNBC SVEVIK](https://www.cnbc.com/quotes/SVEVIK-SE) · [MFN Svevik](https://mfn.se/a/svevikindustri/svevik-industris-erbjudande-kraftigt-overtecknat-och-utokningsoptionen-nyttjas)"
+        },
+        {
+          "type": "p",
+          "text": "**Axvik Group (AXVIK)** — handel sedan **21 sep** (First North). Teckningskurs **55 kr**. Föregående stängning **60,90 kr**; i dag kl **12:12**: **61,70 kr** (**+1,31 %**). Aktien ligger över teckningskursen, och spannet sedan debuten (**51,00–77,80 kr**) visar hur stor risken för snabba fall är i samma papper. Flyg & försvar."
+        },
+        {
+          "type": "p",
+          "text": "Källa: [CNBC AXVIK](https://www.cnbc.com/quotes/AXVIK-SE) · [MFN Axvik](https://mfn.se/all/a/axvik/axvik-group-offentliggor-utfallet-av-erbjudandet-samt-meddelar-att-handel-pa-nasdaq-first-north-growth-market-inleds-den-21-september)"
+        },
+        {
+          "type": "p",
+          "text": "**Globalt: Airtel Money (London)** — fast pris **1,96 pund** per aktie, värdering ca **5,3 mdr pund**; befintliga ägare säljer **270 miljoner** aktier (ca **529 miljoner pund**). Handel på Londonbörsen väntas starta **9 okt** — enligt Bloomberg Londons största börsintroduktion på fem år."
+        },
+        {
+          "type": "p",
+          "text": "Källa: [Business Today/Bloomberg 1 okt](https://www.businesstoday.in/markets/ipo-corner/story/airtel-money-ipo-londons-biggest-in-5-years-at-ps1-96-company-valued-at-ps5-3-billion-559067-2026-10-01)"
+        },
+        {
+          "type": "p",
+          "text": "IPO-översikt: [IPO-kalender](/nyheter#ipo-cal-heading)"
+        }
+      ]
+    }
+  }
+}
