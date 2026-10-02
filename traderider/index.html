@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0a1628" />
-    <title>Traderider · NVDA Rider, Raket och Akademin · Kapital &amp; Strategi</title>
-    <meta name="description" content="Traderider: öva med NVDA Rider, Raket och Akademin på simulerade kurser – inte verkliga marknadsdata. Inga riktiga pengar, inget konto, ingen inloggning." />
+    <title data-i18n="land.title">Traderider · NVDA Rider, Raket och Akademin · Kapital &amp; Strategi</title>
+    <meta data-i18n="land.desc" name="description" content="Traderider: öva med NVDA Rider, Raket och Akademin på simulerade kurser – inte verkliga marknadsdata. Inga riktiga pengar, inget konto, ingen inloggning." />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -54,14 +54,18 @@
       @media (max-width:820px){.grid{grid-template-columns:1fr}.art{height:120px}.brand b{font-size:1.25rem}.main-nav a{padding:.45rem .65rem;font-size:.9rem}}
       @media (prefers-reduced-motion:reduce){.mode{transition:none}.mode:hover{transform:none}}
       .simlabel{display:inline-block;margin:0 0 12px;padding:5px 12px;border-radius:999px;border:1px solid rgba(118,185,0,.55);background:rgba(118,185,0,.12);font-weight:600;font-size:13px;letter-spacing:.01em}
+      .lang-switcher{display:flex;gap:4px}
+      .lang-switcher-btn{border:1px solid var(--border);background:transparent;color:var(--text);border-radius:8px;padding:.3rem .5rem;font-weight:700;cursor:pointer}
+      .lang-switcher-btn.active{background:var(--gold);color:#0a1628}
     </style>
   </head>
   <body>
     <div class="wrap">
       <header class="top">
-        <a class="brand" href="/" aria-label="Kapital &amp; Strategi – startsidan"><span class="badge">K&amp;S</span><b>Kapital &amp; Strategi</b></a>
+        <a class="brand" href="/" data-i18n-aria="brand.home" aria-label="Kapital &amp; Strategi – startsidan"><span class="badge">K&amp;S</span><b>Kapital &amp; Strategi</b></a>
+        <div data-lang-slot></div>
       </header>
-      <nav class="main-nav" aria-label="Huvudmeny">
+      <nav class="main-nav" data-i18n-aria="nav.menu" aria-label="Huvudmeny">
         <a href="/">Start</a>
         <a href="/player-value">Player Value</a>
         <a href="/tradingskolan">Tradingskolan</a>
@@ -74,55 +78,54 @@
 
       <main>
         <section class="hero">
-          <p class="eyebrow">Traderider · övning · simulerade kurser</p>
-          <h1>Traderider</h1>
-          <p class="simlabel" role="note">Simulerade kurser – inte verkliga marknadsdata</p>
-          <p class="lead">Tre lägen på samma simulerade kursserie: NVDA Rider, Raket och Akademin. Namnet är bara spelets namn – kurserna är inte NVDA:s. Inga riktiga pengar,
-            ingen inloggning och ingen mäklare. Alla utfall är simuleringar – övningen kan både gå bra och dåligt, och inget är ett löfte om avkastning.</p>
+          <p class="eyebrow" data-i18n="land.kicker">Traderider · övning · simulerade kurser</p>
+          <h1 data-i18n="land.h1">Traderider</h1>
+          <p class="simlabel" role="note" data-i18n="sim.label">Simulerade kurser – inte verkliga marknadsdata</p>
+          <p class="lead" data-i18n="land.lead">Tre lägen på samma simulerade kursserie: NVDA Rider, Raket och Akademin. Namnet är bara spelets namn – kurserna är inte en verklig aktie. Inga riktiga pengar, ingen inloggning och ingen mäklare. Alla utfall är simuleringar – övningen kan både gå bra och dåligt, och inget är ett löfte om avkastning.</p>
         </section>
 
-        <p class="note"><span>Skola först: lär dig risk, stopp och positionsstorlek innan du övar med verktygen.</span>
-          <a href="/tradingskolan">Öppna Tradingskolan →</a></p>
+        <p class="note"><span data-i18n="land.note">Skola först: lär dig risk, stopp och positionsstorlek innan du övar med verktygen.</span>
+          <a href="/tradingskolan" data-i18n="land.school">Öppna Tradingskolan →</a></p>
 
         <div class="grid">
           <a class="mode" href="/traderider/spel/#nvda-rider">
-            <div class="art cover" role="img" aria-label="NVDA Rider"></div>
+            <div class="art cover" role="img" data-i18n-aria="mode.nvda" aria-label="NVDA Rider"></div>
             <div class="body">
-              <p class="tag">Läge 1 · åk på rälsen</p>
-              <h2>NVDA Rider</h2>
-              <p class="d">Tåget åker längs kurslinjen på Bollinger-räls: rälsen ovanför är BUY (long), rälsen under är SELL (short) och FLAT stänger.
-                Hävstången gör både uppgången och nedgången större – hoppet om ett bra åk och risken för ett dåligt följs alltid åt.</p>
-              <p class="keys">BUY W / ↑ · SELL S / ↓ · FLAT ␣ eller 0 · hävstång A / ← och D / → · P paus</p>
-              <span class="cta">Starta NVDA Rider →</span>
+              <p class="tag" data-i18n="land.mode1">Läge 1 · åk på rälsen</p>
+              <h2 data-i18n="mode.nvda">NVDA Rider</h2>
+              <p class="d" data-i18n="land.nvdaBody">Tåget åker längs kurslinjen på Bollinger-räls: rälsen ovanför är KÖP (lång), rälsen under är SÄLJ (kort) och STÄNG avslutar. Hävstången gör både uppgången och nedgången större – hoppet om ett bra åk och risken för ett dåligt följs alltid åt.</p>
+              <p class="keys" data-i18n="land.nvdaKeys">KÖP W / ↑ · SÄLJ S / ↓ · STÄNG ␣ eller 0 · hävstång A / ← och D / → · P paus</p>
+              <span class="cta" data-i18n="land.nvdaCta">Starta NVDA Rider →</span>
             </div>
           </a>
           <a class="mode" href="/traderider/spel/#raket">
-            <div class="art raket" role="img" aria-label="Raket"></div>
+            <div class="art raket" role="img" data-i18n-aria="mode.raket" aria-label="Raket"></div>
             <div class="body">
-              <p class="tag">Läge 2 · tiden uppåt</p>
-              <h2>Raket</h2>
-              <p class="d">Samma kurser och räls, vridna: tiden går uppåt och högre pris ligger åt höger. Raketen får fart när kursen går
-                med dig och möter asteroider när den går emot dig – möjligheten och risken syns i samma bild.</p>
-              <p class="keys">BUY W / ↑ · SELL S / ↓ · FLAT ␣ · hävstång A / D · 1 eller 2 spelare</p>
-              <span class="cta">Starta Raket →</span>
+              <p class="tag" data-i18n="land.mode2">Läge 2 · tiden uppåt</p>
+              <h2 data-i18n="mode.raket">Raket</h2>
+              <p class="d" data-i18n="land.raketBody">Samma kurser och räls, vridna: tiden går uppåt och högre pris ligger åt höger. Raketen får fart när kursen går med dig och möter asteroider när den går emot dig – möjligheten och risken syns i samma bild.</p>
+              <p class="keys" data-i18n="land.raketKeys">KÖP W / ↑ · SÄLJ S / ↓ · STÄNG ␣ · hävstång A / D · 1 eller 2 spelare</p>
+              <span class="cta" data-i18n="land.raketCta">Starta Raket →</span>
             </div>
           </a>
           <a class="mode" href="/traderider/spel/#akademin">
-            <div class="art akademin" role="img" aria-label="Akademin"></div>
+            <div class="art akademin" role="img" data-i18n-aria="mode.akademin" aria-label="Akademin"></div>
             <div class="body">
-              <p class="tag">Läge 3 · fyra lektioner</p>
-              <h2>Akademin</h2>
-              <p class="d">Risk och positionsstorlek, stop-loss och take-profit, Bollingerband och RSI på simulerade kurser.
-                Varje klarat moment ger en utmärkelse för lärandet – den lovar ingen avkastning, och varje affär kan lika gärna gå med förlust.</p>
-              <p class="keys">Framstegen sparas bara i din webbläsare.</p>
-              <span class="cta">Öppna Akademin →</span>
+              <p class="tag" data-i18n="land.mode3">Läge 3 · fyra lektioner</p>
+              <h2 data-i18n="mode.akademin">Akademin</h2>
+              <p class="d" data-i18n="land.akBody">Risk och positionsstorlek, stop-loss och take-profit, Bollingerband och RSI på simulerade kurser. Varje klarat moment ger en utmärkelse för lärandet – den lovar ingen avkastning, och varje affär kan lika gärna gå med förlust.</p>
+              <p class="keys" data-i18n="land.akKeys">Framstegen sparas bara i din webbläsare.</p>
+              <span class="cta" data-i18n="land.akCta">Öppna Akademin →</span>
             </div>
           </a>
         </div>
       </main>
 
-      <footer>Övning på simulerade kurser – inte verkliga marknadsdata. Inga riktiga pengar, ingen mäklare, inget konto, inga personuppgifter.
-        Alla utfall är simuleringar och inget löfte om avkastning. Inte investeringsrådgivning.</footer>
+      <footer data-i18n="land.foot">Övning på simulerade kurser – inte verkliga marknadsdata. Inga riktiga pengar, ingen mäklare, inget konto, inga personuppgifter. Alla utfall är simuleringar och inget löfte om avkastning. Inte investeringsrådgivning.</footer>
     </div>
+    <script type="module">
+      import { bootStatic } from '/traderider/spel/lagen/i18n.js'
+      bootStatic()
+    </script>
   </body>
 </html>

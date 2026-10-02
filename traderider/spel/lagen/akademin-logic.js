@@ -5,42 +5,29 @@
  * (motorns track.points: price, upper, lower, mid, t) – utan någon annan motor, inget övningssaldo,
  * ingen kurs-slippage. Positionsstorlek uttrycks som andel av saldot (inget påhittat belopp).
  * Nytt: utmärkelser per klarat delmoment, sparade lokalt (localStorage), ingen inloggning.
+ * Texter hämtas från språkresursen när de visas.
  */
+import { t } from './i18n.js'
+
 export const STORE_KEY = 'nvda-line-akademin-v1'
 export const MAX_RISK_PCT = 2
 export const RISK_CHOICES = [0.5, 1, 2, 5]
 export const STOP_SIGMAS = [1, 1.5, 2]
 export const TP_R_MULTIPLES = [1, 2, 3]
+
 export const RSI_HIGH = 70
 export const RSI_LOW = 30
 
-export const LESSONS = {
-  1: {
-    title: 'Risk och positionsstorlek',
-    text: 'Innan du tänker på vinst bestämmer du hur mycket du högst får förlora på en affär. En vanlig tumregel är att aldrig riskera mer än 1–2 % av saldot per affär. Risken per aktie är avståndet mellan ingång och stopp; positionsstorleken blir riskbudgeten delad med risken per aktie. Då blir en förlust hanterbar, oavsett hur säker du känner dig.',
-    task: `Välj en risk på högst ${MAX_RISK_PCT} % av saldot, välj stoppavstånd och räkna fram hur stor del av saldot positionen blir.`,
-  },
-  2: {
-    title: 'Stop-loss och take-profit',
-    text: 'En stop-loss är kursen där du i förväg bestämt att affären var fel och ska stängas. En take-profit är kursen där du tar hem. Båda sätts innan du öppnar — inte när känslorna tagit över. Förhållandet mellan mål och risk (R) visar om upplägget är rimligt: 2R betyder att målet ligger dubbelt så långt bort som stoppet.',
-    task: 'Välj riktning, sätt både stop-loss och take-profit, öppna övningsaffären och låt simuleringen köra tills en av dem träffas.',
-  },
-  3: {
-    title: 'Bollingerband',
-    text: 'Bollingerbanden (20 perioder, 2 standardavvikelser) bildar en korridor runt kursen. Den streckade mittlinjen är 20-perioders glidande medelvärde. Banden ovanför och under kursen visar när kursen rört sig ovanligt långt från medel. När banden drar ihop sig — en squeeze — är rörelsen ovanligt lugn; ofta följer en större rörelse, men banden säger inte åt vilket håll.',
-    task: 'Pausa (P) och markera 1) en rälsberöring — kursen vid övre eller undre bandet, och 2) en squeeze — de markerade zonerna där bandbredden är som smalast.',
-  },
-  4: {
-    title: 'RSI',
-    text: 'RSI (14) jämför styrkan i de senaste uppgångarna med nedgångarna på en skala 0–100. Över 70 kallas överköpt, under 30 översålt. RSI ensamt är inget köp- eller säljbesked — det blir användbart tillsammans med banden: kurs vid övre räls och RSI över 70 är ett sträckt läge där nästa steg ofta är vila eller återgång mot mittlinjen.',
-    task: "Vänta tills RSI går över 70 eller under 30, tryck 'Läs läget' och välj tolkningen som stämmer med både band och RSI.",
-  },
+export function lessonContent(id) {
+  return {
+    title: t(`lesson.${id}.title`),
+    text: t(`lesson.${id}.text`),
+    task: t(`lesson.${id}.task`, { max: MAX_RISK_PCT }),
+  }
 }
 
-export const READ_TEXT = {
-  stretched_up: 'Sträckt uppåt: kursen vid övre bandet och RSI ≥ 70. Nästa steg brukar vara vila eller återgång mot mittlinjen — öva på att inte jaga köp här.',
-  stretched_down: 'Sträckt nedåt: kursen vid undre bandet och RSI ≤ 30. Nästa steg brukar vara vila eller återgång mot mittlinjen — öva på att inte jaga sälj här.',
-  rsi_only: 'RSI är extremt men kursen är inne i korridoren. Signalerna säger olika — vänta på bekräftelse från banden.',
+export function readText(key) {
+  return t(`read.${key}`)
 }
 
 export const XP_TABLE = {
@@ -73,21 +60,26 @@ export function lessonUnlocked(id, earned) {
 /* ---------- utmärkelser ---------- */
 // Ett märke per klarat delmoment + en medalj per klar lektion. Raden säger vad man övat på – aldrig pengar, vinst eller riktig handel.
 export const AWARDS = [
-  { id: 'm_l1_risk', kind: 'märke', lesson: 1, needs: ['l1_risk'], title: 'Riskbudget', learned: 'Du valde en risk inom 2 %-regeln innan du tänkte på utfallet.' },
-  { id: 'm_l1_size', kind: 'märke', lesson: 1, needs: ['l1_size'], title: 'Positionsstorlek', learned: 'Du räknade fram positionens storlek ur risk och stoppavstånd.' },
-  { id: 'm_l2_bracket', kind: 'märke', lesson: 2, needs: ['l2_bracket'], title: 'Stopp och mål', learned: 'Du satte både stop-loss och take-profit innan affären öppnades.' },
-  { id: 'm_l2_open', kind: 'märke', lesson: 2, needs: ['l2_open'], title: 'Plan före ingång', learned: 'Du öppnade övningsaffären först när planen var komplett.' },
-  { id: 'm_l2_closed', kind: 'märke', lesson: 2, needs: ['l2_closed'], title: 'Följde planen', learned: 'Du lät stopp eller mål avgöra – processen räknas, inte utfallet.' },
-  { id: 'm_l3_touch', kind: 'märke', lesson: 3, needs: ['l3_touch'], title: 'Rälsberöring', learned: 'Du kände igen när kursen står vid övre eller undre bandet (%B).' },
-  { id: 'm_l3_squeeze', kind: 'märke', lesson: 3, needs: ['l3_squeeze'], title: 'Squeeze', learned: 'Du hittade en squeeze – ovanligt smala band, utan att veta riktningen.' },
-  { id: 'm_l4_extreme', kind: 'märke', lesson: 4, needs: ['l4_extreme'], title: 'RSI-extrem', learned: 'Du väntade in RSI över 70 eller under 30 innan du läste läget.' },
-  { id: 'm_l4_read_ok', kind: 'märke', lesson: 4, needs: ['l4_read_ok'], title: 'Läste läget', learned: 'Du tolkade band och RSI tillsammans – en bild av läget, inget löfte.' },
-  { id: 'medalj_1', kind: 'medalj', lesson: 1, needs: LESSON_DONE[1], title: 'Lektion 1 · Risk', learned: 'Risk och positionsstorlek: förlusten bestäms innan affären.' },
-  { id: 'medalj_2', kind: 'medalj', lesson: 2, needs: LESSON_DONE[2], title: 'Lektion 2 · Stopp och mål', learned: 'Stop-loss, take-profit och R sätts innan känslorna tar över.' },
-  { id: 'medalj_3', kind: 'medalj', lesson: 3, needs: LESSON_DONE[3], title: 'Lektion 3 · Bollingerband', learned: 'Korridoren, rälsberöringar och squeeze – och vad banden inte säger.' },
-  { id: 'medalj_4', kind: 'medalj', lesson: 4, needs: LESSON_DONE[4], title: 'Lektion 4 · RSI', learned: 'RSI tillsammans med banden, aldrig ensamt som besked.' },
+  { id: 'm_l1_risk', kind: 'märke', lesson: 1, needs: ['l1_risk'] },
+  { id: 'm_l1_size', kind: 'märke', lesson: 1, needs: ['l1_size'] },
+  { id: 'm_l2_bracket', kind: 'märke', lesson: 2, needs: ['l2_bracket'] },
+  { id: 'm_l2_open', kind: 'märke', lesson: 2, needs: ['l2_open'] },
+  { id: 'm_l2_closed', kind: 'märke', lesson: 2, needs: ['l2_closed'] },
+  { id: 'm_l3_touch', kind: 'märke', lesson: 3, needs: ['l3_touch'] },
+  { id: 'm_l3_squeeze', kind: 'märke', lesson: 3, needs: ['l3_squeeze'] },
+  { id: 'm_l4_extreme', kind: 'märke', lesson: 4, needs: ['l4_extreme'] },
+  { id: 'm_l4_read_ok', kind: 'märke', lesson: 4, needs: ['l4_read_ok'] },
+  { id: 'medalj_1', kind: 'medalj', lesson: 1, needs: LESSON_DONE[1] },
+  { id: 'medalj_2', kind: 'medalj', lesson: 2, needs: LESSON_DONE[2] },
+  { id: 'medalj_3', kind: 'medalj', lesson: 3, needs: LESSON_DONE[3] },
+  { id: 'medalj_4', kind: 'medalj', lesson: 4, needs: LESSON_DONE[4] },
 ]
-export const AWARD_NOTE = 'En utmärkelse visar vad du har övat på i Akademin. Den är ingen licens och inget råd, och den har ingenting med pengar, vinst i handel eller riktig handel att göra.'
+export function awardView(a) {
+  return { ...a, title: t(`award.${a.id}.title`), learned: t(`award.${a.id}.learned`), kindLabel: t(a.kind === 'medalj' ? 'kind.medal' : 'kind.mark') }
+}
+export function awardNote() {
+  return t('award.note')
+}
 
 export function awardsFor(earned) {
   return AWARDS.filter((a) => a.needs.every((k) => earned.has(k))).map((a) => a.id)
@@ -149,11 +141,11 @@ export function positionShare(riskPct, entry, stop) {
   return { perSharePct, sharePct: Math.min(100, raw), capped: raw > 100 }
 }
 export function openPractice(points, index, side, stop, target) {
-  if (stop == null || target == null) return { error: 'Sätt både stop-loss och take-profit innan du öppnar.' }
+  if (stop == null || target == null) return { error: 'ak.err.both' }
   const entry = points[index]?.price
-  if (!(entry > 0)) return { error: 'Kurs saknas här.' }
-  if (side === 'long' && !(stop < entry && target > entry)) return { error: 'Long: stop under och mål över ingångskursen.' }
-  if (side === 'short' && !(stop > entry && target < entry)) return { error: 'Short: stop över och mål under ingångskursen.' }
+  if (!(entry > 0)) return { error: 'ak.err.price' }
+  if (side === 'long' && !(stop < entry && target > entry)) return { error: 'ak.err.long' }
+  if (side === 'short' && !(stop > entry && target < entry)) return { error: 'ak.err.short' }
   return { side, entry, stop, target, openedAt: index, checkedTo: index }
 }
 /** Går igenom punkterna efter senaste kontroll (stängningskurser); stopp kontrolleras före mål. */

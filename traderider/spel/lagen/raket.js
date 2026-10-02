@@ -14,7 +14,10 @@
  * prefers-reduced-motion: ingen parallax, inga partiklar, statiska stjärnor och scanlines, ingen glitch.
  */
 import { keyAction, PREVENT_DEFAULT, HINTS } from './keys.js'
-import { simTid, SIM_ETIKETT } from './simtid.js'
+import { simTid } from './simtid.js'
+import { t, onLang, helpLine } from './i18n.js'
+import { stepSide, readSide } from './styrmotor.js'
+import { mountEntrySnap, bindStepGestures } from './snapp.js'
 
 // HUD-palett (kontrast mot BG_PANEL kontrolleras i test/raket-stil.test.mjs – WCAG AA)
 const BG_TOP = '#0d1238' // djupt marinblå
@@ -283,18 +286,45 @@ export function createRaket({ engine }) {
   document.head.appendChild(style)
   const root = document.createElement('div')
   root.className = 'nlr-raket'
-  root.setAttribute('aria-label', 'Raket – NVDA-grafen vriden på höjden')
+  root.setAttribute('aria-label', t('rk.aria'))
   root.innerHTML = `
-    <canvas aria-label="Raket: tiden går uppåt, högre pris åt höger. Grön BUY-räls till höger, röd SELL-räls till vänster, flat längs mittlinjen."></canvas>
+    <canvas></canvas>
     <div class="nlr-rk-scan" aria-hidden="true"></div>
     <div class="nlr-rk-div"></div>
-    <div class="nlr-rk-card nlr-rk-start"><h3>Raket</h3><p>Samma simulerade kurser och räls som NVDA Rider, vriden: tiden uppåt, högre pris åt höger.</p><p data-k="keys"></p></div>
-    <div class="nlr-rk-card nlr-rk-end"><h3>Perioden slut</h3><p data-k="endTxt"></p><p>Övning på simulerade kurser – samma rörelse kunde lika gärna ha gått emot dig.</p><button type="button" data-k="again">Åk igen</button></div>`
+    <div class="nlr-rk-card nlr-rk-start"><h3></h3><p data-k="startBody"></p><p data-k="keys"></p></div>
+    <div class="nlr-rk-card nlr-rk-end"><h3 data-k="endTitle"></h3><p data-k="endTxt"></p><button type="button" data-k="again"></button></div>`
   document.body.appendChild(root)
   const canvas = root.querySelector('canvas')
   const divider = root.querySelector('.nlr-rk-div')
   const startCard = root.querySelector('.nlr-rk-start')
   const endCard = root.querySelector('.nlr-rk-end')
+  let entrySnap = null
+  function relabel() {
+    root.setAttribute('aria-label', t('rk.aria'))
+    canvas.setAttribute('aria-label', t('rk.canvas'))
+    startCard.querySelector('h3').textContent = t('mode.raket')
+    const body = startCard.querySelector('[data-k="startBody"]')
+    if (body) body.textContent = t('rk.startBody')
+    const keys = root.querySelector('[data-k="keys"]')
+    if (keys) keys.textContent = helpLine(mode)
+    endCard.querySelector('[data-k="endTitle"]').textContent = t('rk.endTitle')
+    endCard.querySelector('[data-k="again"]').textContent = t('rk.again')
+    if (endCard.classList.contains('on')) endCard.querySelector('[data-k="endTxt"]').textContent = t('end.body')
+    for (const pl of players) {
+      const q = pl.dom.q
+      q('buyLbl').textContent = t('btn.buy')
+      q('sellLbl').textContent = t('btn.sell')
+      q('flatLbl').textContent = t('btn.flat')
+      q('levName').textContent = t('btn.leverage')
+      q('quoteLbl').textContent = t('sim.price')
+      q('note').textContent = t('rk.note')
+      q('play').setAttribute('aria-label', t('btn.playPause'))
+      q('reset').setAttribute('aria-label', t('btn.reset'))
+      q('levDown').setAttribute('aria-label', t('btn.lower', { key: hintSet(players.indexOf(pl)).levDown }))
+      q('levUp').setAttribute('aria-label', t('btn.raise', { key: hintSet(players.indexOf(pl)).levUp }))
+      q('who').textContent = t('rk.player', { n: players.indexOf(pl) + 1 })
+    }
+  }
 
   let mode = '1p'
   let pts = []
@@ -325,24 +355,24 @@ export function createRaket({ engine }) {
     const el = document.createElement('div')
     el.className = 'nlr-rk-pl'
     el.innerHTML = `
-      <div class="nlr-rk-card nlr-rk-who" data-k="who" style="display:${mode === '2p' ? 'block' : 'none'}">Spelare ${i + 1}</div>
-      <div class="nlr-rk-card nlr-rk-quote"><small>Simulerad kurs</small><b data-k="price">—</b><span data-k="when">—</span></div>
-      <div class="nlr-rk-card nlr-rk-pnl" data-k="pnlCard"><small data-k="pnlLabel">P&amp;L · 1×</small><b data-k="pnl">—</b><span data-k="pnlSub">av positionen · övning</span>
-        <div class="nlr-rk-gas"><span data-k="gasLbl">BOOST</span><i><u data-k="gas"></u></i><span data-k="gasVal">0</span></div></div>
+      <div class="nlr-rk-card nlr-rk-who" data-k="who" style="display:${mode === '2p' ? 'block' : 'none'}"></div>
+      <div class="nlr-rk-card nlr-rk-quote"><small data-k="quoteLbl"></small><b data-k="price">—</b><span data-k="when">—</span></div>
+      <div class="nlr-rk-card nlr-rk-pnl" data-k="pnlCard"><small data-k="pnlLabel"></small><b data-k="pnl">—</b><span data-k="pnlSub"></span>
+        <div class="nlr-rk-gas"><span data-k="gasLbl"></span><i><u data-k="gas"></u></i><span data-k="gasVal">0</span></div></div>
       <div class="nlr-rk-ctl">
         <div class="nlr-rk-row">
-          <button type="button" class="nlr-rk-side buy" data-k="buy">${ICON_UP}<span>BUY</span><kbd class="nlr-rk-kbd">${h.buy}</kbd></button>
-          <button type="button" class="nlr-rk-side sell" data-k="sell">${ICON_DOWN}<span>SELL</span><kbd class="nlr-rk-kbd">${h.sell}</kbd></button>
-          <button type="button" class="nlr-rk-side flat" data-k="flat"><i data-k="flatIcon" style="display:contents">${ICON_FLAT}</i><span>FLAT</span><kbd class="nlr-rk-kbd">${h.flat}</kbd></button>
+          <button type="button" class="nlr-rk-side buy" data-k="buy">${ICON_UP}<span data-k="buyLbl"></span><kbd class="nlr-rk-kbd">${h.buy}</kbd></button>
+          <button type="button" class="nlr-rk-side sell" data-k="sell">${ICON_DOWN}<span data-k="sellLbl"></span><kbd class="nlr-rk-kbd">${h.sell}</kbd></button>
+          <button type="button" class="nlr-rk-side flat" data-k="flat"><i data-k="flatIcon" style="display:contents">${ICON_FLAT}</i><span data-k="flatLbl"></span><kbd class="nlr-rk-kbd">${h.flat}</kbd></button>
         </div>
         <div class="nlr-rk-card nlr-rk-bar">
-          <button type="button" class="play" data-k="play" aria-label="Paus/kör (P)">▶</button>
-          <button type="button" data-k="reset" aria-label="Börja om (R)">↺</button>
-          <div class="nlr-rk-lev"><button type="button" data-k="levDown" aria-label="Lägre hävstång (${h.levDown})"><kbd class="nlr-rk-kbd">${h.levDown}</kbd>−</button><span><small>LEV</small><b data-k="lev">1×</b></span><button type="button" data-k="levUp" aria-label="Högre hävstång (${h.levUp})"><kbd class="nlr-rk-kbd">${h.levUp}</kbd>+</button></div>
+          <button type="button" class="play" data-k="play">▶</button>
+          <button type="button" data-k="reset">↺</button>
+          <div class="nlr-rk-lev"><button type="button" data-k="levDown"><kbd class="nlr-rk-kbd">${h.levDown}</kbd>−</button><span><small data-k="levName"></small><b data-k="lev">1×</b></span><button type="button" data-k="levUp"><kbd class="nlr-rk-kbd">${h.levUp}</kbd>+</button></div>
           <span class="nlr-rk-info" data-k="info">—</span>
         </div>
         <div class="nlr-rk-prog"><i data-k="prog"></i></div>
-        <p class="nlr-rk-note" data-k="note">${SIM_ETIKETT} · inga riktiga pengar · vinst och förlust är lika möjliga · ingen rådgivning</p>
+        <p class="nlr-rk-note" data-k="note"></p>
       </div>`
     root.appendChild(el)
     const q = (k) => el.querySelector(`[data-k="${k}"]`)
@@ -401,10 +431,8 @@ export function createRaket({ engine }) {
     root.classList.toggle('nlr-rk-2p', mode === '2p')
     endCard.classList.remove('on')
     startCard.style.display = ''
-    root.querySelector('[data-k="keys"]').textContent =
-      mode === '2p'
-        ? 'Spelare 1: W BUY · S SELL · A/D hävstång · ␣ FLAT. Spelare 2: ↑ BUY · ↓ SELL · ←/→ hävstång · 0 FLAT. P paus · R om.'
-        : 'W/↑ BUY · S/↓ SELL · A/← D/→ hävstång · ␣ eller 0 FLAT · P paus · R börja om.'
+    if (entrySnap) entrySnap.root.style.display = mode === '2p' ? 'none' : ''
+    relabel()
   }
 
   const priceAt = (p, f = 'price') => {
@@ -434,10 +462,15 @@ export function createRaket({ engine }) {
     const price = priceAt(clock.p)
     if (kind === 'buy' || kind === 'sell') {
       if (clock.ended) return
-      pl.st = { ...switchSide(pl.st, kind, price), traded: true }
-      clock.playing = true
-      clock.started = true
-      startCard.style.display = 'none'
+      const next = stepSide(readSide(pl.st), kind === 'buy' ? 1 : -1)
+      if (next === readSide(pl.st)) return
+      pl.st = next === 'flat' ? closePosition(pl.st, price) : { ...switchSide(pl.st, next, price), traded: true }
+      if (next !== 'flat') {
+        clock.playing = true
+        clock.started = true
+        startCard.style.display = 'none'
+        if (entrySnap) entrySnap.root.style.display = 'none'
+      }
     } else if (kind === 'flat') {
       pl.st = closePosition(pl.st, price)
     } else if (kind === 'levDown' || kind === 'levUp') {
@@ -722,13 +755,15 @@ export function createRaket({ engine }) {
     c.strokeStyle = BG_PANEL
     const labI = Math.min(pts.length - 1, Math.floor(p) + Math.floor(ahead * 0.55))
     c.textAlign = 'left'
-    c.strokeText('BUY', col(pts[labI].upper) + 13, row(labI))
+    const buyW = t('btn.buy')
+    const sellW = t('btn.sell')
+    c.strokeText(buyW, col(pts[labI].upper) + 13, row(labI))
     c.fillStyle = BUY
-    c.fillText('BUY', col(pts[labI].upper) + 13, row(labI))
+    c.fillText(buyW, col(pts[labI].upper) + 13, row(labI))
     c.textAlign = 'right'
-    c.strokeText('SELL', col(pts[labI].lower) - 13, row(labI))
+    c.strokeText(sellW, col(pts[labI].lower) - 13, row(labI))
     c.fillStyle = SELL
-    c.fillText('SELL', col(pts[labI].lower) - 13, row(labI))
+    c.fillText(sellW, col(pts[labI].lower) - 13, row(labI))
     c.textAlign = 'left'
 
     c.setLineDash([2, 4])
@@ -956,8 +991,7 @@ export function createRaket({ engine }) {
     }
 
     // etikett under raketen: läge + öppet resultat (riktiga tal)
-    const openNow = openPct(st, priceAt(p))
-    const tagTxt = fx.boost > 0.01 ? `BOOST ${fmtPct(openNow)}` : fx.loss > 0.01 ? `ASTEROIDER ${fmtPct(openNow)}` : flat && st.traded ? 'FLAT' : ''
+    const tagTxt = fx.boost > 0.01 ? t('rk.boost') : fx.loss > 0.01 ? t('rk.rocks') : flat && st.traded ? t('pos.flat') : ''
     if (tagTxt) {
       const plus = fx.boost > 0.01
       const minus = fx.loss > 0.01
@@ -965,7 +999,7 @@ export function createRaket({ engine }) {
     }
     // varning vid förlust ≥ GLITCH_AT % (statisk text även vid reducerad rörelse)
     const alert = fx.move <= -GLITCH_AT
-    if (alert) hudLabel(c, `VARNING · förlust ${fmtPct(fx.move)} utan hävstång`, W / 2, Math.max(twoP ? 110 : 86, rocketY - (compact ? 120 : 150)), { size: compact ? 10 : 12, align: 'center', W, color: TEXT, border: SELL, bg: 'rgba(40,8,28,0.92)' })
+    if (alert) hudLabel(c, t('rk.warn', { pct: fmtPct(fx.move) }), W / 2, Math.max(twoP ? 110 : 86, rocketY - (compact ? 120 : 150)), { size: compact ? 10 : 12, align: 'center', W, color: TEXT, border: SELL, bg: 'rgba(40,8,28,0.92)' })
 
     // prisbricka vid raketen
     const price = priceAt(p)
@@ -995,17 +1029,16 @@ export function createRaket({ engine }) {
     } else pnlCard.classList.remove('glitch')
 
     // HUD – bara riktiga tal från simuleringen
-    const t = priceAt(p, 't')
+    const ts = priceAt(p, 't')
     q('price').textContent = fmtPrice(price)
-    q('when').textContent = fmtDate(t, key)
-    const total = pnlPct(st, price)
-    q('pnlLabel').textContent = flat ? 'P&L · realiserat' : `P&L · ${st.lev}×`
+    q('when').textContent = fmtDate(ts, key)
+    q('pnlLabel').textContent = !st.traded ? t('hud.result') : flat ? t('rk.pnlFlat') : t('rk.pnlOpen', { lev: st.lev })
     const pnlEl = q('pnl')
-    pnlEl.textContent = !st.traded ? '—' : fmtPct(total)
-    pnlEl.style.color = !st.traded ? TEXT : total > 0 ? BUY : total < 0 ? SELL : TEXT
-    q('pnlSub').textContent = flat ? (st.traded ? 'stängt · inget öppet · övning' : 'ingen position · övning') : `varav öppet ${fmtPct(openPct(st, price))} · övning`
+    pnlEl.textContent = !st.traded ? '—' : t('hud.resultNote')
+    pnlEl.style.color = TEXT
+    q('pnlSub').textContent = !st.traded ? t('rk.pnlSubNone') : flat ? t('rk.pnlSubFlat') : t('rk.pnlSubOpen', { pct: fmtPct(openPct(st, price)) })
     const lvl = fx.loss > 0.01 ? fx.loss : fx.boost
-    q('gasLbl').textContent = fx.loss > 0.01 ? 'ASTEROIDER' : 'BOOST'
+    q('gasLbl').textContent = fx.loss > 0.01 ? t('rk.rocks') : t('rk.boost')
     const gasKey = `${Math.round(lvl * 100)}|${fx.loss > 0.01}`
     if (pl.gasKey !== gasKey) {
       pl.gasKey = gasKey
@@ -1019,8 +1052,8 @@ export function createRaket({ engine }) {
     q('levDown').disabled = st.lev <= LEV_MIN
     q('levUp').disabled = st.lev >= LEV_MAX
     q('play').textContent = clock.playing ? '❚❚' : '▶'
-    const pos = flat ? 'Flat' : st.side === 'buy' ? 'Long' : 'Short'
-    q('info').innerHTML = `<b style="color:${flat ? TEXT : st.side === 'buy' ? BUY : SELL}">${pos}</b> · ${fmtPrice(price)} · ${periodName(key)} · ${fmtDate(t, key)}`
+    const pos = flat ? t('pos.flat') : st.side === 'buy' ? t('pos.long') : t('pos.short')
+    q('info').innerHTML = `<b style="color:${flat ? TEXT : st.side === 'buy' ? BUY : SELL}">${pos}</b> · ${fmtPrice(price)} · ${periodName(key)} · ${fmtDate(ts, key)}`
     q('prog').style.width = `${pts.length > 1 ? (p / (pts.length - 1)) * 100 : 0}%`
     q('buy').classList.toggle('on', !flat && st.side === 'buy')
     q('sell').classList.toggle('on', !flat && st.side === 'sell')
@@ -1028,7 +1061,7 @@ export function createRaket({ engine }) {
     fb.classList.toggle('on', flat)
     fb.disabled = flat
     fb.setAttribute('aria-pressed', String(flat))
-    fb.title = flat ? 'Du är redan flat – ingen öppen position' : 'Stäng positionen'
+    fb.title = flat ? t('flat.already') : t('flat.close')
     q('flatIcon').innerHTML = flat ? ICON_CHECK : ICON_FLAT
     q('note').style.display = mode === '2p' && i === 0 ? 'none' : ''
     q('who').style.display = mode === '2p' ? 'block' : 'none'
@@ -1085,8 +1118,7 @@ export function createRaket({ engine }) {
         clock.ended = true
         clock.playing = false
         const price = priceAt(clock.p)
-        const txt = players.map((pl, i) => `${mode === '2p' ? `Spelare ${i + 1}: ` : 'Resultat '}${pl.st.traded ? fmtPct(pnlPct(pl.st, price)) : '—'} (${pl.st.lev}×)`).join(' · ')
-        root.querySelector('[data-k="endTxt"]').textContent = `${txt} – ${periodName(key)}, av positionen.`
+        root.querySelector('[data-k="endTxt"]').textContent = t('end.body')
         endCard.classList.add('on')
       }
     }
@@ -1094,6 +1126,20 @@ export function createRaket({ engine }) {
     if (visible) raf = requestAnimationFrame(frame)
   }
   root.querySelector('[data-k="again"]').onclick = () => act(0, 'reset')
+  entrySnap = mountEntrySnap(root, {
+    getSide: () => (players[0] ? readSide(players[0].st) : 'flat'),
+    applyDir: (dir) => act(0, dir > 0 ? 'buy' : 'sell'),
+  })
+  entrySnap.root.style.display = 'none'
+  bindStepGestures(root, {
+    enabled: () => visible && mode === '1p',
+    getSide: () => (players[0] ? readSide(players[0].st) : 'flat'),
+    applyDir: (dir) => act(0, dir > 0 ? 'buy' : 'sell'),
+  })
+  onLang(() => {
+    relabel()
+    entrySnap?.paint()
+  })
 
   return {
     show() {

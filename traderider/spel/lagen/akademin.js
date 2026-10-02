@@ -2,13 +2,17 @@
  * Akademin i NVDA Line-stil (tredje vyn i växeln «NVDA Line | Raket | Akademin»).
  * Lektioner, texter, uppgifter och pedagogik från KS Akademin (se akademin-logic.js); ombyggt på NVDA Lines
  * egna data och i NVDA Lines ljusa stil. Egen kod: inget porträtt, ingen mörk grafik, inget övningssaldo i dollar.
- * Tangenter där det passar: P kör/paus, R spola tillbaka, A/← och D/→ tempo, W/↑ och S/↓ väljer riktning i lektion 2.
+ * Tangenter: samma plan som övriga lägen (köp/sälj). Tempo är −/+, inte hävstångstangenterna.
  * Utmärkelser: märke per klarat delmoment + medalj per lektion, kort animation, sparas i localStorage.
+ * All synlig text kommer från språkresursen.
  */
 import * as A from './akademin-logic.js'
 import { rsiAtPoints } from './rsi.js'
-import { isTypingTarget } from './keys.js'
+import { isTypingTarget, HINTS, keyAction } from './keys.js'
 import { simTid } from './simtid.js'
+import { t, onLang } from './i18n.js'
+import { stepSide } from './styrmotor.js'
+import { bindStepGestures } from './snapp.js'
 
 const PAPER = '#f3ede2'
 const INK = '#1c1915'
@@ -105,7 +109,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
   document.head.appendChild(style)
   const root = document.createElement('div')
   root.className = 'nlr-ak'
-  root.setAttribute('aria-label', 'Akademin – guidade lektioner på NVDA-grafen')
+  root.setAttribute('aria-label', t('ak.aria'))
   document.body.appendChild(root)
   const toast = document.createElement('div')
   toast.className = 'nlr-ak-toast'
@@ -115,7 +119,8 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
 
   let prog = A.loadProgress(storage)
   let lesson = [1, 2, 3, 4].find((l) => !A.lessonDone(l, prog.earned)) ?? 4
-  let note = ''
+  let noteKey = ''
+  let noteVars = null
   let riskPct = null
   let sigma = 1.5
   let sizeCalc = null
@@ -165,10 +170,10 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
       toast.classList.remove('on')
       return
     }
-    const a = A.AWARDS.find((x) => x.id === id)
+    const a = A.awardView(A.AWARDS.find((x) => x.id === id))
     toast.classList.remove('on')
     void toast.offsetWidth
-    toast.innerHTML = `${medalSvg(a, 't' + id)}<div><small style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:${MUTED};font-weight:600">Ny utmärkelse · ${a.kind}</small><b>${a.title}</b><span>${a.learned}</span></div>`
+    toast.innerHTML = `${medalSvg(a, 't' + id)}<div><small style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:${MUTED};font-weight:600">${t('ak.toast', { kind: a.kindLabel })}</small><b>${a.title}</b><span>${a.learned}</span></div>`
     toast.dataset.award = id
     toast.classList.add('on')
     toastT = setTimeout(nextToast, toastQ.length ? 1700 : 4200)
@@ -177,36 +182,53 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
   function pick(l) {
     if (!A.lessonUnlocked(l, prog.earned)) return
     lesson = l
-    note = ''
+    noteKey = ''
+    noteVars = null
     quiz = null
     build()
   }
 
   function computeSize() {
     const pt = cur()
-    if (riskPct == null || !pt) return setNote('Välj först en riskprocent.')
-    if (!A.riskAllowed(riskPct)) return setNote(`${String(riskPct).replace('.', ',')} % är mer än regeln tillåter (högst ${A.MAX_RISK_PCT} %). Välj en lägre risk.`)
+    const pct = String(riskPct).replace('.', ',')
+    if (riskPct == null || !pt) return setNote('ak.err.riskFirst')
+    if (!A.riskAllowed(riskPct)) return setNote('ak.err.riskHigh', { pct, max: A.MAX_RISK_PCT })
     const stop = A.stopPrice(pt.price, A.bandStdev(pt), sigma, 'long')
     const s = A.positionShare(riskPct, pt.price, stop)
     sizeCalc = { ...s, entry: pt.price, stop }
     earn('l1_risk', 'l1_size')
-    setNote(`Bra. Med ${String(riskPct).replace('.', ',')} % risk och stopp ${fmtP(stop)} (${fmt1(s.perSharePct)} % under ingången) blir positionen ${fmt1(s.sharePct)} % av ditt saldo${s.capped ? ' (taket 100 %, ingen belåning)' : ''}. Träffas stoppet förlorar du högst ${String(riskPct).replace('.', ',')} % av saldot – oavsett hur stort det är.`)
+    setNote('ak.sizeOk', { pct, stop: fmtP(stop), per: fmt1(s.perSharePct), share: fmt1(s.sharePct), cap: s.capped ? t('ak.sizeCap') : '' })
+  }
+  function asCycle(v) {
+    return v === 'long' ? 'buy' : v === 'short' ? 'sell' : 'flat'
+  }
+  function fromCycle(v) {
+    return v === 'buy' ? 'long' : v === 'sell' ? 'short' : 'flat'
+  }
+  function stepLesson(dir) {
+    const next = fromCycle(stepSide(asCycle(side), dir))
+    if (next !== side) {
+      side = next
+      slSet = false
+      tpSet = false
+    }
   }
   function l2Lines() {
     const pt = cur()
-    if (!pt) return { stop: null, target: null }
+    if (!pt || (side !== 'long' && side !== 'short')) return { stop: null, target: null }
     const stop = slSet ? A.stopPrice(pt.price, A.bandStdev(pt), sigma, side) : null
     const target = stop != null && tpSet ? A.takeProfitPrice(pt.price, stop, rMult, side) : null
     return { stop, target }
   }
   function openL2() {
+    if (side !== 'long' && side !== 'short') return setNote('ak.err.side')
     const { stop, target } = l2Lines()
-    const t = A.openPractice(pts, idx(), side, stop, target)
-    if (t.error) return setNote(t.error)
-    trade = t
+    const opened = A.openPractice(pts, idx(), side, stop, target)
+    if (opened.error) return setNote(opened.error)
+    trade = opened
     earn('l2_open')
     playing = true
-    setNote(`Övningsaffär öppnad: ${side === 'long' ? 'BUY (long)' : 'SELL (short)'} på ${fmtP(t.entry)}, stop-loss ${fmtP(t.stop)}, take-profit ${fmtP(t.target)}. Låt simuleringen köra.`)
+    setNote('ak.opened', { side: t(side === 'long' ? 'side.long' : 'side.short'), entry: fmtP(opened.entry), stop: fmtP(opened.stop), target: fmtP(opened.target) })
   }
   function markTouch() {
     const pt = cur()
@@ -214,8 +236,8 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     const pb = A.percentB(pt.price, pt)
     if (A.isTouch(pt.price, pt)) {
       earn('l3_touch')
-      setNote(`Rätt — %B ${fmt2(pb)}: kursen står vid ${pb >= 0.5 ? 'övre' : 'undre'} rälsen.`)
-    } else setNote(`Inte än — %B är ${fmt2(pb)}. En beröring är %B ≥ 0,95 eller ≤ 0,05.`)
+      setNote('ak.touchOk', { pb: fmt2(pb), rail: t(pb >= 0.5 ? 'ak.railUp' : 'ak.railDown') })
+    } else setNote('ak.touchNo', { pb: fmt2(pb) })
   }
   function markSqueeze() {
     const pt = cur()
@@ -223,14 +245,14 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     const bw = A.bandwidthPct(pt)
     if (bw <= sqThr) {
       earn('l3_squeeze')
-      setNote(`Rätt — bandbredden ${fmt1(bw)} % är bland de smalaste i serien (gräns ${fmt1(sqThr)} %).`)
-    } else setNote(`Inte en squeeze — bandbredden är ${fmt1(bw)} % (gräns ${fmt1(sqThr)} %). Leta efter de markerade zonerna.`)
+      setNote('ak.squeezeOk', { bw: fmt1(bw), lim: fmt1(sqThr) })
+    } else setNote('ak.squeezeNo', { bw: fmt1(bw), lim: fmt1(sqThr) })
   }
   function readMarket() {
     const pt = cur()
     const r = rsi[idx()]
-    if (!pt || r == null) return setNote('RSI saknas här ännu – kör vidare.')
-    if (!A.rsiExtreme(r)) return setNote(`RSI är ${fmt1(r)} — vänta tills den är över 70 eller under 30.`)
+    if (!pt || r == null) return setNote('ak.rsiMissing')
+    if (!A.rsiExtreme(r)) return setNote('ak.rsiWait', { n: fmt1(r) })
     playing = false
     earn('l4_extreme')
     quiz = { answer: A.correctRead(pt.price, pt, r), rsi: r, pb: A.percentB(pt.price, pt) ?? 0.5 }
@@ -241,11 +263,12 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     if (a === quiz.answer) {
       earn('l4_read_ok')
       quiz = null
-      setNote('Rätt tolkning. Band och RSI tillsammans ger en bild av läget — inte ett löfte om nästa rörelse.')
-    } else setNote(`Inte riktigt: %B ${fmt2(quiz.pb)} och RSI ${fmt1(quiz.rsi)}. Titta på både korridoren och RSI.`)
+      setNote('ak.readOk')
+    } else setNote('ak.readNo', { pb: fmt2(quiz.pb), rsi: fmt1(quiz.rsi) })
   }
-  function setNote(t) {
-    note = t
+  function setNote(key, vars) {
+    noteKey = key || ''
+    noteVars = vars || null
     build()
   }
   function rewind() {
@@ -257,8 +280,10 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
   }
 
   /* ---------- DOM ---------- */
+  let ungesture = () => {}
   function build() {
-    const L = A.LESSONS[lesson]
+    const L = A.lessonContent(lesson)
+    const hk = HINTS['1p']
     const xp = A.xpTotal(prog.earned)
     const lv = A.levelFor(xp)
     const lvPct = lv.to == null ? 100 : ((xp - lv.from) / (lv.to - lv.from)) * 100
@@ -275,65 +300,65 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     let task = ''
     if (rd && lesson === 1) {
       task = `<div class="nlr-ak-row">
-        ${choice('Risk av saldot', A.RISK_CHOICES, riskPct, 'risk', (v) => `${String(v).replace('.', ',')} %`)}
-        ${choice('Stopp (band-σ)', A.STOP_SIGMAS, sigma, 'sigma', (v) => `${String(v).replace('.', ',')}σ`)}
-        <div><button type="button" class="nlr-ak-btn" data-act="size">Beräkna positionsstorlek →</button></div>
-        <div class="nlr-ak-facts"><span>Ingång <b data-k="f_price">${fmtP(pt?.price)}</b></span><span>Stopp <b data-k="f_stop">${fmtP(l1Stop)}</b></span><span>Risk per aktie <b>${sizeCalc ? fmt1(sizeCalc.perSharePct) + ' %' : '—'}</b></span><span>Position <b>${sizeCalc ? fmt1(sizeCalc.sharePct) + ' % av saldot' : '—'}</b></span></div>
+        ${choice(t('ak.riskOf'), A.RISK_CHOICES, riskPct, 'risk', (v) => `${String(v).replace('.', ',')} %`)}
+        ${choice(t('ak.stopSigma'), A.STOP_SIGMAS, sigma, 'sigma', (v) => `${String(v).replace('.', ',')}σ`)}
+        <div><button type="button" class="nlr-ak-btn" data-act="size">${t('ak.calc')}</button></div>
+        <div class="nlr-ak-facts"><span>${t('ak.entry')} <b data-k="f_price">${fmtP(pt?.price)}</b></span><span>${t('ak.stop')} <b data-k="f_stop">${fmtP(l1Stop)}</b></span><span>${t('ak.riskShare')} <b>${sizeCalc ? fmt1(sizeCalc.perSharePct) + ' %' : '—'}</b></span><span>${t('ak.position')} <b>${sizeCalc ? t('ak.ofBalance', { n: fmt1(sizeCalc.sharePct) }) : '—'}</b></span></div>
       </div>`
     } else if (rd && lesson === 2) {
       const locked = !!trade && !trade.closed
       task = `<div class="nlr-ak-row">
-        <div class="nlr-ak-choice"><span>Riktning</span>${chip('BUY (long) <kbd>W/↑</kbd>', side === 'long', `data-act="side" data-v="long" ${locked ? 'disabled' : ''}`, 'on-green')}${chip('SELL (short) <kbd>S/↓</kbd>', side === 'short', `data-act="side" data-v="short" ${locked ? 'disabled' : ''}`, 'on-red')}</div>
-        ${choice('Stopp (band-σ)', A.STOP_SIGMAS, sigma, 'sigma', (v) => `${String(v).replace('.', ',')}σ`)}
-        ${choice('Mål (R)', A.TP_R_MULTIPLES, rMult, 'r', (v) => `${v}R`)}
-        <div class="nlr-ak-choice"><span>Plan</span>${chip(slSet ? `Stop-loss ${fmtP(locked ? trade.stop : l2Stop)}` : 'Sätt stop-loss', slSet, 'data-act="sl"', 'on-red')}${chip(tpSet ? `Take-profit ${fmtP(locked ? trade.target : l2Target)}` : 'Sätt take-profit', tpSet, `data-act="tp" ${slSet ? '' : 'disabled'}`, 'on-green')}</div>
-        <div><button type="button" class="nlr-ak-btn" data-act="open" ${!slSet || !tpSet || locked ? 'disabled' : ''}>Öppna övningsaffär →</button></div>
-        ${!slSet || !tpSet ? '<span class="muted">Öppna-knappen är låst tills både stop-loss och take-profit är satta.</span>' : ''}
-        ${trade ? `<div class="nlr-ak-facts"><span>Ingång <b>${fmtP(trade.entry)}</b></span><span>Stop-loss <b>${fmtP(trade.stop)}</b></span><span>Take-profit <b>${fmtP(trade.target)}</b></span><span>Status <b>${trade.closed ? (trade.closed.reason === 'stop' ? 'stoppad' : trade.closed.reason === 'target' ? 'mål nått' : 'serien slut') : 'öppen'}</b></span>${trade.closed ? `<span>Simulerat utfall <b>${trade.closed.r >= 0 ? '+' : '−'}${fmt2(Math.abs(trade.closed.r))}R (${trade.closed.pct >= 0 ? '+' : '−'}${fmt2(Math.abs(trade.closed.pct))} % på positionen)</b></span>` : ''}</div>` : ''}
+        <div class="nlr-ak-choice"><span>${t('ak.direction')}</span>${chip(`${t('side.long')} <kbd>${hk.buy}</kbd>`, side === 'long', `data-act="side" data-v="long" ${locked ? 'disabled' : ''}`, 'on-green')}${chip(`${t('side.short')} <kbd>${hk.sell}</kbd>`, side === 'short', `data-act="side" data-v="short" ${locked ? 'disabled' : ''}`, 'on-red')}</div>
+        ${choice(t('ak.stopSigma'), A.STOP_SIGMAS, sigma, 'sigma', (v) => `${String(v).replace('.', ',')}σ`)}
+        ${choice(t('ak.targetR'), A.TP_R_MULTIPLES, rMult, 'r', (v) => `${v}R`)}
+        <div class="nlr-ak-choice"><span>${t('ak.plan')}</span>${chip(slSet ? t('ak.slSet', { price: fmtP(locked ? trade.stop : l2Stop) }) : t('ak.setSl'), slSet, 'data-act="sl"', 'on-red')}${chip(tpSet ? t('ak.tpSet', { price: fmtP(locked ? trade.target : l2Target) }) : t('ak.setTp'), tpSet, `data-act="tp" ${slSet ? '' : 'disabled'}`, 'on-green')}</div>
+        <div><button type="button" class="nlr-ak-btn" data-act="open" ${!slSet || !tpSet || locked ? 'disabled' : ''}>${t('ak.open')}</button></div>
+        ${!slSet || !tpSet ? `<span class="muted">${t('ak.openLocked')}</span>` : ''}
+        ${trade ? `<div class="nlr-ak-facts"><span>${t('ak.entry')} <b>${fmtP(trade.entry)}</b></span><span>${t('ak.slWord')} <b>${fmtP(trade.stop)}</b></span><span>${t('ak.tpWord')} <b>${fmtP(trade.target)}</b></span><span>${t('ak.status')} <b>${t(trade.closed ? (trade.closed.reason === 'stop' ? 'ak.stStop' : trade.closed.reason === 'target' ? 'ak.stTarget' : 'ak.stEnd') : 'ak.stOpen')}</b></span></div>` : ''}
       </div>`
     } else if (rd && lesson === 3) {
       task = `<div class="nlr-ak-row"><div class="nlr-ak-choice">
-        <button type="button" class="nlr-ak-btn ${prog.earned.has('l3_touch') ? 'ghost' : ''}" data-act="touch">${prog.earned.has('l3_touch') ? '✓ Rälsberöring' : 'Markera rälsberöring →'}</button>
-        <button type="button" class="nlr-ak-btn ${prog.earned.has('l3_squeeze') ? 'ghost' : ''}" data-act="squeeze">${prog.earned.has('l3_squeeze') ? '✓ Squeeze' : 'Markera squeeze →'}</button></div>
-        <div class="nlr-ak-facts"><span>%B <b data-k="f_pb">${pt ? fmt2(A.percentB(pt.price, pt)) : '—'}</b></span><span>Bandbredd <b data-k="f_bw">${pt ? fmt1(A.bandwidthPct(pt)) + ' %' : '—'}</b></span><span>Squeeze-gräns <b>${fmt1(sqThr)} %</b></span></div></div>`
+        <button type="button" class="nlr-ak-btn ${prog.earned.has('l3_touch') ? 'ghost' : ''}" data-act="touch">${prog.earned.has('l3_touch') ? t('ak.touchDone') : t('ak.touch')}</button>
+        <button type="button" class="nlr-ak-btn ${prog.earned.has('l3_squeeze') ? 'ghost' : ''}" data-act="squeeze">${prog.earned.has('l3_squeeze') ? t('ak.squeezeDone') : t('ak.squeeze')}</button></div>
+        <div class="nlr-ak-facts"><span>%B <b data-k="f_pb">${pt ? fmt2(A.percentB(pt.price, pt)) : '—'}</b></span><span>${t('ak.bandwidth')} <b data-k="f_bw">${pt ? fmt1(A.bandwidthPct(pt)) + ' %' : '—'}</b></span><span>${t('ak.squeezeLimit')} <b>${fmt1(sqThr)} %</b></span></div></div>`
     } else if (rd && lesson === 4) {
       const r = rsi[idx()]
-      task = `<div class="nlr-ak-row"><div><button type="button" class="nlr-ak-btn" data-act="readm">Läs läget →</button></div>
+      task = `<div class="nlr-ak-row"><div><button type="button" class="nlr-ak-btn" data-act="readm">${t('ak.readMarket')}</button></div>
         <div class="nlr-ak-facts"><span>RSI 14 <b data-k="f_rsi">${r == null ? '—' : fmt1(r)}</b></span><span>%B <b data-k="f_pb">${pt ? fmt2(A.percentB(pt.price, pt)) : '—'}</b></span></div>
-        ${quiz ? `<div class="nlr-ak-quiz">${['stretched_up', 'stretched_down', 'rsi_only'].map((k) => `<button type="button" data-act="ans" data-v="${k}">${A.READ_TEXT[k]}</button>`).join('')}</div>` : ''}</div>`
+        ${quiz ? `<div class="nlr-ak-quiz">${['stretched_up', 'stretched_down', 'rsi_only'].map((k) => `<button type="button" data-act="ans" data-v="${k}">${A.readText(k)}</button>`).join('')}</div>` : ''}</div>`
     }
     root.innerHTML = `<div class="nlr-ak-in">
       <aside>
-        <div class="nlr-ak-card sk"><span class="kick">NVDA Rider</span><h1>Akademin</h1><p class="muted">Guidade lektioner på samma simulerade kurser som NVDA Rider.</p></div>
-        <div class="nlr-ak-card sk nlr-ak-xp"><div class="row"><b>Nivå ${lv.level}</b><span>${xp} / ${A.XP_MAX} XP</span></div><div class="nlr-ak-bar"><i style="width:${lvPct}%"></i></div><p class="muted">XP ges bara för lärande — läsa, sätta risk, stopp och mål, markera band och RSI. Aldrig för simulerad vinst.</p></div>
+        <div class="nlr-ak-card sk"><span class="kick">${t('ak.kicker')}</span><h1>${t('mode.akademin')}</h1><p class="muted">${t('ak.lead')}</p></div>
+        <div class="nlr-ak-card sk nlr-ak-xp"><div class="row"><b>${t('ak.level', { n: lv.level })}</b><span>${t('ak.xp', { xp, max: A.XP_MAX })}</span></div><div class="nlr-ak-bar"><i style="width:${lvPct}%"></i></div><p class="muted">${t('ak.xpNote')}</p></div>
         <ol class="nlr-ak-lessons">${[1, 2, 3, 4].map((l) => {
           const open = A.lessonUnlocked(l, prog.earned)
           const d = A.lessonDone(l, prog.earned)
-          return `<li><button type="button" class="nlr-ak-lesson ${lesson === l ? 'on' : ''}" data-act="pick" data-v="${l}" ${open ? '' : 'disabled'}><span class="nlr-ak-dot ${d ? 'done' : open ? 'open' : ''}">${d ? '✓' : open ? l : '🔒'}</span><span><small>Lektion ${l} av 4</small>${A.LESSONS[l].title}</span></button></li>`
+          return `<li><button type="button" class="nlr-ak-lesson ${lesson === l ? 'on' : ''}" data-act="pick" data-v="${l}" ${open ? '' : 'disabled'}><span class="nlr-ak-dot ${d ? 'done' : open ? 'open' : ''}">${d ? '✓' : open ? l : '🔒'}</span><span><small>${t('ak.lessonOf', { n: l })}</small>${A.lessonContent(l).title}</span></button></li>`
         }).join('')}</ol>
-        <div class="nlr-ak-card sk" data-k="awards"><div class="row" style="display:flex;justify-content:space-between"><h3>Dina utmärkelser</h3><span class="muted">${unlocked.size} / ${A.AWARDS.length}</span></div>
-          <div class="nlr-ak-aw">${A.AWARDS.map((a) => `<figure class="${unlocked.has(a.id) ? '' : 'locked'}" title="${unlocked.has(a.id) ? a.learned : 'Inte upplåst än'}" data-award="${a.id}">${medalSvg(a, 'o' + a.id)}<figcaption>${a.title}</figcaption></figure>`).join('')}</div>
-          <p class="muted">Sparas bara i den här webbläsaren (localStorage), utan inloggning. ${A.AWARD_NOTE}</p></div>
-        <p class="muted">Adaptiva övningsverktyg i Tradingskolan — inte en officiell licens, certifiering eller behörighet. Simulerade kurser (inte verkliga marknadsdata) och simulerade utfall: en affär kan ge vinst men lika gärna förlust, och här finns inget löfte om avkastning och ingen rådgivning.</p>
+        <div class="nlr-ak-card sk" data-k="awards"><div class="row" style="display:flex;justify-content:space-between"><h3>${t('ak.awards')}</h3><span class="muted">${unlocked.size} / ${A.AWARDS.length}</span></div>
+          <div class="nlr-ak-aw">${A.AWARDS.map((raw) => { const a = A.awardView(raw); return `<figure class="${unlocked.has(a.id) ? '' : 'locked'}" title="${unlocked.has(a.id) ? a.learned : t('ak.locked')}" data-award="${a.id}">${medalSvg(a, 'o' + a.id)}<figcaption>${a.title}</figcaption></figure>` }).join('')}</div>
+          <p class="muted">${t('ak.saved', { note: A.awardNote() })}</p></div>
+        <p class="muted">${t('ak.disclaimer')}</p>
       </aside>
       <main>
-        <section class="nlr-ak-card sk"><div style="display:flex;justify-content:space-between;align-items:center"><span class="kick">Lektion ${lesson} av 4</span><span class="muted">${[1, 2, 3, 4].map((l) => (A.lessonDone(l, prog.earned) ? '●' : l === lesson ? '◉' : '○')).join(' ')}</span></div>
+        <section class="nlr-ak-card sk"><div style="display:flex;justify-content:space-between;align-items:center"><span class="kick">${t('ak.lessonOf', { n: lesson })}</span><span class="muted">${[1, 2, 3, 4].map((l) => (A.lessonDone(l, prog.earned) ? '●' : l === lesson ? '◉' : '○')).join(' ')}</span></div>
           <h2>${L.title}</h2><p>${L.text}</p>
-          ${!rd ? `<div><button type="button" class="nlr-ak-btn" data-act="read">Jag har läst — starta övningen (+10 XP) →</button></div>` : ''}</section>
+          ${!rd ? `<div><button type="button" class="nlr-ak-btn" data-act="read">${t('ak.read')}</button></div>` : ''}</section>
         <section class="nlr-ak-card sk nlr-ak-chart"><div class="head"><span data-k="chartHead">—</span><span data-k="chartFacts">—</span></div>
-          <canvas aria-label="NVDA-graf med Bollingerband och RSI. Lektionens element är markerat."></canvas>
+          <canvas aria-label="${t('ak.canvas')}"></canvas>
           <div class="nlr-ak-transport">
-            <button type="button" class="nlr-ak-chip" data-act="play"><span data-k="playTxt">${playing ? 'Paus' : 'Kör'}</span> <kbd>P</kbd></button>
-            <button type="button" class="nlr-ak-chip" data-act="tempoDown">Tempo − <kbd>A/←</kbd></button>
-            <button type="button" class="nlr-ak-chip" data-act="tempoUp">Tempo + <kbd>D/→</kbd></button>
+            <button type="button" class="nlr-ak-chip" data-act="play"><span data-k="playTxt">${playing ? t('ak.pause') : t('ak.play')}</span> <kbd>P</kbd></button>
+            <button type="button" class="nlr-ak-chip" data-act="tempoDown">${t('ak.tempoDown')} <kbd>−</kbd></button>
+            <button type="button" class="nlr-ak-chip" data-act="tempoUp">${t('ak.tempoUp')} <kbd>+</kbd></button>
             <span class="muted" data-k="tempoTxt"></span>
-            <button type="button" class="nlr-ak-chip" data-act="rewind">Spola tillbaka <kbd>R</kbd></button>
+            <button type="button" class="nlr-ak-chip" data-act="rewind">${t('ak.rewind')} <kbd>R</kbd></button>
           </div></section>
-        <section class="nlr-ak-card sk nlr-ak-task ${rd ? '' : 'nlr-ak-dim'}"><div class="top"><h3>Övningsuppgift</h3><span class="nlr-ak-badge ${done ? 'done' : ''}">${done ? 'Klar' : rd ? 'Pågår' : 'Läs först'}</span></div>
+        <section class="nlr-ak-card sk nlr-ak-task ${rd ? '' : 'nlr-ak-dim'}"><div class="top"><h3>${t('ak.task')}</h3><span class="nlr-ak-badge ${done ? 'done' : ''}">${done ? t('ak.done') : rd ? t('ak.going') : t('ak.readFirst')}</span></div>
           <p>${L.task}</p>${task}
-          ${note ? `<div class="nlr-ak-note" data-k="note">${note}</div>` : ''}
-          ${rd && done && lesson < 4 ? `<div style="margin-top:10px"><button type="button" class="nlr-ak-btn" data-act="pick" data-v="${lesson + 1}">Lektion ${lesson + 1} är upplåst — fortsätt →</button></div>` : ''}
-          ${allDone ? '<div class="nlr-ak-note">Alla fyra lektioner klara. Detta är ett adaptivt övningsverktyg — inte en officiell licens, certifiering eller behörighet.</div>' : ''}
+          ${noteKey ? `<div class="nlr-ak-note" data-k="note">${t(noteKey, noteVars)}</div>` : ''}
+          ${rd && done && lesson < 4 ? `<div style="margin-top:10px"><button type="button" class="nlr-ak-btn" data-act="pick" data-v="${lesson + 1}">${t('ak.next', { n: lesson + 1 })}</button></div>` : ''}
+          ${allDone ? `<div class="nlr-ak-note">${t('ak.allDone')}</div>` : ''}
         </section>
       </main></div>`
     if (skinFrom) {
@@ -344,6 +369,17 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     }
     hud()
     draw()
+    ungesture()
+    const canvas = root.querySelector('canvas')
+    ungesture = bindStepGestures(canvas, {
+      enabled: () => visible && lesson === 2,
+      getSide: () => asCycle(side),
+      applyDir: (dir) => {
+        if (!read() || (trade && !trade.closed)) return
+        stepLesson(dir)
+        build()
+      },
+    })
   }
 
   root.addEventListener('click', (e) => {
@@ -364,7 +400,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
       sizeCalc = null
     } else if (act === 'size') return computeSize()
     else if (act === 'side') {
-      if (!trade || trade.closed) side = v
+      if (!trade || trade.closed) stepLesson(v === 'long' ? 1 : -1)
     } else if (act === 'r') rMult = Number(v)
     else if (act === 'sl') {
       slSet = true
@@ -389,14 +425,15 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     (e) => {
       if (!visible || e.ctrlKey || e.metaKey || e.altKey || isTypingTarget(e.target)) return
       const c = e.code
+      const hit = keyAction(e, '1p')
       let used = true
-      if (c === 'KeyP') playing = !playing
-      else if (c === 'KeyR') return e.preventDefault(), e.stopImmediatePropagation(), rewind()
-      else if (c === 'KeyA' || c === 'ArrowLeft') tempo = Math.max(1, tempo - 1)
-      else if (c === 'KeyD' || c === 'ArrowRight') tempo = Math.min(4, tempo + 1)
-      else if ((c === 'KeyW' || c === 'ArrowUp') && lesson === 2 && read() && (!trade || trade.closed)) side = 'long'
-      else if ((c === 'KeyS' || c === 'ArrowDown') && lesson === 2 && read() && (!trade || trade.closed)) side = 'short'
-      else if (c === 'Space' || c === 'ArrowUp' || c === 'ArrowDown' || c === 'KeyW' || c === 'KeyS' || c === 'Digit0' || c === 'Numpad0') used = 'swallow'
+      if (c === 'Minus' || c === 'NumpadSubtract') tempo = Math.max(1, tempo - 1)
+      else if (c === 'Equal' || c === 'NumpadAdd') tempo = Math.min(4, tempo + 1)
+      else if (hit?.action === 'pause') playing = !playing
+      else if (hit?.action === 'reset') return e.preventDefault(), e.stopImmediatePropagation(), rewind()
+      else if (hit?.action === 'buy' && lesson === 2 && read() && (!trade || trade.closed)) stepLesson(1)
+      else if (hit?.action === 'sell' && lesson === 2 && read() && (!trade || trade.closed)) stepLesson(-1)
+      else if (hit) used = 'swallow'
       else used = false
       if (!used) return
       e.stopImmediatePropagation() // NVDA Lines dolda tåg ska inte reagera
@@ -416,10 +453,10 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     if (!q('chartHead')) return
     const r = rsi[idx()]
     const d = pt ? simTid(pt.t, engine.spec?.key) : '—'
-    q('chartHead').innerHTML = `NVDA Rider · simulerade kurser · ${d}`
-    q('chartFacts').innerHTML = `Kurs <b>${fmtP(pt?.price)}</b> · RSI <b>${r == null ? '—' : fmt1(r)}</b> · %B <b>${pt ? fmt2(A.percentB(pt.price, pt)) : '—'}</b>`
-    q('playTxt').textContent = playing ? 'Paus' : 'Kör'
-    q('tempoTxt').textContent = `Tempo ${tempo}× · ${playing ? 'spelas' : 'pausad'}${p >= pts.length - 1 ? ' · serien slut' : ''}`
+    q('chartHead').textContent = t('ak.chartHead', { when: d })
+    q('chartFacts').innerHTML = t('ak.chartFacts', { price: `<b>${fmtP(pt?.price)}</b>`, rsi: `<b>${r == null ? '—' : fmt1(r)}</b>`, pb: `<b>${pt ? fmt2(A.percentB(pt.price, pt)) : '—'}</b>` })
+    q('playTxt').textContent = playing ? t('ak.pause') : t('ak.play')
+    q('tempoTxt').textContent = t('ak.tempo', { n: tempo, state: playing ? t('ak.playing') : t('ak.paused'), end: p >= pts.length - 1 ? t('ak.seriesEnd') : '' })
     const set = (k, v) => {
       const el = q(k)
       if (el) el.textContent = v
@@ -563,7 +600,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
         c.arc(x(trade.openedAt), y(trade.entry), 5, 0, Math.PI * 2)
         c.fill()
       }
-    } else if (lesson === 1 && sizeCalc) hline(sizeCalc.stop, RED, 'Stopp')
+    } else if (lesson === 1 && sizeCalc) hline(sizeCalc.stop, RED, t('ak.stop'))
     else if (lesson === 2) {
       const l = l2Lines()
       hline(l.stop, RED, 'SL')
@@ -602,7 +639,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     c.stroke()
     c.fillStyle = MUTED
     c.font = '600 10px "IBM Plex Sans", sans-serif'
-    c.fillText('RSI 14', 6, ry + 10)
+    c.fillText('RSI 14', 6, ry + 10) // symbol, same in every language
     if (lesson === 4 || lesson === 3) {
       c.save()
       c.setLineDash([6, 5])
@@ -628,11 +665,9 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
           trade = nx
           if (nx.closed) {
             earn('l2_closed')
-            note = nx.closed.reason === 'stop'
-              ? 'Stop-loss träffades — förlusten stannade där du bestämt i förväg. Det är processen som ger XP.'
-              : nx.closed.reason === 'target'
-                ? 'Take-profit träffades enligt plan. XP ges för att du följde processen, inte för utfallet.'
-                : 'Den simulerade serien tog slut; affären stängdes på sista kursen.'
+            const signed = (n) => `${n >= 0 ? '+' : '−'}${fmt2(Math.abs(n))}`
+            noteKey = nx.closed.reason === 'stop' ? 'ak.closed.stop' : nx.closed.reason === 'target' ? 'ak.closed.target' : 'ak.closed.end'
+            noteVars = { r: signed(nx.closed.r), pct: signed(nx.closed.pct) }
             build()
           }
         }
@@ -644,6 +679,11 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
   }
 
   return {
+    onLang(() => {
+      root.setAttribute('aria-label', t('ak.aria'))
+      if (visible) build()
+    })
+
     show() {
       data()
       visible = true
@@ -661,7 +701,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
       cancelAnimationFrame(raf)
     },
     // för tester/skärmdumpar
-    state: () => ({ lesson, p, playing, tempo, side, earned: [...prog.earned], awards: { ...prog.awards }, trade, quiz, note }),
+    state: () => ({ lesson, p, playing, tempo, side, earned: [...prog.earned], awards: { ...prog.awards }, trade, quiz, note: noteKey ? t(noteKey, noteVars) : '' }),
     seek(i) {
       playing = false
       p = Math.max(0, Math.min(pts.length - 1, i))

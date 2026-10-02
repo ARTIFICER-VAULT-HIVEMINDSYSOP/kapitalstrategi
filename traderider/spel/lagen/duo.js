@@ -6,6 +6,9 @@
  */
 import { keyAction, PREVENT_DEFAULT, HINTS } from './keys.js'
 import { simTid } from './simtid.js'
+import { t, onLang } from './i18n.js'
+import { stepSide, readSide } from './styrmotor.js'
+import { bindStepGestures } from './snapp.js'
 
 const css = `
 .nlr-duo{position:fixed;inset:0;z-index:45;display:none;background:#f3ede2;font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:#1c1915}
@@ -58,7 +61,7 @@ export function createDuo({ engine: main, skinFrom }) {
   document.head.appendChild(style)
   const root = document.createElement('div')
   root.className = 'nlr-duo'
-  root.setAttribute('aria-label', 'NVDA Rider – två spelare, delad skärm')
+  root.setAttribute('aria-label', t('duo.aria'))
   document.body.appendChild(root)
   const divider = document.createElement('div')
   divider.className = 'nlr-duo-div'
@@ -105,20 +108,20 @@ export function createDuo({ engine: main, skinFrom }) {
     el.dataset.player = String(i + 1)
     el.innerHTML = `
       <canvas></canvas>
-      <div class="nlr-duo-card nlr-duo-who"><small>Spelare ${i + 1}</small><b data-k="pos">Flat</b></div>
-      <div class="nlr-duo-card nlr-duo-pnl"><small data-k="pnlLabel">P&amp;L · 1×</small><b data-k="pnl">—</b></div>
+      <div class="nlr-duo-card nlr-duo-who"><small data-k="who"></small><b data-k="pos"></b></div>
+      <div class="nlr-duo-card nlr-duo-pnl"><small data-k="pnlLabel"></small><b data-k="pnl">—</b></div>
       <div class="nlr-duo-ctl">
         <div class="nlr-duo-row">
-          <button type="button" data-k="buy" class="${BTN}${OFF_BUY}">${ICON_UP}BUY<kbd>${hint.buy}</kbd></button>
-          <button type="button" data-k="sell" class="${BTN}${OFF}">${ICON_DOWN}SELL<kbd>${hint.sell}</kbd></button>
-          <button type="button" data-k="flat" class="${BTN}${OFF}"><i data-k="flatIcon" style="display:contents">${ICON_FLAT}</i>FLAT<kbd>${hint.flat}</kbd></button>
+          <button type="button" data-k="buy" class="${BTN}${OFF_BUY}">${ICON_UP}<span data-k="buyLbl"></span><kbd>${hint.buy}</kbd></button>
+          <button type="button" data-k="sell" class="${BTN}${OFF}">${ICON_DOWN}<span data-k="sellLbl"></span><kbd>${hint.sell}</kbd></button>
+          <button type="button" data-k="flat" class="${BTN}${OFF}"><i data-k="flatIcon" style="display:contents">${ICON_FLAT}</i><span data-k="flatLbl"></span><kbd>${hint.flat}</kbd></button>
         </div>
         <div class="flex items-center gap-2 rounded-xl bg-surface/92 p-1.5 ring-1 ring-line backdrop-blur-sm">
-          <button type="button" data-k="play" class="flex h-11 min-w-11 items-center justify-center rounded-lg bg-ink text-paper" aria-label="Kör/paus båda (P)">▶</button>
+          <button type="button" data-k="play" class="flex h-11 min-w-11 items-center justify-center rounded-lg bg-ink text-paper">▶</button>
           <div class="flex items-center rounded-lg bg-paper-deep/80">
-            <button type="button" data-k="levDown" class="flex h-11 min-w-11 items-center justify-center text-graphite disabled:opacity-35" aria-label="Lägre hävstång (${hint.levDown})"><kbd>${hint.levDown}</kbd>−</button>
-            <div class="min-w-12 px-1 text-center"><div class="text-[10px] uppercase tracking-[0.12em] text-muted">Lev</div><div class="text-sm font-semibold tabular-nums leading-none" data-k="lev">1×</div></div>
-            <button type="button" data-k="levUp" class="flex h-11 min-w-11 items-center justify-center text-graphite disabled:opacity-35" aria-label="Högre hävstång (${hint.levUp})"><kbd>${hint.levUp}</kbd>+</button>
+            <button type="button" data-k="levDown" class="flex h-11 min-w-11 items-center justify-center text-graphite disabled:opacity-35"><kbd>${hint.levDown}</kbd>−</button>
+            <div class="min-w-12 px-1 text-center"><div class="text-[10px] uppercase tracking-[0.12em] text-muted" data-k="levName"></div><div class="text-sm font-semibold tabular-nums leading-none" data-k="lev">1×</div></div>
+            <button type="button" data-k="levUp" class="flex h-11 min-w-11 items-center justify-center text-graphite disabled:opacity-35"><kbd>${hint.levUp}</kbd>+</button>
           </div>
           <span class="nlr-duo-info" data-k="info">—</span>
         </div>
@@ -164,6 +167,11 @@ export function createDuo({ engine: main, skinFrom }) {
     layout()
     halves.forEach((hv, i) => {
       hv.eng = newEngine(hv.canvas)
+      bindStepGestures(hv.canvas, {
+        enabled: () => visible,
+        getSide: () => readSide(hv.eng?.train),
+        applyDir: (dir) => act(i + 1, dir > 0 ? 'buy' : 'sell'),
+      })
       if (i === 1) hv.eng.audio.setMuted(true) // ett ljud räcker
       hv.eng.onHud = (h) => {
         hv.hud = h
@@ -189,11 +197,20 @@ export function createDuo({ engine: main, skinFrom }) {
     const h = hv?.hud
     if (!h) return
     const q = hv.q
-    const pos = h.finished ? 'Mål' : h.flat ? 'Flat' : h.side === 'buy' ? 'Long' : 'Short'
+    const hint = HINTS[i === 0 ? 'p1' : 'p2']
+    q('who').textContent = t('duo.player', { n: i + 1 })
+    q('buyLbl').textContent = t('btn.buy')
+    q('sellLbl').textContent = t('btn.sell')
+    q('flatLbl').textContent = t('btn.flat')
+    q('levName').textContent = t('btn.leverage')
+    q('play').setAttribute('aria-label', t('btn.playPause'))
+    q('levDown').setAttribute('aria-label', t('btn.lower', { key: hint.levDown }))
+    q('levUp').setAttribute('aria-label', t('btn.raise', { key: hint.levUp }))
+    const pos = h.finished ? t('pos.goal') : h.flat ? t('pos.flat') : h.side === 'buy' ? t('pos.long') : t('pos.short')
     q('pos').textContent = pos
-    q('pnlLabel').textContent = `P&L · ${h.leverage}×`
-    q('pnl').textContent = fmtMoney(h.pnl)
-    q('pnl').style.color = h.pnl > 0 ? '#4d7a00' : h.pnl < 0 ? '#9a3b2a' : '#1c1915'
+    q('pnlLabel').textContent = t('hud.result')
+    q('pnl').textContent = t('hud.resultNote')
+    q('pnl').style.color = '#1c1915'
     q('lev').textContent = `${h.leverage}×`
     q('levDown').disabled = h.leverage <= 1
     q('levUp').disabled = h.leverage >= 10
@@ -206,7 +223,7 @@ export function createDuo({ engine: main, skinFrom }) {
     fb.className = BTN + (h.flat ? ON_FLAT : OFF)
     fb.disabled = !!h.flat
     fb.setAttribute('aria-pressed', String(!!h.flat))
-    fb.title = h.flat ? 'Du är redan flat' : 'Stäng positionen'
+    fb.title = h.flat ? t('flat.already') : t('flat.close')
     q('flatIcon').innerHTML = h.flat ? ICON_CHECK : ICON_FLAT
   }
 
@@ -227,7 +244,12 @@ export function createDuo({ engine: main, skinFrom }) {
     if (!hv) return
     const e = hv.eng
     if (action === 'buy' || action === 'sell') {
-      e.choose(action)
+      const cur = readSide(e.train)
+      const next = stepSide(cur, action === 'buy' ? 1 : -1)
+      if (next === cur) return
+      if (next === 'flat') e.flat()
+      else if (typeof e.applySide === 'function') e.applySide(next)
+      else e.choose(next)
       if (!started) {
         // samma start för båda – rakt jämförbart
         started = true
@@ -259,6 +281,10 @@ export function createDuo({ engine: main, skinFrom }) {
     true,
   )
   addEventListener('resize', () => visible && layout())
+  onLang(() => {
+    root.setAttribute('aria-label', t('duo.aria'))
+    halves.forEach((_, i) => paint(i))
+  })
 
   return {
     show() {

@@ -14,7 +14,9 @@ import { createRaket } from './raket.js'
 import { createDuo } from './duo.js'
 import { createAkademin } from './akademin.js'
 import { isTypingTarget } from './keys.js'
-import { SIM_ETIKETT } from './simtid.js'
+import { t, onLang, mountSwitcher } from './i18n.js'
+import { readSide, cycleIndex, stepSide, ENTRY_SIDE } from './styrmotor.js'
+import { mountEntrySnap, bindStepGestures, mountRatt } from './snapp.js'
 
 const INK = '#1c1915'
 const MUTED = '#8a8478'
@@ -36,6 +38,10 @@ const css = `
 .tr-skal a{display:flex;align-items:center;border-radius:999px;padding:0 12px;height:100%;font:500 13px "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:${INK};text-decoration:none;white-space:nowrap}
 .tr-skal a:focus-visible{outline:2px solid ${GREEN};outline-offset:1px}
 .tr-skal .tr-fs-ico{font-size:15px;line-height:1}
+.tr-skal .lang-switcher{display:flex;align-items:center;gap:2px;height:100%}
+.tr-skal .lang-switcher-btn{border:0;background:transparent;border-radius:999px;padding:0 8px;height:calc(100% - 8px);font:600 11px "IBM Plex Sans",sans-serif;color:inherit;cursor:pointer}
+.tr-skal .lang-switcher-btn.active{background:${INK};color:#f3ede2}
+html[data-nlr-view="raket"] .tr-skal .lang-switcher-btn.active{background:#e8f4ff;color:#061022}
 html[data-nlr-view="raket"] .tr-skal a{color:#e8f4ff !important;font:600 12px "IBM Plex Mono",ui-monospace,monospace !important;letter-spacing:.06em}
 html.tr-fs-css,html.tr-fs-css body{height:100dvh;overflow:hidden}
 html.tr-fs-css[data-nlr-view="akademin"],html.tr-fs-css[data-nlr-view="akademin"] body{overflow:auto}
@@ -78,7 +84,7 @@ function waitEngine() {
 
 function periodLabel(eng) {
   const key = eng.spec?.key
-  return { live: '1D', '5d': '5D', '1mo': '1M', '6mo': '6M', '1y': '1Y', '5y': '5Y', max: 'Max' }[key] ?? key ?? '—'
+  return { live: '1D', '5d': '5D', '1mo': '1M', '6mo': '6M', '1y': '1Y', '5y': '5Y', max: t('period.max') }[key] ?? key ?? '—'
 }
 
 async function main() {
@@ -116,7 +122,7 @@ async function main() {
   }
 
   function layoutPanel() {
-    const buy = findButton(/^BUY/)
+    const buy = document.querySelector('button[data-tr="buy"]')
     const grid = buy?.parentElement
     if (!grid) return
     const r = grid.getBoundingClientRect()
@@ -210,19 +216,20 @@ async function main() {
     }
     const z = rsiZone(cur)
     const warming = cur == null && valid && idx < RSI_PERIOD
-    valueEl.textContent = cur == null ? (warming ? '—' : 'saknas') : cur.toFixed(1)
+    const rsiVal = cur == null ? (warming ? t('rsi.warming', { n: RSI_PERIOD + 1 }) : t('rsi.none')) : cur.toFixed(1)
+    valueEl.textContent = cur == null ? '—' : cur.toFixed(1)
     valueEl.style.color = z === 'overkopt' ? RED : z === 'oversalt' ? '#4d7a00' : INK
-    zoneEl.textContent = `${periodLabel(eng)} · ${z === 'overkopt' ? 'över 70' : z === 'oversalt' ? 'under 30' : z === 'neutral' ? '30–70' : warming ? `startar vid candle ${RSI_PERIOD + 1}` : 'saknas här'}`
-    panel.setAttribute('aria-label', `RSI ${RSI_PERIOD} för perioden ${periodLabel(eng)}: ${cur == null ? (warming ? `startar vid candle ${RSI_PERIOD + 1}` : 'saknas') : cur.toFixed(1)}`)
+    zoneEl.textContent = `${periodLabel(eng)} · ${z === 'overkopt' ? t('rsi.zoneHigh') : z === 'oversalt' ? t('rsi.zoneLow') : z === 'neutral' ? t('rsi.zoneMid') : rsiVal}`
+    panel.setAttribute('aria-label', t('rsi.aria', { period: RSI_PERIOD, range: periodLabel(eng), value: cur == null ? rsiVal : cur.toFixed(1) }))
   }
 
   // ---------- 2. Växel NVDA Line | Raket ----------
   const toggle = el('div', 'nlr-pill nlr-toggle')
   toggle.setAttribute('role', 'group')
-  toggle.setAttribute('aria-label', 'Byt vy')
-  const bLine = el('button', '', 'NVDA Rider')
-  const bRaket = el('button', '', 'Raket')
-  const bAk = el('button', '', 'Akademin')
+  toggle.setAttribute('aria-label', t('mode.aria'))
+  const bLine = el('button', '', t('mode.nvda'))
+  const bRaket = el('button', '', t('mode.raket'))
+  const bAk = el('button', '', t('mode.akademin'))
   bLine.type = bRaket.type = bAk.type = 'button'
   toggle.append(bLine, bRaket, bAk)
   copySkin(periodPill, toggle)
@@ -257,12 +264,12 @@ async function main() {
   // ---------- 3. Växel 1P | 2P ----------
   const modeToggle = el('div', 'nlr-pill nlr-toggle')
   modeToggle.setAttribute('role', 'group')
-  modeToggle.setAttribute('aria-label', 'Antal spelare')
-  const b1 = el('button', '', '1P')
-  const b2 = el('button', '', '2P')
+  modeToggle.setAttribute('aria-label', t('players.aria'))
+  const b1 = el('button', '', t('players.1'))
+  const b2 = el('button', '', t('players.2'))
   b1.type = b2.type = 'button'
-  b1.title = '1 spelare – alla tangenter styr samma spelare'
-  b2.title = '2 spelare, delad skärm – spelare 1: WASD + mellanslag, spelare 2: pilar + 0'
+  b1.title = t('players.1title')
+  b2.title = t('players.2title')
   modeToggle.append(b1, b2)
   copySkin(periodPill, modeToggle)
   modeToggle.style.zIndex = '60'
@@ -271,18 +278,20 @@ async function main() {
   // ---------- 5. Skalrad: tillbaka till Traderider + helskärm ----------
   const skal = el('div', 'nlr-pill nlr-toggle tr-skal')
   skal.setAttribute('role', 'group')
-  skal.setAttribute('aria-label', 'Sida')
-  const back = el('a', 'tr-back', '← Traderider')
+  skal.setAttribute('aria-label', t('shell.aria'))
+  const back = el('a', 'tr-back', t('shell.back'))
   back.href = '/traderider/'
-  const bFs = el('button', 'tr-fs', '<span class="tr-fs-ico" aria-hidden="true">⛶</span><span class="tr-fs-txt"> Helskärm</span>')
+  const bFs = el('button', 'tr-fs', '<span class="tr-fs-ico" aria-hidden="true">⛶</span><span class="tr-fs-txt"></span>')
+  const langSlot = el('span', 'tr-lang-slot')
   bFs.type = 'button'
-  skal.append(back, bFs)
+  skal.append(back, bFs, langSlot)
+  mountSwitcher(langSlot)
   copySkin(periodPill, skal)
   skal.style.zIndex = '60'
   document.body.appendChild(skal)
 
   // ---------- 6. Synlig etikett: simulerade kurser, inte verkliga marknadsdata (i varje läge) ----------
-  const sim = el('div', 'tr-sim', SIM_ETIKETT)
+  const sim = el('div', 'tr-sim', t('sim.label'))
   sim.setAttribute('role', 'note')
   sim.dataset.trSim = '1'
   document.body.appendChild(sim)
@@ -298,10 +307,10 @@ async function main() {
   function fsLabel() {
     const on = fsOn()
     bFs.setAttribute('aria-pressed', String(on))
-    bFs.setAttribute('aria-label', on ? 'Avsluta helskärm (Esc)' : 'Helskärm')
-    bFs.title = on ? 'Avsluta helskärm (Esc)' : 'Helskärm'
+    bFs.setAttribute('aria-label', on ? t('shell.fsExit') : t('shell.fs'))
+    bFs.title = on ? t('shell.fsExit') : t('shell.fs')
     bFs.querySelector('.tr-fs-ico').textContent = on ? '✕' : '⛶'
-    bFs.querySelector('.tr-fs-txt').textContent = on ? ' Avsluta' : ' Helskärm'
+    bFs.querySelector('.tr-fs-txt').textContent = on ? t('shell.fsExitShort') : t('shell.fsShort')
   }
   bFs.onclick = async () => {
     try {
@@ -367,10 +376,12 @@ async function main() {
       if (resumeLine) eng.play()
       resumeLine = false
     }
+    syncSnap()
     if (push) {
-      const h = view === 'akademin' ? 'akademin' : [view === 'raket' ? 'raket' : '', mode === '2p' ? '2p' : ''].filter(Boolean).join('-')
+      const slug = view === 'akademin' ? 'akademin' : view === 'raket' ? 'raket' : 'nvda-rider'
+      const h = slug + (mode === '2p' && view !== 'akademin' ? '-2p' : '')
       try {
-        history.replaceState(history.state, '', h ? `#${h}` : location.pathname + location.search)
+        history.replaceState(history.state, '', `#${h}`)
       } catch {
         /* ignore */
       }
@@ -403,6 +414,61 @@ async function main() {
     apply(false)
   }
   addEventListener('hashchange', fromHash)
+
+  function labelChrome() {
+    toggle.setAttribute('aria-label', t('mode.aria'))
+    bLine.textContent = t('mode.nvda')
+    bRaket.textContent = t('mode.raket')
+    bAk.textContent = t('mode.akademin')
+    modeToggle.setAttribute('aria-label', t('players.aria'))
+    b1.textContent = t('players.1')
+    b2.textContent = t('players.2')
+    b1.title = t('players.1title')
+    b2.title = t('players.2title')
+    skal.setAttribute('aria-label', t('shell.aria'))
+    back.textContent = t('shell.back')
+    sim.textContent = t('sim.label')
+    document.title = t('page.title')
+    const meta = document.querySelector('meta[name="description"]')
+    if (meta) meta.content = t('page.desc')
+    fsLabel()
+    entrySnap?.paint()
+  }
+
+  let entrySide = ENTRY_SIDE
+  let entryDone = false
+  const entrySnap = mountEntrySnap(document.body, {
+    getSide: () => entrySide,
+    applyDir: (dir) => {
+      entrySide = stepEntry(dir)
+    },
+  })
+  function stepEntry(dir) {
+    return stepSide(entrySide, dir)
+  }
+  window.__trCommitEntry = () => {
+    const eng = window.__trEngine
+    if (!eng?.train) return
+    let guard = 0
+    while (readSide(eng.train) !== entrySide && guard++ < 3) {
+      const cur = cycleIndex(readSide(eng.train))
+      const dir = cycleIndex(entrySide) > cur ? 1 : -1
+      eng.choose(dir > 0 ? 'buy' : 'sell')
+    }
+    entryDone = true
+    entrySnap.root.style.display = 'none'
+  }
+  function syncSnap() {
+    const show = view === 'line' && mode === '1p' && !entryDone
+    entrySnap.root.style.display = show ? '' : 'none'
+  }
+  bindStepGestures(document.body, {
+    enabled: () => entryDone && view === 'line' && mode === '1p',
+    getSide: () => readSide(window.__trEngine?.train),
+    applyDir: (dir) => window.__trEngine?.choose(dir > 0 ? 'buy' : 'sell'),
+  })
+  mountRatt()
+  onLang(labelChrome)
 
   // Mellanslag = FLAT i 1P: hindra att en fokuserad knapp (t.ex. kör/paus) dessutom aktiveras på keyup.
   addEventListener(
@@ -452,6 +518,8 @@ async function main() {
   }
   loop()
   if (location.hash) fromHash()
+  else apply(true)
+  syncSnap()
 
   window.__nvdaLineRsi = {
     series: () => {
