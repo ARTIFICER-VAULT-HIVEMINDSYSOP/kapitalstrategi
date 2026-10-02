@@ -1,0 +1,354 @@
+[
+  {
+    "path": "traderider/app/docs/demo-till-nvda-rider/nvda-rider-efter-omdirigering-dator.jpg",
+    "md5": "ca7271cc46ef3d0a9c1a28f04657f608"
+  },
+  {
+    "path": "traderider/app/docs/demo-till-nvda-rider/nvda-rider-efter-omdirigering-mobil.jpg",
+    "md5": "c0c100c8a7a3075475ad29eec70a2680"
+  },
+  {
+    "path": "traderider/app/docs/demo-till-nvda-rider/omdirigeringssida-dator.jpg",
+    "md5": "32b8047bf197ed08b7365a84900bc59f"
+  },
+  {
+    "path": "traderider/app/docs/demo-till-nvda-rider/omdirigeringssida-mobil.jpg",
+    "md5": "ccb4dbf0769494a00a7d36d4801ed1ef"
+  },
+  {
+    "path": "traderider/app/docs/demo-till-nvda-rider/start-meny-dator.jpg",
+    "md5": "1200c6e520366be4417758924652b984"
+  },
+  {
+    "path": "traderider/app/docs/demo-till-nvda-rider/traderider-ingang-dator.jpg",
+    "md5": "bd09c9a927dbeeaeb5d2f97e312367d3"
+  },
+  {
+    "path": "traderider/app/docs/demo-till-nvda-rider/traderider-ingang-mobil.jpg",
+    "md5": "0e0be0358bb972a3a4de3b4d4eb27aa9"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/kontaktark-desktop.png",
+    "md5": "5523327e907df68ba1ef5f0ee0b54a08"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/kontaktark-mobil.png",
+    "md5": "3214062e7d9034de9ed199a8fb7b3ca0"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/budget-1-installning-desktop.png",
+    "md5": "2e4587ab1a97fd19ea92b6aebf0cbfa0"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/budget-1-installning-mobil.png",
+    "md5": "f44da42739f64b113edeff1af181d137"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/budget-2-spel-tp-sl-desktop.png",
+    "md5": "d5945dd8be868074d7aa04faffeaa3cd"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/budget-2-spel-tp-sl-mobil.png",
+    "md5": "476ff55fb3c4acd0af868b3f1d3992ae"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/budget-3-margin-call-desktop.png",
+    "md5": "4353dac79099b03f427e3b235345c9ca"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/budget-3-margin-call-mobil.png",
+    "md5": "a315dd7147df22d82ea5a9ea3546df25"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/budget-4-stop-loss-budget-kvar-desktop.png",
+    "md5": "4efeb4e6dca13cc41cebb276d4cb1264"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/budget-4-stop-loss-budget-kvar-mobil.png",
+    "md5": "a61fe54c691bc5f09fa5a80cbf2d1a3a"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/chock-1-installning-desktop.png",
+    "md5": "35b4cfadf76aa510a6cab47312fea5c9"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/chock-1-installning-mobil.png",
+    "md5": "268fb0e339c1b910b4ec1744b0b99985"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/chock-2-spel-tp-sl-desktop.png",
+    "md5": "49a9e95cefbe6d0395354970e1a00854"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/chock-2-spel-tp-sl-mobil.png",
+    "md5": "3a98bdb9b521a47cda1d4dd7c0d9e9da"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/chock-2b-draget-kom-desktop.png",
+    "md5": "be2fff597643fefc18829d97632589c6"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/chock-2b-draget-kom-mobil.png",
+    "md5": "711cb51db2ef7d95d849536436a5a316"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/chock-3-margin-call-desktop.png",
+    "md5": "b64232f59c53ef29f1c431b8af5571c3"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/chock-3-margin-call-mobil.png",
+    "md5": "d0986a5cb2cbf921bbc144fc0c99608e"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/dra-tp-linje-desktop.png",
+    "md5": "c1f6660e70e039e70b470baf15e1e68e"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/fri-akning-klassisk-desktop.png",
+    "md5": "24fce2e7914597f1aecb3164eff15615"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/gas-reglage-desktop.png",
+    "md5": "ef7fcfaab3266a72fffab8ecb5dbd83c"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/gas-reglage-mobil.png",
+    "md5": "62b59ae21a7345d695bdcd6220f42fb7"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/gas-reglage-narbild-desktop.png",
+    "md5": "60ecdf44c8faff969018ce20aa6ac721"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/gas-reglage-narbild-mobil.png",
+    "md5": "e5152a4354c6a61e9901cddb63ec3ac5"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/ingang-traderider-desktop.png",
+    "md5": "11a85632b23feba6231a60fdcda9d0f2"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/ingang-traderider-mobil.png",
+    "md5": "43b1a318cb6085b976d4c6c411a5d9fe"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-1-installning-desktop.png",
+    "md5": "26fc73545f5f3f731968ae2cd0ddbf15"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-1-installning-mobil.png",
+    "md5": "5c8257ee97e539356c440234e1e7c528"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-2-spel-tp-sl-desktop.png",
+    "md5": "11ae5e05703255d826ffb4adcc281e83"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-2-spel-tp-sl-mobil.png",
+    "md5": "4860bb79000527e8398fedb4ea41f1f0"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-3-margin-call-desktop.png",
+    "md5": "681395260802db00275a90d382f59c88"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-3-margin-call-mobil.png",
+    "md5": "4488904d0a5b504ca3fe56eddf214816"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-4-tvangsstangd-desktop.png",
+    "md5": "7e49217b24c5ea60646c2be8d3331cc3"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-4-tvangsstangd-mobil.png",
+    "md5": "c115044a4bc6b15db3a7a21f257ed69b"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-5-niva-klarad-desktop.png",
+    "md5": "6caf3baefe4fc747c291c338a7b80a2b"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-5-niva-klarad-mobil.png",
+    "md5": "7a3a320cbdba0d73636678722fca468f"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-6-stop-loss-desktop.png",
+    "md5": "4500facf264a2b3ba6e96c1cf70003ba"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-6-stop-loss-mobil.png",
+    "md5": "7e7ec9ed05409a0df8baf853322f70d1"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-7-margin-call-mindre-rorelse-desktop.png",
+    "md5": "8cd9aef39e7567cba4418c9b41f914b4"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/niva-7-margin-call-mindre-rorelse-mobil.png",
+    "md5": "2250f7f847cc1fedad6389e293f92313"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/spoke-1-installning-desktop.png",
+    "md5": "3c45cd28b355e4100114f4821671426a"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/spoke-1-installning-mobil.png",
+    "md5": "9d57a4a156ff729b31fd01c8cc7ded3d"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/spoke-2-spel-tp-sl-desktop.png",
+    "md5": "c0fb237a70a2a1002723d6034291afa3"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/spoke-2-spel-tp-sl-mobil.png",
+    "md5": "af5f85cf6c894b68aa42d810bd512afc"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/spoke-3-margin-call-desktop.png",
+    "md5": "c51a182830d31577b17319a68ddedc08"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/spoke-3-margin-call-mobil.png",
+    "md5": "d954370059b24a5a831996f27e7ae44f"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/stopp-1-installning-desktop.png",
+    "md5": "857fea91f25f8ac0eb629207a2849a64"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/stopp-1-installning-mobil.png",
+    "md5": "31a87832ecadc0f7a363d512caf8bd41"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/stopp-2-spel-tp-sl-desktop.png",
+    "md5": "868e8ecf813b3bcb6370151116dd3536"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/stopp-2-spel-tp-sl-mobil.png",
+    "md5": "1b0389bea573797e47cb13309ca84b94"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/stopp-3-margin-call-desktop.png",
+    "md5": "27a44f8b1ace32b9de5b86dc0beb0e86"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/stopp-3-margin-call-mobil.png",
+    "md5": "caf54e13bf9bd4d0f523f140f5affc0a"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/tid-1-installning-desktop.png",
+    "md5": "e03c3061ca10273837f675c539926dc8"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/tid-1-installning-mobil.png",
+    "md5": "0fcb2f1c3e75e66394ae3fadb0316805"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/tid-2-spel-tp-sl-desktop.png",
+    "md5": "64025ef1b0e7951437cfe61f983d06a9"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/tid-2-spel-tp-sl-mobil.png",
+    "md5": "70a039e1c44278703fba9767bd699b2e"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/tid-3-margin-call-desktop.png",
+    "md5": "e5c495630bbb23c48f356cdcd06ac468"
+  },
+  {
+    "path": "traderider/app/docs/raket-lagen/shots/tid-3-margin-call-mobil.png",
+    "md5": "2c1e9d0db30c7d9395948e88945634e8"
+  },
+  {
+    "path": "traderider/art/akademin.jpg",
+    "md5": "7c4df6e832a58b6c90a9fed33a6e7410"
+  },
+  {
+    "path": "traderider/art/raket.jpg",
+    "md5": "e5cf6aecd4d57092bc8ae6614e855167"
+  },
+  {
+    "path": "traderider/art/rider-cover.jpg",
+    "md5": "ecfe7c147ddc5e47dce8bb4afd8c587f"
+  },
+  {
+    "path": "traderider/docs/raket-akademin/01-traderider-desktop.jpg",
+    "md5": "429e253a07fa6319b50871048d0cc262"
+  },
+  {
+    "path": "traderider/docs/raket-akademin/01-traderider-mobil.jpg",
+    "md5": "b5a6c8bf9a47af4be7219d72b9f2dba6"
+  },
+  {
+    "path": "traderider/docs/raket-akademin/02-nvda-rider-desktop.jpg",
+    "md5": "e71f6c770c879d99c763a66ea3c6d523"
+  },
+  {
+    "path": "traderider/docs/raket-akademin/02-nvda-rider-mobil.jpg",
+    "md5": "367f285277af513e18347839d33bba86"
+  },
+  {
+    "path": "traderider/docs/raket-akademin/03-raket-desktop.jpg",
+    "md5": "3daccc12b7142b3f7d7ae6ba7b14a358"
+  },
+  {
+    "path": "traderider/docs/raket-akademin/03-raket-mobil.jpg",
+    "md5": "67986ec279cb860c765bf2a42d5c3230"
+  },
+  {
+    "path": "traderider/docs/raket-akademin/04-akademin-desktop.jpg",
+    "md5": "8628de9e92c45ecb8df49701f8341b34"
+  },
+  {
+    "path": "traderider/docs/raket-akademin/04-akademin-mobil.jpg",
+    "md5": "89ef4c15f17881e27e33fee955851dcd"
+  },
+  {
+    "path": "traderider/docs/raket-akademin/loket-framat-desktop.jpg",
+    "md5": "bf4049c80e0e4a9293873bf3075139f2"
+  },
+  {
+    "path": "traderider/docs/raket-akademin/loket-framat-mobil.jpg",
+    "md5": "189ba3f72b30e359dabf211a73d911a2"
+  },
+  {
+    "path": "traderider/spel/favicon.svg",
+    "md5": "e5666c2ab2237dbb261a851226024237"
+  },
+  {
+    "path": "traderider/spel/og.jpg",
+    "md5": "ecfe7c147ddc5e47dce8bb4afd8c587f"
+  },
+  {
+    "path": "traderider/spel/sprites/crash-1.png",
+    "md5": "ad471b6d613629b70e4a371be16f35f3"
+  },
+  {
+    "path": "traderider/spel/sprites/crash-2.png",
+    "md5": "28b35534e782f031e1e55186048826a0"
+  },
+  {
+    "path": "traderider/spel/sprites/crash-3.png",
+    "md5": "bac967dd358ea8162df177098f47f4ff"
+  },
+  {
+    "path": "traderider/spel/sprites/crash-4.png",
+    "md5": "c78f7696d5abc369f733ad271c26390c"
+  },
+  {
+    "path": "traderider/spel/sprites/ride-1.png",
+    "md5": "47e5c6f1e979624f59fc9b3fc5f62734"
+  },
+  {
+    "path": "traderider/spel/sprites/ride-2.png",
+    "md5": "16b3dc9a57c7485c6785351fad75e111"
+  },
+  {
+    "path": "traderider/spel/sprites/ride-3.png",
+    "md5": "87517712cbccbdf4c041c8d4c29ea6a6"
+  },
+  {
+    "path": "traderider/spel/sprites/ride-4.png",
+    "md5": "db866a4d3f4d7928fe0253cf447394ee"
+  }
+]
