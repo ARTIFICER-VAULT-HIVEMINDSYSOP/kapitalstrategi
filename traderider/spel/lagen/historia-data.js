@@ -2,6 +2,8 @@
  * Fas 1. Verklig daglig serie i liten skala (index 100 vid första stängningen).
  * Inbäddad i modulen. Ingen hämtning och ingen valuta.
  * seriesId är datamängdens id, inte produktnamnet.
+ *
+ * Datakälla och indexering: se traderider/app/spel-test/historia-kalla.md.
  */
 export const HISTORIA = {
   seriesId: 'NVDA',
@@ -28,6 +30,6 @@ export const HISTORIA = {
     { t: '2026-08-12', o: 108.74, h: 110.73, l: 108.32, c: 110.24 },
     { t: '2026-08-13', o: 110.71, h: 111.78, l: 110.05, c: 110.83 },
     { t: '2026-08-14', o: 111.56, h: 111.91, l: 110.44, c: 110.76 },
-    { t: '2026-08-17', o: 111.19, h: 111.75, l: 110.85, c: 110.92 },
+    { t: '2026-08-17', o: 111.17, h: 112.12, l: 110.62, c: 110.69 },
   ],
 }
