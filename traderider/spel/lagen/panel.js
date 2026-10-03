@@ -74,7 +74,12 @@ html[data-tr-dock="top"] [data-tr-splash] .min-h-dvh{min-height:100%}
 html[data-tr-dock="top"][data-nlr-view="akademin"] .nlr-ak-in{padding-top:16px}
 html[data-tr-dock="top"] .nlr-rh-hud{top:12px}
 html[data-tr-dock="top"] .tr-fas{top:calc(var(--tr-header-b, var(--tr-chrome-b, 72px)) + 8px);max-height:calc(100dvh - var(--tr-header-b, 72px) - 16px);overflow:auto}
-@media (max-height:560px){div.relative.h-dvh>.absolute.top-36{display:none !important}}
+@media (max-height:560px){
+div.relative.h-dvh>.absolute.top-36{display:none !important}
+header.pointer-events-none .pointer-events-auto.flex-col>.rounded-xl.text-right{padding:2px 8px !important;width:max-content;max-width:min(220px,46vw)}
+header.pointer-events-none .pointer-events-auto.flex-col>.rounded-xl.text-right>.tabular-nums{display:none !important}
+header.pointer-events-none .pointer-events-auto.flex-col>.rounded-xl.text-right>.uppercase{white-space:nowrap}
+}
 @media (max-width:640px){.nlr-rsi-txt{min-width:64px}.nlr-rsi-txt b{font-size:14px}.nlr-toggle button{padding:0 9px;font-size:12px}.tr-skal{padding:3px}.tr-skal .tr-back{display:none}.tr-skal .tr-fs-txt{display:none}.tr-skal button{padding:0 9px}}
 @media (max-width:520px){.nlr-toggle{max-width:calc(100vw - 16px);overflow-x:auto}.nlr-toggle button{padding:0 8px;font-size:11px}header.pointer-events-none{flex-wrap:wrap}header.pointer-events-none>.pointer-events-auto:first-child{min-width:0;max-width:100%;flex:1 1 100%}header.pointer-events-none .overflow-x-auto{max-width:100%}header.pointer-events-none .overflow-x-auto button{min-width:0;padding-left:6px;padding-right:6px;font-size:11px;height:32px}}
 `
@@ -118,6 +123,95 @@ function shownBox(el) {
   const r = el.getBoundingClientRect()
   if (r.width < 2 || r.height < 2) return null
   return r
+}
+
+function progressMeter() {
+  const root = document.querySelector('div.relative.h-dvh')
+  if (!root) return null
+  return [...root.querySelectorAll('div')].find((node) => {
+    const cls = String(node.className)
+    return cls.includes('h-1') && cls.includes('max-w-3xl') && cls.includes('rounded-full')
+  }) ?? null
+}
+
+function practiceCard() {
+  const header = document.querySelector('header.pointer-events-none')
+  if (!header || getComputedStyle(header).display === 'none') return null
+  const notes = new Set([STRINGS.sv['hud.resultNote'], STRINGS.en['hud.resultNote'], STRINGS.uk['hud.resultNote']])
+  const names = [STRINGS.sv['hud.result'], STRINGS.en['hud.result'], STRINGS.uk['hud.result']]
+  for (const node of header.querySelectorAll('div')) {
+    if (node.children.length !== 2) continue
+    const head = (node.children[0].textContent || '').trim()
+    const note = (node.children[1].textContent || '').trim()
+    if (!notes.has(note)) continue
+    if (!names.some((name) => head === name || head.startsWith(`${name} `) || head.startsWith(`${name} ·`))) continue
+    return node
+  }
+  return null
+}
+
+function tradeButtons() {
+  return [...document.querySelectorAll('button[data-tr="buy"],button[data-tr="sell"],button[data-tr="flat"]')].filter((b) => {
+    const r = b.getBoundingClientRect()
+    return r.width > 8 && r.height > 8
+  })
+}
+
+/** Kortet får inte ligga över köpraden när spelplanen är nedskjuten under lägesraden. */
+function fitPracticeCard() {
+  const card = practiceCard()
+  if (!card) return
+  const note = card.children[1]
+  const row = card.previousElementSibling
+  const tile = row?.firstElementChild
+  const short = innerHeight <= 560
+  const restorePrice = () => {
+    if (!row?.dataset.trFitPrice) return
+    delete row.dataset.trFitPrice
+    if (tile) tile.style.padding = ''
+    for (const child of row.querySelectorAll('[data-tr-fit-hide]')) {
+      child.style.display = ''
+      delete child.dataset.trFitHide
+    }
+  }
+  if (!short) {
+    note.style.display = ''
+    card.style.marginTop = ''
+    restorePrice()
+    return
+  }
+  note.style.display = 'none'
+  card.style.marginTop = ''
+  restorePrice()
+  const limitFor = () => {
+    const r = card.getBoundingClientRect()
+    let limit = Infinity
+    for (const b of tradeButtons()) {
+      const br = b.getBoundingClientRect()
+      const iw = Math.min(r.right, br.right) - Math.max(r.left, br.left)
+      if (iw <= 2) continue
+      limit = Math.min(limit, br.top)
+    }
+    return limit
+  }
+  const crosses = () => {
+    const limit = limitFor()
+    return Number.isFinite(limit) && card.getBoundingClientRect().bottom > limit + 0.5
+  }
+  if (crosses() && tile && tile.children.length >= 2) {
+    row.dataset.trFitPrice = '1'
+    tile.style.padding = '2px 8px'
+    for (const child of [tile.children[0], tile.children[2]]) {
+      if (!child) continue
+      child.style.display = 'none'
+      child.dataset.trFitHide = '1'
+    }
+  }
+  const limit = limitFor()
+  if (Number.isFinite(limit)) {
+    const over = card.getBoundingClientRect().bottom - (limit - 4)
+    if (over > 1) card.style.marginTop = `${-Math.ceil(over)}px`
+  }
 }
 
 /** Underkanten på sidhuvudet och korten som ligger i den övre delen av spelplanen. */
@@ -222,6 +316,7 @@ async function main() {
     let top = Math.round(anchor.top - h - 8)
     if (top > aboveMax) top = aboveMax
     panel.classList.remove('compact')
+    panel.style.padding = ''
     if (top < minTop) {
       let low = anchor.bottom
       for (const el of document.querySelectorAll('button')) {
@@ -230,13 +325,18 @@ async function main() {
         if (r.width < 8 || r.height < 8 || r.bottom > pane.bottom + 2 || r.top < anchor.top - 8) continue
         if (r.bottom > low) low = r.bottom
       }
-      const compactH = 28
-      const below = Math.round(low + 4)
-      if (below + compactH > pane.bottom - 2) return park()
+      const meter = progressMeter()
+      const meterBox = shownBox(meter)
+      if (meterBox && meterBox.top >= anchor.top - 4 && meterBox.bottom <= pane.bottom + 2) low = Math.max(low, meterBox.bottom)
+      const below = Math.round(low + 2)
+      const room = Math.floor(pane.bottom - below - 2)
+      if (room < 12) return park()
+      const compactH = Math.min(28, room)
       top = below
       h = compactH
-      canvasH = 16
+      canvasH = Math.max(10, compactH - 4)
       panel.classList.add('compact')
+      panel.style.padding = compactH < 24 ? '0 8px' : ''
     }
     panel.style.left = `${Math.round(Math.max(pane.left, anchor.left))}px`
     panel.style.width = `${Math.round(Math.min(anchor.width, pane.width, innerWidth))}px`
@@ -285,6 +385,7 @@ async function main() {
       c.lineTo(W - 22, y(lv))
       c.stroke()
       c.globalAlpha = 1
+      if (panel.classList.contains('compact')) continue
       c.fillStyle = col
       c.font = '600 9px "IBM Plex Sans", sans-serif'
       c.textBaseline = 'middle'
@@ -840,6 +941,7 @@ async function main() {
     if (shell && !shell.closest('.nlr-duo, .nlr-raket')) shell.dataset.trLinebar = '1'
     placeSplash(bottom)
     syncPriceCaption()
+    fitPracticeCard()
     const sig = `${dock}:${bottom}:${innerWidth}`
     if (sig !== layoutChrome.sig) {
       layoutChrome.sig = sig

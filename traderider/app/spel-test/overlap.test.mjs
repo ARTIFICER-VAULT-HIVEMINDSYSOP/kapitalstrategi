@@ -328,11 +328,16 @@ function collect() {
       [r.left + pad, r.bottom - pad],
       [r.right - pad, r.bottom - pad],
     ]
+    const through = getComputedStyle(el).pointerEvents === 'none'
+    const prev = el.style.pointerEvents
+    if (through) el.style.pointerEvents = 'auto'
+    let onTop = true
     for (const [px, py] of points) {
       const hit = document.elementFromPoint(px, py)
-      if (!hit || (hit !== el && !el.contains(hit))) return false
+      if (!hit || (hit !== el && !el.contains(hit))) onTop = false
     }
-    return true
+    if (through) el.style.pointerEvents = prev
+    return onTop
   }
   const claims = []
   for (const el of document.querySelectorAll('[data-tr-claim]')) {
@@ -486,9 +491,55 @@ test('vyer: brickor, lägesrad, klick och höjd håller sig inom fönstret', { t
       await page.close().catch(() => {})
     }
   }
-  assert.equal(checked, MODES.length * 2 * VIEWPORTS.length + MODES.length * 2 + 3)
+  for (const phase of ['before', 'after']) {
+    for (const vp of [
+      { w: 568, h: 320, name: '568x320' },
+      { w: 667, h: 375, name: '667x375' },
+      { w: 740, h: 360, name: '740x360' },
+      { w: 844, h: 390, name: '844x390' },
+    ]) {
+      checked += 1
+      const page = await browser.newPage()
+      try {
+        await page.setViewport({ width: vp.w, height: vp.h, deviceScaleFactor: 1 })
+        await page.goto(base + '#trade-rider', { waitUntil: 'domcontentloaded', timeout: 30000 })
+        await page.waitForSelector('.tr-skal', { timeout: 20000 })
+        await new Promise((r) => setTimeout(r, 500))
+        if (phase === 'after') await begin(page, 'splash')
+        await new Promise((r) => setTimeout(r, 400))
+        const hits = await page.evaluate(tradeHits)
+        const bad = hits.filter((h) => h.state !== 'ok')
+        if (phase === 'after') {
+          if (bad.length) failures.push(`tr-1p ${phase} ${vp.name} träff: ${bad.map((h) => `${h.name}=${h.state}${h.other ? `:${h.other}` : ''}`).join(' | ')}`)
+        } else if (hits.some((h) => h.state === 'ok' || h.state === 'miss') && bad.length) {
+          failures.push(`tr-1p ${phase} ${vp.name} träff: ${bad.map((h) => `${h.name}=${h.state}${h.other ? `:${h.other}` : ''}`).join(' | ')}`)
+        }
+        await page.screenshot({ path: join(SHOTS, `tr-1p-${phase}-${vp.name}-flat.png`) })
+      } finally {
+        await page.close().catch(() => {})
+      }
+    }
+  }
+  assert.equal(checked, MODES.length * 2 * VIEWPORTS.length + MODES.length * 2 + 3 + 8)
   assert.deepEqual(failures, [], `${checked} kontroller, ${failures.length} fel`)
 })
+
+function tradeHits() {
+  const names = ['buy', 'sell', 'flat']
+  return names.map((name) => {
+    const el = document.querySelector(`button[data-tr="${name}"]`)
+    if (!el) return { name, state: 'missing' }
+    const r = el.getBoundingClientRect()
+    if (r.width < 8 || r.height < 8) return { name, state: 'hidden' }
+    const cx = r.left + r.width / 2
+    const cy = r.top + r.height / 2
+    if (cx < 1 || cy < 1 || cx > innerWidth - 1 || cy > innerHeight - 1) return { name, state: 'offscreen' }
+    const hit = document.elementFromPoint(cx, cy)
+    if (hit && (hit === el || el.contains(hit))) return { name, state: 'ok' }
+    const other = hit ? String(hit.innerText || hit.className || hit.tagName).replace(/\s+/g, ' ').trim().slice(0, 40) : 'tomt'
+    return { name, state: 'miss', other }
+  })
+}
 
 async function userClick(page, selector) {
   const handle = await page.waitForSelector(selector, { visible: true, timeout: 8000 })

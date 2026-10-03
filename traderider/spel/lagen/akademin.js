@@ -92,6 +92,7 @@ const css = `
 @media (prefers-reduced-motion:reduce){.nlr-ak-toast.on,.nlr-ak-toast svg,.nlr-ak-toast .shine{animation:none}}
 .nlr-ak-claim{display:none;margin:0;padding:10px 12px;border-radius:0;background:rgba(118,185,0,.12);color:${INK};font-size:13px;line-height:1.45}
 @media (max-width:820px){.nlr-ak-in{grid-template-columns:minmax(0,1fr);padding-top:60px}.nlr-ak aside{order:2}.nlr-ak-claim{display:block}.nlr-ak-chart canvas{height:300px}.nlr-ak h1{font-size:24px}.nlr-ak-choice>span{min-width:100%}.nlr-ak kbd{display:none}}
+@media (max-width:480px){.nlr-ak-chart canvas{height:210px}}
 `
 
 function medalSvg(a, uid) {
