@@ -182,7 +182,7 @@ export function rabbitSprite({ eating = false } = {}) {
       { id: 'arm-r', kind: 'arm', on: 'body', x: 42, y: -66 },
       { id: 'ear-l', kind: 'ear', on: 'head', x: -20, y: -96, inner: 'pink' },
       { id: 'ear-r', kind: 'ear', on: 'head', x: 22, y: -90, inner: 'pink' },
-      { id: 'battery', kind: 'battery', on: 'body', x: 0, y: -22, logo: false },
+      { id: 'battery', kind: 'battery', on: 'arm-r', x: 62, y: -66, logo: false },
       { id: 'head', kind: 'head', on: 'head', x: 0, y: 10 },
       { id: 'eye-l', kind: 'eye', on: 'head', x: -12, y: 8, frame },
       { id: 'eye-r', kind: 'eye', on: 'head', x: 12, y: 8, frame },
@@ -237,9 +237,24 @@ function drawEar(c, tip, side) {
   c.fill()
 }
 
+/** Samma ruta som drawBattery: kroppen plus polen till höger. */
+export function batteryBounds(part) {
+  return { left: part.x - 16, top: part.y - 11, right: part.x + 21, bottom: part.y + 11 }
+}
+
+/** Bålens ellips, rx 26 och ry 30, samma mått som ritningen. */
+export function torsoBounds(part) {
+  return { left: part.x - 26, top: part.y - 30, right: part.x + 26, bottom: part.y + 30 }
+}
+
+export function boundsIntersect(a, b) {
+  return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
+}
+
 function drawBattery(c, p) {
-  const x = p.x - 16
-  const y = p.y - 11
+  const box = batteryBounds(p)
+  const x = box.left
+  const y = box.top
   c.fillStyle = '#d08a3c'
   roundRect(c, x, y, 32, 22, 4)
   c.fill()
@@ -583,14 +598,29 @@ function drawFloater(c, floater) {
   c.restore()
 }
 
-function drawHp(c, hp, w) {
-  const x0 = Math.max(16, w - 28 - 8 * 16)
+const HP_DROP = 40
+
+function hpRowTop(hud, root) {
+  let top = 18 + HP_DROP
+  try {
+    const hb = hud.getBoundingClientRect()
+    const rb = root.getBoundingClientRect()
+    if (hb.height > 4 && rb.height > 4) top = Math.max(top, hb.bottom - rb.top + 8)
+  } catch {
+    /* mätningen saknas i testmiljön */
+  }
+  return top
+}
+
+function drawHp(c, hp, w, top) {
+  const x0 = Math.max(16, w - 28 - HP_MAX * 16)
+  const y = top
   for (let i = 0; i < HP_MAX; i++) {
     c.fillStyle = i < hp ? '#ff8a2a' : 'rgba(255,255,255,0.18)'
     c.beginPath()
-    c.moveTo(x0 + i * 16, 18)
-    c.lineTo(x0 + i * 16 + 5, 28)
-    c.lineTo(x0 + i * 16 - 5, 28)
+    c.moveTo(x0 + i * 16, y)
+    c.lineTo(x0 + i * 16 + 5, y + 10)
+    c.lineTo(x0 + i * 16 - 5, y + 10)
     c.closePath()
     c.fill()
   }
@@ -726,21 +756,20 @@ export function createRabbit() {
     c.setTransform(dpr, 0, 0, dpr, 0, 0)
     drawTunnel(c, w, h, y, spin, reduced)
     const scale = Math.max(1.08, Math.min(1.5, w / 500))
+    const inFront = (item) => item.kind === 'chili' && item.y < rabbitY - 30
     for (const item of items) {
-      if (item.y < rabbitY - 30) continue
+      if (inFront(item)) continue
       if (item.kind === 'carrot') drawCarrot(c, item.x, item.y, item.scale || 1)
       else if (item.kind === 'chili') drawChili(c, item.x, item.y, item.scale || 1)
       else drawSign(c, item.x, item.y, item.scale || 1, item.label)
     }
     drawRabbit(c, xPos, rabbitY, scale, sprite)
     for (const item of items) {
-      if (item.y >= rabbitY - 30) continue
-      if (item.kind === 'carrot') drawCarrot(c, item.x, item.y, item.scale || 1)
-      else if (item.kind === 'chili') drawChili(c, item.x, item.y, item.scale || 1)
-      else drawSign(c, item.x, item.y, item.scale || 1, item.label)
+      if (!inFront(item)) continue
+      drawChili(c, item.x, item.y, item.scale || 1)
     }
     drawFloater(c, floater)
-    drawHp(c, hp, w)
+    drawHp(c, hp, w, hpRowTop(hud, root))
   }
 
   function apply(intent) {
