@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { STRINGS } from '../../spel/lagen/i18n.js'
 import { preRaceQuestions, spokenLines, guardLines, PRE_RACE, speechView, createGuideState } from '../../spel/lagen/robban-script.js'
 import { rocketX } from '../../spel/lagen/tra.js'
 
@@ -22,6 +23,21 @@ test('frågorna före loppet är fasta och kommer från samma manus', () => {
   assert.equal(first[0].prompt.length > 0, true)
   assert.equal(first[0].choices.length, 2)
   assert.notEqual(first[0].prompt, first[1].prompt)
+})
+
+test('växeln har Trade Rider Academy och framsidan saknar intern text', () => {
+  const panel = readFileSync(new URL('../../spel/lagen/panel.js', import.meta.url), 'utf8')
+  assert.match(panel, /MODES\.tra\.nameKey/)
+  assert.match(panel, /setView\('tra'\)/)
+  assert.match(panel, /toggle\.append\(bLine, bRaket, bAcademy, bRabbit, bTra\)/)
+  for (const lang of ['sv', 'en', 'uk']) {
+    const lead = STRINGS[lang]['tra.lead']
+    assert.equal(/utkast|draft|чернетка/i.test(lead), false, lang)
+    assert.match(lead, /Robban|Роббан/)
+    assert.match(STRINGS[lang]['tra.raceNote'], /simuler|simulated|симул/i)
+  }
+  assert.match(STRINGS.sv['tra.raceNote'], /kan gå bra/)
+  assert.match(STRINGS.sv['tra.raceNote'], /kan gå dåligt/)
 })
 
 test('talbubblan har en enda stängning, och raketen rör sig åt höger', () => {

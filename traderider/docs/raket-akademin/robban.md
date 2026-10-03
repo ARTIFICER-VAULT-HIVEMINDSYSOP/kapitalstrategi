@@ -8,6 +8,6 @@ Figuren är en egen teckning: vitt skal, guldantenn, cyanvisir och blå ryggsäc
 
 ## Koppling
 
-Frågorna före loppet kommer från Robbans manus, i fast ordning, som ett utkast. De är en rekommendation, inte ett krav. Loppet går att starta ändå, och Trade Rider går att öppna ändå.
+Frågorna före loppet kommer från Robbans manus, i fast ordning. De är en rekommendation, inte ett krav. Loppet går att starta ändå, och Trade Rider går att öppna ändå.
 
 Rösten följer Robban-linjen: säkerhet före fart. Nämns en uppgång står risken i samma mening.

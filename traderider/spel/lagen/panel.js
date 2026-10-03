@@ -451,8 +451,9 @@ async function main() {
   const bRaket = el('button', '', t(MODES.raket.nameKey))
   const bAcademy = el('button', '', t(MODES.akademin.nameKey))
   const bRabbit = el('button', '', t(MODES.rabbitHole.nameKey))
-  bLine.type = bRaket.type = bAcademy.type = bRabbit.type = 'button'
-  toggle.append(bLine, bRaket, bAcademy, bRabbit)
+  const bTra = el('button', '', t(MODES.tra.nameKey))
+  bLine.type = bRaket.type = bAcademy.type = bRabbit.type = bTra.type = 'button'
+  toggle.append(bLine, bRaket, bAcademy, bRabbit, bTra)
   copySkin(periodPill, toggle)
   toggle.style.zIndex = '60'
   document.body.appendChild(toggle)
@@ -594,6 +595,7 @@ async function main() {
     bRaket.setAttribute('aria-pressed', String(view === 'raket'))
     bAcademy.setAttribute('aria-pressed', String(view === 'akademin'))
     bRabbit.setAttribute('aria-pressed', String(view === 'rabbit'))
+    bTra.setAttribute('aria-pressed', String(view === 'tra'))
     document.title = viewTitle()
     modeToggle.style.display = view === 'akademin' || view === 'rabbit' || view === 'tra' ? 'none' : ''
     b1.setAttribute('aria-pressed', String(mode === '1p'))
@@ -684,12 +686,14 @@ async function main() {
   bRaket.setAttribute('aria-pressed', 'false')
   bAcademy.setAttribute('aria-pressed', 'false')
   bRabbit.setAttribute('aria-pressed', 'false')
+  bTra.setAttribute('aria-pressed', 'false')
   b1.setAttribute('aria-pressed', 'true')
   b2.setAttribute('aria-pressed', 'false')
   bLine.onclick = () => setView(selectMode({ via: 'click', value: 1 }))
   bRaket.onclick = () => setView(selectMode({ via: 'click', value: 2 }))
   bAcademy.onclick = () => setView(selectMode({ via: 'click', value: 3 }))
   bRabbit.onclick = () => setView(selectMode({ via: 'click', value: 4 }))
+  bTra.onclick = () => setView('tra')
   b1.onclick = () => setMode('1p')
   b2.onclick = () => setMode('2p')
   let hashBooted = false
@@ -719,6 +723,7 @@ async function main() {
     bRaket.textContent = t(MODES.raket.nameKey)
     bAcademy.textContent = t(MODES.akademin.nameKey)
     bRabbit.textContent = t(MODES.rabbitHole.nameKey)
+    bTra.textContent = t(MODES.tra.nameKey)
     modeToggle.setAttribute('aria-label', t('players.aria'))
     b1.textContent = t('players.1')
     b2.textContent = t('players.2')
