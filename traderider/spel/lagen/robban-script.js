@@ -189,10 +189,7 @@ export function speechView(state, lang) {
   if (topic === 'stopp') {
     return {
       say: table['rb.stopp'],
-      choices: [
-        { id: 'prerace', label: table['rb.choice.prerace'], act: 'prerace' },
-        { id: 'min', label: table['rb.choice.min'], act: 'close' },
-      ],
+      choices: [{ id: 'prerace', label: table['rb.choice.prerace'], act: 'prerace' }],
     }
   }
   if (topic === 'prerace') {
@@ -200,10 +197,7 @@ export function speechView(state, lang) {
     const replyKey = lastReplyKey(state)
     if (!pending) {
       const say = replyKey ? `${table[replyKey]} ${table['rb.done']}` : table['rb.done']
-      return {
-        say,
-        choices: [{ id: 'min', label: table['rb.choice.min'], act: 'close' }],
-      }
+      return { say, choices: [] }
     }
     const say = replyKey ? `${table[replyKey]} ${table[pending.prompt]}` : table[pending.prompt]
     return {
@@ -221,7 +215,6 @@ export function speechView(state, lang) {
     choices: [
       { id: 'prerace', label: table['rb.choice.prerace'], act: 'prerace' },
       { id: 'stopp', label: table['rb.choice.stopp'], act: 'stopp' },
-      { id: 'min', label: table['rb.choice.min'], act: 'close' },
     ],
   }
 }

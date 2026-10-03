@@ -1,15 +1,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { preRaceQuestions, spokenLines, guardLines, PRE_RACE } from '../../spel/lagen/robban-script.js'
-
-function points(n = 40) {
-  const out = []
-  for (let i = 0; i < n; i++) {
-    const price = 100 + Math.sin(i / 4) * 4
-    out.push({ price, upper: price + 6, lower: price - 6, mid: price, t: i, c: price })
-  }
-  return out
-}
+import { readFileSync } from 'node:fs'
+import { preRaceQuestions, spokenLines, guardLines, PRE_RACE, speechView, createGuideState } from '../../spel/lagen/robban-script.js'
+import { rocketX } from '../../spel/lagen/tra.js'
 
 test('Robbans rader klarar innehållsvakten på alla Akademins språk', () => {
   for (const lang of ['sv', 'en', 'uk']) {
@@ -31,9 +24,19 @@ test('frågorna före loppet är fasta och kommer från samma manus', () => {
   assert.notEqual(first[0].prompt, first[1].prompt)
 })
 
-test('Akademin har Robban nere till höger, öppnar helfigur och stänger tillbaka', async () => {
+test('talbubblan har en enda stängning, och raketen rör sig åt höger', () => {
+  const greet = speechView(createGuideState(), 'sv')
+  assert.equal(greet.choices.some((c) => c.act === 'close'), false)
+  assert.equal(rocketX(640, 0) < rocketX(640, 0.4), true)
+  assert.equal(rocketX(640, 0.4) < rocketX(640, 0.8), true)
+  const akademin = readFileSync(new URL('../../spel/lagen/akademin.js', import.meta.url), 'utf8')
+  assert.equal(akademin.includes('mountRobban'), false)
+  assert.equal(akademin.includes('drawRobbanCraft'), false)
+})
+
+test('Trade Rider Academy har Robban nere till höger, öppnar helfigur och stänger tillbaka', async () => {
   const { Window } = await import('happy-dom')
-  const w = new Window({ url: 'https://www.kapitalstrategi.com/traderider/spel/#academy' })
+  const w = new Window({ url: 'https://www.kapitalstrategi.com/traderider/spel/#tra' })
   globalThis.window = w
   globalThis.document = w.document
   globalThis.localStorage = w.localStorage
@@ -48,11 +51,9 @@ test('Akademin har Robban nere till höger, öppnar helfigur och stänger tillba
   globalThis.innerHeight = 800
   w.localStorage.setItem('app.language', 'sv')
 
-  const { createAkademin } = await import('../../spel/lagen/akademin.js')
-  const storage = { getItem: () => null, setItem() {} }
-  const engine = { track: { points: points() }, spec: { log: false, key: '1y' }, quote: { candles: [] } }
-  const akademin = createAkademin({ engine, storage })
-  akademin.show()
+  const { createTradeRiderAcademy } = await import('../../spel/lagen/tra.js')
+  const tra = createTradeRiderAcademy()
+  tra.show()
 
   const hud = document.querySelector('[data-robban-hud]')
   assert.ok(hud, 'HUD-knapp saknas')
@@ -80,8 +81,22 @@ test('Akademin har Robban nere till höger, öppnar helfigur och stänger tillba
   assert.equal(document.querySelector('[data-robban-root]').dataset.robbanState, 'open')
   const figure = pop.querySelector('[data-robban-figure="full"]')
   assert.ok(figure)
-  assert.equal(figure.style.overflow, 'visible')
+  assert.equal(figure.style.overflow, 'hidden')
+  assert.equal(pop.style.flexDirection, 'column')
+  assert.equal(figure.nextElementSibling.className.includes('rb-speech'), true)
   assert.ok(parseFloat(figure.style.height) >= 160)
+  assert.equal(figure.querySelector('button'), null)
+  const minimera = [...pop.querySelectorAll('button')].filter((b) => b.textContent === 'Minimera')
+  assert.equal(minimera.length, 1)
+  assert.equal(pop.querySelectorAll('[data-rb-act="close"]').length, 0)
+  assert.ok(pop.querySelectorAll('.rb-choices button, [data-robban-close]').length > 0)
+  for (const button of pop.querySelectorAll('.rb-choices button, [data-robban-close]')) {
+    assert.equal(button.closest('.rb-speech') != null, true)
+  }
+  const stand = document.querySelector('[data-robban-stand]')
+  const question = document.querySelector('[data-robban-prerace] button')
+  assert.ok(stand)
+  assert.equal(stand.contains(question), false)
   assert.ok(figure.querySelector('[data-part="head"]'))
   assert.ok(figure.querySelector('[data-part="torso"]'))
   assert.ok(figure.querySelector('[data-part="legs"]'))
@@ -105,10 +120,14 @@ test('Akademin har Robban nere till höger, öppnar helfigur och stänger tillba
   const reply = document.querySelector('[data-robban-prerace] [data-rb-reply]').textContent
   assert.equal(reply, preRaceQuestions('sv')[0].choices[0].reply)
 
-  akademin.step(0.05)
-  const canvas = document.querySelector('.nlr-ak-chart canvas')
+  document.querySelector('[data-tra-start]').click()
+  tra.step(0.2)
+  const canvas = document.querySelector('[data-tra-canvas]')
+  assert.equal(canvas.dataset.rocketDir, 'ltr')
   assert.equal(canvas.dataset.robbanRide, 'on')
+  assert.ok(rocketX(640, 0.2) > rocketX(640, 0))
 
-  akademin.hide()
+  tra.hide()
   assert.equal(document.querySelector('[data-robban-root]').hidden, true)
+  assert.equal(document.querySelector('[data-tra]').classList.contains('on'), false)
 })

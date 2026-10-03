@@ -1,11 +1,13 @@
-# Robban i Akademin
+# Robban i Trade Rider Academy
 
-Robban Robotsson är guiden i Akademin (läge 3, `#academy`). Han anropas med en knapp som sitter kvar nere till höger. Öppnas den hoppar han upp i helfigur, med en talbubbla och några svar att klicka på. Minimera lägger tillbaka honom i knappen.
+Robban Robotsson är guiden i Trade Rider Academy (`#tra`, även `#trade-rider-academy`). Det är ett eget spår. Akademin (`#academy`) är oförändrad.
 
-Figuren är en egen teckning i hans etablerade look: vitt skal, guldantenn, cyanvisir och blå ryggsäck. Under loppet, när grafen spelas, åker samma figur på en liten farkost längs kurslinjen.
+Han anropas med en knapp som sitter kvar nere till höger. Öppnas den hoppar panelen upp, med hela kroppen ovanför talbubblan och en enda stängknapp. Stängning lägger tillbaka honom i knappen. På framsidan står samma figur där den dekorativa personen skulle ha stått.
+
+Figuren är en egen teckning: vitt skal, guldantenn, cyanvisir och blå ryggsäck. I loppet flyger en raket från vänster till höger, och samma figur åker på en liten farkost längs linjen.
 
 ## Koppling
 
-Frågorna före loppet kommer från Robbans manus, i fast ordning. De är en rekommendation, inte ett krav. Trade Rider går att öppna ändå, och en utmärkelse låser inte upp handel.
+Frågorna före loppet kommer från Robbans manus, i fast ordning, som ett utkast. De är en rekommendation, inte ett krav. Loppet går att starta ändå, och Trade Rider går att öppna ändå.
 
 Rösten följer Robban-linjen: säkerhet före fart. Nämns en uppgång står risken i samma mening.

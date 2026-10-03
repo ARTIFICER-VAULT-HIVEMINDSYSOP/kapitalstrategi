@@ -30,6 +30,13 @@ export const MODES = {
     nameKey: 'mode.akademin.name',
     orientation: { movement: 'right', highPriceSide: 'up' },
   },
+  tra: {
+    id: 'tra',
+    hash: 'tra',
+    aliases: ['trade-rider-academy'],
+    nameKey: 'mode.tra.name',
+    orientation: { movement: 'right', highPriceSide: 'up' },
+  },
   rabbitHole: {
     id: 'rabbit-hole',
     hash: 'rabbit-hole',
@@ -219,6 +226,7 @@ export const MODE_ORDER = ['line', 'raket', 'akademin', 'rabbit']
 export function modeFromHash(hash) {
   const raw = String(hash || '').replace(/^#/, '').split('?')[0]
   const h = raw.replace(/-2p$/, '')
+  if (h === 'tra' || h === 'trade-rider-academy') return 'tra'
   if (h === '4' || h.includes('rabbit')) return 'rabbit'
   if (h === '3' || h.includes('academy') || h.includes('akademin')) return 'akademin'
   if (h === '2' || h.includes('racex') || h.includes('raket')) return 'raket'
@@ -229,6 +237,7 @@ export function hashForView(view) {
   if (view === 'rabbit') return 'rabbit-hole'
   if (view === 'raket') return 'racex'
   if (view === 'akademin') return 'academy'
+  if (view === 'tra') return 'tra'
   return 'trade-rider'
 }
 

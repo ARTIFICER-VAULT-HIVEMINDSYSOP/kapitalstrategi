@@ -14,6 +14,7 @@ import { createRaket } from './raket.js'
 import { createRabbit } from './rabbit.js'
 import { createDuo } from './duo.js'
 import { createAkademin } from './akademin.js'
+import { createTradeRiderAcademy } from './tra.js'
 import { isTypingTarget } from './keys.js'
 import { t, onLang, mountSwitcher, setPriceKey, STRINGS } from './i18n.js'
 import { readSide, cycleIndex, stepSide, ENTRY_SIDE } from './styrmotor.js'
@@ -56,11 +57,12 @@ const css = `
 html[data-nlr-view="raket"] .tr-skal .lang-switcher-btn.active{background:#e8f4ff;color:#061022}
 html[data-nlr-view="raket"] .tr-skal a{color:#e8f4ff !important;font:600 12px "IBM Plex Mono",ui-monospace,monospace !important;letter-spacing:.06em}
 html.tr-fs-css,html.tr-fs-css body{height:100dvh;overflow:hidden}
-html.tr-fs-css[data-nlr-view="akademin"],html.tr-fs-css[data-nlr-view="akademin"] body{overflow:auto}
+html.tr-fs-css[data-nlr-view="akademin"],html.tr-fs-css[data-nlr-view="akademin"] body,html.tr-fs-css[data-nlr-view="tra"],html.tr-fs-css[data-nlr-view="tra"] body{overflow:auto}
 a[href="/login"]{display:none !important}
 .tr-sim{position:fixed;z-index:60;pointer-events:none;box-sizing:border-box;font:600 11px/1.25 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.02em;color:${INK};background:rgba(246,242,234,.94);border:1px solid rgba(28,25,21,.16);border-radius:999px;padding:4px 10px;white-space:nowrap;max-width:calc(100vw - 16px);overflow:hidden;text-overflow:ellipsis}
 html[data-nlr-view="raket"] .tr-sim{color:#e8f4ff;background:rgba(8,12,32,.85);border-color:rgba(64,224,255,.5);font:600 11px/1.25 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.04em}
 html[data-nlr-view="akademin"] .nlr-ak-in{padding-top:calc(var(--tr-chrome-b, 72px) + 16px)}
+html[data-nlr-view="tra"] .nlr-tra-in{padding-top:calc(var(--tr-chrome-b, 72px) + 16px)}
 .tr-chrome{position:fixed;z-index:70;display:flex;flex-wrap:wrap;align-items:center;gap:6px;box-sizing:border-box;pointer-events:none;max-width:calc(100vw - 16px)}
 .tr-chrome>.nlr-pill,.tr-chrome>.tr-sim,.tr-chrome>.tr-instr-open{position:relative !important;inset:auto !important;pointer-events:auto;flex:0 1 auto;margin:0}
 .tr-chrome>.nlr-toggle{max-width:100% !important;overflow:visible !important;flex-wrap:wrap;height:auto;align-items:center}
@@ -69,9 +71,9 @@ html[data-nlr-view="akademin"] .nlr-ak-in{padding-top:calc(var(--tr-chrome-b, 72
 html[data-nlr-solo="0"] header.pointer-events-none,html[data-nlr-solo="0"] [data-tr-linebar]{display:none !important}
 html[data-tr-dock="top"],html[data-tr-dock="top"] body{height:100%;overflow:hidden}
 html[data-tr-dock="top"] div.relative.h-dvh{margin-top:var(--tr-chrome-b,0px);height:calc(100dvh - var(--tr-chrome-b,0px));max-height:calc(100dvh - var(--tr-chrome-b,0px))}
-html[data-tr-dock="top"] .nlr-duo.on,html[data-tr-dock="top"] .nlr-raket.on,html[data-tr-dock="top"] .nlr-rh.on,html[data-tr-dock="top"] .nlr-ak.on{top:var(--tr-chrome-b,0px);bottom:auto;height:calc(100dvh - var(--tr-chrome-b,0px))}
+html[data-tr-dock="top"] .nlr-duo.on,html[data-tr-dock="top"] .nlr-raket.on,html[data-tr-dock="top"] .nlr-rh.on,html[data-tr-dock="top"] .nlr-ak.on,html[data-tr-dock="top"] .nlr-tra.on{top:var(--tr-chrome-b,0px);bottom:auto;height:calc(100dvh - var(--tr-chrome-b,0px))}
 html[data-tr-dock="top"] [data-tr-splash] .min-h-dvh{min-height:100%}
-html[data-tr-dock="top"][data-nlr-view="akademin"] .nlr-ak-in{padding-top:16px}
+html[data-tr-dock="top"][data-nlr-view="akademin"] .nlr-ak-in,html[data-tr-dock="top"][data-nlr-view="tra"] .nlr-tra-in{padding-top:16px}
 html[data-tr-dock="top"] .nlr-rh-hud{top:12px}
 html[data-tr-dock="top"] .tr-fas{top:calc(var(--tr-header-b, var(--tr-chrome-b, 72px)) + 8px);max-height:calc(100dvh - var(--tr-header-b, 72px) - 16px);overflow:auto}
 @media (max-height:560px){
@@ -225,7 +227,7 @@ function bandFloor(pane) {
   }
   take(shownBox(document.querySelector('header.pointer-events-none')))
   for (const node of document.querySelectorAll('div, span, small, p, button')) {
-    if (node.closest('.nlr-rsi, .tr-chrome, [data-tr-splash], .nlr-raket, .nlr-duo, .nlr-rh, .nlr-ak')) continue
+    if (node.closest('.nlr-rsi, .tr-chrome, [data-tr-splash], .nlr-raket, .nlr-duo, .nlr-rh, .nlr-ak, .nlr-tra')) continue
     if (node.children.length) continue
     const text = (node.textContent || '').trim()
     if (!BAND_LABEL.test(text)) continue
@@ -320,7 +322,7 @@ async function main() {
     if (top < minTop) {
       let low = anchor.bottom
       for (const el of document.querySelectorAll('button')) {
-        if (el.closest('.tr-chrome, header.pointer-events-none, [data-tr-splash], .nlr-raket, .nlr-duo, .nlr-rh, .nlr-ak')) continue
+        if (el.closest('.tr-chrome, header.pointer-events-none, [data-tr-splash], .nlr-raket, .nlr-duo, .nlr-rh, .nlr-ak, .nlr-tra')) continue
         const r = el.getBoundingClientRect()
         if (r.width < 8 || r.height < 8 || r.bottom > pane.bottom + 2 || r.top < anchor.top - 8) continue
         if (r.bottom > low) low = r.bottom
@@ -476,6 +478,7 @@ async function main() {
   const raket = createRaket({ engine: eng, skinFrom: periodPill })
   const duo = createDuo({ engine: eng, skinFrom: periodPill })
   const akademin = createAkademin({ engine: eng, skinFrom: periodPill })
+  const tra = createTradeRiderAcademy()
   const rabbit = createRabbit()
   let view = 'line'
   let mode = '1p'
@@ -592,7 +595,7 @@ async function main() {
     bAcademy.setAttribute('aria-pressed', String(view === 'akademin'))
     bRabbit.setAttribute('aria-pressed', String(view === 'rabbit'))
     document.title = viewTitle()
-    modeToggle.style.display = view === 'akademin' || view === 'rabbit' ? 'none' : ''
+    modeToggle.style.display = view === 'akademin' || view === 'rabbit' || view === 'tra' ? 'none' : ''
     b1.setAttribute('aria-pressed', String(mode === '1p'))
     b2.setAttribute('aria-pressed', String(mode === '2p'))
     if (!lineSolo) {
@@ -602,28 +605,39 @@ async function main() {
       }
       panel.style.display = 'none'
     }
-    if (view === 'akademin') {
+    if (view === 'tra') {
+      akademin.hide()
+      duo.hide()
+      raket.hide()
+      rabbit.hide()
+      tra.show()
+    } else if (view === 'akademin') {
+      tra.hide()
       duo.hide()
       raket.hide()
       rabbit.hide()
       akademin.show()
     } else if (view === 'rabbit') {
+      tra.hide()
       akademin.hide()
       duo.hide()
       raket.hide()
       rabbit.show()
     } else if (view === 'raket') {
+      tra.hide()
       akademin.hide()
       rabbit.hide()
       duo.hide()
       raket.setMode(mode)
       raket.show()
     } else if (mode === '2p') {
+      tra.hide()
       akademin.hide()
       rabbit.hide()
       raket.hide()
       duo.visible() || duo.show()
     } else {
+      tra.hide()
       akademin.hide()
       rabbit.hide()
       raket.hide()
@@ -641,7 +655,7 @@ async function main() {
     syncSnap()
     if (push) {
       const slug = hashForView(view)
-      const h = slug + (mode === '2p' && view !== 'akademin' && view !== 'rabbit' ? '-2p' : '')
+      const h = slug + (mode === '2p' && view !== 'akademin' && view !== 'rabbit' && view !== 'tra' ? '-2p' : '')
       try {
         history.replaceState(history.state, '', `#${h}`)
       } catch {
@@ -652,6 +666,7 @@ async function main() {
   function viewTitle() {
     if (view === 'raket') return t(MODES.raket.nameKey)
     if (view === 'akademin') return t(MODES.akademin.nameKey)
+    if (view === 'tra') return t(MODES.tra.nameKey)
     if (view === 'rabbit') return t(MODES.rabbitHole.nameKey)
     return t(MODES.trendRider.nameKey)
   }
@@ -682,7 +697,7 @@ async function main() {
     const h = source == null ? location.hash : source
     view = modeFromHash(h)
     mode = String(h).includes('2p') ? '2p' : '1p'
-    const slug = hashForView(view) + (mode === '2p' && view !== 'akademin' && view !== 'rabbit' ? '-2p' : '')
+    const slug = hashForView(view) + (mode === '2p' && view !== 'akademin' && view !== 'rabbit' && view !== 'tra' ? '-2p' : '')
     apply(location.hash !== `#${slug}`)
   }
   addEventListener('hashchange', () => fromHash(location.hash))
@@ -771,7 +786,7 @@ async function main() {
     const narrow = innerWidth <= 520
     if (narrow) {
       toggle.style.maxWidth = 'calc(100vw - 16px)'
-      if (mode === '2p' || view === 'akademin' || view === 'rabbit') {
+      if (mode === '2p' || view === 'akademin' || view === 'rabbit' || view === 'tra') {
         toggle.style.left = '8px'
         toggle.style.top = '8px'
         toggle.style.height = '36px'
@@ -787,12 +802,12 @@ async function main() {
       return
     }
     toggle.style.maxWidth = ''
-    if (mode === '2p' || view === 'akademin') {
-      // delad skärm / Akademin: båda växlarna centrerade överst, över delningen
+    if (mode === '2p' || view === 'akademin' || view === 'tra') {
+      // delad skärm / Akademin / Trade Rider Academy: växeln centrerad överst
       const h = innerWidth <= 640 ? 36 : 40
       toggle.style.height = `${h}px`
       const tw = toggle.getBoundingClientRect().width
-      const mw = view === 'akademin' ? -8 : modeToggle.getBoundingClientRect().width
+      const mw = view === 'akademin' || view === 'tra' ? -8 : modeToggle.getBoundingClientRect().width
       const sw = skal.getBoundingClientRect().width
       const left = Math.max(4, Math.round((innerWidth - tw - 8 - mw - 8 - sw) / 2))
       toggle.style.left = `${left}px`
