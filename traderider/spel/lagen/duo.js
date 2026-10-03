@@ -15,7 +15,7 @@ const css = `
 .nlr-duo.on{display:block}
 .nlr-duo-half{position:absolute;overflow:hidden;display:flex;flex-direction:column}
 .nlr-duo-hud{flex:none;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:8px 8px 0}
-.nlr-duo-claim{flex:1 0 100%;margin:0;font:500 11px/1.35 "IBM Plex Sans",sans-serif;color:#5c564c;pointer-events:none}
+.nlr-duo-claim{flex:1 0 100%;margin:0;font:500 11px/1.35 "IBM Plex Sans",sans-serif;color:#5c564c}
 .nlr-duo-play{position:relative;flex:1;min-height:0}
 .nlr-duo-play canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .nlr-duo-half .nlr-duo-card{position:relative;top:auto;left:auto;right:auto;max-width:48%}

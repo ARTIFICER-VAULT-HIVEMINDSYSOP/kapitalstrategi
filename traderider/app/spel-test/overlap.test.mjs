@@ -21,8 +21,6 @@ const VIEWPORTS = [
   { w: 390, h: 844, dpr: 3, name: '390x844-dpr3' },
   { w: 768, h: 1024, dpr: 1, name: '768x1024' },
   { w: 844, h: 390, dpr: 1, name: '844x390' },
-  { w: 740, h: 360, dpr: 1, name: '740x360' },
-  { w: 667, h: 375, dpr: 1, name: '667x375' },
   { w: 1280, h: 800, dpr: 1, name: '1280x800' },
   { w: 1440, h: 900, dpr: 1, name: '1440x900' },
 ]
@@ -449,7 +447,46 @@ test('vyer: brickor, lägesrad, klick och höjd håller sig inom fönstret', { t
       }
     }
   }
-  assert.equal(checked, MODES.length * 2 * VIEWPORTS.length + MODES.length * 2)
+  for (const vp of [
+    { w: 844, h: 390, name: '844x390' },
+    { w: 740, h: 360, name: '740x360' },
+    { w: 667, h: 375, name: '667x375' },
+  ]) {
+    checked += 1
+    const page = await browser.newPage()
+    try {
+      await page.setViewport({ width: vp.w, height: vp.h, deviceScaleFactor: 1 })
+      await page.goto(base + '#trade-rider', { waitUntil: 'domcontentloaded', timeout: 30000 })
+      await page.waitForSelector('.tr-skal', { timeout: 20000 })
+      await new Promise((r) => setTimeout(r, 500))
+      await begin(page, 'splash')
+      await new Promise((r) => setTimeout(r, 400))
+      const hit = await page.evaluate(() => {
+        const panel = document.querySelector('.nlr-rsi')
+        if (!panel || getComputedStyle(panel).display === 'none') return 'dold'
+        const pr = panel.getBoundingClientRect()
+        if (pr.height < 8 || pr.top < 1 || pr.bottom > innerHeight - 1) return 'utanför'
+        const hits = []
+        for (const el of document.querySelectorAll('header.pointer-events-none button, header.pointer-events-none div')) {
+          if (el.closest('.nlr-rsi')) continue
+          const text = (el.innerText || '').replace(/\s+/g, ' ').trim()
+          const interesting = el.tagName === 'BUTTON' || /^(Övning|Practice|Тренування|1D|5D|1M|6M|1Y|5Y|Max|Maks|Live)\b/.test(text)
+          if (!interesting) continue
+          const r = el.getBoundingClientRect()
+          if (r.width < 2 || r.height < 2 || r.height > 160) continue
+          const iw = Math.min(pr.right, r.right) - Math.max(pr.left, r.left)
+          const ih = Math.min(pr.bottom, r.bottom) - Math.max(pr.top, r.top)
+          if (iw > 1 && ih > 1) hits.push(text.slice(0, 28) || el.tagName)
+        }
+        return hits.length ? [...new Set(hits)].join(' | ') : ''
+      })
+      if (hit) failures.push(`tr-1p after ${vp.name} rsi: ${hit}`)
+      await page.screenshot({ path: join(SHOTS, `tr-1p-rsi-${vp.name}.png`) })
+    } finally {
+      await page.close().catch(() => {})
+    }
+  }
+  assert.equal(checked, MODES.length * 2 * VIEWPORTS.length + MODES.length * 2 + 3)
   assert.deepEqual(failures, [], `${checked} kontroller, ${failures.length} fel`)
 })
 
