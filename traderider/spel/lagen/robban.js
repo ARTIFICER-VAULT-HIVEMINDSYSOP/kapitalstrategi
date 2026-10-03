@@ -114,9 +114,12 @@ export function mountRobban({ onAnswer } = {}) {
     if (!open) return
     const view = speechView(guide, getLang())
     pop.replaceChildren()
-    const short = (window.innerHeight || 800) < 640
-    const figureW = short ? 64 : 104
-    const figureH = short ? 112 : 196
+    const w = window.innerWidth || 1280
+    const h = window.innerHeight || 800
+    const narrow = w <= 720 || h <= 520
+    const short = h < 640
+    const figureW = narrow ? 72 : short ? 64 : 104
+    const figureH = narrow ? 132 : short ? 112 : 196
     const figure = el('div', 'rb-figure')
     figure.dataset.robbanFigure = 'full'
     figure.style.overflow = 'hidden'
@@ -160,6 +163,8 @@ export function mountRobban({ onAnswer } = {}) {
     pop.style.flexDirection = 'column'
     pop.style.alignItems = 'flex-end'
     pop.style.gap = '12px'
+    pop.style.width = narrow ? '168px' : 'min(360px, calc(100vw - 16px))'
+    pop.style.right = '12px'
     pop.style.maxHeight = 'calc(100vh - 108px)'
     pop.style.overflow = 'auto'
     speech.style.width = '100%'

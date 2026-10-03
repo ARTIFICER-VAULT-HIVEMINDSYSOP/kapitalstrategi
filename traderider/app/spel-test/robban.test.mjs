@@ -38,6 +38,22 @@ test('växeln har Trade Rider Academy och framsidan saknar intern text', () => {
   }
   assert.match(STRINGS.sv['tra.raceNote'], /kan gå bra/)
   assert.match(STRINGS.sv['tra.raceNote'], /kan gå dåligt/)
+  assert.match(STRINGS.sv['land.lead'], /Fem lägen/)
+  assert.equal(/Fyra lägen/.test(STRINGS.sv['land.lead']), false)
+  assert.match(STRINGS.en['land.lead'], /Five modes/)
+  assert.equal(/Four modes/.test(STRINGS.en['land.lead']), false)
+  assert.match(STRINGS.uk['land.lead'], /П’ять режимів/)
+  assert.equal(/Чотири режими/.test(STRINGS.uk['land.lead']), false)
+  for (const lang of ['sv', 'en', 'uk']) {
+    assert.equal(STRINGS[lang]['land.traKeys'].includes('#tra'), false, lang)
+    assert.equal(STRINGS[lang]['land.traKeys'].includes('#academy'), false, lang)
+  }
+  assert.match(panel, /isActive: \(\) => view !== 'tra'/)
+  assert.match(panel, /instr\.hide\(\)/)
+  const traSrc = readFileSync(new URL('../../spel/lagen/tra.js', import.meta.url), 'utf8')
+  assert.match(traSrc, /root\.scrollTop = 0/)
+  assert.match(traSrc, /prefers-reduced-motion/)
+  assert.match(traSrc, /data-tra-risk/)
 })
 
 test('talbubblan har en enda stängning, och raketen rör sig åt höger', () => {
@@ -136,12 +152,39 @@ test('Trade Rider Academy har Robban nere till höger, öppnar helfigur och stä
   const reply = document.querySelector('[data-robban-prerace] [data-rb-reply]').textContent
   assert.equal(reply, preRaceQuestions('sv')[0].choices[0].reply)
 
+  const scroller = document.querySelector('[data-tra]')
+  scroller.scrollTop = 480
+  document.documentElement.scrollTop = 200
   document.querySelector('[data-tra-start]').click()
+  assert.equal(scroller.scrollTop, 0)
+  assert.equal(document.documentElement.scrollTop, 0)
+  const risk = document.querySelector('[data-tra-risk]')
+  assert.match(risk.textContent, /kan gå bra/)
+  assert.match(risk.textContent, /kan gå dåligt/)
   tra.step(0.2)
   const canvas = document.querySelector('[data-tra-canvas]')
   assert.equal(canvas.dataset.rocketDir, 'ltr')
   assert.equal(canvas.dataset.robbanRide, 'on')
+  assert.equal(canvas.dataset.rocketMotion, 'on')
   assert.ok(rocketX(640, 0.2) > rocketX(640, 0))
+
+  scroller.scrollTop = 320
+  document.querySelector('[data-tra-back]').click()
+  assert.equal(scroller.scrollTop, 0)
+  assert.equal(document.documentElement.scrollTop, 0)
+  assert.ok(document.querySelector('[data-tra-start]'))
+
+  globalThis.matchMedia = (query) => ({
+    matches: String(query).includes('reduce'),
+    media: String(query),
+    addEventListener() {},
+    removeEventListener() {},
+  })
+  document.querySelector('[data-tra-start]').click()
+  assert.equal(tra.state().clock, 0)
+  assert.equal(document.querySelector('[data-tra-canvas]').dataset.rocketMotion, 'off')
+  await new Promise((r) => setTimeout(r, 40))
+  assert.equal(tra.state().clock, 0)
 
   tra.hide()
   assert.equal(document.querySelector('[data-robban-root]').hidden, true)

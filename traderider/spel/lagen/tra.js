@@ -26,6 +26,7 @@ const css = `
 .nlr-tra-start:focus-visible,.nlr-tra-back:focus-visible{outline:3px solid ${CYAN};outline-offset:2px}
 .nlr-tra-race{display:flex;flex-direction:column;gap:12px}
 .nlr-tra-race h1{margin:0;font:600 28px/1.1 Fraunces,Georgia,serif}
+.nlr-tra-risk{margin:0}
 .nlr-tra canvas{width:100%;height:min(420px,62vh);background:#050814;border-radius:18px;border:1px solid rgba(34,211,238,.35);display:block}
 @media (max-width:720px){
   .nlr-tra-stage{grid-template-columns:1fr;gap:16px}
@@ -33,6 +34,17 @@ const css = `
   .nlr-tra-hero svg{width:112px;height:220px}
   .nlr-tra-copy h1{font-size:28px}
   .nlr-tra-in{padding-bottom:300px}
+}
+@media (max-width:720px),(max-height:520px){
+  .nlr-tra-copy{padding-right:184px;box-sizing:border-box}
+}
+@media (max-height:500px){
+  .nlr-tra-race{gap:8px}
+  .nlr-tra-race h1{font-size:22px}
+  .nlr-tra canvas{height:min(160px,36vh)}
+}
+@media (prefers-reduced-motion:reduce){
+  .nlr-tra canvas{scroll-behavior:auto}
 }
 `
 
@@ -87,6 +99,15 @@ function drawRocket(ctx, x, y) {
   ctx.restore()
 }
 
+function reducedMotion() {
+  if (typeof matchMedia !== 'function') return false
+  try {
+    return matchMedia('(prefers-reduced-motion: reduce)').matches
+  } catch {
+    return false
+  }
+}
+
 function drawRace(ctx, width, height, t) {
   ctx.clearRect(0, 0, width, height)
   ctx.fillStyle = SKY
@@ -137,7 +158,7 @@ export function createTradeRiderAcademy() {
       root.innerHTML = `<div class="nlr-tra-in nlr-tra-race">
         <p class="nlr-tra-claim" data-tr-claim="1">${t('sim.claim')}</p>
         <h1>${t('tra.raceTitle')}</h1>
-        <p>${t('tra.raceNote')}</p>
+        <p class="nlr-tra-risk" data-tra-risk="1">${t('tra.raceNote')}</p>
         <canvas data-tra-canvas data-rocket-dir="ltr" aria-label="${t('tra.canvas')}"></canvas>
         <div><button type="button" class="nlr-tra-back" data-tra-back>${t('tra.back')}</button></div>
       </div>`
@@ -166,6 +187,7 @@ export function createTradeRiderAcademy() {
     if (!cv) return
     cv.dataset.rocketDir = 'ltr'
     cv.dataset.robbanRide = playing ? 'on' : 'off'
+    cv.dataset.rocketMotion = reducedMotion() ? 'off' : 'on'
     cv.dataset.rocketX = String(Math.round(rocketX(cv.clientWidth || 640, clock)))
     const w = cv.clientWidth || 640
     const h = cv.clientHeight || 320
@@ -178,8 +200,24 @@ export function createTradeRiderAcademy() {
     drawRace(ctx, w, h, clock)
   }
 
+  function resetScroll() {
+    const go = () => {
+      root.scrollTop = 0
+      const doc = document.scrollingElement || document.documentElement
+      if (doc) doc.scrollTop = 0
+      if (document.body) document.body.scrollTop = 0
+      if (typeof window.scrollTo === 'function') window.scrollTo(0, 0)
+    }
+    go()
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(go)
+  }
+
   function frame(now) {
     if (!visible || !playing) return
+    if (reducedMotion()) {
+      draw()
+      return
+    }
     const dt = Math.min(0.05, (now - last) / 1000 || 0)
     last = now
     clock += dt
@@ -195,9 +233,10 @@ export function createTradeRiderAcademy() {
     playing = Boolean(start)
     clock = 0
     paint()
-    if (playing) {
+    resetScroll()
+    cancelAnimationFrame(raf)
+    if (playing && !reducedMotion()) {
       last = performance.now()
-      cancelAnimationFrame(raf)
       raf = requestAnimationFrame(frame)
     }
   })

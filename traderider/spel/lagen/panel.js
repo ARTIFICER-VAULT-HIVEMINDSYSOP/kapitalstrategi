@@ -63,6 +63,7 @@ a[href="/login"]{display:none !important}
 html[data-nlr-view="raket"] .tr-sim{color:#e8f4ff;background:rgba(8,12,32,.85);border-color:rgba(64,224,255,.5);font:600 11px/1.25 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.04em}
 html[data-nlr-view="akademin"] .nlr-ak-in{padding-top:calc(var(--tr-chrome-b, 72px) + 16px)}
 html[data-nlr-view="tra"] .nlr-tra-in{padding-top:calc(var(--tr-chrome-b, 72px) + 16px)}
+html[data-nlr-view="tra"] .tr-instr,html[data-nlr-view="tra"] .tr-instr-open{display:none !important}
 .tr-chrome{position:fixed;z-index:70;display:flex;flex-wrap:wrap;align-items:center;gap:6px;box-sizing:border-box;pointer-events:none;max-width:calc(100vw - 16px)}
 .tr-chrome>.nlr-pill,.tr-chrome>.tr-sim,.tr-chrome>.tr-instr-open{position:relative !important;inset:auto !important;pointer-events:auto;flex:0 1 auto;margin:0}
 .tr-chrome>.nlr-toggle{max-width:100% !important;overflow:visible !important;flex-wrap:wrap;height:auto;align-items:center}
@@ -492,7 +493,7 @@ async function main() {
   }
   const instr = mountInstruction(document.body, {
     getOrientation: () => orientationFor(),
-    isActive: () => true,
+    isActive: () => view !== 'tra',
   })
   const fas = mountFas(document.body, {
     getOrientation: () => orientationFor(),
@@ -608,6 +609,7 @@ async function main() {
       panel.style.display = 'none'
     }
     if (view === 'tra') {
+      instr.hide()
       akademin.hide()
       duo.hide()
       raket.hide()
