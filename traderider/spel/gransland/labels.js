@@ -34,7 +34,7 @@ export function formatPct(value) {
   return `${sign}${Math.abs(value).toFixed(1).replace('.', ',')} %`
 }
 
-export function phaseLabel({ phase, fetching, unknown, source, time, delayed }) {
+export function phaseLabel({ phase, fetching, unknown, source, time, delayed, course }) {
   if (unknown) return t('gl.unknown')
   if (fetching) return t('gl.fetching')
   if (phase === 'live' && source && time) {
@@ -42,7 +42,21 @@ export function phaseLabel({ phase, fetching, unknown, source, time, delayed }) 
     const base = t('gl.live', { source, time: clock })
     return delayed ? `${base} · ${t('gl.delayed')}` : base
   }
+  if (course === 'simulerad') return t('gl.sim')
   return t('hist.badge')
+}
+
+export function courseSegments({ course, phase, fetching, unknown, source, time, delayed }) {
+  const segments = []
+  if (course === 'simulerad') segments.push({ kind: 'simulerad', label: t('gl.sim') })
+  else segments.push({ kind: 'historia', label: t('hist.badge') })
+  if (phase === 'live' && !unknown && !fetching && source && time) {
+    segments.push({
+      kind: 'live',
+      label: phaseLabel({ phase: 'live', fetching: false, unknown: false, source, time, delayed, course }),
+    })
+  }
+  return segments
 }
 
 export function moneySentence(pct) {

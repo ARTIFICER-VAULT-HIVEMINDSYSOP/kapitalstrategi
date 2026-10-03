@@ -4,8 +4,8 @@ Gränslandet är övergången från den historiska banan till verkliga kurser. D
 
 ## Flöde
 
-1. Historisk bana. Verkliga historiska kurser, märkta VERKLIG · HISTORISK. Banorna slumpas inte.
-2. Loppet tar slut. Sista ljuset fryses. Valet syns direkt: Gå in i riktiga kurser, Spela historien igen, Tillbaka till menyn.
+1. Banan i spelet är simulerad och märks SIMULERAD. En verklig historisk serie, när den används, märks VERKLIG · HISTORISK. Ingen simulerad serie märks VERKLIG. Banorna slumpas inte.
+2. Loppet tar slut. Sista ljuset fryses och spelvärlden står stilla. Valet syns direkt: Gå in i riktiga kurser, Spela historien igen, Tillbaka till menyn.
 3. Live. Samma diagram fortsätter med verkliga kurser fram till nu, och sedan med nya kurser när de kommer. Spelaren ser bara data fram till nu. Under hämtningen står det Hämtar verkliga värden … och inga påhittade siffror visas.
 4. Två spelare delar skärmen och läser samma verkliga data. Var och en har egna simulerade val.
 

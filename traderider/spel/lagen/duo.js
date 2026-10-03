@@ -81,6 +81,7 @@ export function createDuo({ engine: main, skinFrom }) {
   let halves = []
   let visible = false
   let started = false
+  let sealing = false
 
   function rects() {
     const W = root.clientWidth || innerWidth
@@ -170,6 +171,7 @@ export function createDuo({ engine: main, skinFrom }) {
 
   function build() {
     destroy()
+    sealing = false
     halves = [makeHalf(0), makeHalf(1)]
     layout()
     halves.forEach((hv, i) => {
@@ -183,6 +185,14 @@ export function createDuo({ engine: main, skinFrom }) {
       hv.eng.onHud = (h) => {
         hv.hud = h
         paint(i)
+        if (sealing) return
+        if (h && (h.finished || h.crashed) && hv.eng.playing) {
+          sealing = true
+          hv.eng.pause()
+          sealing = false
+          hv.hud = hv.eng.hudSnap()
+          paint(i)
+        }
         noteTradeRiderDuo({
           huds: halves.map((item) => item.hud),
           candles: main.quote?.candles,

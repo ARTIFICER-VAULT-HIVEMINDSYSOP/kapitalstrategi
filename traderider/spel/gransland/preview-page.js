@@ -17,6 +17,7 @@ const session = createGransland({
   players,
   history: HISTORIA.bars,
   instrument: liveShot ? 'BTC-USD' : 'NVDA',
+  course: 'historia',
   poll: false,
   decisions: players === 2
     ? [{ side: 'buy', leverage: 2, entry: HISTORIA.bars.at(-1).c }, { side: 'sell', leverage: 1, entry: HISTORIA.bars.at(-1).c }]

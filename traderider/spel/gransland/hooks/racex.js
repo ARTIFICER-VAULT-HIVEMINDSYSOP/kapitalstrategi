@@ -11,6 +11,7 @@ export function noteRaceXEnd(ctx = {}) {
   noted = true
   signalRaceEnd({
     variant: 'racex',
+    course: 'simulerad',
     players: ctx.players === 2 ? 2 : 1,
     history: ctx.bars,
     decisions: ctx.decisions,

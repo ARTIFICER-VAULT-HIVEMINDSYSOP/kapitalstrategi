@@ -15,6 +15,7 @@ export function noteTradeRider(ctx = {}) {
   noted = true
   signalRaceEnd({
     variant: 'trade-rider',
+    course: 'simulerad',
     players: ctx.players || 1,
     history: ctx.candles,
     decisions: [{ side: hud.flat ? 'flat' : hud.side, leverage: hud.leverage, entry: hud.price }],
@@ -40,6 +41,7 @@ export function noteTradeRiderDuo(ctx = {}) {
   duoNoted = true
   signalRaceEnd({
     variant: 'trade-rider',
+    course: 'simulerad',
     players: 2,
     history: ctx.candles,
     decisions: huds.map((hud) => ({ side: hud.flat ? 'flat' : hud.side, leverage: hud.leverage, entry: hud.price })),

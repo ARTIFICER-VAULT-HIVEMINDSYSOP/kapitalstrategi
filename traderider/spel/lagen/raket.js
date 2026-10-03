@@ -514,6 +514,11 @@ export function createRaket({ engine }) {
     if (kind === 'reset') {
       fresh()
       render()
+      if (visible) {
+        cancelAnimationFrame(raf)
+        last = performance.now()
+        raf = requestAnimationFrame(frame)
+      }
       return
     }
     if (kind === 'pause') {
@@ -907,7 +912,7 @@ export function createRaket({ engine }) {
     c.fillText(sellW, col(pts[labI].lower) - 13, row(labI))
     c.textAlign = 'left'
 
-    c.setLineDash([2, 4])
+    c.setLineDash(clock.ended ? [] : [2, 4])
     c.strokeStyle = 'rgba(234,246,255,0.55)'
     c.lineWidth = 1.2
     path('price')
@@ -1326,7 +1331,7 @@ export function createRaket({ engine }) {
       }
     }
     render(dt)
-    if (visible) raf = requestAnimationFrame(frame)
+    if (visible && !clock.ended) raf = requestAnimationFrame(frame)
   }
   root.querySelector('[data-k="again"]').onclick = () => act(0, 'reset')
   entrySnap = mountEntrySnap(root, {

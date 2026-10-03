@@ -146,6 +146,55 @@ export const cases = [
     }
   }],
 
+  ['en simulerad serie från kroken märks inte som verklig', async (assert) => {
+    await ensureDom()
+    setLang('sv')
+    const bars = historyBars()
+    const fires = [
+      () => noteTradeRider({ hud: { finished: true, flat: false, side: 'buy', leverage: 1, price: 110 }, candles: bars, poll: false, enabled: false }),
+      () => noteTradeRiderDuo({
+        huds: [
+          { finished: true, flat: false, side: 'buy', leverage: 1, price: 110 },
+          { finished: true, flat: true, side: 'sell', leverage: 1, price: 110 },
+        ],
+        candles: bars,
+        poll: false,
+      }),
+      () => noteRaceXEnd({ ended: true, bars, decisions: [{ side: 'buy', leverage: 1 }], poll: false }),
+      () => noteAcademySeriesEnd({ reachedEnd: true, bars, side: 'long', poll: false }),
+      () => noteRabbitLap({ atEnd: true, bars, decisions: [{ side: 'sell', leverage: 1 }], poll: false }),
+    ]
+    for (const fire of fires) {
+      resetHooks()
+      fire()
+      const root = document.querySelector('[data-gl-root]')
+      const badge = root.querySelector('[data-gl-badge]').textContent
+      assert.equal(/VERKLIG/i.test(badge), false, badge)
+      assert.equal(badge, t('gl.sim'))
+      const sim = root.querySelector('[data-gl-segment="simulerad"]')
+      assert.equal(/VERKLIG/i.test(sim.textContent), false)
+      assert.equal(sim.textContent, t('gl.sim'))
+      assert.match(root.querySelector('[data-gl-claim]').textContent, /inte verkliga marknadsdata/)
+      root.remove()
+    }
+    const session = createGransland({
+      course: 'simulerad',
+      history: bars,
+      instrument: 'BTC-USD',
+      poll: false,
+      now: () => NOW,
+      fetch: coinbaseFetch(),
+    })
+    session.endRace()
+    await session.enterReal()
+    const snap = session.snapshot()
+    const simSeg = snap.segments.find((seg) => seg.kind === 'simulerad')
+    const liveSeg = snap.segments.find((seg) => seg.kind === 'live')
+    assert.equal(/VERKLIG/i.test(simSeg.label), false)
+    assert.match(liveSeg.label, /^VERKLIG · Coinbase ·/)
+    assert.match(snap.label, /^VERKLIG · Coinbase ·/)
+  }],
+
   ['för gammal eller utebliven data blir OKÄND utan siffror', async (assert) => {
     await ensureDom()
     setLang('sv')

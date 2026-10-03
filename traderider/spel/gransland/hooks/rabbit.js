@@ -12,6 +12,7 @@ export function noteRabbitLap(ctx = {}) {
   ctx.freeze?.()
   signalRaceEnd({
     variant: 'rabbit',
+    course: 'simulerad',
     players: ctx.players === 2 ? 2 : 1,
     history: ctx.bars,
     decisions: ctx.decisions,

@@ -6,7 +6,7 @@ import { assessFreshness } from './stale.js'
 import { loadInstrument } from './adapters.js'
 import { createPoller } from './feed.js'
 import { indicatorPack } from './indicators.js'
-import { phaseLabel, moneySentence } from './labels.js'
+import { phaseLabel, courseSegments, moneySentence } from './labels.js'
 import { attachLiveFeed, resetLiveFeedForTests } from '../lagen/live-port.js'
 
 export const VARIANTS = ['trade-rider', 'racex', 'academy', 'rabbit']
@@ -51,6 +51,7 @@ function simulatedPct(player, price) {
 
 export function createGransland(opts = {}) {
   const variant = VARIANTS.includes(opts.variant) ? opts.variant : 'trade-rider'
+  const course = opts.course === 'simulerad' ? 'simulerad' : 'historia'
   const enabled = opts.enabled !== false
   const workerUrl = opts.workerUrl === undefined ? WORKER_URL : opts.workerUrl
   const fetchImpl = opts.fetch || globalThis.fetch
@@ -164,7 +165,18 @@ export function createGransland(opts = {}) {
       fetching,
       unknown,
       reason,
+      course,
       label: phaseLabel({
+        phase: machine.phase(),
+        fetching,
+        unknown,
+        source,
+        time: quoteTime,
+        delayed,
+        course,
+      }),
+      segments: courseSegments({
+        course,
         phase: machine.phase(),
         fetching,
         unknown,

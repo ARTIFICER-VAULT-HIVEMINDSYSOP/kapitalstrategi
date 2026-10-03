@@ -12,6 +12,7 @@ export function noteAcademySeriesEnd(ctx = {}) {
   const side = ctx.side === 'short' ? 'sell' : ctx.side === 'long' ? 'buy' : 'flat'
   signalRaceEnd({
     variant: 'academy',
+    course: 'simulerad',
     players: 1,
     history: ctx.bars,
     decisions: [{ side, leverage: 1 }],

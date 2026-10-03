@@ -8,6 +8,9 @@ const css = `
 .gl-root[data-variant="racex"] .gl-card{background:#10183f;color:#eaf6ff;border-color:rgba(46,230,255,.35)}
 .gl-root[data-variant="rabbit"] .gl-card{background:#1c120f;color:#f4efe6;border-color:rgba(231,177,90,.35)}
 .gl-badge{margin:0 0 6px;font:700 13px/1.3 "IBM Plex Sans",sans-serif;letter-spacing:.04em}
+.gl-segments{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.gl-segments span{font:700 12px/1.2 "IBM Plex Sans",sans-serif;letter-spacing:.03em;border:1px solid rgba(28,25,21,.22);border-radius:999px;padding:4px 8px}
+.gl-claim{margin:0 0 8px;font-size:13px}
 .gl-frozen{margin:0 0 8px;font-size:14px}
 .gl-chart{width:100%;height:180px;display:block;background:#1c1915;border-radius:10px}
 .gl-root[data-shot="frozen"] .gl-chart{height:240px}
@@ -44,19 +47,6 @@ function priceJump(left, right) {
   return Math.max(left, right) / Math.min(left, right) > 3
 }
 
-function chartWindow(bars) {
-  if (bars.length <= 140) return bars
-  let split = 0
-  for (let i = bars.length - 1; i > 0; i--) {
-    if (priceJump(bars[i - 1].c, bars[i].c)) {
-      split = i
-      break
-    }
-  }
-  if (!split) return bars.slice(-120)
-  return bars.slice(Math.max(0, split - 24), split).concat(bars.slice(split).slice(-100))
-}
-
 function scaleRuns(bars) {
   const runs = []
   for (const bar of bars) {
@@ -79,56 +69,75 @@ function drawChart(canvas, bars, gaps) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
   ctx.fillStyle = '#1c1915'
   ctx.fillRect(0, 0, w, h)
-  const shown = chartWindow(bars)
+  const runs = scaleRuns(bars)
+  if (!runs.length) return
+  const seam = runs.length > 1
+  const shown = (seam ? runs[runs.length - 1] : runs[0]).slice(-120)
   if (!shown.length) return
-  const slot = w / shown.length
-  const gapBefore = new Set((gaps || []).map((gap) => gap.before))
-  let index = 0
-  for (const run of scaleRuns(shown)) {
-    let lo = Infinity
-    let hi = -Infinity
-    for (const bar of run) {
-      lo = Math.min(lo, bar.l)
-      hi = Math.max(hi, bar.h)
-    }
-    const span = hi - lo || 1
-    const y = (v) => 10 + ((hi - v) / span) * (h - 20)
-    run.forEach((bar, i) => {
-      const at = index + i
-      const x = at * slot + slot / 2
-      const up = bar.c >= bar.o
-      const last = at === shown.length - 1
-      ctx.strokeStyle = up ? '#2f8f7a' : '#d45d75'
-      ctx.fillStyle = ctx.strokeStyle
-      ctx.lineWidth = last ? 3 : 2
-      ctx.beginPath()
-      ctx.moveTo(x, y(bar.h))
-      ctx.lineTo(x, y(bar.l))
-      ctx.stroke()
-      const top = y(Math.max(bar.o, bar.c))
-      const bot = y(Math.min(bar.o, bar.c))
-      const body = Math.max(3, Math.min(8, slot * 0.62))
-      ctx.fillRect(x - body / 2, top, body, Math.max(2, bot - top))
-      if (i === 0 && at > 0) {
-        ctx.strokeStyle = 'rgba(243,237,226,.75)'
-        ctx.setLineDash([3, 3])
-        ctx.beginPath()
-        ctx.moveTo(at * slot + 1, 8)
-        ctx.lineTo(at * slot + 1, h - 8)
-        ctx.stroke()
-        ctx.setLineDash([])
-      } else if (gapBefore.has(bar.t)) {
-        ctx.strokeStyle = 'rgba(243,237,226,.7)'
-        ctx.setLineDash([3, 3])
-        ctx.beginPath()
-        ctx.moveTo(at * slot + 1, 8)
-        ctx.lineTo(at * slot + 1, h - 8)
-        ctx.stroke()
-        ctx.setLineDash([])
-      }
-    })
-    index += run.length
+  let lo = Infinity
+  let hi = -Infinity
+  for (const bar of shown) {
+    lo = Math.min(lo, bar.l, bar.c)
+    hi = Math.max(hi, bar.h, bar.c)
   }
+  const span = hi - lo || 1
+  const y = (v) => 10 + ((hi - v) / span) * (h - 20)
+  const slot = w / shown.length
+  const track = shown.every((bar) => Math.abs(bar.h - bar.l) < 1e-6 && Math.abs(bar.o - bar.c) < 1e-6)
+  if (seam) {
+    ctx.strokeStyle = 'rgba(243,237,226,.75)'
+    ctx.setLineDash([4, 4])
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.moveTo(14, 8)
+    ctx.lineTo(14, h - 8)
+    ctx.stroke()
+    ctx.setLineDash([])
+  }
+  if (track) {
+    ctx.beginPath()
+    ctx.strokeStyle = '#e7d7b1'
+    ctx.lineWidth = 2.5
+    ctx.lineJoin = 'round'
+    shown.forEach((bar, i) => {
+      const x = i * slot + slot / 2
+      if (i) ctx.lineTo(x, y(bar.c))
+      else ctx.moveTo(x, y(bar.c))
+    })
+    ctx.stroke()
+    const last = shown[shown.length - 1]
+    const x = (shown.length - 1) * slot + slot / 2
+    ctx.fillStyle = '#e7d7b1'
+    ctx.beginPath()
+    ctx.arc(x, y(last.c), 4.5, 0, Math.PI * 2)
+    ctx.fill()
+    return
+  }
+  const gapBefore = new Set((gaps || []).map((gap) => gap.before))
+  shown.forEach((bar, i) => {
+    const x = i * slot + slot / 2
+    const up = bar.c >= bar.o
+    ctx.strokeStyle = up ? '#2f8f7a' : '#d45d75'
+    ctx.fillStyle = ctx.strokeStyle
+    ctx.lineWidth = i === shown.length - 1 ? 3 : 2
+    ctx.beginPath()
+    ctx.moveTo(x, y(bar.h))
+    ctx.lineTo(x, y(bar.l))
+    ctx.stroke()
+    const top = y(Math.max(bar.o, bar.c))
+    const bot = y(Math.min(bar.o, bar.c))
+    const body = Math.max(3, Math.min(8, slot * 0.62))
+    ctx.fillRect(x - body / 2, top, body, Math.max(2, bot - top))
+    if (gapBefore.has(bar.t) && i > 0) {
+      ctx.strokeStyle = 'rgba(243,237,226,.7)'
+      ctx.setLineDash([3, 3])
+      ctx.beginPath()
+      ctx.moveTo(i * slot + 1, 8)
+      ctx.lineTo(i * slot + 1, h - 8)
+      ctx.stroke()
+      ctx.setLineDash([])
+    }
+  })
 }
 
 function figureRow(pack) {
@@ -166,6 +175,12 @@ export function mountView(host, session, opts = {}) {
   const badge = document.createElement('p')
   badge.className = 'gl-badge'
   badge.dataset.glBadge = '1'
+  const segments = document.createElement('div')
+  segments.className = 'gl-segments'
+  segments.dataset.glSegments = '1'
+  const claim = document.createElement('p')
+  claim.className = 'gl-claim'
+  claim.dataset.glClaim = '1'
   const frozen = document.createElement('p')
   frozen.className = 'gl-frozen'
   frozen.dataset.glFrozen = '1'
@@ -205,7 +220,7 @@ export function mountView(host, session, opts = {}) {
   split.className = 'gl-split'
   split.dataset.glSplit = '1'
   choice.append(enter, crypto, again, replay, menu)
-  card.append(badge, frozen, canvas, figures, split, money, choice)
+  card.append(badge, segments, claim, frozen, canvas, figures, split, money, choice)
   root.append(card)
   host.appendChild(root)
 
@@ -216,6 +231,15 @@ export function mountView(host, session, opts = {}) {
     root.dataset.glUnknown = snap.unknown ? '1' : '0'
     root.dataset.glFetching = snap.fetching ? '1' : '0'
     badge.textContent = snap.label
+    segments.replaceChildren()
+    for (const seg of snap.segments || []) {
+      const chip = document.createElement('span')
+      chip.dataset.glSegment = seg.kind
+      chip.textContent = seg.label
+      segments.append(chip)
+    }
+    claim.hidden = snap.course !== 'simulerad'
+    claim.textContent = snap.course === 'simulerad' ? t('sim.claim') : ''
     frozen.hidden = snap.phase !== 'gransland'
     frozen.textContent = snap.phase === 'gransland' ? t('gl.frozen') : ''
     drawChart(canvas, snap.bars, snap.gaps)

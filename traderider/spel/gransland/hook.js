@@ -29,6 +29,7 @@ export function signalRaceEnd(detail = {}) {
     workerUrl: detail.workerUrl,
     fetch: detail.fetch,
     now: detail.now,
+    course: detail.course === 'historia' ? 'historia' : 'simulerad',
     poll: detail.poll !== false,
     onReplay: detail.onReplay,
     onMenu: detail.onMenu,

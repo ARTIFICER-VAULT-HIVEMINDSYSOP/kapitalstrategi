@@ -248,6 +248,11 @@ function periodLabel(eng) {
 
 async function main() {
   const eng = await waitEngine()
+  const priorEvent = eng.onEvent
+  eng.onEvent = (ev) => {
+    priorEvent?.(ev)
+    if (ev && (ev.type === 'finish' || ev.type === 'crash') && eng.playing) eng.pause()
+  }
   const style = el('style')
   style.id = 'nvda-line-rsi-style'
   style.textContent = css
@@ -1016,8 +1021,10 @@ async function main() {
     if (view === 'line' && mode === '1p') {
       drawPanel()
       if (!fas.isCovering() && !instr.isOpen()) {
+        const hud = typeof eng.hudSnap === 'function' ? eng.hudSnap() : null
+        if (hud && (hud.finished || hud.crashed) && eng.playing) eng.pause()
         noteTradeRider({
-          hud: typeof eng.hudSnap === 'function' ? eng.hudSnap() : null,
+          hud,
           candles: eng.quote?.candles,
           replay() {
             eng.reset?.()
@@ -1053,6 +1060,7 @@ async function main() {
     raket,
     duo,
     akademin,
+    rabbit,
   }
 }
 
