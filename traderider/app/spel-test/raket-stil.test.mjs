@@ -2,7 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { HUD, smoothTo, rocketTilt, glitchLevel, GLITCH_AT, exhaustRate, parallaxSpeed, makeStars, STAR_LAYERS, effectLevels, FX_FULL } from '../../spel/lagen/raket.js'
+import { HUD, smoothTo, rocketTilt, headingFromPath, glitchLevel, GLITCH_AT, exhaustRate, parallaxSpeed, makeStars, STAR_LAYERS, effectLevels, FX_FULL } from '../../spel/lagen/raket.js'
 
 const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
 const lin = (v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)
@@ -53,6 +53,42 @@ test('nosen pekar i färdriktningen: lutning följer rälsen och är begränsad'
   assert.ok(rocketTilt(-10, 30) < 0)
   assert.equal(rocketTilt(0, 30), 0)
   assert.ok(Math.abs(rocketTilt(1e6, 30)) <= 0.6)
+  assert.ok(rocketTilt(12, 30, true) > 0)
+  assert.ok(Math.abs(rocketTilt(12, 30, true)) < Math.abs(rocketTilt(12, 30)))
+})
+
+test('nosen har samma tecken som banans lutning över flera bildrutor', () => {
+  const follow = (xs) => {
+    let tilt = 0
+    const frames = []
+    for (let i = 1; i < xs.length; i++) {
+      const slope = xs[i] - xs[i - 1]
+      const aim = headingFromPath([
+        { x: xs[i - 1], y: 120 },
+        { x: xs[i], y: 80 },
+      ])
+      tilt = smoothTo(tilt, aim, 1 / 30, 6)
+      frames.push({ slope, tilt })
+    }
+    return frames
+  }
+  const rise = follow([0, 8, 18, 30, 44, 60, 78])
+  assert.ok(rise.length >= 5)
+  assert.ok(rise.every((frame) => frame.slope > 0 && frame.tilt > 0))
+  const fall = follow([80, 62, 44, 28, 14, 4, 0])
+  assert.ok(fall.every((frame) => frame.slope < 0 && frame.tilt < 0))
+  let bank = 0
+  const lane = [100, 100, 148, 210, 250]
+  const banks = []
+  for (let i = 1; i < lane.length; i++) {
+    const slope = lane[i] - lane[i - 1]
+    bank = smoothTo(bank, headingFromPath([{ x: lane[i - 1], y: 160 }, { x: lane[i], y: 120 }]), 1 / 30, 6)
+    banks.push({ slope, tilt: bank })
+  }
+  assert.ok(banks.filter((frame) => frame.slope > 0).every((frame) => frame.tilt > 0))
+  const calm = headingFromPath([{ x: 0, y: 50 }, { x: 24, y: 10 }], true)
+  const full = headingFromPath([{ x: 0, y: 50 }, { x: 24, y: 10 }], false)
+  assert.ok(calm > 0 && calm < full)
 })
 test('glitch vid förlust ≥ 5 % – samma mått som asteroiderna; aldrig vid reducerad rörelse', () => {
   const st = { side: 'buy', entry: 100, realized: 0, lev: 3 }

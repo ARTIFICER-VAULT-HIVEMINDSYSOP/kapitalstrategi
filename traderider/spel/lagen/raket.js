@@ -251,9 +251,24 @@ export function smoothTo(cur, target, dt, rate) {
   if (cur == null || !Number.isFinite(cur)) return target
   return cur + (target - cur) * (1 - Math.exp(-rate * Math.max(0, dt)))
 }
-/** Lutning (radianer) ur rälsens sidled dx per rad. Positiv = nosen lutar åt höger. Nosen pekar alltid framåt (uppåt). */
-export function rocketTilt(dx, pxPer) {
-  return Math.max(-0.6, Math.min(0.6, Math.atan2(dx, pxPer)))
+/** Lutning (radianer) ur sidled dx mot färd uppåt. Positiv = nosen åt höger. Nosen pekar framåt.
+ *  calm dämpar vinkeln men behåller tecken, så riktningen syns även vid reducerad rörelse. */
+export function rocketTilt(dx, pxPer, calm = false) {
+  const up = Math.max(1, Math.abs(pxPer) || 1)
+  let angle = Math.atan2(dx, up)
+  if (calm) angle *= 0.65
+  const cap = calm ? 0.45 : 0.6
+  return Math.max(-cap, Math.min(cap, angle))
+}
+
+/** Nosen längs tangenten från första till sista punkten. y växer nedåt på skärmen. */
+export function headingFromPath(samples, calm = false) {
+  if (!samples || samples.length < 2) return 0
+  const a = samples[0]
+  const b = samples[samples.length - 1]
+  const dx = b.x - a.x
+  const dyUp = a.y - b.y
+  return rocketTilt(dx, dyUp > 0 ? dyUp : 1, calm)
 }
 /** Glitch vid förlust ≥ GLITCH_AT % – samma mått som asteroiderna (orealiserad rörelse utan hävstång). Margin call finns inte i Raket. */
 export const GLITCH_AT = 5
@@ -905,10 +920,26 @@ export function createRaket({ engine }) {
     const sellX = col(priceAt(p, 'lower'))
     const targetX = positionFor(flat ? 'flat' : st.side, buyX, sellX)
     const step = dt || 0.016
-    pl.shownX = smoothTo(pl.shownX, targetX, step, 11)
+    const prevX = pl.shownX
+    pl.shownX = smoothTo(pl.shownX, targetX, step, calm ? 14 : 11)
     const x = pl.shownX
-    const dx = col(priceAt(p + 0.5, f)) - col(priceAt(Math.max(0, p - 0.5), f))
-    pl.tilt = smoothTo(pl.tilt, rocketTilt(dx, pxPer), step, 7)
+    const railHere = col(priceAt(p, f))
+    const railAhead = col(priceAt(Math.min(pts.length - 1, p + 1), f))
+    const railDx = railAhead - railHere
+    const playing = clock.playing && !clock.ended && dt > 0
+    const forward = playing ? PTS_PER_SEC * dt * pxPer : pxPer
+    const backX = prevX == null ? x - railDx : prevX
+    // Framför: vald räls ett steg upp, plus sidsteget mot KÖP, SÄLJ eller FLAT.
+    const aheadX = targetX + railDx
+    const aim = headingFromPath(
+      [
+        { x: backX, y: rocketY + forward },
+        { x, y: rocketY },
+        { x: aheadX, y: rocketY - pxPer },
+      ],
+      calm,
+    )
+    pl.tilt = smoothTo(pl.tilt, aim, step, calm ? 11 : 6)
     const tilt = pl.tilt
     const accentRGB = st.side === 'buy' ? '140,240,60' : '255,90,106'
     const tagTxt = fx.boost > 0.01 ? t('rk.boost') : fx.loss > 0.01 ? t('rk.rocks') : flat && st.traded ? t('pos.flat') : ''
@@ -992,12 +1023,18 @@ export function createRaket({ engine }) {
       c.strokeStyle = `rgba(46,230,255,${(0.12 + 0.22 * fx.boost).toFixed(3)})`
       c.lineWidth = 1.2
       c.beginPath()
+      const ax = Math.sin(tilt)
+      const ay = Math.cos(tilt)
+      const px = Math.cos(tilt)
+      const py = -Math.sin(tilt)
       for (let k = 0; k < n; k++) {
         const ox = ((k * 53) % 150) - 75
         const len = 18 + 44 * fx.boost
-        const yy = rocketY - 70 + ((now * (260 + 380 * fx.boost) + k * 97) % 280)
-        c.moveTo(x + ox, yy)
-        c.lineTo(x + ox, yy + len)
+        const along = ((now * (260 + 380 * fx.boost) + k * 97) % 280) - 70
+        const sx = x + px * ox + ax * along
+        const sy = rocketY + py * ox + ay * along
+        c.moveTo(sx, sy)
+        c.lineTo(sx + ax * len, sy + ay * len)
       }
       c.stroke()
     }
