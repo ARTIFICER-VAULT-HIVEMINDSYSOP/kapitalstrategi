@@ -16,6 +16,7 @@ Varje spelläge är en övningsyta för samma steg, inte en egen väg förbi sko
 | RaceX (`#racex`, äldre `#raket`) | Samma övning, med rörelsen uppåt. |
 | Rabbit Hole (`#rabbit-hole`) | Samma övning, med rörelsen nedåt. Gränslandet ligger längst ned. |
 | Akademin (`#academy`, äldre `#akademin`) | Lektionerna, frågan och utmärkelsen, plus kapitlet Hansan – köpmännens riskskola. Utmärkelsen låser inte upp riktig handel. |
+| Trade Rider Academy (`#tra`, även `#trade-rider-academy`) | Eget spår. Robban Robotsson är guiden, med frågor före loppet som en rekommendation. Sedan flyger en raket från vänster till höger. |
 
 ## Spelarvärdet
 
@@ -25,6 +26,7 @@ Varje spelläge är en övningsyta för samma steg, inte en egen väg förbi sko
 | RaceX | Samma styrning och hävstång, sedd uppifrån och ned. Sedan Historia och Gränslandet. |
 | Rabbit Hole | Samma styrning, med fallet nedåt. Gränslandet är hålets botten. |
 | Akademin | Risk och positionsstorlek, stop-loss och take-profit, Bollingerband, RSI. Klarat moment ger en utmärkelse för lärandet. Ett övningsutfall kan se ut som vinst, men risken för förlust hör till samma mening. |
+| Trade Rider Academy | Frågor före loppet, sedan en raket från vänster till höger på en simulerad linje. Det kan gå bra, och det kan gå dåligt. |
 
 ## Tradingskolan
 

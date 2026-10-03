@@ -126,6 +126,12 @@ test('hash: #trade-rider, #racex, #academy och #rabbit-hole, med äldre alias', 
   assert.equal(selectMode({ via: 'hash', value: '#racex' }), 'raket')
   assert.equal(selectMode({ via: 'hash', value: '#raket' }), 'raket')
   assert.equal(selectMode({ via: 'key', value: '4' }), 'rabbit')
+  assert.equal(modeFromHash('#tra'), 'tra')
+  assert.equal(modeFromHash('#trade-rider-academy'), 'tra')
+  assert.equal(hashForView('tra'), 'tra')
+  assert.equal(selectMode({ via: 'hash', value: '#tra' }), 'tra')
+  assert.equal(modeFromHash('#academy'), 'akademin')
+  assert.equal(modeFromHash('#trade-rider'), 'line')
 })
 
 test('klick, tangent 1–4 och hash i alla fyra lägen, med alias', () => {
