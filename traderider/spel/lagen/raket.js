@@ -20,6 +20,7 @@ import { t, onLang } from './i18n.js'
 import { stepSide, readSide } from './styrmotor.js'
 import { positionFor } from './spar.js'
 import { mountEntrySnap, bindStepGestures } from './snapp.js'
+import { noteRaceXEnd, resetRaceXHook } from '../gransland/hooks/racex.js'
 
 // HUD-palett (kontrast mot BG_PANEL kontrolleras i test/raket-stil.test.mjs – WCAG AA)
 const BG_TOP = '#0d1238' // djupt marinblå
@@ -466,6 +467,7 @@ export function createRaket({ engine }) {
     clock.playing = false
     clock.started = false
     clock.ended = false
+    resetRaceXHook()
     for (const pl of players) pl.dom.el.remove()
     const n = mode === '2p' ? 2 : 1
     players = []
@@ -1308,9 +1310,19 @@ export function createRaket({ engine }) {
       if (clock.p >= pts.length - 1) {
         clock.ended = true
         clock.playing = false
-        const price = priceAt(clock.p)
         root.querySelector('[data-k="endTxt"]').textContent = t('end.body')
         endCard.classList.add('on')
+        noteRaceXEnd({
+          ended: true,
+          players: mode === '2p' ? 2 : 1,
+          bars: pts,
+          decisions: players.map((pl) => ({
+            side: isFlat(pl.st) ? 'flat' : pl.st.side,
+            leverage: pl.st.lev,
+            entry: pl.st.entry,
+          })),
+          replay: () => act(0, 'reset'),
+        })
       }
     }
     render(dt)

@@ -22,6 +22,7 @@ import { mountEntrySnap, bindStepGestures, mountRatt } from './snapp.js'
 import { mountInstruction } from './instruktion.js'
 import { mountFas } from './faser.js'
 import { scrubVisibleNames } from './synlig.js'
+import { noteTradeRider } from '../gransland/hooks/trade-rider.js'
 
 const bootHash = typeof window !== 'undefined' ? window.__trBootHash || '' : ''
 
@@ -1012,7 +1013,19 @@ async function main() {
     if (fas.isCovering()) sim.style.display = 'none'
     layoutChrome()
     syncSnap()
-    if (view === 'line' && mode === '1p') drawPanel()
+    if (view === 'line' && mode === '1p') {
+      drawPanel()
+      if (!fas.isCovering() && !instr.isOpen()) {
+        noteTradeRider({
+          hud: typeof eng.hudSnap === 'function' ? eng.hudSnap() : null,
+          candles: eng.quote?.candles,
+          replay() {
+            eng.reset?.()
+            eng.play?.()
+          },
+        })
+      }
+    }
     setTimeout(() => requestAnimationFrame(loop), 90)
   }
   loop()

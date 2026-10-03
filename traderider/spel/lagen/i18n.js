@@ -332,6 +332,19 @@ const sv = {
   'ak.err.price': 'Kurs saknas här.',
   'ak.err.long': 'Lång: stopp under och mål över ingångskursen.',
   'ak.err.short': 'Kort: stopp över och mål under ingångskursen.',
+  'gl.title': 'Gränslandet',
+  'gl.choice': 'Gå in i riktiga kurser',
+  'gl.fetching': 'Hämtar verkliga värden …',
+  'gl.unknown': 'OKÄND',
+  'gl.live': 'VERKLIG · {source} · {time}',
+  'gl.delayed': 'fördröjd',
+  'gl.money': 'Simulerade pengar',
+  'gl.risk': 'Ett bra resultat i spelet ger ingen garanti på marknaden, där du kan förlora pengar.',
+  'gl.crypto': 'Byt till krypto (dygnet runt)',
+  'gl.again': 'Spela igen',
+  'gl.frozen': 'Sista ljuset är fryst.',
+  'gl.player': 'Spelare {n}',
+  'gl.result': 'Simulerade pengar, utfall {pct}: ett bra resultat i spelet ger ingen garanti på marknaden, där du kan förlora pengar.',
 }
 
 const en = {
@@ -658,6 +671,19 @@ const en = {
   'ak.err.price': 'No price here.',
   'ak.err.long': 'Long: stop below and target above the entry price.',
   'ak.err.short': 'Short: stop above and target below the entry price.',
+  'gl.title': 'The borderland',
+  'gl.choice': 'Enter real prices',
+  'gl.fetching': 'Fetching real values …',
+  'gl.unknown': 'UNKNOWN',
+  'gl.live': 'REAL · {source} · {time}',
+  'gl.delayed': 'delayed',
+  'gl.money': 'Simulated money',
+  'gl.risk': 'A good result in the game is no guarantee in the market, where you can lose money.',
+  'gl.crypto': 'Switch to crypto (around the clock)',
+  'gl.again': 'Play again',
+  'gl.frozen': 'The last candle is frozen.',
+  'gl.player': 'Player {n}',
+  'gl.result': 'Simulated money, result {pct}: a good result in the game is no guarantee in the market, where you can lose money.',
 }
 
 const uk = {
@@ -984,6 +1010,19 @@ const uk = {
   'ak.err.price': 'Тут немає курсу.',
   'ak.err.long': 'Лонг: стоп нижче, ціль вище ціни входу.',
   'ak.err.short': 'Шорт: стоп вище, ціль нижче ціни входу.',
+  'gl.title': 'Прикордоння',
+  'gl.choice': 'Перейти до справжніх курсів',
+  'gl.fetching': 'Отримуємо справжні значення …',
+  'gl.unknown': 'НЕВІДОМО',
+  'gl.live': 'СПРАВЖНЄ · {source} · {time}',
+  'gl.delayed': 'із затримкою',
+  'gl.money': 'Симульовані гроші',
+  'gl.risk': 'Добрий результат у грі не гарантує нічого на ринку, де можна втратити гроші.',
+  'gl.crypto': 'Перейти на крипто (цілодобово)',
+  'gl.again': 'Грати знову',
+  'gl.frozen': 'Остання свічка заморожена.',
+  'gl.player': 'Гравець {n}',
+  'gl.result': 'Симульовані гроші, результат {pct}: добрий результат у грі не гарантує нічого на ринку, де можна втратити гроші.',
 }
 
 export const STRINGS = { sv, en, uk }

@@ -9,6 +9,7 @@ import { simTid } from './simtid.js'
 import { t, onLang } from './i18n.js'
 import { stepSide, readSide } from './styrmotor.js'
 import { bindStepGestures } from './snapp.js'
+import { noteTradeRiderDuo } from '../gransland/hooks/trade-rider.js'
 
 const css = `
 .nlr-duo{position:fixed;inset:0;z-index:45;display:none;background:#f3ede2;font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:#1c1915}
@@ -182,6 +183,13 @@ export function createDuo({ engine: main, skinFrom }) {
       hv.eng.onHud = (h) => {
         hv.hud = h
         paint(i)
+        noteTradeRiderDuo({
+          huds: halves.map((item) => item.hud),
+          candles: main.quote?.candles,
+          replay() {
+            build()
+          },
+        })
       }
       hv.eng.start()
       hv.hud = hv.eng.hudSnap()
