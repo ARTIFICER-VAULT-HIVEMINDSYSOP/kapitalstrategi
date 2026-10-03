@@ -15,7 +15,7 @@ Varje spelläge är en övningsyta för samma steg, inte en egen väg förbi sko
 | Trade Rider (`#trade-rider`, äldre `#nvda-rider`) | Övning i att styra mellan SÄLJ, FLAT och KÖP och att ändra hävstång. Högre hävstång kan ge större vinst men också större förlust. |
 | RaceX (`#racex`, äldre `#raket`) | Samma övning, med rörelsen uppåt. |
 | Rabbit Hole (`#rabbit-hole`) | Samma övning, med rörelsen nedåt. Gränslandet ligger längst ned. |
-| Akademin (`#academy`, äldre `#akademin`) | Lektionerna, frågan och utmärkelsen, plus kapitlet Hansan – köpmännens riskskola. Utmärkelsen låser inte upp riktig handel. |
+| Akademin (`#academy`, äldre `#akademin`) | Lektionerna, frågan och utmärkelsen, plus kapitlet Hansan – köpmännens riskskola. Robban Robotsson är guiden, med frågor före loppet som en rekommendation. Utmärkelsen låser inte upp riktig handel. |
 
 ## Spelarvärdet
 

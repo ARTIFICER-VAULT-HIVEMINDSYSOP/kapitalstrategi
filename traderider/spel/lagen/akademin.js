@@ -15,6 +15,8 @@ import { stepSide } from './styrmotor.js'
 import { bindStepGestures } from './snapp.js'
 import { positionFor } from './spar.js'
 import { chapterHtml, gradeAnswer, gradeLabel } from '../../../school/hansan-riskskola/text.js'
+import { mountRobban } from './robban.js'
+import { drawRobbanCraft } from './robban-art.js'
 
 const PAPER = '#f3ede2'
 const INK = '#1c1915'
@@ -29,7 +31,7 @@ const PTS_PER_SEC = 3
 const css = `
 .nlr-ak{position:fixed;inset:0;z-index:50;background:${PAPER};display:none;overflow:auto;font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:${INK}}
 .nlr-ak.on{display:block}
-.nlr-ak-in{max-width:1180px;margin:0 auto;padding:66px 16px 28px;display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px}
+.nlr-ak-in{max-width:1180px;margin:0 auto;padding:66px 16px 120px;display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px}
 .nlr-ak-card{border-radius:22px;padding:14px 16px;box-sizing:border-box}
 .nlr-ak small,.nlr-ak .kick{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:${MUTED};font-weight:600}
 .nlr-ak h1{margin:2px 0 4px;font:600 30px/1.05 Fraunces,Georgia,serif}
@@ -120,6 +122,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
   toast.setAttribute('role', 'status')
   toast.setAttribute('aria-live', 'polite')
   document.body.appendChild(toast)
+  const guide = mountRobban({ onAnswer() { if (visible) build() } })
 
   let prog = A.loadProgress(storage)
   let lesson = [1, 2, 3, 4].find((l) => !A.lessonDone(l, prog.earned)) ?? 4
@@ -332,7 +335,13 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
         <div class="nlr-ak-facts"><span>RSI 14 <b data-k="f_rsi">${r == null ? '—' : fmt1(r)}</b></span><span>%B <b data-k="f_pb">${pt ? fmt2(A.percentB(pt.price, pt)) : '—'}</b></span></div>
         ${quiz ? `<div class="nlr-ak-quiz">${['stretched_up', 'stretched_down', 'rsi_only'].map((k) => `<button type="button" data-act="ans" data-v="${k}">${A.readText(k)}</button>`).join('')}</div>` : ''}</div>`
     }
-    root.innerHTML = `<div class="nlr-ak-in">
+    let slot = root.querySelector(':scope > .nlr-ak-in')
+    if (!slot) {
+      slot = document.createElement('div')
+      slot.className = 'nlr-ak-in'
+      root.appendChild(slot)
+    }
+    slot.innerHTML = `
       <aside>
         <div class="nlr-ak-card sk"><span class="kick">${t('ak.kicker')}</span><h1>${t('mode.akademin')}</h1><p class="muted" data-tr-claim="1">${t('sim.claim')}</p><p class="muted">${t('ak.lead')}</p></div>
         <div class="nlr-ak-card sk nlr-ak-xp"><div class="row"><b>${t('ak.level', { n: lv.level })}</b><span>${t('ak.xp', { xp, max: A.XP_MAX })}</span></div><div class="nlr-ak-bar"><i style="width:${lvPct}%"></i></div><p class="muted">${t('ak.xpNote')}</p></div>
@@ -351,6 +360,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
         <section class="nlr-ak-card sk"><div style="display:flex;justify-content:space-between;align-items:center"><span class="kick">${t('ak.lessonOf', { n: lesson })}</span><span class="muted">${[1, 2, 3, 4].map((l) => (A.lessonDone(l, prog.earned) ? '●' : l === lesson ? '◉' : '○')).join(' ')}</span></div>
           <h2>${L.title}</h2><p>${L.text}</p>
           ${!rd ? `<div><button type="button" class="nlr-ak-btn" data-act="read">${t('ak.read')}</button></div>` : ''}</section>
+        ${guide.markup()}
         <section class="nlr-ak-card sk nlr-ak-chart"><div class="head"><span data-k="chartHead">—</span><span data-k="chartFacts">—</span></div>
           <canvas aria-label="${t('ak.canvas')}"></canvas>
           <div class="nlr-ak-transport">
@@ -367,7 +377,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
           ${allDone ? `<div class="nlr-ak-note">${t('ak.allDone')}</div>` : ''}
         </section>
         <section class="nlr-ak-card sk" data-chapter="hansan">${chapterHtml(getLang())}${hansaMsg ? `<p data-k="hansaMsg">${hansaMsg}</p>` : ''}</section>
-      </main></div>`
+      </main>`
     if (skinFrom) {
       const cs = getComputedStyle(skinFrom)
       root.querySelectorAll('.sk').forEach((c) => {
@@ -480,6 +490,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
   function draw() {
     const cv = root.querySelector('.nlr-ak-chart canvas')
     if (!cv || !pts.length) return
+    cv.dataset.robbanRide = playing ? 'on' : 'off'
     const W = cv.clientWidth
     const H = cv.clientHeight
     if (!W || !H) return
@@ -573,6 +584,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     c.beginPath()
     c.arc(x(i1), y(pt.price), 3.5, 0, Math.PI * 2)
     c.fill()
+    if (playing) drawRobbanCraft(c, x(i1), y(pt.price), p)
     const railFlat = positionFor('flat', y(pt.upper), y(pt.lower))
     c.strokeStyle = 'rgba(28,25,21,0.35)'
     c.setLineDash([2, 3])
@@ -705,6 +717,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
       data()
       visible = true
       root.classList.add('on')
+      guide.show()
       build()
       last = performance.now()
       cancelAnimationFrame(raf)
@@ -713,6 +726,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     hide() {
       visible = false
       playing = false
+      guide.hide()
       root.classList.remove('on')
       toast.classList.remove('on')
       cancelAnimationFrame(raf)
