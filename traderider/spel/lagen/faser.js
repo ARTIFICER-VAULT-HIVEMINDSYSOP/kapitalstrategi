@@ -104,7 +104,7 @@ function reducedMotion() {
 }
 
 const css = `
-.tr-fas{position:fixed;z-index:70;left:50%;top:88px;transform:translateX(-50%);width:min(440px,calc(100vw - 24px));box-sizing:border-box;background:rgba(246,242,234,.97);color:#1c1915;border:1px solid rgba(28,25,21,.16);border-radius:16px;padding:14px 16px 16px;font:500 14px/1.45 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;box-shadow:0 10px 30px rgba(28,25,21,.12)}
+.tr-fas{position:fixed;z-index:70;left:50%;top:calc(var(--tr-chrome-b, 72px) + 10px);transform:translateX(-50%);width:min(440px,calc(100vw - 24px));box-sizing:border-box;background:rgba(246,242,234,.97);color:#1c1915;border:1px solid rgba(28,25,21,.16);border-radius:16px;padding:14px 16px 16px;font:500 14px/1.45 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;box-shadow:0 10px 30px rgba(28,25,21,.12)}
 .tr-fas[data-place="bottom"]{top:auto;bottom:12px;left:12px;right:12px;width:auto;transform:none}
 .tr-fas[hidden]{display:none !important}
 .tr-fas-badge{margin:0 0 4px;font:700 12px/1.2 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.08em}
@@ -203,9 +203,44 @@ export function mountFas(host, opts) {
   let timer = 0
   let covering = false
   const lock = createGestureLock(480)
+  const shots = []
+  function shown(el) {
+    let node = el
+    while (node) {
+      if (node.hidden) return false
+      if (node.style && node.style.display === 'none') return false
+      node = node.parentElement
+    }
+    return !!el
+  }
+  function sampleMarks() {
+    const badgeOn = !root.hidden && shown(badge)
+    const nodes = [
+      ...document.querySelectorAll('[data-tr-splash], .tr-sim, [data-tr-sim]'),
+    ]
+    for (const el of document.querySelectorAll('span, p, div, button, a')) {
+      const text = (el.childNodes.length === 1 ? el.textContent : '').trim()
+      if (text === t('sim.badge') || text === t('sim.label') || text === t('splash.board')) nodes.push(el)
+    }
+    return { badgeOn, simOn: nodes.some(shown) }
+  }
+  // Under Historia får den simulerade pillen och startkortet inte ligga kvar.
+  function hideSimulatedMarks(on) {
+    for (const el of document.querySelectorAll('[data-tr-splash], .tr-sim, [data-tr-sim]')) {
+      if (on) {
+        el.dataset.trHistoriaHide = '1'
+        el.style.setProperty('display', 'none', 'important')
+      } else if (el.dataset.trHistoriaHide === '1') {
+        delete el.dataset.trHistoriaHide
+        el.style.removeProperty('display')
+      }
+    }
+  }
   const playback = createPlayback(HISTORIA.bars, {
     onIndex(index) {
       drawBars(canvas, HISTORIA.bars, index)
+      paint()
+      if (phases.phase() === 'historia') shots.push(sampleMarks())
     },
     onEnd() {
       phases.endHistoria()
@@ -248,10 +283,14 @@ export function mountFas(host, opts) {
         card.appendChild(button)
       } else cross.textContent = t('grans.cross')
     } else if (cross) cross.remove()
-    const showCard = phases.phase() !== 'historia'
+    const historia = phases.phase() === 'historia'
+    badge.hidden = !historia
+    range.hidden = !historia
+    const showCard = !historia
     card.hidden = !showCard
     canvas.hidden = showCard && reducedMotion()
     root.hidden = !covering || opts.isActive?.() === false
+    hideSimulatedMarks(historia && covering && !root.hidden)
   }
 
   function stop() {
@@ -298,9 +337,16 @@ export function mountFas(host, opts) {
   replay.addEventListener('click', () => play())
   onLang(paint)
 
+  function step() {
+    stop()
+    playback.tick()
+  }
+
   return {
     root,
     play,
+    step,
+    shots,
     sync: paint,
     isCovering: () => covering && !root.hidden,
     phases,

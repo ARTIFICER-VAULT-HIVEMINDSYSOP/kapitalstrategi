@@ -6,7 +6,7 @@ import { stepSide, stepFromDelta, SNAP_TOP_TO_BOTTOM, createGestureLock, ENTRY_S
 import { t, onLang } from './i18n.js'
 
 const css = `
-.tr-snap{position:fixed;z-index:36;right:12px;top:76px;bottom:132px;width:min(200px,46vw);overflow:hidden;border-radius:18px;background:rgba(246,242,234,.94);border:1px solid rgba(28,25,21,.16);box-shadow:0 8px 28px rgba(28,25,21,.12);display:flex;flex-direction:column}
+.tr-snap{position:fixed;z-index:36;right:12px;top:calc(var(--tr-chrome-b, 88px) + 8px);bottom:132px;width:min(200px,46vw);overflow:hidden;border-radius:18px;background:rgba(246,242,234,.94);border:1px solid rgba(28,25,21,.16);box-shadow:0 8px 28px rgba(28,25,21,.12);display:flex;flex-direction:column}
 .tr-snap-view{flex:1;overflow:hidden;scroll-snap-type:y mandatory;scrollbar-width:none}
 .tr-snap-view::-webkit-scrollbar{display:none}
 .tr-snap-opt{scroll-snap-align:center;height:100%;width:100%;border:0;background:transparent;font:600 18px/1.2 "IBM Plex Sans",sans-serif;color:#1c1915;cursor:pointer}
@@ -17,6 +17,8 @@ html[data-nlr-view="raket"] .tr-snap-opt{color:#e8f4ff;font-family:"IBM Plex Mon
 html[data-nlr-view="raket"] .tr-snap-help{color:#b9c9ea}
 .tr-ratt{position:fixed;z-index:80;width:28px;height:28px;margin:0;pointer-events:none;display:none;color:#1c1915}
 @media (prefers-reduced-motion:reduce){.tr-snap-view{scroll-behavior:auto}}
+@media (max-width:520px){.tr-snap{top:calc(var(--tr-chrome-b, 120px) + 8px);bottom:auto;height:132px;left:auto;right:8px;width:min(120px,34vw)}}
+html[data-nlr-view="raket"] .tr-snap,html[data-nlr-view="rabbit"] .tr-snap,html[data-nlr-view="akademin"] .tr-snap,html[data-nlr-mode="2p"] .tr-snap{display:none !important}
 `
 
 let styled = false

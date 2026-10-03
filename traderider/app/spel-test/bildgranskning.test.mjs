@@ -6,14 +6,16 @@ import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const REPO = fileURLToPath(new URL('../../../', import.meta.url))
-const ROOT = join(REPO, 'traderider')
+const ROOT = REPO
 const LIST = new URL('./bildgranskning.json', import.meta.url)
 const EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.svg'])
 
 // traderider/app/docs/ publiceras inte: Pages tar bort traderider/app
 // (.github/workflows/pages.yml). Mappen är intern utvecklingsdokumentation.
 function excluded(rel) {
-  return rel.startsWith('traderider/app/docs/') || rel.split('/').includes('node_modules')
+  if (rel.startsWith('traderider/app/') || rel.startsWith('traderider/app/docs/')) return true
+  const parts = rel.split('/')
+  return parts.includes('node_modules') || parts.includes('.git')
 }
 
 function extOf(name) {

@@ -5,7 +5,7 @@ Fyra övningslägen på samma sida, `/traderider/spel/`. Kurserna i övningen ä
 | Adress | Vad |
 | --- | --- |
 | `/traderider/` | Ingången med fyra kort. |
-| `/traderider/spel/#nvda-rider` | Trade Rider. Växeln högst upp byter läge. |
+| `/traderider/spel/#trade-rider` | Trade Rider. Växeln högst upp byter läge. Äldre adressen `#nvda-rider` öppnar samma läge. |
 | `/traderider/spel/#racex` | RaceX. Äldre adressen `#raket` öppnar samma läge. |
 | `/traderider/spel/#academy` | Akademin: fyra lektioner med utmärkelser, och kapitlet Hansan – köpmännens riskskola. Äldre adressen `#akademin` öppnar samma läge. |
 | `/traderider/spel/#rabbit-hole` | Rabbit Hole. |
@@ -14,7 +14,7 @@ Etiketten «Simulerade kurser – inte verkliga marknadsdata» syns i övningen 
 
 ## Koppling
 
-Hur lägena hänger ihop med Tradingskolan, vad spelaren övar, och vilken lektion som ligger närmast, står i [koppling.md](koppling.md). Skolan först är en rekommendation, inte ett krav.
+Hur lägena hänger ihop med Tradingskolan, vad spelaren övar, och vilken lektion som ligger närmast, står i [koppling.md](koppling.md). Skolavsnitt och quiz är rekommenderade, inte ett krav, och ger ingen licens att handla.
 
 ## Skärmdumpar
 

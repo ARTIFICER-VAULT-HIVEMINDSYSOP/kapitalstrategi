@@ -13,8 +13,8 @@
  * Raketen själv är i metall (guldgradient med högdager, färger från KS guldknappar).
  * prefers-reduced-motion: ingen parallax, inga partiklar, statiska stjärnor och scanlines, ingen glitch.
  */
-import { keyAction, PREVENT_DEFAULT, HINTS } from './keys.js'
-import { MODES } from './orientation.js'
+import { keyAction, PREVENT_DEFAULT } from './keys.js'
+import { MODES, controlHints } from './orientation.js'
 import { simTid } from './simtid.js'
 import { t, onLang } from './i18n.js'
 import { stepSide, readSide } from './styrmotor.js'
@@ -71,7 +71,7 @@ const css = `
 .nlr-rk-card b{display:block;font:600 20px ${MONO};font-variant-numeric:tabular-nums;color:${TEXT};text-shadow:0 0 10px rgba(46,230,255,.35)}
 .nlr-rk-card span{font:500 11px ${MONO};color:${TEXT2}}
 .nlr-rk-quote{right:14px;top:12px;text-align:right;min-width:150px}
-.nlr-rk-pnl{right:14px;top:104px;text-align:right;min-width:150px}
+.nlr-rk-pnl{right:14px;top:104px;text-align:right;min-width:150px;max-width:min(280px,calc(100% - 180px))}
 .nlr-rk-pnl b{font-size:24px}
 .nlr-rk-boost{display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-top:4px}
 .nlr-rk-boost i{display:block;width:64px;height:5px;border-radius:1px;background:rgba(147,168,212,.22);overflow:hidden}
@@ -80,7 +80,7 @@ const css = `
 .nlr-rk-pnl.glitch{animation:nlrRkGlitch .18s steps(2,end) 1}
 @keyframes nlrRkGlitch{0%{transform:translate(0,0);clip-path:inset(0 0 0 0)}25%{transform:translate(-3px,1px);clip-path:inset(10% 0 35% 0)}50%{transform:translate(3px,-1px);clip-path:inset(40% 0 8% 0)}75%{transform:translate(-2px,0);clip-path:inset(0 0 60% 0)}100%{transform:translate(0,0);clip-path:inset(0 0 0 0)}}
 .nlr-rk-who{left:14px;top:64px;font:600 12px ${MONO};letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;color:${CYAN}}
-.nlr-rk-ctl{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;width:min(616px,calc(100% - 24px));display:flex;flex-direction:column;gap:8px}
+.nlr-rk-ctl{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;width:min(616px,calc(100% - 24px));display:flex;flex-direction:column;gap:8px;z-index:5}
 .nlr-rk-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .nlr-rk-side{height:52px;border-radius:4px;border:1px solid rgba(46,230,255,.35);background:rgba(10,15,46,.86);color:${TEXT};font:600 15px ${MONO};letter-spacing:.14em;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;padding:0 6px;min-width:0;box-shadow:inset 0 0 14px rgba(46,230,255,.06)}
 .nlr-rk-side svg{width:18px;height:18px;flex:none}
@@ -114,12 +114,12 @@ const css = `
 .nlr-rk-start{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);text-align:center;padding:14px 18px;max-width:calc(100% - 32px);z-index:2}
 .nlr-rk-start p{margin:3px 0;font:500 12px ${MONO};color:${TEXT2}}
 .nlr-rk-div{position:absolute;background:${MAGENTA};box-shadow:0 0 10px ${MAGENTA};display:none}
-@media (max-width:640px){.nlr-rk-kbd{display:none}.nlr-rk-quote{top:auto;bottom:196px;right:12px;min-width:0}.nlr-rk-pnl{top:auto;bottom:196px;right:auto;left:12px;text-align:left;min-width:0}.nlr-rk-pnl .nlr-rk-boost{justify-content:flex-start}.nlr-rk-card b{font-size:16px}.nlr-rk-pnl b{font-size:18px}.nlr-rk-info{font-size:11px}.nlr-rk-side{font-size:14px;letter-spacing:.08em}.nlr-rk-boost i{width:44px}.nlr-rk-note{font-size:10px}.nlr-rk-card span{font-size:10px}}
+@media (max-width:640px){.nlr-rk-kbd{display:none}.nlr-rk-quote{top:auto;bottom:196px;right:12px;min-width:0;max-width:132px}.nlr-rk-pnl{top:auto;bottom:196px;right:auto;left:12px;text-align:left;min-width:0;max-width:calc(100% - 160px)}.nlr-rk-pnl .nlr-rk-boost{justify-content:flex-start}.nlr-rk-card b{font-size:16px}.nlr-rk-pnl b{font-size:18px}.nlr-rk-info{font-size:11px}.nlr-rk-side{font-size:14px;letter-spacing:.08em}.nlr-rk-boost i{width:44px}.nlr-rk-note{font-size:10px}.nlr-rk-card span{font-size:10px}.nlr-rk-start{top:12%;left:12px;right:auto;transform:none;max-width:calc(100% - 148px);text-align:left}}
 /* 2P: kompakta halvor */
 .nlr-rk-2p .nlr-rk-quote{display:none}
-.nlr-rk-2p .nlr-rk-pnl{top:12px;bottom:auto;right:12px;left:auto;text-align:right;min-width:0}
+.nlr-rk-2p .nlr-rk-pnl{top:12px;bottom:auto;right:12px;left:auto;text-align:right;min-width:0;max-width:min(220px,46%)}
 .nlr-rk-2p .nlr-rk-pnl .nlr-rk-boost{justify-content:flex-end}
-.nlr-rk-2p .nlr-rk-who{top:12px}
+.nlr-rk-2p .nlr-rk-who{top:12px;left:8px;max-width:42%}
 .nlr-rk-2p .nlr-rk-ctl{bottom:10px;gap:6px}
 .nlr-rk-2p .nlr-rk-side{height:44px;font-size:13px}
 .nlr-rk-2p .nlr-rk-bar{padding:4px 8px;gap:6px}
@@ -138,6 +138,21 @@ html[data-nlr-view="raket"] .nlr-toggle{${HUD_BOX.replace(/;/g, ' !important;')}
 html[data-nlr-view="raket"] .nlr-toggle button{color:${TEXT} !important;font:600 12px ${MONO} !important;letter-spacing:.06em;border-radius:3px !important}
 html[data-nlr-view="raket"] .nlr-toggle button[aria-pressed="true"]{background:${CYAN} !important;color:${ON_DARK} !important;box-shadow:0 0 12px rgba(46,230,255,.55)}
 html[data-nlr-view="raket"] .nlr-toggle button:focus-visible{outline:2px solid ${MAGENTA} !important}
+.nlr-rk-2p .nlr-rk-start{left:50%;right:auto;transform:translateX(-50%);text-align:center;top:46%;max-width:min(480px,calc(100% - 24px))}
+.nlr-rk-2p.narrow .nlr-rk-start{top:40%}
+.nlr-rk-2p.narrow .nlr-rk-start p{display:none}
+.nlr-raket.short .nlr-rk-boost,.nlr-raket.short .nlr-rk-note,.nlr-raket.short .nlr-rk-pnl span{display:none}
+.nlr-raket.short.nlr-rk-2p.narrow .nlr-rk-note{display:block}
+.nlr-raket.short .nlr-rk-start [data-k="startBody"]{display:none}
+.nlr-raket.short:not(.nlr-rk-2p) .nlr-rk-quote{top:8px;max-width:148px}
+.nlr-raket.short:not(.nlr-rk-2p) .nlr-rk-pnl{display:none}
+.nlr-raket.short.live:not(.nlr-rk-2p) .nlr-rk-pnl{display:block;top:8px;right:auto;bottom:auto;left:12px;text-align:left;min-width:0;max-width:min(220px,46%);padding:4px 8px}
+.nlr-raket.short.live:not(.nlr-rk-2p) .nlr-rk-pnl b,.nlr-raket.short.live:not(.nlr-rk-2p) .nlr-rk-pnl .nlr-rk-boost{display:none}
+.nlr-raket.short.live:not(.nlr-rk-2p) .nlr-rk-pnl small{font-size:11px;letter-spacing:.04em;text-transform:none}
+.nlr-raket.short .nlr-rk-start{top:12px;left:12px;transform:none;text-align:left;max-width:min(340px,calc(100% - 200px))}
+.nlr-raket.short.nlr-rk-2p .nlr-rk-pnl{max-width:min(148px,34%);max-height:44px;overflow:hidden}
+.nlr-raket.short.nlr-rk-2p .nlr-rk-who{max-height:32px;overflow:hidden}
+.nlr-raket.short.nlr-rk-2p .nlr-rk-start{left:50%;transform:translateX(-50%);text-align:center;top:52px;max-width:min(220px,34%)}
 `
 
 const ICON_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>'
@@ -263,6 +278,33 @@ export const STAR_LAYERS = [
   { n: 40, speed: 0.3, size: 1.6, alpha: 0.6 },
   { n: 16, speed: 0.6, size: 2.2, alpha: 0.8 },
 ]
+/** Rektangel för en HUD-etikett. y är mitten, textWidth är utan utfyllnad. */
+export function labelBox(x, y, textWidth, { size = 13, align = 'left', W = Infinity } = {}) {
+  const tw = textWidth + 16
+  const h = size + 11
+  let lx = align === 'center' ? x - tw / 2 : align === 'right' ? x - tw : x
+  if (Number.isFinite(W)) lx = Math.max(4, Math.min(W - tw - 4, lx))
+  return { x: lx, y: y - h / 2, w: tw, h }
+}
+
+export function boxesOverlap(a, b) {
+  const iw = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)
+  const ih = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y)
+  return iw > 1 && ih > 1
+}
+
+/** Flytta ENTRY tills rutan är fri. Hindren (SKJUTS, pris) lämnas orörda. */
+export function dodgeEntryY(boxAt, obstacles, { minY, maxY, startY }) {
+  const clear = (y) => y >= minY && y <= maxY && obstacles.every((o) => !boxesOverlap(boxAt(y), o))
+  if (clear(startY)) return startY
+  const reach = Math.ceil(Math.max(0, maxY - minY)) + 2
+  for (let d = 2; d <= reach; d += 2) {
+    if (clear(startY - d)) return startY - d
+    if (clear(startY + d)) return startY + d
+  }
+  return null
+}
+
 export function makeStars(seed = 7) {
   let s = seed
   const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647)
@@ -293,7 +335,7 @@ export function createRaket({ engine }) {
     <canvas></canvas>
     <div class="nlr-rk-scan" aria-hidden="true"></div>
     <div class="nlr-rk-div"></div>
-    <div class="nlr-rk-card nlr-rk-start"><h3></h3><p data-k="startBody"></p><p data-k="keys"></p></div>
+    <div class="nlr-rk-card nlr-rk-start"><h3></h3><p data-k="startClaim" data-tr-claim="1"></p><p data-k="startBody"></p><p data-k="keys"></p></div>
     <div class="nlr-rk-card nlr-rk-end"><h3 data-k="endTitle"></h3><p data-k="endTxt"></p><button type="button" data-k="again"></button></div>`
   document.body.appendChild(root)
   const canvas = root.querySelector('canvas')
@@ -305,6 +347,8 @@ export function createRaket({ engine }) {
     root.setAttribute('aria-label', t('rk.aria'))
     canvas.setAttribute('aria-label', t('rk.canvas'))
     startCard.querySelector('h3').textContent = t('mode.raket')
+    const claim = startCard.querySelector('[data-k="startClaim"]')
+    if (claim) claim.textContent = t('sim.claim')
     const body = startCard.querySelector('[data-k="startBody"]')
     if (body) body.textContent = t('rk.startBody')
     const keys = root.querySelector('[data-k="keys"]')
@@ -349,7 +393,8 @@ export function createRaket({ engine }) {
   const sprites = new Map()
 
   function hintSet(i) {
-    return mode === '2p' ? HINTS[i === 0 ? 'p1' : 'p2'] : HINTS['1p']
+    const player = mode === '2p' ? (i === 0 ? 'p1' : 'p2') : '1p'
+    return controlHints(MODES.raket.orientation, player)
   }
 
   function buildPlayerDom(i) {
@@ -374,7 +419,7 @@ export function createRaket({ engine }) {
           <span class="nlr-rk-info" data-k="info">—</span>
         </div>
         <div class="nlr-rk-prog"><i data-k="prog"></i></div>
-        <p class="nlr-rk-note" data-k="note"></p>
+        <p class="nlr-rk-note" data-k="note" data-tr-claim="1"></p>
       </div>`
     root.appendChild(el)
     const q = (k) => el.querySelector(`[data-k="${k}"]`)
@@ -499,6 +544,51 @@ export function createRaket({ engine }) {
     true,
   )
 
+  function intersects(a, b) {
+    const iw = Math.min(a.right, b.right) - Math.max(a.left, b.left)
+    const ih = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top)
+    return iw > 1 && ih > 1
+  }
+
+  function placeStartCard() {
+    if (startCard.style.display === 'none') return
+    const rootBox = root.getBoundingClientRect()
+    startCard.style.maxHeight = ''
+    startCard.style.overflow = ''
+    startCard.style.width = ''
+    const blocks = [...root.querySelectorAll('.nlr-rk-ctl, .nlr-rk-who, .nlr-rk-pnl, .nlr-rk-quote')]
+      .filter((el) => getComputedStyle(el).display !== 'none')
+      .map((el) => el.getBoundingClientRect())
+      .filter((r) => r.width > 2 && r.height > 2)
+    const ctlBoxes = [...root.querySelectorAll('.nlr-rk-ctl')]
+      .map((el) => el.getBoundingClientRect())
+      .filter((r) => r.width > 2 && r.height > 2)
+    if (!ctlBoxes.length) return
+    const card = startCard.getBoundingClientRect()
+    if (!blocks.some((r) => intersects(card, r))) return
+    const ctlTop = Math.min(...ctlBoxes.map((r) => r.top))
+    const sides = [...root.querySelectorAll('.nlr-rk-who, .nlr-rk-pnl, .nlr-rk-quote')]
+      .filter((el) => getComputedStyle(el).display !== 'none')
+      .map((el) => el.getBoundingClientRect())
+      .filter((r) => r.width > 2 && r.height > 2 && r.top < ctlTop)
+    const floor = sides.length ? Math.max(...sides.map((r) => r.bottom)) + 8 : rootBox.top + 8
+    const gap = ctlTop - 8 - floor
+    startCard.style.left = '12px'
+    startCard.style.right = 'auto'
+    startCard.style.transform = 'none'
+    startCard.style.width = `${Math.max(120, Math.round(rootBox.width - 24))}px`
+    startCard.style.maxWidth = `${Math.max(120, Math.round(rootBox.width - 24))}px`
+    if (gap >= 44) {
+      startCard.style.top = `${Math.max(8, Math.round(floor - rootBox.top))}px`
+      startCard.style.maxHeight = `${Math.floor(gap)}px`
+      startCard.style.overflow = 'hidden'
+      return
+    }
+    startCard.style.top = '8px'
+    startCard.style.maxHeight = `${Math.max(36, Math.round(ctlTop - rootBox.top - 16))}px`
+    startCard.style.overflow = 'hidden'
+  }
+
   function render(dt = 0) {
     const W = root.clientWidth
     const H = root.clientHeight
@@ -512,6 +602,8 @@ export function createRaket({ engine }) {
     c.setTransform(dpr, 0, 0, dpr, 0, 0)
     const vps = splitViewports(W, H, mode)
     root.classList.toggle('narrow', mode === '2p' && W <= 700)
+    root.classList.toggle('short', H < 520)
+    root.classList.toggle('live', clock.started)
     const calm = reduced()
     const now = performance.now() / 1000
     players.forEach((pl, i) => {
@@ -519,8 +611,29 @@ export function createRaket({ engine }) {
       Object.assign(pl.dom.el.style, { left: `${vp.x}px`, top: `${vp.y}px`, width: `${vp.w}px`, height: `${vp.h}px` })
       for (const sel of ['.nlr-rk-who', '.nlr-rk-pnl']) {
         const cEl = pl.dom.el.querySelector(sel)
-        cEl.style.top = mode === '2p' ? (vp.y === 0 ? '60px' : '12px') : '' // plats för växlarna överst
-        cEl.style.bottom = mode === '2p' ? 'auto' : ''
+        if (mode !== '2p') {
+          cEl.style.top = ''
+          cEl.style.bottom = ''
+          cEl.style.left = ''
+          cEl.style.right = ''
+          cEl.style.maxWidth = ''
+          continue
+        }
+        cEl.style.bottom = 'auto'
+        cEl.style.top = '12px'
+        if (W <= 700 && sel === '.nlr-rk-who') {
+          cEl.style.left = '8px'
+          cEl.style.right = 'auto'
+          cEl.style.maxWidth = '42%'
+        } else if (W <= 700) {
+          cEl.style.left = 'auto'
+          cEl.style.right = '8px'
+          cEl.style.maxWidth = '46%'
+        } else {
+          cEl.style.left = ''
+          cEl.style.right = ''
+          cEl.style.maxWidth = ''
+        }
       }
       c.save()
       c.beginPath()
@@ -530,6 +643,7 @@ export function createRaket({ engine }) {
       renderPlayer(c, pl, i, vp, dt, calm, now)
       c.restore()
     })
+    placeStartCard()
     if (mode === '2p') {
       const v = vps[1]
       Object.assign(divider.style, v.x > 0 ? { display: 'block', left: `${v.x}px`, top: '0', width: '1px', height: '100%' } : { display: 'block', left: '0', top: `${v.y}px`, width: '100%', height: '1px' })
@@ -643,25 +757,22 @@ export function createRaket({ engine }) {
 
   function hudLabel(c, text, x, y, { color = TEXT, border = 'rgba(46,230,255,0.7)', bg = 'rgba(10,15,46,0.92)', size = 13, align = 'left', W = Infinity } = {}) {
     c.font = `600 ${size}px ${MONO}`
-    const tw = c.measureText(text).width + 16
-    const h = size + 11
-    let lx = align === 'center' ? x - tw / 2 : align === 'right' ? x - tw : x
-    lx = Math.max(4, Math.min(W - tw - 4, lx))
+    const box = labelBox(x, y, c.measureText(text).width, { size, align, W })
     c.fillStyle = bg
-    c.fillRect(lx, y - h / 2, tw, h)
+    c.fillRect(box.x, box.y, box.w, box.h)
     c.strokeStyle = border
     c.lineWidth = 1
-    c.strokeRect(lx + 0.5, y - h / 2 + 0.5, tw - 1, h - 1)
+    c.strokeRect(box.x + 0.5, box.y + 0.5, box.w - 1, box.h - 1)
     c.fillStyle = border
-    c.fillRect(lx, y - h / 2, 5, 1.5)
-    c.fillRect(lx, y - h / 2, 1.5, 5)
-    c.fillRect(lx + tw - 5, y + h / 2 - 1.5, 5, 1.5)
-    c.fillRect(lx + tw - 1.5, y + h / 2 - 5, 1.5, 5)
+    c.fillRect(box.x, box.y, 5, 1.5)
+    c.fillRect(box.x, box.y, 1.5, 5)
+    c.fillRect(box.x + box.w - 5, box.y + box.h - 1.5, 5, 1.5)
+    c.fillRect(box.x + box.w - 1.5, box.y + box.h - 5, 1.5, 5)
     c.fillStyle = color
     c.textBaseline = 'middle'
     c.textAlign = 'left'
-    c.fillText(text, lx + 8, y + 0.5)
-    return { x: lx, w: tw, h }
+    c.fillText(text, box.x + 8, y + 0.5)
+    return box
   }
 
   function renderPlayer(c, pl, i, vp, dt, calm, now) {
@@ -682,7 +793,17 @@ export function createRaket({ engine }) {
       c.fillText(t('rk.missing'), 20, 40)
       return
     }
-    const rocketY = Math.round(H * (twoP ? (H < 500 ? 0.42 : 0.5) : W <= 640 ? 0.52 : 0.6))
+    const paneTop = pl.dom.el.getBoundingClientRect().top
+    let cardBand = 0
+    if (twoP) {
+      for (const sel of ['.nlr-rk-who', '.nlr-rk-pnl']) {
+        const card = pl.dom.el.querySelector(sel)
+        if (!card || getComputedStyle(card).display === 'none') continue
+        cardBand = Math.max(cardBand, card.getBoundingClientRect().bottom - paneTop)
+      }
+    }
+    let rocketY = Math.round(H * (twoP ? (H < 500 ? 0.42 : 0.5) : W <= 640 ? 0.52 : 0.6))
+    if (twoP) rocketY = Math.max(rocketY, Math.round(cardBand + 28))
     const p = clock.p
     const row = (k) => rocketY - (k - p) * pxPer
     const ahead = Math.ceil(rocketY / pxPer) + 2
@@ -790,6 +911,28 @@ export function createRaket({ engine }) {
     pl.tilt = smoothTo(pl.tilt, rocketTilt(dx, pxPer), step, 7)
     const tilt = pl.tilt
     const accentRGB = st.side === 'buy' ? '140,240,60' : '255,90,106'
+    const tagTxt = fx.boost > 0.01 ? t('rk.boost') : fx.loss > 0.01 ? t('rk.rocks') : flat && st.traded ? t('pos.flat') : ''
+    const price = priceAt(p)
+    const priceText = fmtPrice(price)
+    c.font = `600 13px ${MONO}`
+    const priceMeasure = c.measureText(priceText).width
+    const priceOuter = priceMeasure + 16
+    let priceX = x + (flat || st.side === 'buy' ? -priceOuter - 28 : 28)
+    if (priceX < 4) priceX = x + 28
+    if (priceX + priceOuter > W - 4) priceX = x - priceOuter - 28
+    const fixedLabels = []
+    if (tagTxt) {
+      c.font = `600 11px ${MONO}`
+      fixedLabels.push(labelBox(x, rocketY + 56, c.measureText(tagTxt).width, { size: 11, align: 'center', W }))
+    }
+    fixedLabels.push(labelBox(priceX, rocketY, priceMeasure, { size: 13, align: 'left', W }))
+    const alert = fx.move <= -GLITCH_AT
+    const alertY = Math.max(twoP ? 110 : 86, rocketY - (compact ? 120 : 150))
+    const alertSize = compact ? 10 : 12
+    if (alert) {
+      c.font = `600 ${alertSize}px ${MONO}`
+      fixedLabels.push(labelBox(W / 2, alertY, c.measureText(t('rk.warn', { pct: fmtPct(fx.move) })).width, { size: alertSize, align: 'center', W }))
+    }
 
     // ingångslinje (befintligt ingångspris – ingen ny logik)
     if (!flat) {
@@ -803,7 +946,23 @@ export function createRaket({ engine }) {
         c.lineTo(ex + 0.5, H)
         c.stroke()
         c.setLineDash([])
-        hudLabel(c, `ENTRY ${fmtPrice(st.entry)}`, ex, rocketY + (compact ? 78 : 92), { size: 11, align: 'center', color: TEXT, border: `rgba(${accentRGB},0.8)`, W })
+        const ctlTop = pl.dom.el.querySelector('.nlr-rk-ctl')?.getBoundingClientRect()
+        let entryY = rocketY + (compact ? 78 : 92)
+        let maxY = H - 16
+        if (ctlTop) {
+          const limit = ctlTop.top - paneTop - 16
+          if (entryY > limit) entryY = limit
+          maxY = Math.min(maxY, limit)
+        }
+        const entryText = `ENTRY ${fmtPrice(st.entry)}`
+        c.font = `600 11px ${MONO}`
+        const entryW = c.measureText(entryText).width
+        const placed = dodgeEntryY((yy) => labelBox(ex, yy, entryW, { size: 11, align: 'center', W }), fixedLabels, {
+          minY: rocketY + 21,
+          maxY,
+          startY: entryY,
+        })
+        if (placed != null) hudLabel(c, entryText, ex, placed, { size: 11, align: 'center', color: TEXT, border: `rgba(${accentRGB},0.8)`, W })
       }
     }
 
@@ -995,26 +1154,15 @@ export function createRaket({ engine }) {
       c.fillRect(0, 0, W, H)
     }
 
-    // etikett under raketen: läge + öppet resultat (riktiga tal)
-    const tagTxt = fx.boost > 0.01 ? t('rk.boost') : fx.loss > 0.01 ? t('rk.rocks') : flat && st.traded ? t('pos.flat') : ''
+    // etikett under raketen: läge + öppet resultat (riktiga tal). Rutan är redan räknad så ENTRY kan väja.
     if (tagTxt) {
       const plus = fx.boost > 0.01
       const minus = fx.loss > 0.01
       hudLabel(c, tagTxt, x, rocketY + 56, { size: 11, align: 'center', W, color: plus || minus ? ON_DARK : TEXT, bg: plus ? BUY : minus ? SELL : 'rgba(10,15,46,0.92)', border: plus ? BUY : minus ? SELL : CYAN })
     }
-    // varning vid förlust ≥ GLITCH_AT % (statisk text även vid reducerad rörelse)
-    const alert = fx.move <= -GLITCH_AT
-    if (alert) hudLabel(c, t('rk.warn', { pct: fmtPct(fx.move) }), W / 2, Math.max(twoP ? 110 : 86, rocketY - (compact ? 120 : 150)), { size: compact ? 10 : 12, align: 'center', W, color: TEXT, border: SELL, bg: 'rgba(40,8,28,0.92)' })
+    if (alert) hudLabel(c, t('rk.warn', { pct: fmtPct(fx.move) }), W / 2, alertY, { size: alertSize, align: 'center', W, color: TEXT, border: SELL, bg: 'rgba(40,8,28,0.92)' })
 
-    // prisbricka vid raketen
-    const price = priceAt(p)
-    const label = fmtPrice(price)
-    c.font = `600 13px ${MONO}`
-    const tw = c.measureText(label).width + 16
-    let lx = x + (flat || st.side === 'buy' ? -tw - 28 : 28)
-    if (lx < 4) lx = x + 28
-    if (lx + tw > W - 4) lx = x - tw - 28
-    hudLabel(c, label, lx, rocketY, { size: 13, W, color: TEXT, border: 'rgba(46,230,255,0.8)' })
+    hudLabel(c, priceText, priceX, rocketY, { size: 13, W, color: TEXT, border: 'rgba(46,230,255,0.8)' })
 
     // glitch vid stor förlust (inte vid reducerad rörelse)
     const gl = glitchLevel(fx, calm)
@@ -1037,7 +1185,8 @@ export function createRaket({ engine }) {
     const ts = priceAt(p, 't')
     q('price').textContent = fmtPrice(price)
     q('when').textContent = fmtDate(ts, key)
-    q('pnlLabel').textContent = !st.traded ? t('hud.result') : flat ? t('rk.pnlFlat') : t('rk.pnlOpen', { lev: st.lev })
+    const practiceBadge = mode !== '2p' && root.classList.contains('short') && root.classList.contains('live')
+    q('pnlLabel').textContent = practiceBadge ? t('hud.practiceBadge') : !st.traded ? t('hud.result') : flat ? t('rk.pnlFlat') : t('rk.pnlOpen', { lev: st.lev })
     const pnlEl = q('pnl')
     pnlEl.textContent = !st.traded ? '—' : t('hud.resultNote')
     pnlEl.style.color = TEXT

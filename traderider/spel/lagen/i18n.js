@@ -13,7 +13,8 @@ const sv = {
   'lang.sv': 'Svenska',
   'lang.en': 'Engelska',
   'lang.uk': 'Ukrainska',
-  'sim.label': 'Simulerade kurser – inte verkliga marknadsdata',
+  'sim.label': 'Simulerade kurser',
+  'sim.claim': 'Simulerade kurser – inte verkliga marknadsdata',
   'sim.price': 'Simulerad kurs',
   'sim.badge': 'Simulerade kurser',
   'sim.loading': 'Laddar simulerade kurser…',
@@ -89,6 +90,7 @@ const sv = {
   'instr.start': 'Starta',
   'instr.open': 'Visa styrning',
   'hist.badge': 'VERKLIG · HISTORISK',
+  'hist.price': 'Kurs',
   'hist.range': 'Index 100 vid start, {from}–{to}. Komprimerad tid, liten skala, ingen valuta.',
   'grans.title': 'Gränslandet',
   'grans.summary': 'Du valde {side} med hävstång {lev}: högre hävstång kan ge större vinst men också större förlust.',
@@ -104,9 +106,9 @@ const sv = {
   'mode.raket.name': 'RaceX',
   'mode.rabbitHole.name': 'Rabbit Hole',
   'mode.akademin.name': 'Akademin',
-  'flat.closed': 'STÄNG – ingen öppen position',
-  'flat.open': 'STÄNG – avsluta positionen (mellanslag)',
-  'flat.already': 'Du har redan stängt – ingen öppen position',
+  'flat.closed': 'FLAT – ingen öppen position',
+  'flat.open': 'FLAT – avsluta positionen (mellanslag)',
+  'flat.already': 'Redan FLAT – ingen öppen position',
   'flat.close': 'Avsluta positionen',
   'pos.flat': 'FLAT',
   'snap.aria': 'Riktning, ett steg i taget',
@@ -125,6 +127,7 @@ const sv = {
   'hud.steady': 'Stadigt',
   'hud.result': 'Övning',
   'hud.resultNote': 'Samma hävstång kan ge vinst eller förlust.',
+  'hud.practiceBadge': 'Övning · simulerat',
   'rails': 'Bollinger-räls',
   'play.ariaPause': 'Paus',
   'play.ariaRide': 'Kör',
@@ -138,7 +141,7 @@ const sv = {
   'chart.fail': 'Grafen misslyckades',
   'splash.kicker': 'Trade Rider · simulerade kurser',
   'splash.orSell': 'eller SÄLJ',
-  'splash.body': 'Två rälsar. Rälsen ovanför är det övre Bollingerbandet – det är KÖP. Rälsen under är det nedre bandet – det är SÄLJ. Simulerade kurser, inte verkliga marknadsdata. Utfallen är bara övning: ingen riktig handel sker, och hopp om vinst och risk för förlust hör ihop. Inget är ett löfte.',
+  'splash.body': 'Två rälsar. Rälsen ovanför är det övre Bollingerbandet – det är KÖP. Rälsen under är det nedre bandet – det är SÄLJ. Simulerade kurser – inte verkliga marknadsdata. Utfallen är bara övning: ingen riktig handel sker, och hopp om vinst och risk för förlust hör ihop. Inget är ett löfte.',
   'splash.loading': 'Laddar grafen…',
   'splash.board': 'Hoppa på tåget',
   'end.kickerDone': 'Avslutad',
@@ -212,7 +215,7 @@ const sv = {
   'ak.awards': 'Dina utmärkelser',
   'ak.locked': 'Inte upplåst än',
   'ak.saved': 'Sparas bara i den här webbläsaren, utan inloggning. {note}',
-  'ak.disclaimer': 'Simulerade kurser, inte verkliga marknadsdata. Ett övningsutfall kan se ut som vinst, men risken för förlust hör till samma mening och inget är ett löfte om avkastning.',
+  'ak.disclaimer': 'Simulerade kurser – inte verkliga marknadsdata. Ett övningsutfall kan se ut som vinst, men risken för förlust hör till samma mening och inget är ett löfte om avkastning.',
   'ak.read': 'Jag har läst — starta övningen (+10 XP) →',
   'ak.task': 'Övningsuppgift',
   'ak.done': 'Klar',
@@ -336,7 +339,8 @@ const en = {
   'lang.sv': 'Swedish',
   'lang.en': 'English',
   'lang.uk': 'Ukrainian',
-  'sim.label': 'Simulated prices – not real market data',
+  'sim.label': 'Simulated prices',
+  'sim.claim': 'Simulated prices – not real market data',
   'sim.price': 'Simulated price',
   'sim.badge': 'Simulated prices',
   'sim.loading': 'Loading simulated prices…',
@@ -412,6 +416,7 @@ const en = {
   'instr.start': 'Start',
   'instr.open': 'Show steering',
   'hist.badge': 'REAL · HISTORICAL',
+  'hist.price': 'Price',
   'hist.range': 'Index 100 at the start, {from}–{to}. Compressed time, tiny scale, no currency.',
   'grans.title': 'The borderland',
   'grans.summary': 'You chose {side} with leverage {lev}: higher leverage can bring a larger gain but also a larger loss.',
@@ -448,6 +453,7 @@ const en = {
   'hud.steady': 'Steady',
   'hud.result': 'Practice',
   'hud.resultNote': 'The same leverage can produce a gain or a loss.',
+  'hud.practiceBadge': 'Practice · simulated',
   'rails': 'Bollinger rails',
   'play.ariaPause': 'Pause',
   'play.ariaRide': 'Ride',
@@ -461,7 +467,7 @@ const en = {
   'chart.fail': 'Chart failed',
   'splash.kicker': 'Trade Rider · simulated prices',
   'splash.orSell': 'or SELL',
-  'splash.body': 'Two rails. The rail above is the upper Bollinger band – that is BUY. The rail below is the lower band – that is SELL. Simulated prices, not real market data. Outcomes are practice only: no real trading takes place, and hope of a gain and the risk of a loss belong together. Nothing is a promise.',
+  'splash.body': 'Two rails. The rail above is the upper Bollinger band – that is BUY. The rail below is the lower band – that is SELL. Simulated prices – not real market data. Outcomes are practice only: no real trading takes place, and hope of a gain and the risk of a loss belong together. Nothing is a promise.',
   'splash.loading': 'Loading chart…',
   'splash.board': 'Board the train',
   'end.kickerDone': 'Closed',
@@ -535,7 +541,7 @@ const en = {
   'ak.awards': 'Your awards',
   'ak.locked': 'Not unlocked yet',
   'ak.saved': 'Saved only in this browser, with no sign-in. {note}',
-  'ak.disclaimer': 'Simulated prices, not real market data. A practice outcome can look like a gain, but the risk of loss belongs in the same sentence and nothing is a promise of return.',
+  'ak.disclaimer': 'Simulated prices – not real market data. A practice outcome can look like a gain, but the risk of loss belongs in the same sentence and nothing is a promise of return.',
   'ak.read': 'I have read this — start the exercise (+10 XP) →',
   'ak.task': 'Exercise',
   'ak.done': 'Done',
@@ -659,7 +665,8 @@ const uk = {
   'lang.sv': 'Шведська',
   'lang.en': 'Англійська',
   'lang.uk': 'Українська',
-  'sim.label': 'Симульовані курси – не реальні ринкові дані',
+  'sim.label': 'Симульовані курси',
+  'sim.claim': 'Симульовані курси – не реальні ринкові дані',
   'sim.price': 'Симульований курс',
   'sim.badge': 'Симульовані курси',
   'sim.loading': 'Завантаження симульованих курсів…',
@@ -735,6 +742,7 @@ const uk = {
   'instr.start': 'Старт',
   'instr.open': 'Показати керування',
   'hist.badge': 'РЕАЛЬНЕ · ІСТОРИЧНЕ',
+  'hist.price': 'Курс',
   'hist.range': 'Індекс 100 на старті, {from}–{to}. Стиснутий час, малий масштаб, без валюти.',
   'grans.title': 'Межа',
   'grans.summary': 'Ви обрали {side} з плечем {lev}: вище плече може дати більший прибуток, але й більший збиток.',
@@ -771,6 +779,7 @@ const uk = {
   'hud.steady': 'Спокійно',
   'hud.result': 'Тренування',
   'hud.resultNote': 'Те саме плече може дати прибуток або збиток.',
+  'hud.practiceBadge': 'Тренування · симуляція',
   'rails': 'Рейки Боллінджера',
   'play.ariaPause': 'Пауза',
   'play.ariaRide': 'Їхати',
@@ -784,7 +793,7 @@ const uk = {
   'chart.fail': 'Графік не вдався',
   'splash.kicker': 'Trade Rider · симульовані курси',
   'splash.orSell': 'або ПРОДАЖ',
-  'splash.body': 'Дві рейки. Рейка згори – верхня смуга Боллінджера, це КУПІВЛЯ. Рейка знизу – нижня смуга, це ПРОДАЖ. Симульовані курси, не реальні ринкові дані. Результати – лише тренування: реальної торгівлі немає, і надія на прибуток разом із ризиком збитку. Ніщо не є обіцянкою.',
+  'splash.body': 'Дві рейки. Рейка згори – верхня смуга Боллінджера, це КУПІВЛЯ. Рейка знизу – нижня смуга, це ПРОДАЖ. Симульовані курси – не реальні ринкові дані. Результати – лише тренування: реальної торгівлі немає, і надія на прибуток разом із ризиком збитку. Ніщо не є обіцянкою.',
   'splash.loading': 'Завантаження графіка…',
   'splash.board': 'Сісти в потяг',
   'end.kickerDone': 'Завершено',
@@ -858,7 +867,7 @@ const uk = {
   'ak.awards': 'Ваші відзнаки',
   'ak.locked': 'Ще не відкрито',
   'ak.saved': 'Зберігається лише в цьому браузері, без входу. {note}',
-  'ak.disclaimer': 'Симульовані курси, не реальні ринкові дані. Результат тренування може виглядати як прибуток, але ризик збитку в тому самому реченні, і ніщо не є обіцянкою доходу.',
+  'ak.disclaimer': 'Симульовані курси – не реальні ринкові дані. Результат тренування може виглядати як прибуток, але ризик збитку в тому самому реченні, і ніщо не є обіцянкою доходу.',
   'ak.read': 'Я прочитав — почати вправу (+10 XP) →',
   'ak.task': 'Вправа',
   'ak.done': 'Готово',
@@ -980,6 +989,12 @@ const uk = {
 export const STRINGS = { sv, en, uk }
 
 const listeners = new Set()
+let priceKey = null
+
+/** Under Historia byts sim.price mot en neutral etikett. null återställer. */
+export function setPriceKey(key) {
+  priceKey = key || null
+}
 
 function readStored() {
   try {
@@ -1025,6 +1040,7 @@ export function onLang(fn) {
 }
 
 export function t(key, vars) {
+  if (key === 'sim.price' && priceKey) key = priceKey
   const lang = getLang()
   let s = STRINGS[lang]?.[key] ?? STRINGS.sv[key] ?? key
   if (vars) {

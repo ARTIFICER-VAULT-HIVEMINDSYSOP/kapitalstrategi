@@ -13,14 +13,19 @@ import { bindStepGestures } from './snapp.js'
 const css = `
 .nlr-duo{position:fixed;inset:0;z-index:45;display:none;background:#f3ede2;font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:#1c1915}
 .nlr-duo.on{display:block}
-.nlr-duo-half{position:absolute;overflow:hidden}
-.nlr-duo-half canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.nlr-duo-half{position:absolute;overflow:hidden;display:flex;flex-direction:column}
+.nlr-duo-hud{flex:none;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:8px 8px 0}
+.nlr-duo-claim{flex:1 0 100%;margin:0;font:500 11px/1.35 "IBM Plex Sans",sans-serif;color:#5c564c}
+.nlr-duo-play{position:relative;flex:1;min-height:0}
+.nlr-duo-play canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.nlr-duo-half .nlr-duo-card{position:relative;top:auto;left:auto;right:auto;max-width:48%}
+.nlr-duo-half .nlr-duo-ctl{position:relative;left:auto;right:auto;bottom:auto;transform:none;width:auto;margin:0 8px 8px}
 .nlr-duo-div{position:absolute;background:rgba(28,25,21,.18)}
 .nlr-duo-card{position:absolute;box-sizing:border-box;padding:6px 12px;border-radius:16px}
 .nlr-duo-card small{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8a8478;font-weight:600}
 .nlr-duo-card b{display:block;font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
-.nlr-duo-who{left:12px;top:12px}
-.nlr-duo-pnl{right:12px;top:12px;text-align:right}
+.nlr-duo-who{left:12px;top:12px;max-width:42%}
+.nlr-duo-pnl{right:12px;top:12px;text-align:right;max-width:calc(100% - 128px)}
 .nlr-duo-ctl{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;width:min(560px,calc(100% - 20px));display:flex;flex-direction:column;gap:6px}
 .nlr-duo-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .nlr-duo-row button{min-width:0;padding:0 6px}
@@ -77,8 +82,8 @@ export function createDuo({ engine: main, skinFrom }) {
   let started = false
 
   function rects() {
-    const W = innerWidth
-    const H = innerHeight
+    const W = root.clientWidth || innerWidth
+    const H = root.clientHeight || innerHeight
     root.classList.toggle('narrow', W <= 700)
     if (W > 700) {
       const w = Math.floor(W / 2)
@@ -92,9 +97,7 @@ export function createDuo({ engine: main, skinFrom }) {
     const rs = rects()
     halves.forEach((hv, i) => {
       Object.assign(hv.el.style, { left: `${rs[i].x}px`, top: `${rs[i].y}px`, width: `${rs[i].w}px`, height: `${rs[i].h}px` })
-      // halvor som börjar överst lämnar plats för växlarna (centrerade överst)
-      const top = rs[i].y === 0 ? '60px' : '12px'
-      hv.el.querySelectorAll('.nlr-duo-card').forEach((c) => (c.style.top = top))
+      hv.el.querySelectorAll('.nlr-duo-card').forEach((c) => (c.style.top = ''))
     })
     const r = rs[1]
     Object.assign(divider.style, r.x > 0 ? { left: `${r.x}px`, top: '0', width: '1px', height: '100%' } : { left: '0', top: `${r.y}px`, width: '100%', height: '1px' })
@@ -107,9 +110,12 @@ export function createDuo({ engine: main, skinFrom }) {
     el.className = 'nlr-duo-half'
     el.dataset.player = String(i + 1)
     el.innerHTML = `
-      <canvas></canvas>
-      <div class="nlr-duo-card nlr-duo-who"><small data-k="who"></small><b data-k="pos"></b></div>
-      <div class="nlr-duo-card nlr-duo-pnl"><small data-k="pnlLabel"></small><b data-k="pnl">—</b></div>
+      <div class="nlr-duo-hud">
+        ${i === 0 ? '<p class="nlr-duo-claim" data-k="claim" data-tr-claim="1"></p>' : ''}
+        <div class="nlr-duo-card nlr-duo-who"><small data-k="who"></small><b data-k="pos"></b></div>
+        <div class="nlr-duo-card nlr-duo-pnl"><small data-k="pnlLabel"></small><b data-k="pnl">—</b></div>
+      </div>
+      <div class="nlr-duo-play"><canvas></canvas></div>
       <div class="nlr-duo-ctl">
         <div class="nlr-duo-row">
           <button type="button" data-k="buy" class="${BTN}${OFF_BUY}">${ICON_UP}<span data-k="buyLbl"></span><kbd>${hint.buy}</kbd></button>
@@ -199,6 +205,7 @@ export function createDuo({ engine: main, skinFrom }) {
     const q = hv.q
     const hint = HINTS[i === 0 ? 'p1' : 'p2']
     q('who').textContent = t('duo.player', { n: i + 1 })
+    if (q('claim')) q('claim').textContent = t('sim.claim')
     q('buyLbl').textContent = t('btn.buy')
     q('sellLbl').textContent = t('btn.sell')
     q('flatLbl').textContent = t('btn.flat')
@@ -298,6 +305,10 @@ export function createDuo({ engine: main, skinFrom }) {
       destroy()
     },
     visible: () => visible,
+    layout,
+    placeCards() {
+      layout()
+    },
     engines: () => halves.map((h) => h.eng),
     hud: (i) => halves[i]?.hud ?? null,
     act,

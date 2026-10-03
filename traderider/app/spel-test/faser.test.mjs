@@ -80,6 +80,43 @@ test('ett stängt flöde visar status och stannar i Gränslandet', () => {
   assert.equal(phases.phase(), 'granslandet')
 })
 
+test('Historia döljer simulerad markör och startkort under hela fasen', () => {
+  const w = new Window()
+  globalThis.window = w
+  globalThis.document = w.document
+  globalThis.localStorage = w.localStorage
+  globalThis.matchMedia = () => ({ matches: false })
+  setLang('sv')
+  resetLiveFeedForTests()
+  const splash = w.document.createElement('div')
+  splash.dataset.trSplash = '1'
+  const pill = w.document.createElement('span')
+  pill.textContent = t('sim.badge')
+  const board = w.document.createElement('button')
+  board.textContent = t('splash.board')
+  splash.append(pill, board)
+  const top = w.document.createElement('div')
+  top.className = 'tr-sim'
+  top.textContent = t('sim.label')
+  w.document.body.append(splash, top)
+  const ui = mountFas(w.document.body, {
+    getOrientation: () => ({ movement: 'down', highPriceSide: 'right' }),
+    getPlace: () => 'chart',
+    isActive: () => true,
+  })
+  ui.play()
+  let guard = 0
+  while (ui.phases.phase() === 'historia' && guard++ < HISTORIA.bars.length + 2) ui.step()
+  assert.equal(ui.phases.phase(), 'granslandet')
+  assert.equal(ui.shots.length, HISTORIA.bars.length)
+  assert.ok(ui.shots.length >= 21)
+  for (const shot of ui.shots) {
+    assert.equal(shot.badgeOn, true)
+    assert.equal(shot.simOn, false)
+    assert.equal(shot.badgeOn && shot.simOn, false)
+  }
+})
+
 test('ett live-flöde gör korset tillgängligt och tickar går genom samma källa', () => {
   const ticks = [{ t: 1, price: 101 }, { t: 2, price: 102 }]
   const feed = {

@@ -90,7 +90,9 @@ const css = `
 @keyframes nlrAkPop{0%{transform:scale(.2) rotate(-25deg)}60%{transform:scale(1.18) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
 @keyframes nlrAkShine{from{transform:translateX(-40px)}to{transform:translateX(60px)}}
 @media (prefers-reduced-motion:reduce){.nlr-ak-toast.on,.nlr-ak-toast svg,.nlr-ak-toast .shine{animation:none}}
-@media (max-width:820px){.nlr-ak-in{grid-template-columns:minmax(0,1fr);padding-top:60px}.nlr-ak aside{order:2}.nlr-ak-chart canvas{height:300px}.nlr-ak h1{font-size:24px}.nlr-ak-choice>span{min-width:100%}.nlr-ak kbd{display:none}}
+.nlr-ak-claim{display:none;margin:0;padding:10px 12px;border-radius:0;background:rgba(118,185,0,.12);color:${INK};font-size:13px;line-height:1.45}
+@media (max-width:820px){.nlr-ak-in{grid-template-columns:minmax(0,1fr);padding-top:60px}.nlr-ak aside{order:2}.nlr-ak-claim{display:block}.nlr-ak-chart canvas{height:300px}.nlr-ak h1{font-size:24px}.nlr-ak-choice>span{min-width:100%}.nlr-ak kbd{display:none}}
+@media (max-width:480px){.nlr-ak-chart canvas{height:210px}}
 `
 
 function medalSvg(a, uid) {
@@ -332,7 +334,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     }
     root.innerHTML = `<div class="nlr-ak-in">
       <aside>
-        <div class="nlr-ak-card sk"><span class="kick">${t('ak.kicker')}</span><h1>${t('mode.akademin')}</h1><p class="muted">${t('ak.lead')}</p></div>
+        <div class="nlr-ak-card sk"><span class="kick">${t('ak.kicker')}</span><h1>${t('mode.akademin')}</h1><p class="muted" data-tr-claim="1">${t('sim.claim')}</p><p class="muted">${t('ak.lead')}</p></div>
         <div class="nlr-ak-card sk nlr-ak-xp"><div class="row"><b>${t('ak.level', { n: lv.level })}</b><span>${t('ak.xp', { xp, max: A.XP_MAX })}</span></div><div class="nlr-ak-bar"><i style="width:${lvPct}%"></i></div><p class="muted">${t('ak.xpNote')}</p></div>
         <ol class="nlr-ak-lessons">${[1, 2, 3, 4].map((l) => {
           const open = A.lessonUnlocked(l, prog.earned)
@@ -345,6 +347,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
         <p class="muted">${t('ak.disclaimer')}</p>
       </aside>
       <main>
+        <p class="nlr-ak-claim" data-tr-claim="1">${t('sim.claim')}</p>
         <section class="nlr-ak-card sk"><div style="display:flex;justify-content:space-between;align-items:center"><span class="kick">${t('ak.lessonOf', { n: lesson })}</span><span class="muted">${[1, 2, 3, 4].map((l) => (A.lessonDone(l, prog.earned) ? '●' : l === lesson ? '◉' : '○')).join(' ')}</span></div>
           <h2>${L.title}</h2><p>${L.text}</p>
           ${!rd ? `<div><button type="button" class="nlr-ak-btn" data-act="read">${t('ak.read')}</button></div>` : ''}</section>

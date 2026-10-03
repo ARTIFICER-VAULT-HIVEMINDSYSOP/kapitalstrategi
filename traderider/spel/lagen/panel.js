@@ -5,7 +5,7 @@
  *  2. Växel «NVDA Line | Raket». Raket är en ny, egen vy (se raket.js) på samma data och samma Bollinger-räls.
  *  4. Akademin (akademin.js): KS Akademins lektioner i NVDA Line-stil, med utmärkelser.
  *  3. Tillval «1P | 2P»: delad skärm i både NVDA Line (duo.js, två instanser av NVDA Lines egen motor) och Raket.
- *  5. KS /traderider/spel/ (utkast 2026-10-01): växelns första knapp heter «Trade Rider», hash #nvda-rider/#raket/#akademin,
+ *  5. KS /traderider/spel/: växelns första knapp heter «Trade Rider», hash #trade-rider (äldre #nvda-rider)/#racex/#academy,
  *     plus en liten skalrad med «← Traderider» (dator) och helskärmsknapp (Fullscreen API, CSS-reserv där API:t saknas).
  * Inget i NVDA Lines design, styrning eller mekanik ändras. Motorn läses via window.__trEngine (satt i exposeQa).
  */
@@ -15,7 +15,7 @@ import { createRabbit } from './rabbit.js'
 import { createDuo } from './duo.js'
 import { createAkademin } from './akademin.js'
 import { isTypingTarget } from './keys.js'
-import { t, onLang, mountSwitcher } from './i18n.js'
+import { t, onLang, mountSwitcher, setPriceKey, STRINGS } from './i18n.js'
 import { readSide, cycleIndex, stepSide, ENTRY_SIDE } from './styrmotor.js'
 import { MODES, modeFromHash, hashForView, selectMode } from './orientation.js'
 import { mountEntrySnap, bindStepGestures, mountRatt } from './snapp.js'
@@ -32,12 +32,17 @@ const RED = '#9a3b2a'
 
 const css = `
 .nlr-pill{position:fixed;z-index:30;box-sizing:border-box;font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:${INK}}
-.nlr-rsi{display:flex;align-items:stretch;gap:10px;padding:6px 10px 6px 12px;pointer-events:none}
+.nlr-rsi{display:flex;align-items:stretch;gap:10px;padding:6px 10px 6px 12px;pointer-events:none;max-height:64px;overflow:hidden}
 .nlr-rsi-txt{display:flex;flex-direction:column;justify-content:center;min-width:78px}
 .nlr-rsi-txt small{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:${MUTED};font-weight:600}
 .nlr-rsi-txt b{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15}
 .nlr-rsi-txt span{font-size:10px;color:${MUTED}}
-.nlr-rsi canvas{flex:1;min-width:0;height:100%;display:block}
+.nlr-rsi canvas{flex:1;min-width:0;height:40px;max-height:52px;display:block}
+.nlr-rsi.compact{padding:2px 8px;gap:8px;align-items:center}
+.nlr-rsi.compact .nlr-rsi-txt{flex-direction:row;align-items:baseline;gap:6px;min-width:0}
+.nlr-rsi.compact .nlr-rsi-txt span{display:none}
+.nlr-rsi.compact .nlr-rsi-txt b{font-size:13px}
+.nlr-rsi.compact canvas{height:16px;max-height:16px}
 .nlr-toggle{display:flex;gap:2px;padding:4px}
 .nlr-toggle button{border:0;background:transparent;border-radius:999px;padding:0 14px;height:100%;font:500 13px "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:${INK};cursor:pointer;white-space:nowrap}
 .nlr-toggle button[aria-pressed="true"]{background:${INK};color:#f3ede2}
@@ -55,8 +60,28 @@ html.tr-fs-css[data-nlr-view="akademin"],html.tr-fs-css[data-nlr-view="akademin"
 a[href="/login"]{display:none !important}
 .tr-sim{position:fixed;z-index:60;pointer-events:none;box-sizing:border-box;font:600 11px/1.25 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.02em;color:${INK};background:rgba(246,242,234,.94);border:1px solid rgba(28,25,21,.16);border-radius:999px;padding:4px 10px;white-space:nowrap;max-width:calc(100vw - 16px);overflow:hidden;text-overflow:ellipsis}
 html[data-nlr-view="raket"] .tr-sim{color:#e8f4ff;background:rgba(8,12,32,.85);border-color:rgba(64,224,255,.5);font:600 11px/1.25 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.04em}
-html[data-nlr-view="akademin"] .nlr-ak-in{padding-top:96px}
+html[data-nlr-view="akademin"] .nlr-ak-in{padding-top:calc(var(--tr-chrome-b, 72px) + 16px)}
+.tr-chrome{position:fixed;z-index:70;display:flex;flex-wrap:wrap;align-items:center;gap:6px;box-sizing:border-box;pointer-events:none;max-width:calc(100vw - 16px)}
+.tr-chrome>.nlr-pill,.tr-chrome>.tr-sim,.tr-chrome>.tr-instr-open{position:relative !important;inset:auto !important;pointer-events:auto;flex:0 1 auto;margin:0}
+.tr-chrome>.nlr-toggle{max-width:100% !important;overflow:visible !important;flex-wrap:wrap;height:auto;align-items:center}
+.tr-chrome .nlr-toggle button{height:28px}
+.tr-chrome>.tr-sim{flex:0 1 auto;max-width:none;overflow:visible;text-overflow:clip}
+html[data-nlr-solo="0"] header.pointer-events-none,html[data-nlr-solo="0"] [data-tr-linebar]{display:none !important}
+html[data-tr-dock="top"],html[data-tr-dock="top"] body{height:100%;overflow:hidden}
+html[data-tr-dock="top"] div.relative.h-dvh{margin-top:var(--tr-chrome-b,0px);height:calc(100dvh - var(--tr-chrome-b,0px));max-height:calc(100dvh - var(--tr-chrome-b,0px))}
+html[data-tr-dock="top"] .nlr-duo.on,html[data-tr-dock="top"] .nlr-raket.on,html[data-tr-dock="top"] .nlr-rh.on,html[data-tr-dock="top"] .nlr-ak.on{top:var(--tr-chrome-b,0px);bottom:auto;height:calc(100dvh - var(--tr-chrome-b,0px))}
+html[data-tr-dock="top"] [data-tr-splash] .min-h-dvh{min-height:100%}
+html[data-tr-dock="top"][data-nlr-view="akademin"] .nlr-ak-in{padding-top:16px}
+html[data-tr-dock="top"] .nlr-rh-hud{top:12px}
+html[data-tr-dock="top"] .tr-fas{top:calc(var(--tr-header-b, var(--tr-chrome-b, 72px)) + 8px);max-height:calc(100dvh - var(--tr-header-b, 72px) - 16px);overflow:auto}
+@media (max-height:560px){
+div.relative.h-dvh>.absolute.top-36{display:none !important}
+header.pointer-events-none .pointer-events-auto.flex-col>.rounded-xl.text-right{padding:2px 8px !important;width:max-content;max-width:min(220px,46vw)}
+header.pointer-events-none .pointer-events-auto.flex-col>.rounded-xl.text-right>.tabular-nums{display:none !important}
+header.pointer-events-none .pointer-events-auto.flex-col>.rounded-xl.text-right>.uppercase{white-space:nowrap}
+}
 @media (max-width:640px){.nlr-rsi-txt{min-width:64px}.nlr-rsi-txt b{font-size:14px}.nlr-toggle button{padding:0 9px;font-size:12px}.tr-skal{padding:3px}.tr-skal .tr-back{display:none}.tr-skal .tr-fs-txt{display:none}.tr-skal button{padding:0 9px}}
+@media (max-width:520px){.nlr-toggle{max-width:calc(100vw - 16px);overflow-x:auto}.nlr-toggle button{padding:0 8px;font-size:11px}header.pointer-events-none{flex-wrap:wrap}header.pointer-events-none>.pointer-events-auto:first-child{min-width:0;max-width:100%;flex:1 1 100%}header.pointer-events-none .overflow-x-auto{max-width:100%}header.pointer-events-none .overflow-x-auto button{min-width:0;padding-left:6px;padding-right:6px;font-size:11px;height:32px}}
 `
 
 function el(tag, cls, html) {
@@ -89,6 +114,132 @@ function waitEngine() {
   })
 }
 
+const BAND_LABEL = /^(Övning|Practice|Тренування|På grafen|On chart|На графіку|När|When|Коли|Band|Bands|Смуги|1D|5D|1M|6M|1Y|5Y|Max|Maks|Live)$/
+
+function shownBox(el) {
+  if (!el) return null
+  const cs = getComputedStyle(el)
+  if (cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0) return null
+  const r = el.getBoundingClientRect()
+  if (r.width < 2 || r.height < 2) return null
+  return r
+}
+
+function progressMeter() {
+  const root = document.querySelector('div.relative.h-dvh')
+  if (!root) return null
+  return [...root.querySelectorAll('div')].find((node) => {
+    const cls = String(node.className)
+    return cls.includes('h-1') && cls.includes('max-w-3xl') && cls.includes('rounded-full')
+  }) ?? null
+}
+
+function practiceCard() {
+  const header = document.querySelector('header.pointer-events-none')
+  if (!header || getComputedStyle(header).display === 'none') return null
+  const notes = new Set([STRINGS.sv['hud.resultNote'], STRINGS.en['hud.resultNote'], STRINGS.uk['hud.resultNote']])
+  const names = [STRINGS.sv['hud.result'], STRINGS.en['hud.result'], STRINGS.uk['hud.result']]
+  for (const node of header.querySelectorAll('div')) {
+    if (node.children.length !== 2) continue
+    const head = (node.children[0].textContent || '').trim()
+    const note = (node.children[1].textContent || '').trim()
+    if (!notes.has(note)) continue
+    if (!names.some((name) => head === name || head.startsWith(`${name} `) || head.startsWith(`${name} ·`))) continue
+    return node
+  }
+  return null
+}
+
+function tradeButtons() {
+  return [...document.querySelectorAll('button[data-tr="buy"],button[data-tr="sell"],button[data-tr="flat"]')].filter((b) => {
+    const r = b.getBoundingClientRect()
+    return r.width > 8 && r.height > 8
+  })
+}
+
+/** Kortet får inte ligga över köpraden när spelplanen är nedskjuten under lägesraden. */
+function fitPracticeCard() {
+  const card = practiceCard()
+  if (!card) return
+  const note = card.children[1]
+  const row = card.previousElementSibling
+  const tile = row?.firstElementChild
+  const short = innerHeight <= 560
+  const restorePrice = () => {
+    if (!row?.dataset.trFitPrice) return
+    delete row.dataset.trFitPrice
+    if (tile) tile.style.padding = ''
+    for (const child of row.querySelectorAll('[data-tr-fit-hide]')) {
+      child.style.display = ''
+      delete child.dataset.trFitHide
+    }
+  }
+  if (!short) {
+    note.style.display = ''
+    card.style.marginTop = ''
+    restorePrice()
+    return
+  }
+  note.style.display = 'none'
+  card.style.marginTop = ''
+  restorePrice()
+  const limitFor = () => {
+    const r = card.getBoundingClientRect()
+    let limit = Infinity
+    for (const b of tradeButtons()) {
+      const br = b.getBoundingClientRect()
+      const iw = Math.min(r.right, br.right) - Math.max(r.left, br.left)
+      if (iw <= 2) continue
+      limit = Math.min(limit, br.top)
+    }
+    return limit
+  }
+  const crosses = () => {
+    const limit = limitFor()
+    return Number.isFinite(limit) && card.getBoundingClientRect().bottom > limit + 0.5
+  }
+  if (crosses() && tile && tile.children.length >= 2) {
+    row.dataset.trFitPrice = '1'
+    tile.style.padding = '2px 8px'
+    for (const child of [tile.children[0], tile.children[2]]) {
+      if (!child) continue
+      child.style.display = 'none'
+      child.dataset.trFitHide = '1'
+    }
+  }
+  const limit = limitFor()
+  if (Number.isFinite(limit)) {
+    const over = card.getBoundingClientRect().bottom - (limit - 4)
+    if (over > 1) card.style.marginTop = `${-Math.ceil(over)}px`
+  }
+}
+
+/** Underkanten på sidhuvudet och korten som ligger i den övre delen av spelplanen. */
+function bandFloor(pane) {
+  let floor = pane.top
+  const topLimit = pane.top + pane.height * 0.62
+  const take = (r) => {
+    if (!r || r.height > pane.height * 0.7) return
+    if (r.bottom <= pane.top + 1 || r.top > topLimit) return
+    floor = Math.max(floor, r.bottom)
+  }
+  take(shownBox(document.querySelector('header.pointer-events-none')))
+  for (const node of document.querySelectorAll('div, span, small, p, button')) {
+    if (node.closest('.nlr-rsi, .tr-chrome, [data-tr-splash], .nlr-raket, .nlr-duo, .nlr-rh, .nlr-ak')) continue
+    if (node.children.length) continue
+    const text = (node.textContent || '').trim()
+    if (!BAND_LABEL.test(text)) continue
+    let tile = node
+    for (let n = node.parentElement; n && n !== document.body; n = n.parentElement) {
+      const r = n.getBoundingClientRect()
+      if (r.height > 140 || r.height < 8) break
+      tile = n
+    }
+    take(shownBox(tile))
+  }
+  return floor
+}
+
 function periodLabel(eng) {
   const key = eng.spec?.key
   return { live: '1D', '5d': '5D', '1mo': '1M', '6mo': '6M', '1y': '1Y', '5y': '5Y', max: t('period.max') }[key] ?? key ?? '—'
@@ -102,12 +253,13 @@ async function main() {
   document.head.appendChild(style)
 
   const periodPill = findButton(/^(Live|1D)$/)?.parentElement ?? null
-  let titleEl = [...document.querySelectorAll('h1,h2,div,span')].find((x) => /^NVDA (Line|Rider)$/.test((x.textContent ?? '').trim()))
+  const TITLE_RE = /^(?:NVDA (?:Line|Rider)|Trade Rider)$/
+  let titleEl = [...document.querySelectorAll('h1,h2,div,span')].find((x) => TITLE_RE.test((x.textContent ?? '').trim()))
   let titlePill = titleEl?.closest('div[class*="rounded"]') ?? titleEl?.parentElement ?? null
 
   function refreshTitle() {
     const name = t(MODES.trendRider.nameKey)
-    const fresh = [...document.querySelectorAll('h1,h2,div,span')].find((x) => /^NVDA (Line|Rider)$/.test((x.textContent ?? '').trim()))
+    const fresh = [...document.querySelectorAll('h1,h2,div,span')].find((x) => TITLE_RE.test((x.textContent ?? '').trim()))
     if (fresh) titleEl = fresh
     if (titleEl?.isConnected) {
       if ((titleEl.textContent ?? '').trim() !== name) titleEl.textContent = name
@@ -141,26 +293,72 @@ async function main() {
   }
 
   function layoutPanel() {
+    const mobile = innerWidth <= 640
+    let h = mobile ? 50 : 58
+    let canvasH = h - 12
+    const park = () => {
+      panel.style.top = `${innerHeight + 16}px`
+      panel.style.height = `${h}px`
+      panel.style.maxHeight = '64px'
+      panel.style.overflow = 'hidden'
+      cv.style.height = `${canvasH}px`
+      cv.style.maxHeight = '52px'
+    }
     const buy = document.querySelector('button[data-tr="buy"]')
     const grid = buy?.parentElement
-    if (!grid) return
-    const r = grid.getBoundingClientRect()
-    const mobile = innerWidth <= 640
-    const h = mobile ? 50 : 58
-    panel.style.left = `${Math.round(r.left)}px`
-    panel.style.width = `${Math.round(r.width)}px`
-    panel.style.top = `${Math.round(r.top - h - 8)}px`
+    if (!grid) return park()
+    const row = grid.getBoundingClientRect()
+    const anchor = row.height > innerHeight * 0.45 ? buy.getBoundingClientRect() : row
+    const pane = document.querySelector('div.relative.h-dvh')?.getBoundingClientRect()
+    if (!pane || anchor.width < 2 || anchor.top > pane.bottom - 8 || anchor.bottom < pane.top + 8) return park()
+    const minTop = Math.round(bandFloor(pane) + 4)
+    const aboveMax = Math.round(anchor.top - h - 4)
+    let top = Math.round(anchor.top - h - 8)
+    if (top > aboveMax) top = aboveMax
+    panel.classList.remove('compact')
+    panel.style.padding = ''
+    if (top < minTop) {
+      let low = anchor.bottom
+      for (const el of document.querySelectorAll('button')) {
+        if (el.closest('.tr-chrome, header.pointer-events-none, [data-tr-splash], .nlr-raket, .nlr-duo, .nlr-rh, .nlr-ak')) continue
+        const r = el.getBoundingClientRect()
+        if (r.width < 8 || r.height < 8 || r.bottom > pane.bottom + 2 || r.top < anchor.top - 8) continue
+        if (r.bottom > low) low = r.bottom
+      }
+      const meter = progressMeter()
+      const meterBox = shownBox(meter)
+      if (meterBox && meterBox.top >= anchor.top - 4 && meterBox.bottom <= pane.bottom + 2) low = Math.max(low, meterBox.bottom)
+      const below = Math.round(low + 2)
+      const room = Math.floor(pane.bottom - below - 2)
+      if (room < 12) return park()
+      const compactH = Math.min(28, room)
+      top = below
+      h = compactH
+      canvasH = Math.max(10, compactH - 4)
+      panel.classList.add('compact')
+      panel.style.padding = compactH < 24 ? '0 8px' : ''
+    }
+    panel.style.left = `${Math.round(Math.max(pane.left, anchor.left))}px`
+    panel.style.width = `${Math.round(Math.min(anchor.width, pane.width, innerWidth))}px`
+    panel.style.top = `${top}px`
     panel.style.height = `${h}px`
+    panel.style.maxHeight = '64px'
+    panel.style.overflow = 'hidden'
+    cv.style.height = `${canvasH}px`
+    cv.style.maxHeight = '52px'
+    cv.style.width = '100%'
   }
 
   function drawPanel() {
     recompute()
     const dpr = Math.min(2, devicePixelRatio || 1)
-    const W = Math.max(10, cv.clientWidth)
-    const H = Math.max(10, cv.clientHeight)
-    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) {
-      cv.width = Math.round(W * dpr)
-      cv.height = Math.round(H * dpr)
+    const W = Math.min(innerWidth, Math.max(10, cv.clientWidth || 10))
+    const H = Math.min(52, Math.max(10, parseFloat(cv.style.height) || 40))
+    const bw = Math.min(2048, Math.round(W * dpr))
+    const bh = Math.min(128, Math.round(H * dpr))
+    if (cv.width !== bw || cv.height !== bh) {
+      cv.width = bw
+      cv.height = bh
     }
     const c = cv.getContext('2d')
     c.setTransform(dpr, 0, 0, dpr, 0, 0)
@@ -187,6 +385,7 @@ async function main() {
       c.lineTo(W - 22, y(lv))
       c.stroke()
       c.globalAlpha = 1
+      if (panel.classList.contains('compact')) continue
       c.fillStyle = col
       c.font = '600 9px "IBM Plex Sans", sans-serif'
       c.textBaseline = 'middle'
@@ -337,10 +536,15 @@ async function main() {
   sim.dataset.trSim = '1'
   document.body.appendChild(sim)
   function layoutSim() {
-    const r = toggle.getBoundingClientRect()
+    const anchor = innerWidth <= 520 ? skal : modeToggle.style.display !== 'none' ? modeToggle : toggle
+    const r = anchor.getBoundingClientRect()
     const w = sim.getBoundingClientRect().width
     sim.style.left = `${Math.round(Math.min(Math.max(8, r.left), innerWidth - w - 8))}px`
     sim.style.top = `${Math.round(r.bottom + 6)}px`
+  }
+  function syncGameHeader() {
+    const header = document.querySelector('header.pointer-events-none')
+    if (header) header.style.visibility = view === 'rabbit' ? 'hidden' : ''
   }
   const docEl = document.documentElement
   const fsApi = !!(docEl.requestFullscreen || docEl.webkitRequestFullscreen)
@@ -430,6 +634,7 @@ async function main() {
     }
     instr.sync()
     fas.sync()
+    syncGameHeader()
     if (instr.isOpen() || fas.isCovering()) {
       if (eng.playing) eng.pause()
     }
@@ -541,7 +746,8 @@ async function main() {
     entrySnap.root.style.display = 'none'
   }
   function syncSnap() {
-    const show = view === 'line' && mode === '1p' && !entryDone
+    const splash = document.querySelector('[data-tr-splash]')
+    const show = view === 'line' && mode === '1p' && !entryDone && !splash
     entrySnap.root.style.display = show ? '' : 'none'
   }
   bindStepGestures(document.body, {
@@ -562,6 +768,25 @@ async function main() {
   )
 
   function layoutMode() {
+    const narrow = innerWidth <= 520
+    if (narrow) {
+      toggle.style.maxWidth = 'calc(100vw - 16px)'
+      if (mode === '2p' || view === 'akademin' || view === 'rabbit') {
+        toggle.style.left = '8px'
+        toggle.style.top = '8px'
+        toggle.style.height = '36px'
+      }
+      const rowTop = Math.round(toggle.getBoundingClientRect().bottom + 6)
+      modeToggle.style.height = toggle.style.height || '36px'
+      modeToggle.style.left = '8px'
+      modeToggle.style.top = `${rowTop}px`
+      const mw = modeToggle.getBoundingClientRect().width
+      skal.style.height = modeToggle.style.height
+      skal.style.left = `${Math.round(8 + mw + 8)}px`
+      skal.style.top = `${rowTop}px`
+      return
+    }
+    toggle.style.maxWidth = ''
     if (mode === '2p' || view === 'akademin') {
       // delad skärm / Akademin: båda växlarna centrerade överst, över delningen
       const h = innerWidth <= 640 ? 36 : 40
@@ -590,13 +815,204 @@ async function main() {
     skal.style.top = toggle.style.top
   }
 
+  const chrome = el('div', 'tr-chrome')
+  chrome.append(toggle, modeToggle, skal, sim, instr.reopen)
+  document.body.appendChild(chrome)
+
+  function linePriceTile() {
+    const captions = new Set([
+      STRINGS.sv['sim.price'], STRINGS.en['sim.price'], STRINGS.uk['sim.price'],
+      STRINGS.sv['hist.price'], STRINGS.en['hist.price'], STRINGS.uk['hist.price'],
+    ])
+    for (const node of document.querySelectorAll('header div')) {
+      if (node.children.length) continue
+      const text = (node.textContent || '').trim()
+      if (!captions.has(text) || !String(node.className).includes('uppercase')) continue
+      return node.parentElement
+    }
+    return null
+  }
+
+  function syncPriceCaption() {
+    const historia = fas.isCovering() && fas.phases.phase() === 'historia'
+    setPriceKey(historia ? 'hist.price' : null)
+    const simLabels = new Set([STRINGS.sv['sim.price'], STRINGS.en['sim.price'], STRINGS.uk['sim.price']])
+    if (!historia) {
+      for (const node of document.querySelectorAll('[data-tr-price-swap]')) {
+        node.textContent = t('sim.price')
+        delete node.dataset.trPriceSwap
+      }
+      return
+    }
+    const want = t('hist.price')
+    for (const node of document.querySelectorAll('div, small, span, b')) {
+      if (node.childNodes.length !== 1 || node.childNodes[0].nodeType !== 3) continue
+      if (!simLabels.has((node.textContent || '').trim())) continue
+      node.textContent = want
+      node.dataset.trPriceSwap = '1'
+    }
+  }
+
+  function layoutChrome() {
+    const narrow = innerWidth <= 640
+    const solo = view === 'line' && mode === '1p'
+    document.documentElement.dataset.nlrSolo = solo ? '1' : '0'
+    document.documentElement.dataset.nlrMode = mode
+    const hpx = narrow ? 32 : solo ? 34 : 40
+    for (const pill of [toggle, modeToggle, skal]) {
+      pill.style.height = 'auto'
+      pill.style.minHeight = `${hpx}px`
+    }
+    for (const node of [toggle, modeToggle, skal, sim]) {
+      node.style.left = ''
+      node.style.top = ''
+      node.style.right = ''
+      node.style.bottom = ''
+    }
+    const splashEl = document.querySelector('[data-tr-splash]')
+    const splashOn = !!(splashEl && getComputedStyle(splashEl).display !== 'none' && !splashEl.hidden)
+    if (!fas.isCovering()) sim.style.display = splashOn && narrow && solo ? 'none' : ''
+    sim.style.flex = '0 1 auto'
+    sim.style.maxWidth = 'none'
+    const tight = innerWidth <= 1024 || innerHeight <= 520
+    const dock = tight || !(view === 'line' && mode === '1p')
+    document.documentElement.dataset.trDock = dock ? 'top' : 'band'
+    let left = 8
+    let top = 8
+    let maxW = innerWidth - 16
+    const header = document.querySelector('header.pointer-events-none')
+    const headerShown = !!(header && getComputedStyle(header).display !== 'none' && header.getBoundingClientRect().height > 2)
+    if (dock) {
+      left = 0
+      top = 0
+      maxW = innerWidth
+      chrome.style.width = '100%'
+      chrome.style.padding = '8px'
+      chrome.style.boxSizing = 'border-box'
+      chrome.style.background = view === 'raket' ? '#061022' : view === 'rabbit' ? '#140e0c' : '#f3ede2'
+    } else {
+      chrome.style.width = ''
+      chrome.style.padding = ''
+      chrome.style.boxSizing = ''
+      chrome.style.background = ''
+    }
+    if (!dock && solo) {
+      const title = document.querySelector('[data-tr-trade-title]')
+      const tile = linePriceTile()
+      let anchorRight = 16
+      if (title) anchorRight = Math.max(anchorRight, title.getBoundingClientRect().right)
+      if (headerShown) {
+        for (const button of header.querySelectorAll('button')) {
+          const r = button.getBoundingClientRect()
+          if (r.width > 2 && r.top < 140) anchorRight = Math.max(anchorRight, r.right)
+        }
+      }
+      left = Math.round(anchorRight + 10)
+      top = Math.round(title ? title.getBoundingClientRect().top : 12)
+      let limitLeft = tile ? tile.getBoundingClientRect().left : innerWidth - 8
+      const resultNames = new Set([STRINGS.sv['hud.result'], STRINGS.en['hud.result'], STRINGS.uk['hud.result']])
+      const headerEl = headerShown ? header : null
+      if (headerEl) {
+        for (const node of headerEl.querySelectorAll('div')) {
+          if (node.children.length) continue
+          const text = (node.textContent || '').trim()
+          if (![...resultNames].some((name) => text === name || text.startsWith(`${name} ·`) || text.startsWith(`${name} `))) continue
+          const r = node.parentElement.getBoundingClientRect()
+          if (r.width > 2 && r.top < 240) limitLeft = Math.min(limitLeft, r.left)
+        }
+      }
+      maxW = Math.max(280, Math.round(limitLeft - left - 12))
+    }
+    if (!dock) {
+      if (left < 8) left = 8
+      if (left + 120 > innerWidth) left = 8
+      maxW = Math.min(maxW, innerWidth - left - 8)
+    }
+    chrome.style.left = `${left}px`
+    chrome.style.top = `${top}px`
+    chrome.style.maxWidth = `${Math.round(maxW)}px`
+    chrome.style.gap = solo && !narrow ? '4px' : '6px'
+    const bottom = Math.round(chrome.getBoundingClientRect().bottom)
+    document.documentElement.style.setProperty('--tr-chrome-b', `${bottom}px`)
+    const headerBottom = headerShown ? Math.round(header.getBoundingClientRect().bottom) : bottom
+    document.documentElement.style.setProperty('--tr-header-b', `${headerBottom}px`)
+    const buy = document.querySelector('button[data-tr="buy"]')
+    const shell = buy?.parentElement?.parentElement
+    if (shell && !shell.closest('.nlr-duo, .nlr-raket')) shell.dataset.trLinebar = '1'
+    placeSplash(bottom)
+    syncPriceCaption()
+    fitPracticeCard()
+    const sig = `${dock}:${bottom}:${innerWidth}`
+    if (sig !== layoutChrome.sig) {
+      layoutChrome.sig = sig
+      if (view === 'line' && mode === '2p') duo.layout?.()
+      else if (view === 'line' && mode === '1p') window.__trEngine?.resize?.()
+    }
+  }
+
+  function pinClaim(splash) {
+    const inner = splash?.querySelector('p')?.parentElement
+    if (!inner) return null
+    let line = inner.querySelector('[data-tr-claim-line]')
+    const kicker = inner.querySelector('p:not([data-tr-claim-line])')
+    if (!line) {
+      line = document.createElement('p')
+      line.setAttribute('data-tr-claim', '1')
+      line.setAttribute('data-tr-claim-line', '1')
+      line.style.cssText = 'margin:8px 0;font:600 13px/1.35 "IBM Plex Sans",sans-serif'
+      if (kicker) kicker.insertAdjacentElement('afterend', line)
+      else inner.prepend(line)
+    }
+    const text = t('sim.claim')
+    if (line.textContent !== text) line.textContent = text
+    return inner
+  }
+
+  function placeSplash(chromeBottom) {
+    const splash = document.querySelector('[data-tr-splash]')
+    const innerFromClaim = pinClaim(splash)
+    const kicker = splash?.querySelector('p:not([data-tr-claim-line])')
+    const body = splash?.querySelectorAll('p')[2]
+    if (body) body.setAttribute('data-tr-claim', '1')
+    const inner = innerFromClaim || kicker?.parentElement
+    if (!inner) return
+    if (!inner.dataset.trPadBase) inner.dataset.trPadBase = String(parseFloat(getComputedStyle(inner).paddingTop) || 0)
+    const base = Number(inner.dataset.trPadBase) || 0
+    const hidden = splash.hidden || getComputedStyle(splash).display === 'none'
+    const dock = document.documentElement.dataset.trDock === 'top'
+    if (hidden || !dock) {
+      inner.style.justifyContent = ''
+      inner.style.paddingBottom = ''
+      inner.style.paddingTop = `${base}px`
+      if (hidden) return
+      const overlap = chromeBottom + 8 - kicker.getBoundingClientRect().top
+      inner.style.paddingTop = `${base + Math.max(0, overlap)}px`
+      return
+    }
+    const splashHeader = document.querySelector('header.pointer-events-none')
+    const splashHeaderShown = !!(splashHeader && getComputedStyle(splashHeader).display !== 'none' && splashHeader.getBoundingClientRect().height > 2)
+    const splashTop = splash.getBoundingClientRect().top
+    let floor = chromeBottom + 8
+    if (splashHeaderShown) floor = Math.max(floor, splashHeader.getBoundingClientRect().bottom + 8)
+    inner.style.justifyContent = 'flex-start'
+    inner.style.paddingBottom = '16px'
+    inner.style.paddingTop = `${Math.max(base, Math.round(floor - splashTop))}px`
+  }
+
+  const watch = new ResizeObserver(() => layoutChrome())
+  const headerWatch = document.querySelector('header.pointer-events-none')
+  const splashWatch = document.querySelector('[data-tr-splash]')
+  if (headerWatch) watch.observe(headerWatch)
+  if (splashWatch) watch.observe(splashWatch)
+
   const loop = () => {
     refreshTitle()
     layoutPanel()
-    layoutToggle()
-    layoutMode()
-    layoutSim()
-    if (view === 'line') drawPanel()
+    syncGameHeader()
+    if (fas.isCovering()) sim.style.display = 'none'
+    layoutChrome()
+    syncSnap()
+    if (view === 'line' && mode === '1p') drawPanel()
     setTimeout(() => requestAnimationFrame(loop), 90)
   }
   loop()

@@ -1,6 +1,6 @@
 // Hårdkodsgranskning av det som publiceras för Trade Rider.
 // Kör: node traderider/app/spel-test/hardkod-scan.mjs
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -23,11 +23,11 @@ export function scan() {
   for (const rel of pages) {
     if (read(rel).includes('NVDA Rider')) unjustified.push(`${rel}: produktnamnet innehåller fortfarande NVDA Rider`)
   }
-  justified.push('Hash #nvda-rider är kanonisk adress, inte produktnamnet.')
+  justified.push('Hash #trade-rider är kanonisk adress. #nvda-rider är ett alias, inte produktnamnet.')
   justified.push('historia-data.js seriesId NVDA är datamängdens id och ritas inte i gränssnittet.')
   justified.push('Typsnittsadresser mot fonts.googleapis.com och fonts.gstatic.com är inte kurskällor.')
   justified.push('styrmotor.js 450 är gestlåsets millisekunder, inte en prisnivå.')
-  justified.push('panel.js matchar den färdiga bundelns titel-nod /^NVDA (Line|Rider)$/ för att placera växeln. Knapptexten kommer från i18n.')
+  justified.push('panel.js matchar titel-noden Trade Rider, och fortfarande NVDA Line/Rider om en gammal nod finns kvar, för att placera växeln. Knapptexten kommer från i18n.')
   justified.push('RSI 14 är indikatorns namn, samma på alla språk.')
   justified.push('kind märke/medalj är interna id. Den synliga texten går via kind.mark och kind.medal.')
   justified.push('CSS-klasser som bg-paper är befintliga identifierare, inte kundtext.')
@@ -61,7 +61,11 @@ export function scan() {
   }
 
   if (read('traderider/spel/lagen/historia-data.js').includes('fetch(')) unjustified.push('historia-data.js hämtar data')
-  if (read('nvda-rider/assets/routes-CbqPJAI2.js').includes('nvda-fallback')) unjustified.push('nvda-rider-bundeln hämtar fortfarande fallback-filen')
+  const stale = 'nvda-rider/assets/routes-CbqPJAI2.js'
+  if (existsSync(join(REPO, stale))) {
+    if (read(stale).includes('nvda-fallback')) unjustified.push('nvda-rider-bundeln hämtar fortfarande fallback-filen')
+    unjustified.push('nvda-rider/assets är en gammal bundle och ska inte publiceras')
+  } else justified.push('nvda-rider/assets är borttagen. nvda-rider/index.html är bara en omdirigering.')
 
   return { unjustified, justified }
 }

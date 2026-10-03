@@ -102,7 +102,8 @@ test('de fyra lägena delar stepSide och har ingen egen styrmotor i källan', ()
   assert.equal(/\bgas\b|\bbroms\b|\bbrake\b/i.test(joined), false)
 })
 
-test('hash: #nvda-rider, #racex, #academy och #rabbit-hole, med äldre alias', () => {
+test('hash: #trade-rider, #racex, #academy och #rabbit-hole, med äldre alias', () => {
+  assert.equal(modeFromHash('#trade-rider'), 'line')
   assert.equal(modeFromHash('#nvda-rider'), 'line')
   assert.equal(modeFromHash('#trend-rider'), 'line')
   assert.equal(modeFromHash('#line-rider'), 'line')
@@ -113,7 +114,7 @@ test('hash: #nvda-rider, #racex, #academy och #rabbit-hole, med äldre alias', (
   assert.equal(modeFromHash('#rabbit-hole'), 'rabbit')
   assert.equal(modeFromHash('#2'), 'raket')
   assert.equal(modeFromHash('#3'), 'akademin')
-  assert.equal(hashForView('line'), 'nvda-rider')
+  assert.equal(hashForView('line'), 'trade-rider')
   assert.equal(hashForView('raket'), 'racex')
   assert.equal(hashForView('akademin'), 'academy')
   assert.equal(hashForView('rabbit'), 'rabbit-hole')
@@ -129,7 +130,7 @@ test('hash: #nvda-rider, #racex, #academy och #rabbit-hole, med äldre alias', (
 
 test('klick, tangent 1–4 och hash i alla fyra lägen, med alias', () => {
   const cases = [
-    ['line', 1, '#nvda-rider', null],
+    ['line', 1, '#trade-rider', '#nvda-rider'],
     ['raket', 2, '#racex', '#raket'],
     ['akademin', 3, '#academy', '#akademin'],
     ['rabbit', 4, '#rabbit-hole', null],

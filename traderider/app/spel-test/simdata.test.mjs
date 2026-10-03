@@ -59,6 +59,13 @@ test('synlig etikett i alla lägen och inga påståenden om verkliga kurser', ()
   const i18n = txt(join(SPEL, 'lagen/i18n.js'))
   assert.ok(i18n.includes(SIM))
   assert.ok(i18n.includes(BADGE))
+  assert.match(i18n, /'sim\.claim': 'Simulerade kurser – inte verkliga marknadsdata'/)
+  assert.match(i18n, /'sim\.claim': 'Simulated prices – not real market data'/)
+  assert.match(i18n, /'sim\.claim': 'Симульовані курси – не реальні ринкові дані'/)
+  assert.match(i18n, /'splash\.body':[\s\S]*?Simulerade kurser – inte verkliga marknadsdata/)
+  for (const file of ['duo.js', 'rabbit.js', 'raket.js', 'akademin.js', 'panel.js']) {
+    assert.match(txt(join(SPEL, 'lagen', file)), /data-tr-claim/, `${file} saknar egen synlig mening`)
+  }
   assert.match(txt(join(SPEL, 'lagen/panel.js')), /el\('div', 'tr-sim', t\('sim\.label'\)\)/)
   assert.ok(txt(join(TR, 'index.html')).includes(SIM))
   const claim = /[Rr]iktiga (historiska )?(NVDA-)?kurser|äkta historiska|real historical|live (stock )?chart|LiveTrend|NVIDIA/
@@ -74,13 +81,35 @@ test('synlig etikett i alla lägen och inga påståenden om verkliga kurser', ()
 
 test('den publicerade fallback-filen och live-hämtningen är borta', () => {
   assert.ok(!existsSync(join(REPO, 'nvda-rider/data/nvda-fallback.json')))
-  const rider = txt(join(REPO, 'nvda-rider/assets/routes-CbqPJAI2.js'))
-  assert.equal(rider.includes('nvda-fallback'), false)
-  assert.equal(rider.includes('query1.finance'), false)
+  assert.ok(!existsSync(join(REPO, 'nvda-rider/assets/routes-CbqPJAI2.js')))
+  assert.ok(!existsSync(join(REPO, 'nvda-rider/sprites')))
+  const redirect = txt(join(REPO, 'nvda-rider/index.html'))
+  assert.match(redirect, /#trade-rider/)
+  assert.equal(redirect.includes('NVDA Rider'), false)
   const historia = txt(join(SPEL, 'lagen/historia-data.js'))
   assert.match(historia, /export const HISTORIA/)
   assert.equal(historia.includes('fetch('), false)
   assert.match(txt(join(SPEL, 'lagen/i18n.js')), /VERKLIG · HISTORISK/)
+})
+
+test('publicerade filer saknar tunnel, orderpost och mäklarnycklar', () => {
+  const banned = ['trycloudflare', '/orders', 'alpaca']
+  // Samma kataloger som Pages tar bort före uppladdning (.github/workflows/pages.yml).
+  const unpublished = ['traderider/app/', 'traderider/docs/raket-akademin/_intern/', 'nvda-rider/data/']
+  const hits = []
+  for (const p of upload) {
+    const rel = relative(REPO, p)
+    if (unpublished.some((prefix) => rel.startsWith(prefix))) continue
+    if (!/\.(html|js|mjs|css|json|md|svg)$/.test(p)) continue
+    let text = ''
+    try {
+      text = txt(p).toLowerCase()
+    } catch {
+      continue
+    }
+    for (const word of banned) if (text.includes(word)) hits.push(`${rel}: ${word}`)
+  }
+  assert.deepEqual(hits, [])
 })
 
 test('Pages-uppladdningen i den här grenen: ingen mäklarkod i det som grenen publicerar under traderider/', () => {
