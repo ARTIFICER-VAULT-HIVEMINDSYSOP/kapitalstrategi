@@ -26,9 +26,16 @@ const upload = walk(REPO).filter((p) => !relative(REPO, p).startsWith('traderide
 const spelFiles = walk(SPEL)
 
 test('spelet: ingen Yahoo-, real-data- eller mäklarkod under traderider/spel/', () => {
-  const rx = /yahoo|query1|query2|finance\.yahoo|alpaca|api\.alpaca|paper-api|trycloudflare|nvda-fallback|\/api\/nvda|\/api\/broker|broker/i
-  const hits = spelFiles.filter((p) => /\.(html|js|json|css)$/.test(p) && rx.test(txt(p))).map((p) => relative(REPO, p))
-  assert.deepEqual(hits, [])
+  const broker = /alpaca|api\.alpaca|paper-api|trycloudflare|nvda-fallback|\/api\/nvda|\/api\/broker|broker/i
+  const market = /yahoo|query1|query2|finance\.yahoo/i
+  const code = spelFiles.filter((p) => /\.(html|js|json|css)$/.test(p))
+  const brokerHits = code.filter((p) => broker.test(txt(p))).map((p) => relative(REPO, p))
+  const marketHits = code
+    .filter((p) => !relative(REPO, p).startsWith('traderider/spel/gransland/'))
+    .filter((p) => market.test(txt(p)))
+    .map((p) => relative(REPO, p))
+  assert.deepEqual(brokerHits, [])
+  assert.deepEqual(marketHits, [])
   assert.ok(!existsSync(join(SPEL, 'data/nvda-fallback.json')))
 })
 
@@ -73,7 +80,11 @@ test('synlig etikett i alla lägen och inga påståenden om verkliga kurser', ()
   const hits = []
   for (const p of files) {
     // bara synlig text: hoppa över kommentarer i våra egna moduler
-    const t = txt(p).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '').replaceAll(BADGE, '')
+    const t = txt(p)
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '')
+      .replaceAll(BADGE, '')
+      .replaceAll('Gå in i riktiga kurser', '')
     if (claim.test(t) || /[Hh]istorisk/.test(t)) hits.push(relative(REPO, p))
   }
   assert.deepEqual(hits, [])

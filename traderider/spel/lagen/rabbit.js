@@ -7,6 +7,7 @@ import { MODES, createSteering, wheelToIntent } from './orientation.js'
 import { t, onLang } from './i18n.js'
 import { createGestureLock } from './styrmotor.js'
 import { positionFor, steerLanes } from './spar.js'
+import { noteRabbitLap } from '../gransland/hooks/rabbit.js'
 
 const O = MODES.rabbitHole.orientation
 const steering = createSteering(O)
@@ -119,16 +120,46 @@ export function createRabbit() {
   }
   let priceDebt = 0
   let lastFrame = 0
+  let raceOver = false
   // Samma takttid som Historiens staplar, inte en stapel per bildruta.
   const BAR_SEC = 0.28
   function advancePrice(dt) {
-    if (!series().length) return
+    const candles = series()
+    if (!candles.length || raceOver) return
     priceDebt += Math.max(0, Number(dt) || 0)
     let guard = 0
     let moved = false
     while (priceDebt >= BAR_SEC && guard++ < 4) {
+      if (priceIndex >= candles.length - 1) {
+        priceDebt = 0
+        raceOver = true
+        noteRabbitLap({
+          atEnd: true,
+          bars: candles,
+          decisions: [{ side, leverage, entry }],
+          freeze() {
+            frozen = true
+            cancelAnimationFrame(raf)
+          },
+          replay() {
+            raceOver = false
+            priceIndex = 0
+            priceDebt = 0
+            entry = null
+            result = null
+            frozen = false
+            if (visible) {
+              cancelAnimationFrame(raf)
+              lastFrame = 0
+              raf = requestAnimationFrame(frame)
+            }
+            paint()
+          },
+        })
+        return
+      }
       priceDebt -= BAR_SEC
-      priceIndex = (priceIndex + 1) % series().length
+      priceIndex += 1
       moved = true
     }
     if (!moved) return

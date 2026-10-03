@@ -1,0 +1,13 @@
+name = "gransland-data"
+main = "src/index.js"
+compatibility_date = "2026-10-03"
+workers_dev = false
+
+# Utkast. Inte deployad. Ingen account_id, ingen route, inga hemligheter.
+# wrangler deploy ska inte köras förrän Daniel har sagt ja och ett Cloudflare-konto finns.
+
+[observability]
+enabled = true
+
+[observability.traces]
+enabled = true
