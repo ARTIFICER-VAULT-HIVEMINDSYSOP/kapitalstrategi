@@ -251,6 +251,36 @@ export function boundsIntersect(a, b) {
   return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
 }
 
+/** Bålen på skärmen: överkropp, öronrot och tassar, inte huvudet som leder fallet. */
+export function rabbitBodyBox(x, y, scale = 1) {
+  const s = Number(scale) > 0 ? Number(scale) : 1
+  return {
+    left: x - 40 * s,
+    top: y - 120 * s,
+    right: x + 40 * s,
+    bottom: y - 18 * s,
+  }
+}
+
+/** Ritad utbredning för en morot, chili eller skylt. */
+export function itemScreenBox(item) {
+  const s = Number(item?.scale) > 0 ? Number(item.scale) : 1
+  const pad = item?.kind === 'sign' ? 34 * Math.max(0.55, s) : 22 * s
+  return {
+    left: item.x - pad,
+    right: item.x + pad,
+    top: item.y - pad,
+    bottom: item.y + pad,
+  }
+}
+
+/** Chili framför kaninen bara ovanför mitten och utanför bålen. */
+export function drawsInFront(item, rabbitX, rabbitY, scale) {
+  if (!item || item.kind !== 'chili') return false
+  if (!(item.y < rabbitY - 30)) return false
+  return !boundsIntersect(itemScreenBox(item), rabbitBodyBox(rabbitX, rabbitY, scale))
+}
+
 function drawBattery(c, p) {
   const box = batteryBounds(p)
   const x = box.left
@@ -756,7 +786,7 @@ export function createRabbit() {
     c.setTransform(dpr, 0, 0, dpr, 0, 0)
     drawTunnel(c, w, h, y, spin, reduced)
     const scale = Math.max(1.08, Math.min(1.5, w / 500))
-    const inFront = (item) => item.kind === 'chili' && item.y < rabbitY - 30
+    const inFront = (item) => drawsInFront(item, xPos, rabbitY, scale)
     for (const item of items) {
       if (inFront(item)) continue
       if (item.kind === 'carrot') drawCarrot(c, item.x, item.y, item.scale || 1)

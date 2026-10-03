@@ -59,6 +59,30 @@ test('batteriet sitter vid höger tass och skär inte bålen', async () => {
   assert.ok(box.left > ear.x + 16, 'batteriet ligger till höger om höger öra')
 })
 
+test('inget som ritas framför kaninen skär bålen', async () => {
+  const { drawsInFront, rabbitBodyBox, itemScreenBox, boundsIntersect } = await import('../../spel/lagen/rabbit.js')
+  const scale = 1.25
+  const x = 640
+  const y = 360
+  const body = rabbitBodyBox(x, y, scale)
+  let inFront = 0
+  for (const kind of ['chili', 'carrot', 'sign']) {
+    for (let dx = -240; dx <= 240; dx += 12) {
+      for (let dy = -280; dy <= 80; dy += 14) {
+        const item = { kind, x: x + dx, y: y + dy, scale: 1.15 }
+        if (!drawsInFront(item, x, y, scale)) continue
+        inFront += 1
+        assert.equal(boundsIntersect(itemScreenBox(item), body), false, `${kind} ${dx},${dy}`)
+      }
+    }
+  }
+  assert.ok(inFront > 0, 'en chili vid sidan ska ligga framför')
+  assert.equal(drawsInFront({ kind: 'chili', x: x + 200, y: y - 90, scale: 1 }, x, y, scale), true)
+  assert.equal(drawsInFront({ kind: 'chili', x, y: y - 70 * scale, scale: 1 }, x, y, scale), false)
+  assert.equal(drawsInFront({ kind: 'carrot', x: x + 200, y: y - 90, scale: 1 }, x, y, scale), false)
+  assert.equal(drawsInFront({ kind: 'sign', x: x + 200, y: y - 90, scale: 1 }, x, y, scale), false)
+})
+
 test('ett steg i läget flyttar tunneln uppåt förbi kaninen', async () => {
   const { Window } = await import('happy-dom')
   const w = new Window()
