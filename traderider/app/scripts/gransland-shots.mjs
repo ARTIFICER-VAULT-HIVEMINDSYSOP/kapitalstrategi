@@ -135,20 +135,89 @@ async function still(page, kind) {
       racex: window.__nvdaLineRsi?.raket?.state?.()?.playing ?? null,
       scroll: window.__nvdaLineRsi?.raket?.visuals?.()?.scroll ?? null,
     }
+    const badge = document.querySelector('[data-gl-badge]')?.textContent || ''
+    const segments = [...document.querySelectorAll('[data-gl-segment]')].map((node) => ({
+      kind: node.dataset.glSegment,
+      text: node.textContent,
+    }))
+    const yard = [...document.querySelectorAll('button')].find((node) => (node.textContent || '').trim() === 'Tillbaka till banan')
+    let yardPeek = false
+    if (yard) {
+      let el = yard
+      let hidden = false
+      while (el && !hidden) {
+        const cs = getComputedStyle(el)
+        if (cs.visibility === 'hidden' || cs.display === 'none') hidden = true
+        el = el.parentElement
+      }
+      const rect = yard.getBoundingClientRect()
+      const card = document.querySelector('.gl-card')?.getBoundingClientRect()
+      const covered = !!(card && rect.top >= card.top && rect.bottom <= card.bottom && rect.left >= card.left && rect.right <= card.right)
+      yardPeek = !hidden && !covered && rect.width > 2 && rect.height > 2 && rect.bottom > 0 && rect.top < innerHeight
+    }
+    const scan = document.querySelector('.nlr-rk-scan')
     return {
       mode,
       pause: !!pause,
       ride: !!ride,
       before,
       after,
-      badge: document.querySelector('[data-gl-badge]')?.textContent || '',
-      segments: [...document.querySelectorAll('[data-gl-segment]')].map((node) => ({
-        kind: node.dataset.glSegment,
-        text: node.textContent,
-      })),
+      badge,
+      segments,
       claim: document.querySelector('[data-gl-claim]')?.textContent || '',
+      simCount: [badge, ...segments.map((seg) => seg.text)].filter((text) => text.includes('SIMULERAD')).length,
+      yardPeek,
+      scan: scan ? getComputedStyle(scan).animationName : null,
     }
   }, kind)
+}
+
+async function changedPixels(page, selector) {
+  const before = await page.screenshot({ encoding: 'base64' })
+  const canvas = await page.evaluate(async (sel) => {
+    const nodes = [...document.querySelectorAll(sel)]
+    const snaps = nodes.map((canvas) => {
+      const ctx = canvas.getContext('2d')
+      if (!ctx || !canvas.width || !canvas.height) return null
+      return ctx.getImageData(0, 0, canvas.width, canvas.height).data
+    })
+    await new Promise((resolve) => setTimeout(resolve, 3000))
+    return snaps.map((snap, i) => {
+      const canvas = nodes[i]
+      const ctx = canvas.getContext('2d')
+      if (!snap || !ctx) return null
+      const next = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+      let changed = 0
+      for (let p = 0; p < snap.length; p += 4) {
+        if (snap[p] !== next[p] || snap[p + 1] !== next[p + 1] || snap[p + 2] !== next[p + 2] || snap[p + 3] !== next[p + 3]) changed += 1
+      }
+      return changed
+    })
+  }, selector)
+  const after = await page.screenshot({ encoding: 'base64' })
+  const pageChanged = await page.evaluate(async (a, b) => {
+    const load = (src) => new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => resolve(img)
+      img.onerror = () => reject(new Error('png'))
+      img.src = `data:image/png;base64,${src}`
+    })
+    const [ia, ib] = await Promise.all([load(a), load(b)])
+    const board = document.createElement('canvas')
+    board.width = ia.naturalWidth
+    board.height = ia.naturalHeight
+    const ctx = board.getContext('2d', { willReadFrequently: true })
+    ctx.drawImage(ia, 0, 0)
+    const da = ctx.getImageData(0, 0, board.width, board.height).data
+    ctx.drawImage(ib, 0, 0)
+    const db = ctx.getImageData(0, 0, board.width, board.height).data
+    let changed = 0
+    for (let i = 0; i < da.length; i += 4) {
+      if (da[i] !== db[i] || da[i + 1] !== db[i + 1] || da[i + 2] !== db[i + 2]) changed += 1
+    }
+    return changed
+  }, before, after)
+  return { canvas, page: pageChanged }
 }
 
 const notes = []
@@ -162,9 +231,14 @@ try {
       await drive(page, shot.drive)
       await new Promise((resolve) => setTimeout(resolve, 350))
       const state = await still(page, shot.drive)
+      let motion = null
+      if (shot.drive === 'duo' || shot.drive === 'racex') {
+        const selector = shot.drive === 'duo' ? '.nlr-duo-play canvas' : '.nlr-raket > canvas'
+        motion = await changedPixels(page, selector)
+      }
       const file = join(OUT, `${shot.name}-choice-${size.w}.png`)
       await page.screenshot({ path: file })
-      notes.push({ file, ...shot, width: size.w, ...state })
+      notes.push({ file, ...shot, width: size.w, ...state, motion })
       await page.close()
     }
   }
@@ -210,10 +284,13 @@ const bad = notes.filter((note) => {
     return !sim || /VERKLIG/.test(sim.text) || !live || !/VERKLIG/.test(live.text)
   }
   if (!note.badge?.includes('SIMULERAD') || /VERKLIG/.test(note.badge || '')) return true
+  if (note.simCount !== 1 || note.yardPeek) return true
   if (note.drive === 'line' && (note.pause || note.after?.playing || note.before?.x !== note.after?.x)) return true
   if (note.drive !== 'line' && note.drive !== 'live' && note.after?.playing) return true
   if (note.drive === 'duo' && (note.after?.duo || []).some(Boolean)) return true
+  if (note.drive === 'duo' && (!(note.motion?.canvas || []).length || (note.motion?.canvas || []).some((n) => n !== 0) || note.motion?.page !== 0)) return true
   if (note.drive === 'racex' && (note.after?.racex || JSON.stringify(note.before?.scroll) !== JSON.stringify(note.after?.scroll))) return true
+  if (note.drive === 'racex' && (note.scan !== 'none' || (note.motion?.canvas || []).some((n) => n !== 0) || note.motion?.page !== 0)) return true
   return false
 })
 console.log(JSON.stringify({ notes, bad }, null, 2))

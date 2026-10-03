@@ -171,9 +171,10 @@ export const cases = [
       const badge = root.querySelector('[data-gl-badge]').textContent
       assert.equal(/VERKLIG/i.test(badge), false, badge)
       assert.equal(badge, t('gl.sim'))
-      const sim = root.querySelector('[data-gl-segment="simulerad"]')
-      assert.equal(/VERKLIG/i.test(sim.textContent), false)
-      assert.equal(sim.textContent, t('gl.sim'))
+      const chips = [...root.querySelectorAll('[data-gl-segment]')].map((node) => node.textContent)
+      assert.equal(chips.includes(t('gl.sim')), false)
+      assert.equal(chips.some((text) => /VERKLIG/i.test(text)), false)
+      assert.equal([badge, ...chips].filter((text) => text === t('gl.sim')).length, 1)
       assert.match(root.querySelector('[data-gl-claim]').textContent, /inte verkliga marknadsdata/)
       root.remove()
     }

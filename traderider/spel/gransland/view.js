@@ -3,6 +3,7 @@ import { formatPrice, formatPct } from './labels.js'
 
 const css = `
 .gl-root{position:fixed;z-index:80;inset:0;display:flex;align-items:flex-start;justify-content:center;padding:calc(var(--tr-chrome-b, 72px) + 12px) 12px 12px;box-sizing:border-box;overflow:auto;background:rgba(28,25,21,.28);font:500 15px/1.45 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:#1c1915}
+html:has([data-gl-root]:not([hidden])) .absolute.inset-0.z-30.bg-overlay{visibility:hidden !important}
 .gl-root[hidden]{display:none !important}
 .gl-card{width:min(640px,100%);box-sizing:border-box;background:#f6f2ea;border:1px solid rgba(28,25,21,.16);border-radius:18px;padding:16px;box-shadow:0 16px 40px rgba(28,25,21,.18)}
 .gl-root[data-variant="racex"] .gl-card{background:#10183f;color:#eaf6ff;border-color:rgba(46,230,255,.35)}
@@ -231,8 +232,10 @@ export function mountView(host, session, opts = {}) {
     root.dataset.glUnknown = snap.unknown ? '1' : '0'
     root.dataset.glFetching = snap.fetching ? '1' : '0'
     badge.textContent = snap.label
+    const chips = (snap.segments || []).filter((seg) => snap.phase === 'live' || seg.label !== snap.label)
     segments.replaceChildren()
-    for (const seg of snap.segments || []) {
+    segments.hidden = chips.length === 0
+    for (const seg of chips) {
       const chip = document.createElement('span')
       chip.dataset.glSegment = seg.kind
       chip.textContent = seg.label

@@ -64,6 +64,7 @@ const css = `
 .nlr-raket.on{display:block}
 .nlr-raket>canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .nlr-rk-scan{position:absolute;left:0;right:0;top:-3px;bottom:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(170,225,255,.05) 0 1px,transparent 1px 3px);animation:nlrRkScan .5s linear infinite;will-change:transform}
+.nlr-raket.frozen .nlr-rk-scan{animation:none}
 @keyframes nlrRkScan{from{transform:translateY(0)}to{transform:translateY(3px)}}
 .nlr-rk-pl{position:absolute;box-sizing:border-box;pointer-events:none}
 .nlr-rk-pl>*{pointer-events:auto}
@@ -393,6 +394,7 @@ export function createRaket({ engine }) {
   let log = false
   let key = '1y'
   const clock = { p: 0, playing: false, started: false, ended: false }
+  let frozenNow = 0
   let players = []
   let visible = false
   let raf = 0
@@ -467,6 +469,8 @@ export function createRaket({ engine }) {
     clock.playing = false
     clock.started = false
     clock.ended = false
+    frozenNow = 0
+    root.classList.remove('frozen')
     resetRaceXHook()
     for (const pl of players) pl.dom.el.remove()
     const n = mode === '2p' ? 2 : 1
@@ -612,6 +616,7 @@ export function createRaket({ engine }) {
   }
 
   function render(dt = 0) {
+    if (clock.ended) dt = 0
     const W = root.clientWidth
     const H = root.clientHeight
     dpr = Math.min(DPR_STEPS[quality], devicePixelRatio || 1)
@@ -627,7 +632,7 @@ export function createRaket({ engine }) {
     root.classList.toggle('short', H < 520)
     root.classList.toggle('live', clock.started)
     const calm = reduced()
-    const now = performance.now() / 1000
+    const now = clock.ended && frozenNow ? frozenNow : performance.now() / 1000
     players.forEach((pl, i) => {
       const vp = vps[i]
       Object.assign(pl.dom.el.style, { left: `${vp.x}px`, top: `${vp.y}px`, width: `${vp.w}px`, height: `${vp.h}px` })
@@ -735,7 +740,7 @@ export function createRaket({ engine }) {
         const x = s.x * W
         let y = s.y * H + off
         if (y > H) y -= H
-        const tw = calm ? 1 : 0.65 + 0.35 * Math.sin(now * 1.7 + s.tw)
+        const tw = calm || clock.ended ? 1 : 0.65 + 0.35 * Math.sin(now * 1.7 + s.tw)
         const a = Ly.alpha * tw * (y < hy ? 1 : 0.55)
         c.globalAlpha = a
         c.fillStyle = s.hue < 0.45 ? '#78ebff' : s.hue < 0.78 ? '#eaf6ff' : '#ff82d7'
@@ -1025,7 +1030,7 @@ export function createRaket({ engine }) {
     }
 
     // (3) boost: fartlinjer i cyan
-    if (fx.boost > 0.01 && !calm) {
+    if (fx.boost > 0.01 && !calm && !clock.ended) {
       const n = Math.round(4 + 12 * fx.boost)
       c.strokeStyle = `rgba(46,230,255,${(0.12 + 0.22 * fx.boost).toFixed(3)})`
       c.lineWidth = 1.2
@@ -1296,7 +1301,32 @@ export function createRaket({ engine }) {
     return sprites.get(k)
   }
 
+  function finishRace() {
+    if (clock.ended) return
+    clock.ended = true
+    clock.playing = false
+    frozenNow = performance.now() / 1000
+    root.classList.add('frozen')
+    cancelAnimationFrame(raf)
+    raf = 0
+    root.querySelector('[data-k="endTxt"]').textContent = t('end.body')
+    endCard.classList.add('on')
+    noteRaceXEnd({
+      ended: true,
+      players: mode === '2p' ? 2 : 1,
+      bars: pts,
+      decisions: players.map((pl) => ({
+        side: isFlat(pl.st) ? 'flat' : pl.st.side,
+        leverage: pl.st.lev,
+        entry: pl.st.entry,
+      })),
+      replay: () => act(0, 'reset'),
+    })
+    render(0)
+  }
+
   function frame(now) {
+    if (clock.ended) return
     const dt = Math.min(0.05, (now - last) / 1000 || 0)
     last = now
     frameTimes.push(now)
@@ -1310,24 +1340,11 @@ export function createRaket({ engine }) {
         frameTimes.length = 0
       }
     }
-    if (clock.playing && !clock.ended) {
+    if (clock.playing) {
       clock.p = Math.min(pts.length - 1, clock.p + PTS_PER_SEC * dt)
       if (clock.p >= pts.length - 1) {
-        clock.ended = true
-        clock.playing = false
-        root.querySelector('[data-k="endTxt"]').textContent = t('end.body')
-        endCard.classList.add('on')
-        noteRaceXEnd({
-          ended: true,
-          players: mode === '2p' ? 2 : 1,
-          bars: pts,
-          decisions: players.map((pl) => ({
-            side: isFlat(pl.st) ? 'flat' : pl.st.side,
-            leverage: pl.st.lev,
-            entry: pl.st.entry,
-          })),
-          replay: () => act(0, 'reset'),
-        })
+        finishRace()
+        return
       }
     }
     render(dt)
@@ -1391,7 +1408,12 @@ export function createRaket({ engine }) {
       return pl?.gl ?? 0
     },
     step(sec) {
+      if (clock.ended) return
       clock.p = Math.min(pts.length - 1, clock.p + PTS_PER_SEC * sec)
+      if (clock.started && clock.p >= pts.length - 1) {
+        finishRace()
+        return
+      }
       render()
     },
     act,
