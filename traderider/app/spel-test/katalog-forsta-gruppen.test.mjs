@@ -1,5 +1,6 @@
 // Första gruppen i «Kurser i spåret» är Ms.filter(id => Xc.includes(id)).
 // Den behåller Ms-ordning. Xc-ordning och fältet order styr inte korten.
+// «Din karta genom skolan» ska vara öppen, samma mönster som katalogens open:!0.
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
@@ -42,4 +43,6 @@ test('första kursgruppen ryms på en rad och innehåller Bankernas historia', (
   assert.equal(order.includes('bankernas-historia'), true)
   assert.deepEqual([...first, ...rest].sort(), [...order].sort())
   assert.equal(bundle.includes('className:`ts-catalog-fold card`,open:!0'), true)
+  assert.equal(bundle.split('className:`ts-path-fold card`,open:!0').length - 1, 1)
+  assert.equal(bundle.includes('className:`ts-path-fold card`,children:'), false)
 })
