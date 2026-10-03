@@ -1,4 +1,5 @@
-// Avslutningen i Bankernas historia, lektion 08, ska finnas på sv/en/uk.
+// Avslutningen i Bankernas historia, lektion 08, ska finnas på svenska och engelska.
+// Kursen har inget ukrainskt fält, så inget ukrainskt avslut läggs till.
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
@@ -11,10 +12,6 @@ const CLOSER = {
   en: [
     'The story does not end here. You can go on learning how banks and payments work today through what our customers report to us and through what we have been able to identify on the internet.',
     'What we share is compiled and anonymised, and these are observations, not a guarantee of how any particular bank acts.',
-  ],
-  uk: [
-    'Історія на цьому не закінчується. Як банки й платежі працюють сьогодні, ви можете дізнатися далі з того, що наші клієнти повідомляють нам, і з того, що нам вдалося виявити в інтернеті.',
-    'Те, чим ми ділимося, зібрано й знеособлено, і це спостереження, а не гарантія того, як діє певний банк.',
   ],
 }
 
@@ -53,28 +50,28 @@ function lessonEight(source) {
   const content = parseTickList(source, contentAt + 'content:['.length)
   assert.ok(source.startsWith('],contentEn:[', content.end))
   const en = parseTickList(source, content.end + '],contentEn:['.length)
-  assert.ok(source.startsWith('],contentUk:[', en.end))
-  const uk = parseTickList(source, en.end + '],contentUk:['.length)
-  assert.ok(source.startsWith('],quiz:', uk.end))
-  return { sv: content.items, en: en.items, uk: uk.items }
+  assert.ok(source.startsWith('],quiz:', en.end), 'lektion 08 ska inte ha contentUk')
+  const lesson = source.slice(idAt, en.end)
+  assert.equal(lesson.includes('contentUk'), false)
+  assert.equal(lesson.includes('topicsUk'), false)
+  assert.equal(lesson.includes('moduleTitleUk'), false)
+  return { sv: content.items, en: en.items }
 }
 
 function assertCloser(fields, label) {
-  for (const lang of ['sv', 'en', 'uk']) {
+  for (const lang of ['sv', 'en']) {
     const items = fields[lang]
     assert.ok(items.length > 2, `${label} ${lang}`)
     assert.deepEqual(items.slice(-2), CLOSER[lang], `${label} ${lang}`)
     const tail = items.slice(-2).join(' ')
     for (const word of BANNED) assert.equal(tail.includes(word), false, `${label} ${lang} ${word}`)
-    assert.equal(items.slice(0, -2).some((p) => p.includes('Historien slutar inte här')), false)
   }
   const body = fields.sv.slice(0, -2).join('\n')
   assert.equal(fields.en.slice(0, -2).join('\n'), body)
-  assert.equal(fields.uk.slice(0, -2).join('\n'), body)
   assert.match(fields.sv.at(-3), /Bankkartan är en pedagogisk jämförelse/)
 }
 
-test('lektion 08 i Bankernas historia slutar med samma avslut på sv, en och uk', () => {
+test('lektion 08 i Bankernas historia slutar med samma avslut på svenska och engelska', () => {
   const bundle = readFileSync(new URL('../../../assets/index-CBayL6Go.js', import.meta.url), 'utf8')
   const patch = readFileSync(new URL('../../../school/courses/patch-bundle.mjs', import.meta.url), 'utf8')
   const fromBundle = lessonEight(bundle)
@@ -82,8 +79,9 @@ test('lektion 08 i Bankernas historia slutar med samma avslut på sv, en och uk'
   assertCloser(fromBundle, 'bundle')
   assertCloser(fromPatch, 'patch')
   assert.deepEqual(fromBundle, fromPatch)
-  for (const phrase of [CLOSER.sv[0], CLOSER.en[0], CLOSER.uk[0]]) {
+  for (const phrase of [...CLOSER.sv, ...CLOSER.en]) {
     assert.equal(bundle.split(phrase).length - 1, 1, phrase)
   }
+  assert.equal(bundle.includes('Історія на цьому'), false)
   assert.equal(bundle.includes('courseId:`bankernas-historia`'), true)
 })
