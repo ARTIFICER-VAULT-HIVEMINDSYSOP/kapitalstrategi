@@ -1,0 +1,118 @@
+// Rabbit Hole: fallet går nedåt, spriten har öron och två ögon/linser, ingen logotyp.
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+
+const SRC = readFileSync(new URL('../../spel/lagen/rabbit.js', import.meta.url), 'utf8')
+
+test('världen rullar uppåt så kaninen faller nedåt relativt tunneln', async () => {
+  const { scrollDelta, projectItem, markerScreenY, parallaxShift } = await import('../../spel/lagen/rabbit.js')
+  assert.ok(scrollDelta(0, 40) < 0)
+  assert.ok(scrollDelta(10, 25) < scrollDelta(10, 12))
+  const before = projectItem(3, 16, 0, 800, 600, false)
+  const after = projectItem(3, 16, 30, 800, 600, false)
+  assert.ok(after.y < before.y, `föremål ${before.y} -> ${after.y}`)
+  assert.ok(markerScreenY(20) < markerScreenY(0))
+  assert.ok(parallaxShift(20, 1.4) < parallaxShift(20, 0.6))
+})
+
+test('spriten har två öron och två ögon/linser på huvudet, och huvudet leder fallet', async () => {
+  const { rabbitSprite } = await import('../../spel/lagen/rabbit.js')
+  const sprite = rabbitSprite()
+  assert.equal(sprite.pose, 'head-first-down')
+  assert.equal(sprite.fall, 'down')
+  const ears = sprite.parts.filter((p) => p.kind === 'ear')
+  assert.equal(ears.length, 2)
+  assert.ok(ears.every((ear) => ear.on === 'head' && ear.inner === 'pink'))
+  const head = sprite.parts.find((p) => p.kind === 'head')
+  const body = sprite.parts.find((p) => p.kind === 'body')
+  assert.ok(head.y > body.y, 'huvudet ligger lägre än kroppen')
+  assert.ok(ears.every((ear) => ear.y < head.y), 'öronen pekar uppåt från huvudet')
+  const eyes = sprite.parts.filter((p) => p.kind === 'eye' && p.on === 'head')
+  assert.equal(eyes.length, 2)
+  assert.ok(eyes[0].x !== eyes[1].x)
+  const glints = sprite.parts.filter((p) => p.kind === 'glint')
+  assert.equal(glints.length, 2)
+  assert.equal(sprite.parts.find((p) => p.kind === 'battery').logo, false)
+  assert.equal(sprite.parts.find((p) => p.kind === 'nose').on, 'head')
+  assert.equal(sprite.parts.filter((p) => p.kind === 'cheek').length, 2)
+  assert.equal(rabbitSprite({ eating: true }).parts.find((p) => p.kind === 'mouth').expression, 'eating')
+  const feet = sprite.parts.filter((p) => p.kind === 'foot')
+  assert.equal(feet.length, 2)
+  assert.ok(feet.every((foot) => foot.y < head.y))
+})
+
+test('ett steg i läget flyttar tunneln uppåt förbi kaninen', async () => {
+  const { Window } = await import('happy-dom')
+  const w = new Window()
+  globalThis.window = w
+  globalThis.document = w.document
+  globalThis.HTMLElement = w.HTMLElement
+  globalThis.localStorage = w.localStorage
+  globalThis.matchMedia = () => ({ matches: false })
+  globalThis.devicePixelRatio = 1
+  globalThis.requestAnimationFrame = (fn) => setTimeout(fn, 16)
+  globalThis.cancelAnimationFrame = (id) => clearTimeout(id)
+  globalThis.addEventListener = (...args) => w.addEventListener(...args)
+  const { createRabbit } = await import('../../spel/lagen/rabbit.js')
+  const rabbit = createRabbit()
+  rabbit.show()
+  const before = rabbit.state()
+  const ears = before.sprite.parts.filter((p) => p.kind === 'ear')
+  const eyes = before.sprite.parts.filter((p) => p.kind === 'eye' && p.on === 'head')
+  assert.equal(ears.length, 2)
+  assert.equal(eyes.length, 2)
+  rabbit.step(0.2)
+  const after = rabbit.state()
+  assert.ok(after.y > before.y)
+  assert.ok(after.markerY < before.markerY)
+  assert.equal(after.motion, 'fall')
+  rabbit.hide()
+})
+
+test('reducerad rörelse stoppar spiral och parallax', async () => {
+  const { spiralAngle, parallaxShift, scrollDelta, projectItem, createRabbit } = await import('../../spel/lagen/rabbit.js')
+  assert.equal(spiralAngle(4, true), 0)
+  assert.notEqual(spiralAngle(4, false), 0)
+  assert.equal(parallaxShift(30, 2, true), 0)
+  assert.equal(scrollDelta(0, 30, true), 0)
+  const still = projectItem(2, 10, 0, 400, 300, true)
+  const later = projectItem(2, 10, 80, 400, 300, true)
+  assert.equal(later.y, still.y)
+  globalThis.matchMedia = () => ({ matches: true })
+  const rabbit = createRabbit()
+  rabbit.show()
+  const before = rabbit.state()
+  rabbit.step(0.4)
+  const after = rabbit.state()
+  assert.equal(after.markerY, before.markerY)
+  assert.equal(after.spiral, 0)
+  assert.equal(after.motion, 'reduced')
+  assert.equal(rabbit.anchor(), 'bottom')
+  rabbit.hide()
+})
+
+test('Rabbit Hole-källan och etiketterna saknar varumärke och ticker', async () => {
+  const { artLabels } = await import('../../spel/lagen/rabbit.js')
+  const banned = /Duracell|BRK\.B|\bBRK\b|\bNVDA\b|Berkshire|Liseberg|Julius|Disney/i
+  assert.equal(banned.test(SRC), false)
+  for (const label of artLabels()) assert.equal(banned.test(label), false)
+  assert.deepEqual(artLabels(), ['RSI', 'MACD', '+HP'])
+  assert.match(SRC, /prefers-reduced-motion/)
+})
+
+test('morot ger en liten mängd HP, chili är fallande stapel', async () => {
+  const { eatCarrot, applyPickups, candleKind, CARROT_HP, HP_MAX } = await import('../../spel/lagen/rabbit.js')
+  assert.equal(CARROT_HP, 1)
+  assert.equal(eatCarrot(0), 1)
+  assert.equal(eatCarrot(HP_MAX), HP_MAX)
+  const hit = applyPickups([{ id: 'a', kind: 'carrot', x: 10, y: 10, reach: 8 }], { x: 12, y: 12 }, 2, [])
+  assert.equal(hit.gained, 1)
+  assert.equal(hit.hp, 3)
+  const miss = applyPickups([{ id: 'b', kind: 'chili', x: 10, y: 10, reach: 8 }], { x: 10, y: 10 }, 2, [])
+  assert.equal(miss.gained, 0)
+  const again = applyPickups([{ id: 'a', kind: 'carrot', x: 10, y: 10, reach: 8 }], { x: 10, y: 10 }, 3, hit.eaten)
+  assert.equal(again.gained, 0)
+  assert.equal(candleKind({ o: 10, c: 12 }), 'carrot')
+  assert.equal(candleKind({ open: 12, close: 9 }), 'chili')
+})
