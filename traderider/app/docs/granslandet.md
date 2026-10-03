@@ -9,7 +9,7 @@ Gränslandet är övergången från den historiska banan till verkliga kurser. D
 3. Live. Samma diagram fortsätter med verkliga kurser fram till nu, och sedan med nya kurser när de kommer. Spelaren ser bara data fram till nu. Under hämtningen står det Hämtar verkliga värden … och inga påhittade siffror visas.
 4. Två spelare delar skärmen och läser samma verkliga data. Var och en har egna simulerade val.
 
-Pengarna i livefasen är simulerade. Etiketten är Simulerade pengar. Ett bra resultat i spelet ger ingen garanti på marknaden, där du kan förlora pengar.
+Pengarna i livefasen är simulerade. Etiketten är Simulerade pengar. Ett bra resultat i spelet ger ingen garanti på marknaden, där du kan förlora pengar. Sida och hävstång följer med från loppet. Om den historiska ingången ligger på en annan skala än den verkliga kursen börjar det simulerade utfallet från den verkliga kursen.
 
 ## Kod
 

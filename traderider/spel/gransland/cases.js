@@ -368,6 +368,8 @@ export const cases = [
     assert.equal(snap.players.length, 2)
     assert.equal(snap.players[0].price, snap.players[1].price)
     assert.equal(snap.players[0].price, 84961.08)
+    assert.ok(Math.abs(snap.players[0].pct) < 0.05)
+    assert.ok(Math.abs(snap.players[1].pct) < 0.05)
     const shown = [...view.root.querySelectorAll('[data-gl-price]')].map((node) => node.textContent)
     assert.equal(shown.length, 2)
     assert.equal(shown[0], shown[1])

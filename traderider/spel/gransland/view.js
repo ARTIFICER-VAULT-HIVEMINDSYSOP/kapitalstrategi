@@ -39,9 +39,38 @@ function ensureStyle() {
   document.head.appendChild(style)
 }
 
+function priceJump(left, right) {
+  if (!(left > 0) || !(right > 0)) return false
+  return Math.max(left, right) / Math.min(left, right) > 3
+}
+
+function chartWindow(bars) {
+  if (bars.length <= 140) return bars
+  let split = 0
+  for (let i = bars.length - 1; i > 0; i--) {
+    if (priceJump(bars[i - 1].c, bars[i].c)) {
+      split = i
+      break
+    }
+  }
+  if (!split) return bars.slice(-120)
+  return bars.slice(Math.max(0, split - 24), split).concat(bars.slice(split).slice(-100))
+}
+
+function scaleRuns(bars) {
+  const runs = []
+  for (const bar of bars) {
+    const prev = runs.length ? runs[runs.length - 1].at(-1) : null
+    if (!prev || priceJump(prev.c, bar.c)) runs.push([bar])
+    else runs[runs.length - 1].push(bar)
+  }
+  return runs
+}
+
 function drawChart(canvas, bars, gaps) {
-  const w = canvas.clientWidth || 560
+  const w = canvas.clientWidth || canvas.parentElement?.clientWidth || 0
   const h = canvas.clientHeight || 180
+  if (w < 2) return
   const dpr = Math.min(2, typeof devicePixelRatio === 'number' ? devicePixelRatio : 1)
   canvas.width = Math.round(w * dpr)
   canvas.height = Math.round(h * dpr)
@@ -50,40 +79,56 @@ function drawChart(canvas, bars, gaps) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
   ctx.fillStyle = '#1c1915'
   ctx.fillRect(0, 0, w, h)
-  if (!bars.length) return
-  let lo = Infinity
-  let hi = -Infinity
-  for (const bar of bars) {
-    lo = Math.min(lo, bar.l)
-    hi = Math.max(hi, bar.h)
-  }
-  const span = hi - lo || 1
-  const slot = w / bars.length
+  const shown = chartWindow(bars)
+  if (!shown.length) return
+  const slot = w / shown.length
   const gapBefore = new Set((gaps || []).map((gap) => gap.before))
-  bars.forEach((bar, i) => {
-    const x = i * slot + slot / 2
-    const y = (v) => 10 + ((hi - v) / span) * (h - 20)
-    const up = bar.c >= bar.o
-    ctx.strokeStyle = up ? '#2f8f7a' : '#d45d75'
-    ctx.fillStyle = ctx.strokeStyle
-    ctx.lineWidth = i === bars.length - 1 ? 3 : 2
-    ctx.beginPath()
-    ctx.moveTo(x, y(bar.h))
-    ctx.lineTo(x, y(bar.l))
-    ctx.stroke()
-    const top = y(Math.max(bar.o, bar.c))
-    const bot = y(Math.min(bar.o, bar.c))
-    ctx.fillRect(x - 3, top, 6, Math.max(2, bot - top))
-    if (gapBefore.has(bar.t)) {
-      ctx.strokeStyle = 'rgba(243,237,226,.7)'
-      ctx.setLineDash([3, 3])
-      ctx.beginPath()
-      ctx.moveTo(i * slot + 1, 8)
-      ctx.lineTo(i * slot + 1, h - 8)
-      ctx.stroke()
-      ctx.setLineDash([])
+  let index = 0
+  for (const run of scaleRuns(shown)) {
+    let lo = Infinity
+    let hi = -Infinity
+    for (const bar of run) {
+      lo = Math.min(lo, bar.l)
+      hi = Math.max(hi, bar.h)
     }
-  })
+    const span = hi - lo || 1
+    const y = (v) => 10 + ((hi - v) / span) * (h - 20)
+    run.forEach((bar, i) => {
+      const at = index + i
+      const x = at * slot + slot / 2
+      const up = bar.c >= bar.o
+      const last = at === shown.length - 1
+      ctx.strokeStyle = up ? '#2f8f7a' : '#d45d75'
+      ctx.fillStyle = ctx.strokeStyle
+      ctx.lineWidth = last ? 3 : 2
+      ctx.beginPath()
+      ctx.moveTo(x, y(bar.h))
+      ctx.lineTo(x, y(bar.l))
+      ctx.stroke()
+      const top = y(Math.max(bar.o, bar.c))
+      const bot = y(Math.min(bar.o, bar.c))
+      const body = Math.max(3, Math.min(8, slot * 0.62))
+      ctx.fillRect(x - body / 2, top, body, Math.max(2, bot - top))
+      if (i === 0 && at > 0) {
+        ctx.strokeStyle = 'rgba(243,237,226,.75)'
+        ctx.setLineDash([3, 3])
+        ctx.beginPath()
+        ctx.moveTo(at * slot + 1, 8)
+        ctx.lineTo(at * slot + 1, h - 8)
+        ctx.stroke()
+        ctx.setLineDash([])
+      } else if (gapBefore.has(bar.t)) {
+        ctx.strokeStyle = 'rgba(243,237,226,.7)'
+        ctx.setLineDash([3, 3])
+        ctx.beginPath()
+        ctx.moveTo(at * slot + 1, 8)
+        ctx.lineTo(at * slot + 1, h - 8)
+        ctx.stroke()
+        ctx.setLineDash([])
+      }
+    })
+    index += run.length
+  }
 }
 
 function figureRow(pack) {
@@ -251,6 +296,18 @@ export function mountView(host, session, opts = {}) {
   })
   const off = session.onChange(paint)
   paint()
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(() => paint())
+  }
+  if (typeof ResizeObserver === 'function') {
+    const observer = new ResizeObserver(() => paint())
+    observer.observe(canvas)
+    const previousClose = root.remove
+    root.remove = function removeRoot() {
+      observer.disconnect()
+      return previousClose.call(root)
+    }
+  }
 
   return {
     root,

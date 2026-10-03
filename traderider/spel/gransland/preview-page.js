@@ -32,6 +32,7 @@ if (liveShot) {
   } catch {
     /* OKÄND om nätet inte svarar */
   }
-  view.paint()
 }
+await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+view.paint()
 view.markReady()

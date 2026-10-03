@@ -34,6 +34,15 @@ function makePlayers(count, decisions, history) {
   return players
 }
 
+function rebaseEntries(players, nextPrice) {
+  if (!Number.isFinite(nextPrice) || nextPrice <= 0) return
+  for (const player of players) {
+    if (player.side === 'flat' || player.entry == null || !(player.entry > 0)) continue
+    const ratio = Math.max(nextPrice, player.entry) / Math.min(nextPrice, player.entry)
+    if (ratio > 3) player.entry = nextPrice
+  }
+}
+
 function simulatedPct(player, price) {
   if (!player || player.side === 'flat' || player.entry == null || !(player.entry > 0) || !Number.isFinite(price)) return null
   const sign = player.side === 'buy' ? 1 : -1
@@ -115,6 +124,7 @@ export function createGransland(opts = {}) {
     source = result.source || ''
     delayed = !!result.delayed
     quoteTime = result.time
+    rebaseEntries(players, price)
     if (machine.phase() === 'gransland') machine.enterLive()
     attachLiveFeed({
       status: () => (unknown ? 'fel' : 'live'),
