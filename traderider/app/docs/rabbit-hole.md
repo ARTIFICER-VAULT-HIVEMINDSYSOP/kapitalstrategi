@@ -2,6 +2,10 @@
 
 Visuell riktning för läget `#rabbit-hole`. Samma styrmotor som de andra lägena. Kaninen faller ned i ett schakt. Gränslandet ligger kvar längst ned.
 
+## Start
+
+Kaninen börjar ovanför hålet, med en kort ruta på gräset. Enter eller knappen Hoppa ned börjar fallet. Skift+Enter eller Två spelare delar schaktet lokalt: spelare 1 använder WASD och mellanslag, spelare 2 pilar och 0. Under fallet syns fallfart, sidläge och beslutet SÄLJ, FLAT eller KÖP. `prefers-reduced-motion` hoppar över hoppet och håller spiralen stilla. Gränslandet fryser fallet och visar de tre valen.
+
 ## Rörelse
 
 Världen rullar uppåt förbi kaninen. Det läses som ett fall nedåt, inte som flykt uppåt. W ökar farten nedåt. S bromsar. A och D, och pilarna upp och ned, styr fortfarande mellan SÄLJ, FLAT och KÖP. Mellanslag är FLAT. Högre hävstång kan ge större vinst men också större förlust.
