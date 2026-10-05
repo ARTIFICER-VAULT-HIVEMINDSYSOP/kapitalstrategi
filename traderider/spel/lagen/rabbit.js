@@ -64,7 +64,11 @@ const css = `
 .nlr-rh-bat{width:28px;height:14px}
 @media (max-width:640px){
   .nlr-rh-indicators[data-players="2"]{grid-template-columns:minmax(0,1fr)}
+  .nlr-rh-home{width:min(340px,calc(100% - 16px))}
+  .nlr-rh-card{padding:10px 12px}
   .nlr-rh-card h2{font-size:18px}
+  .nlr-rh-card p{font-size:12px}
+  .nlr-rh-keys{font-size:11px}
   .nlr-rh-decision{font-size:18px}
 }
 @media (max-height:520px){
@@ -127,11 +131,11 @@ export function markerScreenY(fall, reduced = false) {
 export const JUMP_SEC = 0.72
 export const PHASES = ['home', 'jump', 'race']
 
-/** Fall per tick. Högre hävstång ökar farten nedåt. Reducerad rörelse står stilla. */
+/** Fall per tick. Varje steg i hävstången syns. Reducerad rörelse står stilla. */
 export function fallRate(leverage, reduced = false) {
   if (reduced) return 0
-  const lev = Number.isFinite(Number(leverage)) ? Number(leverage) : 1
-  return 2.6 * Math.max(0.45, lev / 4)
+  const lev = Math.max(1, Number.isFinite(Number(leverage)) ? Number(leverage) : 1)
+  return 1.15 + (lev - 1) * 0.55
 }
 
 export function fallBand(rate) {
@@ -158,7 +162,7 @@ export function jumpProgress(elapsed, reduced = false) {
 export function homeLayout(width, height) {
   const w = Math.max(1, Number(width) || 1)
   const h = Math.max(1, Number(height) || 1)
-  const groundY = Math.round(h * 0.62)
+  const groundY = Math.round(h * 0.7)
   const hole = {
     x: w * 0.5,
     y: groundY + Math.min(28, h * 0.045),
@@ -829,11 +833,27 @@ function drawStandingRabbit(c, x, feetY, scale) {
   c.beginPath()
   c.ellipse(0, -84, 20, 18, 0, 0, Math.PI * 2)
   c.fill()
-  c.save()
-  c.translate(0, -78)
-  drawEar(c, { x: -12, y: -52 }, -1)
-  drawEar(c, { x: 14, y: -48 }, 1)
-  c.restore()
+  for (const side of [-1, 1]) {
+    const baseX = side * 10
+    const baseY = -96
+    c.fillStyle = FUR
+    c.beginPath()
+    c.moveTo(baseX - side * 7, baseY)
+    c.quadraticCurveTo(baseX - side * 16, baseY - 34, baseX, baseY - 62)
+    c.quadraticCurveTo(baseX + side * 18, baseY - 32, baseX + side * 8, baseY)
+    c.closePath()
+    c.fill()
+    c.strokeStyle = FUR_SHADE
+    c.lineWidth = 1.2
+    c.stroke()
+    c.fillStyle = INNER
+    c.beginPath()
+    c.moveTo(baseX - side * 2, baseY - 8)
+    c.quadraticCurveTo(baseX - side * 7, baseY - 32, baseX + side * 1, baseY - 50)
+    c.quadraticCurveTo(baseX + side * 9, baseY - 30, baseX + side * 3, baseY - 6)
+    c.closePath()
+    c.fill()
+  }
   c.fillStyle = 'rgba(255, 150, 176, 0.85)'
   c.beginPath()
   c.ellipse(-12, -78, 5, 3.2, 0, 0, Math.PI * 2)
@@ -898,8 +918,12 @@ function drawMeadow(c, w, h, layout, side, glow, showRabbit = true) {
     c.beginPath()
     c.ellipse(x, groundY + 28, on ? 16 : 10, on ? 7 : 5, 0, 0, Math.PI * 2)
     c.fill()
-    c.fillStyle = '#14301a'
-    c.fillText(t(key === 'sell' ? 'btn.sell' : key === 'buy' ? 'btn.buy' : 'btn.flat'), x, groundY + 48)
+    const label = t(key === 'sell' ? 'btn.sell' : key === 'buy' ? 'btn.buy' : 'btn.flat')
+    c.lineWidth = 3
+    c.strokeStyle = '#14301a'
+    c.strokeText(label, x, groundY + 50)
+    c.fillStyle = '#f4efe6'
+    c.fillText(label, x, groundY + 50)
   }
   if (showRabbit) {
     const stand = standPoint(side, layout)
@@ -1144,9 +1168,10 @@ export function createRabbit() {
       const n = String(i + 1)
       const info = movementIndicators({ side: rider.side, leverage: rider.leverage, width: span, reduced })
       const fall = indicators.querySelector(`[data-rh-fall="${n}"]`)
-      if (fall) fall.textContent = `${t('rh.fall')} ${info.fallRate.toFixed(1)} · ${t(bandKey(info.band))}`
+      if (fall) fall.textContent = `${t('rh.fall')} ${info.fallRate.toFixed(1)} · ${t(bandKey(info.band))} · ×${rider.leverage}`
       const meter = indicators.querySelector(`[data-rh-meter="${n}"]`)
-      if (meter) meter.style.width = `${Math.round(Math.min(1, info.fallRate / 4) * 100)}%`
+      const spanRate = fallRate(6, false)
+      if (meter) meter.style.width = `${Math.round(Math.min(1, info.fallRate / spanRate) * 100)}%`
       const laneName = indicators.querySelector(`[data-rh-lane-name="${n}"]`)
       if (laneName) laneName.textContent = `${t('rh.lane')} · ${t(placeKey(info.offset))}`
       const labels = indicators.querySelector(`[data-rh-lane="${n}"]`)
