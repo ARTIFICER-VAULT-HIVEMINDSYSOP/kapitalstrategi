@@ -9,6 +9,7 @@ import { simTid } from './simtid.js'
 import { t, onLang } from './i18n.js'
 import { stepSide, readSide } from './styrmotor.js'
 import { bindStepGestures } from './snapp.js'
+import { noteTradeRiderDuo } from '../gransland/hooks/trade-rider.js'
 
 const css = `
 .nlr-duo{position:fixed;inset:0;z-index:45;display:none;background:#f3ede2;font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:#1c1915}
@@ -80,6 +81,7 @@ export function createDuo({ engine: main, skinFrom }) {
   let halves = []
   let visible = false
   let started = false
+  let sealing = false
 
   function rects() {
     const W = root.clientWidth || innerWidth
@@ -169,10 +171,12 @@ export function createDuo({ engine: main, skinFrom }) {
 
   function build() {
     destroy()
+    sealing = false
     halves = [makeHalf(0), makeHalf(1)]
     layout()
     halves.forEach((hv, i) => {
       hv.eng = newEngine(hv.canvas)
+      holdStill(hv.eng)
       bindStepGestures(hv.canvas, {
         enabled: () => visible,
         getSide: () => readSide(hv.eng?.train),
@@ -182,12 +186,51 @@ export function createDuo({ engine: main, skinFrom }) {
       hv.eng.onHud = (h) => {
         hv.hud = h
         paint(i)
+        if (sealing) return
+        if (h && (h.finished || h.crashed) && hv.eng.playing) {
+          sealing = true
+          freezeHalf(hv.eng)
+          sealing = false
+          hv.hud = hv.eng.hudSnap()
+          paint(i)
+        }
+        noteTradeRiderDuo({
+          huds: halves.map((item) => item.hud),
+          candles: main.quote?.candles,
+          replay() {
+            build()
+          },
+        })
       }
       hv.eng.start()
       hv.hud = hv.eng.hudSnap()
       paint(i)
     })
     started = false
+  }
+
+  /** Sista bilden ska ligga kvar. resize() nollar canvasen, så en fryst motor ritas om utan att klockan går. */
+  function holdStill(eng) {
+    const resize = eng.resize.bind(eng)
+    eng.resize = () => {
+      resize()
+      if (!eng.running) {
+        eng.shake = 0
+        eng.draw()
+      }
+    }
+  }
+
+  function freezeHalf(eng) {
+    if (eng.playing) eng.pause()
+    eng.shake = 0
+    eng.running = false
+    cancelAnimationFrame(eng.raf)
+  }
+
+  function ride(eng) {
+    if (!eng.playing) eng.play()
+    if (!eng.running) eng.start()
   }
 
   function destroy() {
@@ -243,7 +286,7 @@ export function createDuo({ engine: main, skinFrom }) {
     }
     if (action === 'pause') {
       const anyPlaying = halves.some((hv) => hv.eng.playing)
-      for (const hv of halves) anyPlaying ? hv.eng.pause() : hv.eng.play()
+      for (const hv of halves) anyPlaying ? hv.eng.pause() : ride(hv.eng)
       started = true
       return
     }
@@ -260,7 +303,7 @@ export function createDuo({ engine: main, skinFrom }) {
       if (!started) {
         // samma start för båda – rakt jämförbart
         started = true
-        for (const o of halves) o.eng.playing || o.eng.play()
+        for (const o of halves) ride(o.eng)
       }
     } else if (action === 'flat') e.flat()
     else if (action === 'levDown') e.nudgeLeverage(-1)

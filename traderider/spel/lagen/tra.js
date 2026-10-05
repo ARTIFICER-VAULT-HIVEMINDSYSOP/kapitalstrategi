@@ -5,6 +5,7 @@
 import { getLang, onLang, t } from './i18n.js'
 import { drawRobbanCraft, robbanSvg } from './robban-art.js'
 import { mountRobban } from './robban.js'
+import { noteTradeRiderAcademy } from '../gransland/hooks/tra.js'
 
 const SKY = '#070b16'
 const INK = '#e8f4ff'
@@ -143,6 +144,7 @@ export function createTradeRiderAcademy() {
   let visible = false
   let phase = 'home'
   let playing = false
+  let raceOver = false
   let clock = 0
   let raf = 0
   let last = 0
@@ -212,17 +214,65 @@ export function createTradeRiderAcademy() {
     if (typeof requestAnimationFrame === 'function') requestAnimationFrame(go)
   }
 
+  function courseBars() {
+    const candles = window.__trEngine?.quote?.candles
+    return Array.isArray(candles) ? candles : []
+  }
+
+  function courseSeconds() {
+    const series = courseBars()
+    if (series.length) return series.length * 0.28
+    const cv = root.querySelector('[data-tra-canvas]')
+    const width = Math.max(160, cv?.clientWidth || 640)
+    return Math.max(80, width - 150) / 140
+  }
+
+  function finishRace() {
+    if (raceOver || phase !== 'race') return
+    raceOver = true
+    playing = false
+    cancelAnimationFrame(raf)
+    draw()
+    noteTradeRiderAcademy({
+      reachedEnd: true,
+      bars: courseBars(),
+      replay() {
+        raceOver = false
+        clock = 0
+        phase = 'race'
+        playing = true
+        paint()
+        resetScroll()
+        if (visible && !reducedMotion()) {
+          last = performance.now()
+          raf = requestAnimationFrame(frame)
+        }
+      },
+    })
+  }
+
+  function advance(dt) {
+    if (raceOver) return
+    clock += Math.max(0, Number(dt) || 0)
+    if (clock >= courseSeconds()) {
+      clock = courseSeconds()
+      finishRace()
+      return
+    }
+    draw()
+  }
+
   function frame(now) {
-    if (!visible || !playing) return
+    if (!visible || !playing || raceOver) return
     if (reducedMotion()) {
       draw()
+      if (courseBars().length) finishRace()
       return
     }
     const dt = Math.min(0.05, (now - last) / 1000 || 0)
     last = now
-    clock += dt
-    draw()
-    raf = requestAnimationFrame(frame)
+    advance(dt)
+    if (!raceOver) raf = requestAnimationFrame(frame)
   }
 
   root.addEventListener('click', (e) => {
@@ -231,6 +281,7 @@ export function createTradeRiderAcademy() {
     if (!start && !back) return
     phase = start ? 'race' : 'home'
     playing = Boolean(start)
+    raceOver = false
     clock = 0
     paint()
     resetScroll()
@@ -260,10 +311,9 @@ export function createTradeRiderAcademy() {
       cancelAnimationFrame(raf)
     },
     step(dt) {
-      if (!visible || phase !== 'race') return
+      if (!visible || phase !== 'race' || raceOver) return
       playing = true
-      clock += dt
-      draw()
+      advance(dt)
     },
     state: () => ({ phase, playing, clock }),
   }

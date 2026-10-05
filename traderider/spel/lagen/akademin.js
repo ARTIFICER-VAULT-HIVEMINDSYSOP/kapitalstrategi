@@ -15,6 +15,7 @@ import { stepSide } from './styrmotor.js'
 import { bindStepGestures } from './snapp.js'
 import { positionFor } from './spar.js'
 import { chapterHtml, gradeAnswer, gradeLabel } from '../../../school/hansan-riskskola/text.js'
+import { noteAcademySeriesEnd } from '../gransland/hooks/academy.js'
 
 const PAPER = '#f3ede2'
 const INK = '#1c1915'
@@ -146,6 +147,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
   let last = 0
   let toastQ = []
   let toastT = 0
+  let glNoted = false
 
   function data() {
     if (pts === engine.track?.points) return
@@ -675,7 +677,20 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     last = now
     if (playing && pts.length) {
       p = Math.min(pts.length - 1, p + PTS_PER_SEC * tempo * dt)
-      if (p >= pts.length - 1) playing = false
+      if (p >= pts.length - 1) {
+        if (!glNoted) {
+          glNoted = noteAcademySeriesEnd({
+            reachedEnd: true,
+            bars: pts,
+            side,
+            replay() {
+              glNoted = false
+              rewind()
+            },
+          })
+        }
+        playing = false
+      }
       if (trade && !trade.closed) {
         const nx = A.advancePractice(trade, pts, p)
         if (nx !== trade) {

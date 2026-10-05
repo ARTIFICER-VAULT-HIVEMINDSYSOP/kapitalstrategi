@@ -23,6 +23,7 @@ import { mountEntrySnap, bindStepGestures, mountRatt } from './snapp.js'
 import { mountInstruction } from './instruktion.js'
 import { mountFas } from './faser.js'
 import { scrubVisibleNames } from './synlig.js'
+import { noteTradeRider } from '../gransland/hooks/trade-rider.js'
 
 const bootHash = typeof window !== 'undefined' ? window.__trBootHash || '' : ''
 
@@ -250,6 +251,11 @@ function periodLabel(eng) {
 
 async function main() {
   const eng = await waitEngine()
+  const priorEvent = eng.onEvent
+  eng.onEvent = (ev) => {
+    priorEvent?.(ev)
+    if (ev && (ev.type === 'finish' || ev.type === 'crash') && eng.playing) eng.pause()
+  }
   const style = el('style')
   style.id = 'nvda-line-rsi-style'
   style.textContent = css
@@ -1034,7 +1040,21 @@ async function main() {
     if (fas.isCovering()) sim.style.display = 'none'
     layoutChrome()
     syncSnap()
-    if (view === 'line' && mode === '1p') drawPanel()
+    if (view === 'line' && mode === '1p') {
+      drawPanel()
+      if (!fas.isCovering() && !instr.isOpen()) {
+        const hud = typeof eng.hudSnap === 'function' ? eng.hudSnap() : null
+        if (hud && (hud.finished || hud.crashed) && eng.playing) eng.pause()
+        noteTradeRider({
+          hud,
+          candles: eng.quote?.candles,
+          replay() {
+            eng.reset?.()
+            eng.play?.()
+          },
+        })
+      }
+    }
     setTimeout(() => requestAnimationFrame(loop), 90)
   }
   loop()
@@ -1062,6 +1082,8 @@ async function main() {
     raket,
     duo,
     akademin,
+    rabbit,
+    tra,
   }
 }
 
