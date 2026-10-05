@@ -1,6 +1,6 @@
 # Rabbit Hole
 
-Visuell riktning för läget `#rabbit-hole`. Samma styrmotor som de andra lägena. Kaninen faller ned i ett schakt. Gränslandet ligger kvar längst ned.
+Visuell riktning för läget `#rabbit-hole`. Samma styrmotor som de andra lägena. Kaninen faller ned i ett schakt. Gränslandet ligger kvar längst ned. Styrning och Bollinger som gräns mellan tunnel och hål: [rabbit-hole-styrning-fall.md](rabbit-hole-styrning-fall.md).
 
 ## Start
 
@@ -8,7 +8,7 @@ Kaninen börjar ovanför hålet, med en kort ruta på gräset. Enter eller knapp
 
 ## Rörelse
 
-Världen rullar uppåt förbi kaninen. Det läses som ett fall nedåt, inte som flykt uppåt. W ökar farten nedåt. S bromsar. A och D, och pilarna upp och ned, styr fortfarande mellan SÄLJ, FLAT och KÖP. Mellanslag är FLAT. Högre hävstång kan ge större vinst men också större förlust.
+Världen rullar uppåt förbi kaninen. Det läses som ett fall nedåt, inte som flykt uppåt. Form A: W eller pil upp ökar farten nedåt. S eller pil ned bromsar. A eller pil vänster stegar mot SÄLJ. D eller pil höger stegar mot KÖP. Mellanslag är FLAT. Kameran följer fallet med en liten sidoförskjutning. Höger vägg är det övre Bollingerbandet och vänster vägg är det undre, på samma stapelserie som priset. Mellan banden är tunneln. Utanför är hålet. KÖP står på den högra kanten och SÄLJ på den vänstra. RSI och MACD är jämförelsetal, med ett märke när de faktiskt säger något. En handkontroll kan styra spelare 1, en andra spelare 2, lokalt. Högre hävstång kan ge större vinst men också större förlust.
 
 Morot betyder stigande stapel. Chili betyder fallande stapel. En morot som träffar kaninen ger en liten +HP. Skyltar med RSI och MACD följer med fallet. Inga tickersymboler och ingen batterilogotyp.
 

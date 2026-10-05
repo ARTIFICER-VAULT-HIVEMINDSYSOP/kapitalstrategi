@@ -41,7 +41,7 @@ test('per läge: W/S oförändrade, pil längs rörelsen, tvärställda pilar oc
   const cases = [
     [MODES.trendRider.orientation, 'ArrowRight', 'ArrowUp', 'ArrowDown'],
     [MODES.raket.orientation, 'ArrowUp', 'ArrowRight', 'ArrowLeft'],
-    [MODES.rabbitHole.orientation, 'ArrowDown', 'ArrowRight', 'ArrowLeft'],
+    [MODES.rabbitHole.orientation, 'ArrowUp', 'ArrowRight', 'ArrowLeft'],
   ]
   for (const [o, fwd, high, low] of cases) {
     assert.equal(keyToIntent('KeyW', o), 'FORWARD')
@@ -118,7 +118,10 @@ test('hash: #trade-rider, #racex, #academy och #rabbit-hole, med äldre alias', 
   assert.equal(hashForView('raket'), 'racex')
   assert.equal(hashForView('akademin'), 'academy')
   assert.equal(hashForView('rabbit'), 'rabbit-hole')
-  assert.equal(travelVector(MODES.rabbitHole.orientation).y, 1)
+  assert.equal(travelVector(MODES.rabbitHole.orientation).y, -1)
+  assert.equal(keyToIntent('ArrowDown', MODES.rabbitHole.orientation), 'BACKWARD')
+  assert.equal(keyToIntent('KeyA', MODES.rabbitHole.orientation), 'STEER_TOWARD_LOW')
+  assert.equal(keyToIntent('KeyD', MODES.rabbitHole.orientation), 'STEER_TOWARD_HIGH')
   assert.equal(travelVector(MODES.raket.orientation).y, -1)
   assert.equal(travelVector(MODES.trendRider.orientation).x, 1)
   assert.equal(selectMode({ via: 'click', value: 2 }), 'raket')

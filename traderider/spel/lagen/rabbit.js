@@ -1,8 +1,9 @@
 /**
- * Rabbit Hole. Samma styrmotor som de andra lägena, orientation movement down.
- * Kaninen faller nedåt: tunneln, morötterna och chilin rullar uppåt förbi den.
- * Morot = stigande stapel, chili = fallande. Ett neutralt batteri utan logotyp.
- * prefers-reduced-motion: spiralen, virveln och parallaxen står stilla, och hoppet ned hoppas över.
+ * Rabbit Hole. Samma styrmotor som de andra lägena.
+ * Form A: framåt längs fallet är pil upp / W (snabbare fall). Bilden rullar ändå uppåt.
+ * Bollingerbandens kanter är gränsen mellan tunnel och hål, på samma stängningar som priset.
+ * RSI och MACD är jämförelsetal. Morot = stigande stapel, chili = fallande.
+ * prefers-reduced-motion: spiralen, virveln, parallaxen och kamerans lerp står stilla, och hoppet hoppas över.
  * Start: kaninen står ovanför hålet. Enter eller knappen börjar fallet.
  */
 import { isTypingTarget, keyAction, PREVENT_DEFAULT } from './keys.js'
@@ -10,6 +11,7 @@ import { MODES, createSteering, wheelToIntent } from './orientation.js'
 import { t, onLang } from './i18n.js'
 import { createGestureLock } from './styrmotor.js'
 import { positionFor, steerLanes } from './spar.js'
+import { rsi, rsiZone } from './rsi.js'
 
 const O = MODES.rabbitHole.orientation
 const steering = createSteering(O)
@@ -61,6 +63,10 @@ const css = `
 .nlr-rh-decision[data-side="flat"]{color:#e7b15a}
 .nlr-rh-decision[data-side="buy"]{color:#2ee6d6}
 .nlr-rh-cue,.nlr-rh-risk{margin:0;font:500 12px/1.35 "IBM Plex Sans",sans-serif;color:#f4efe6}
+.nlr-rh-market{position:absolute;left:12px;top:72px;max-width:min(320px,46%);display:grid;gap:2px;pointer-events:none;z-index:2;font:600 12px/1.35 "IBM Plex Sans",sans-serif;color:#f4efe6;text-shadow:0 1px 2px #07060c}
+.nlr-rh-market p{margin:0}
+.nlr-rh-market[hidden]{display:none}
+.nlr-rh-signal{color:#ffd27a}
 .nlr-rh-bat{width:28px;height:14px}
 @media (max-width:640px){
   .nlr-rh-indicators[data-players="2"]{grid-template-columns:minmax(0,1fr)}
@@ -211,9 +217,18 @@ export function lateralRead(side, width) {
   return { x, t, offset: t - 0.5, lanes }
 }
 
-export function movementIndicators({ side = 'flat', leverage = 1, width = 800, reduced = false } = {}) {
+function lateralFromLanes(side, lanes) {
+  const x = positionFor(side, lanes.buy, lanes.sell)
+  const span = lanes.buy - lanes.sell || 1
+  const t = (x - lanes.sell) / span
+  return { x, t, offset: t - 0.5, lanes }
+}
+
+export function movementIndicators({ side = 'flat', leverage = 1, width = 800, reduced = false, lanes = null } = {}) {
   const decision = side === 'buy' || side === 'sell' ? side : 'flat'
-  const read = lateralRead(decision, width)
+  const read = lanes && Number.isFinite(lanes.buy) && Number.isFinite(lanes.sell)
+    ? lateralFromLanes(decision, lanes)
+    : lateralRead(decision, width)
   const rate = fallRate(leverage, reduced)
   return {
     fallRate: rate,
@@ -224,6 +239,236 @@ export function movementIndicators({ side = 'flat', leverage = 1, width = 800, r
     x: read.x,
     lanes: read.lanes,
   }
+}
+
+export const BB_PERIOD = 20
+export const BB_K = 2
+export const MACD_FAST = 12
+export const MACD_SLOW = 26
+export const MACD_SIGNAL = 9
+export const MARK_HOLD = 2.2
+const PAD_DEADZONE = 0.35
+
+export function closesOf(candles) {
+  return (Array.isArray(candles) ? candles : []).map((candle) => {
+    const value = Number(candle?.c ?? candle?.close)
+    return Number.isFinite(value) ? value : NaN
+  })
+}
+
+/** Population standard deviation, period 20, k = 2. Same definition as the app Bollinger helper. */
+export function bollingerPoint(closes, index, period = BB_PERIOD, k = BB_K) {
+  const src = Array.isArray(closes) ? closes : []
+  const i = index | 0
+  if (!Number.isInteger(period) || period < 2 || i < period - 1 || i >= src.length) return null
+  let sum = 0
+  for (let j = i - period + 1; j <= i; j++) {
+    const v = src[j]
+    if (!Number.isFinite(v)) return null
+    sum += v
+  }
+  const sma = sum / period
+  let varSum = 0
+  for (let j = i - period + 1; j <= i; j++) {
+    const d = src[j] - sma
+    varSum += d * d
+  }
+  const stdev = Math.sqrt(varSum / period)
+  return { sma, stdev, upper: sma + k * stdev, lower: sma - k * stdev }
+}
+
+export function bandTouch(close, band) {
+  if (!band || !Number.isFinite(close) || !(band.upper > band.lower)) return null
+  const pb = (close - band.lower) / (band.upper - band.lower)
+  if (pb >= 0.95) return 'upper'
+  if (pb <= 0.05) return 'lower'
+  if (pb >= 0.9) return 'near-upper'
+  if (pb <= 0.1) return 'near-lower'
+  return null
+}
+
+function touchSide(kind) {
+  if (kind === 'upper' || kind === 'near-upper') return 'high'
+  if (kind === 'lower' || kind === 'near-lower') return 'low'
+  return null
+}
+
+/** One mark when price enters a band edge, not again while it stays there. */
+export function edgeSignal(prev, next) {
+  const side = touchSide(next)
+  if (!side || side === touchSide(prev)) return null
+  return next
+}
+
+function ema(values, period) {
+  const out = new Array(values.length).fill(null)
+  const alpha = 2 / (period + 1)
+  let sum = 0
+  let n = 0
+  let prev = null
+  for (let i = 0; i < values.length; i++) {
+    const v = values[i]
+    if (!Number.isFinite(v)) {
+      sum = 0
+      n = 0
+      prev = null
+      continue
+    }
+    if (prev == null) {
+      sum += v
+      n += 1
+      if (n === period) {
+        prev = sum / period
+        out[i] = prev
+      }
+    } else {
+      prev = v * alpha + prev * (1 - alpha)
+      out[i] = prev
+    }
+  }
+  return out
+}
+
+export function macdSeries(closes) {
+  const src = Array.isArray(closes) ? closes : []
+  const fast = ema(src, MACD_FAST)
+  const slow = ema(src, MACD_SLOW)
+  const line = src.map((_, i) => (fast[i] != null && slow[i] != null ? fast[i] - slow[i] : null))
+  const signal = new Array(src.length).fill(null)
+  const hist = new Array(src.length).fill(null)
+  const start = line.findIndex((v) => v != null)
+  if (start < 0) return { line, signal, hist }
+  const subset = []
+  for (let i = start; i < line.length; i++) {
+    if (line[i] == null) break
+    subset.push(line[i])
+  }
+  const sig = ema(subset, MACD_SIGNAL)
+  for (let i = 0; i < subset.length; i++) {
+    signal[start + i] = sig[i]
+    if (sig[i] != null) hist[start + i] = subset[i] - sig[i]
+  }
+  return { line, signal, hist }
+}
+
+export function macdCross(prev, next) {
+  if (!Number.isFinite(prev) || !Number.isFinite(next)) return null
+  if (prev <= 0 && next > 0) return 'up'
+  if (prev >= 0 && next < 0) return 'down'
+  return null
+}
+
+export function macdPoint(closes, index) {
+  const series = macdSeries(closes)
+  const i = Math.max(0, index | 0)
+  const hist = series.hist[i] ?? null
+  const prev = i > 0 ? series.hist[i - 1] : null
+  return {
+    line: series.line[i] ?? null,
+    signal: series.signal[i] ?? null,
+    hist,
+    cross: macdCross(prev, hist),
+  }
+}
+
+export function marketReading(closes, index) {
+  const src = Array.isArray(closes) ? closes : []
+  const i = Math.max(0, Math.min(src.length - 1, index | 0))
+  const band = src.length ? bollingerPoint(src, i) : null
+  const close = src.length && Number.isFinite(src[i]) ? src[i] : null
+  const rsiSeries = rsi(src)
+  const rsiValue = rsiSeries[i] ?? null
+  const macd = macdPoint(src, i)
+  return {
+    band,
+    close,
+    touch: bandTouch(close, band),
+    rsi: rsiValue,
+    rsiZone: rsiZone(rsiValue),
+    macd,
+  }
+}
+
+/**
+ * Tunnel inside the bands, hole outside. Lower band is the left wall (SÄLJ), upper band the right wall (KÖP).
+ * Narrow bandwidth draws a narrower shaft. Without a band yet, the lanes fall back to the fixed steer span.
+ */
+export function shaftBorder(width, band) {
+  const w = Math.max(1, Number(width) || 1)
+  if (!band || !(band.upper > band.lower)) {
+    const lanes = steerLanes(w, 'right')
+    return { ...lanes, hasBand: false }
+  }
+  const mid = band.sma > 0 ? band.sma : (band.upper + band.lower) / 2
+  const bw = mid > 0 ? (band.upper - band.lower) / mid : 0.04
+  const t = Math.min(1, Math.max(0, (bw - 0.008) / 0.1))
+  const half = w * (0.16 + t * 0.26)
+  const margin = Math.max(24, w * 0.06)
+  let sell = w / 2 - half
+  let buy = w / 2 + half
+  if (sell < margin) {
+    buy += margin - sell
+    sell = margin
+  }
+  if (buy > w - margin) {
+    sell -= buy - (w - margin)
+    buy = w - margin
+  }
+  sell = Math.max(margin, sell)
+  buy = Math.min(w - margin, Math.max(sell + 8, buy))
+  return { buy, sell, flat: (buy + sell) / 2, hasBand: true, bandwidth: bw }
+}
+
+export function shaftRegion(x, walls) {
+  if (!walls || !Number.isFinite(x) || !Number.isFinite(walls.sell) || !Number.isFinite(walls.buy)) return 'tunnel'
+  const eps = 0.75
+  if (Math.abs(x - walls.sell) <= eps || Math.abs(x - walls.buy) <= eps) return 'border'
+  if (x < walls.sell || x > walls.buy) return 'hole'
+  return 'tunnel'
+}
+
+export function priceOnShaft(close, band, walls) {
+  if (!walls || !Number.isFinite(walls.sell) || !Number.isFinite(walls.buy)) return null
+  if (!band || !Number.isFinite(close) || !(band.upper > band.lower)) return walls.flat
+  return walls.sell + ((close - band.lower) / (band.upper - band.lower)) * (walls.buy - walls.sell)
+}
+
+/** Chase along the fall. Reduced motion keeps the camera fixed. */
+export function chaseCamera(prev, offset, dt, reduced = false) {
+  if (reduced) return { pan: 0, roll: 0 }
+  const lateral = Number(offset) || 0
+  const targetPan = -lateral * 56
+  const targetRoll = lateral * 0.12
+  const from = prev && Number.isFinite(prev.pan) ? prev : { pan: 0, roll: 0 }
+  const step = 1 - Math.exp(-8 * Math.max(0, Number(dt) || 0))
+  return {
+    pan: from.pan + (targetPan - from.pan) * step,
+    roll: from.roll + (targetRoll - from.roll) * step,
+  }
+}
+
+/** First gamepad follows Form A. Button 0 confirms. Missing pads return null. */
+export function gamepadIntent(pad, deadzone = PAD_DEADZONE) {
+  if (!pad) return null
+  const axes = pad.axes || []
+  const buttons = pad.buttons || []
+  const pressed = (i) => {
+    const button = buttons[i]
+    if (!button) return false
+    return typeof button === 'object' ? !!button.pressed : !!button
+  }
+  const x = Number(axes[0])
+  const y = Number(axes[1])
+  const nx = Number.isFinite(x) ? x : 0
+  const ny = Number.isFinite(y) ? y : 0
+  let move = null
+  if (ny < -deadzone || pressed(12)) move = 'FORWARD'
+  else if (ny > deadzone || pressed(13)) move = 'BACKWARD'
+  else if (nx > deadzone || pressed(15)) move = 'STEER_TOWARD_HIGH'
+  else if (nx < -deadzone || pressed(14)) move = 'STEER_TOWARD_LOW'
+  const confirm = pressed(0)
+  if (!move && !confirm) return null
+  return { move, confirm }
 }
 
 export const CARROT_HP = 1
@@ -761,6 +1006,76 @@ function drawTunnel(c, w, h, fall, spin, reduced) {
   c.restore()
 }
 
+function drawShaftBorder(c, w, h, walls, marks) {
+  if (!walls?.hasBand) return
+  const vpX = w / 2
+  const vpY = h * 0.76
+  const nearY = h * 0.4
+  const at = (edge, y) => vpX + (edge - vpX) * ((y - vpY) / (nearY - vpY || 1))
+  const l0 = at(walls.sell, 0)
+  const l1 = at(walls.sell, h)
+  const r0 = at(walls.buy, 0)
+  const r1 = at(walls.buy, h)
+  c.save()
+  c.fillStyle = 'rgba(2, 1, 6, 0.78)'
+  c.beginPath()
+  c.moveTo(0, 0)
+  c.lineTo(l0, 0)
+  c.lineTo(l1, h)
+  c.lineTo(0, h)
+  c.closePath()
+  c.fill()
+  c.beginPath()
+  c.moveTo(w, 0)
+  c.lineTo(r0, 0)
+  c.lineTo(r1, h)
+  c.lineTo(w, h)
+  c.closePath()
+  c.fill()
+  c.lineWidth = 3
+  c.strokeStyle = PINK
+  c.beginPath()
+  c.moveTo(l0, 0)
+  c.lineTo(l1, h)
+  c.stroke()
+  c.strokeStyle = CYAN
+  c.beginPath()
+  c.moveTo(r0, 0)
+  c.lineTo(r1, h)
+  c.stroke()
+  c.font = '700 12px "IBM Plex Sans", sans-serif'
+  c.textAlign = 'center'
+  c.textBaseline = 'middle'
+  c.fillStyle = 'rgba(244,239,230,0.72)'
+  c.fillText(t('rh.hole'), Math.max(22, walls.sell * 0.38), h * 0.58)
+  c.fillText(t('rh.hole'), Math.min(w - 22, walls.buy + (w - walls.buy) * 0.55), h * 0.58)
+  c.fillStyle = '#f4efe6'
+  c.fillText(t('rh.tunnel'), w / 2, h * 0.18)
+  c.fillStyle = PINK
+  c.fillText(t('rh.wallLower'), walls.sell, h * 0.4 + 48)
+  c.fillStyle = CYAN
+  c.fillText(t('rh.wallUpper'), walls.buy, h * 0.4 + 48)
+  if (marks?.band?.life > 0 && marks.band.key) {
+    const x = marks.band.side === 'sell' ? walls.sell : walls.buy
+    c.fillStyle = '#ffd27a'
+    c.fillText(t(marks.band.key), x, h * 0.4 - 44)
+  }
+  c.restore()
+}
+
+function drawPricePip(c, x, y, region) {
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return
+  c.save()
+  c.fillStyle = region === 'hole' ? '#ffd27a' : '#f4efe6'
+  c.strokeStyle = '#07060c'
+  c.lineWidth = 2
+  c.beginPath()
+  c.arc(x, y, region === 'hole' ? 7 : 5, 0, Math.PI * 2)
+  c.fill()
+  c.stroke()
+  c.restore()
+}
+
 function drawFloater(c, floater) {
   if (!floater || floater.life <= 0) return
   c.save()
@@ -1035,11 +1350,25 @@ export function createRabbit() {
   const indicators = document.createElement('div')
   indicators.className = 'nlr-rh-indicators'
   indicators.dataset.rhIndicators = '1'
-  root.append(canvas, home, indicators, hud, note)
+  const market = document.createElement('div')
+  market.className = 'nlr-rh-market'
+  market.dataset.rhMarket = '1'
+  const bbLine = document.createElement('p')
+  bbLine.dataset.rhBb = '1'
+  const rsiLine = document.createElement('p')
+  rsiLine.dataset.rhRsi = '1'
+  const macdLine = document.createElement('p')
+  macdLine.dataset.rhMacd = '1'
+  const sigLine = document.createElement('p')
+  sigLine.className = 'nlr-rh-signal'
+  sigLine.dataset.rhSignal = '1'
+  market.append(bbLine, rsiLine, macdLine, sigLine)
+  root.append(canvas, home, indicators, market, hud, note)
   document.body.appendChild(root)
 
   let visible = false
   let frozen = false
+  let inFrame = false
   let raf = 0
   let phase = 'home'
   let players = 1
@@ -1052,8 +1381,13 @@ export function createRabbit() {
   const lock = createGestureLock(480)
 
   function freshRider() {
-    return { side: 'flat', leverage: 1, entry: null, result: null, y: 0, spin: 0, hp: 0, eatLeft: 0, floater: null, eaten: [] }
+    return { side: 'flat', leverage: 1, entry: null, result: null, y: 0, spin: 0, hp: 0, eatLeft: 0, floater: null, eaten: [], cam: { pan: 0, roll: 0 } }
   }
+  let marks = { band: { life: 0, key: '', side: '' }, rsi: { life: 0, key: '' }, macd: { life: 0, key: '' } }
+  let prevTouch = null
+  let prevZone = 'saknas'
+  let prevHist = null
+  const padLock = [createGestureLock(480), createGestureLock(480)]
   let riders = [freshRider(), freshRider()]
 
   function activeRiders() {
@@ -1194,6 +1528,91 @@ export function createRabbit() {
     })
   }
 
+  function paintMarket() {
+    const reading = marketReading(closesOf(series()), priceIndex)
+    if (reading.band) {
+      bbLine.textContent = `${t('rh.band')} ${reading.band.lower.toFixed(2)} – ${reading.band.upper.toFixed(2)} · ${t('rh.bandRole')}`
+    } else {
+      bbLine.textContent = `${t('rh.band')} · ${t('rh.bandWait')}`
+    }
+    const rsiText = reading.rsi == null ? '—' : reading.rsi.toFixed(0)
+    let rsiLabel = `${t('rh.rsi')} ${rsiText}`
+    if (reading.rsiZone === 'overkopt') rsiLabel += ` · ${t('rh.rsiHigh')}`
+    if (reading.rsiZone === 'oversalt') rsiLabel += ` · ${t('rh.rsiLow')}`
+    rsiLine.textContent = rsiLabel
+    const hist = reading.macd.hist
+    macdLine.textContent = `${t('rh.macd')} ${hist == null ? '—' : hist.toFixed(3)}`
+    const bits = []
+    if (reading.touch === 'upper') bits.push(t('rh.touchUpper'))
+    else if (reading.touch === 'near-upper') bits.push(t('rh.nearUpper'))
+    else if (reading.touch === 'lower') bits.push(t('rh.touchLower'))
+    else if (reading.touch === 'near-lower') bits.push(t('rh.nearLower'))
+    if (marks.rsi.life > 0 && marks.rsi.key) bits.push(t(marks.rsi.key))
+    if (marks.macd.life > 0 && marks.macd.key) bits.push(t(marks.macd.key))
+    sigLine.textContent = bits.join(' · ')
+    sigLine.hidden = bits.length === 0
+  }
+
+  function baselineMarket() {
+    const reading = marketReading(closesOf(series()), priceIndex)
+    prevTouch = reading.touch
+    prevZone = reading.rsiZone
+    prevHist = reading.macd.hist
+    marks = { band: { life: 0, key: '', side: '' }, rsi: { life: 0, key: '' }, macd: { life: 0, key: '' } }
+  }
+
+  function noteBar() {
+    const reading = marketReading(closesOf(series()), priceIndex)
+    const edge = edgeSignal(prevTouch, reading.touch)
+    if (edge === 'upper' || edge === 'near-upper') {
+      marks.band = { life: MARK_HOLD, key: edge === 'upper' ? 'rh.touchUpper' : 'rh.nearUpper', side: 'buy' }
+    } else if (edge === 'lower' || edge === 'near-lower') {
+      marks.band = { life: MARK_HOLD, key: edge === 'lower' ? 'rh.touchLower' : 'rh.nearLower', side: 'sell' }
+    }
+    prevTouch = reading.touch
+    if (reading.rsiZone === 'overkopt' && prevZone !== 'overkopt') marks.rsi = { life: MARK_HOLD, key: 'rh.rsiHigh' }
+    if (reading.rsiZone === 'oversalt' && prevZone !== 'oversalt') marks.rsi = { life: MARK_HOLD, key: 'rh.rsiLow' }
+    prevZone = reading.rsiZone
+    const cross = macdCross(prevHist, reading.macd.hist)
+    if (cross === 'up') marks.macd = { life: MARK_HOLD, key: 'rh.macdUp' }
+    if (cross === 'down') marks.macd = { life: MARK_HOLD, key: 'rh.macdDown' }
+    prevHist = reading.macd.hist
+  }
+
+  function decayMarks(dt) {
+    const step = Math.max(0, Number(dt) || 0)
+    for (const key of ['band', 'rsi', 'macd']) {
+      if (marks[key].life > 0) marks[key].life = Math.max(0, marks[key].life - step)
+    }
+  }
+
+  function pollPads() {
+    const nav = globalThis.navigator
+    if (!nav || typeof nav.getGamepads !== 'function') return
+    let pads = null
+    try {
+      pads = nav.getGamepads()
+    } catch {
+      return
+    }
+    if (!pads) return
+    ;[pads[0], pads[1]].forEach((pad, i) => {
+      if (!pad || phase === 'jump' || frozen) return
+      const reading = gamepadIntent(pad)
+      if (!reading || !padLock[i].allow()) return
+      if (phase === 'home') {
+        if (i === 1 && !reading.confirm) return
+        if (reading.confirm) start(i === 1 ? 2 : 1)
+        else if (i === 0 && (reading.move === 'STEER_TOWARD_HIGH' || reading.move === 'STEER_TOWARD_LOW')) applyTo(0, reading.move)
+        return
+      }
+      if (i === 1 && players !== 2) return
+      const index = players === 2 ? i : 0
+      if (reading.confirm) applyTo(index, 'FLAT')
+      else if (reading.move) applyTo(index, reading.move)
+    })
+  }
+
   function collect(w, h, fall, reduced) {
     const candles = series()
     const count = 14
@@ -1213,14 +1632,26 @@ export function createRabbit() {
     return items
   }
 
+  function currentWalls(width) {
+    const closes = closesOf(series())
+    const band = bollingerPoint(closes, priceIndex)
+    return { closes, band, walls: shaftBorder(width, band), reading: marketReading(closes, priceIndex) }
+  }
+
   function paintRider(c, rider, box, h, reduced) {
     c.save()
     c.beginPath()
     c.rect(box.left, 0, box.width, h)
     c.clip()
     c.translate(box.left, 0)
+    const cam = reduced ? { pan: 0, roll: 0 } : rider.cam || { pan: 0, roll: 0 }
+    c.translate(box.width / 2, h * 0.4)
+    c.rotate(cam.roll || 0)
+    c.translate(-box.width / 2 + (cam.pan || 0), -h * 0.4)
     drawTunnel(c, box.width, h, rider.y, rider.spin, reduced)
-    const info = movementIndicators({ side: rider.side, leverage: rider.leverage, width: box.width, reduced })
+    const view = currentWalls(box.width)
+    drawShaftBorder(c, box.width, h, view.walls, marks)
+    const info = movementIndicators({ side: rider.side, leverage: rider.leverage, width: box.width, reduced, lanes: view.walls })
     drawLaneGuides(c, box.width, h, info)
     const rabbitY = h * 0.4
     const xPos = info.x
@@ -1243,6 +1674,10 @@ export function createRabbit() {
       else drawSign(c, item.x, item.y, item.scale || 1, item.label)
     }
     drawRabbit(c, xPos, rabbitY, scale, sprite)
+    if (view.walls.hasBand) {
+      const px = priceOnShaft(view.reading.close, view.band, view.walls)
+      drawPricePip(c, px, rabbitY - 28, shaftRegion(px, view.walls))
+    }
     for (const item of items) {
       if (!inFront(item)) continue
       drawChili(c, item.x, item.y, item.scale || 1)
@@ -1267,11 +1702,15 @@ export function createRabbit() {
     root.dataset.motion = phase === 'home' ? 'home' : phase === 'jump' ? 'jump' : reduced ? 'reduced' : 'fall'
     home.hidden = phase !== 'home'
     indicators.hidden = phase !== 'race'
+    market.hidden = phase !== 'race'
     hud.hidden = phase !== 'race'
     copyChrome()
     const price = priceAt(priceIndex)
     hud.innerHTML = `<span><b>${t('sim.price')}</b> ${fmtPrice(price)}</span><span><b>${t('hud.result')}</b> ${fmtResult(riders[0].result)}</span>`
-    if (phase === 'race') paintIndicators(reduced)
+    if (phase === 'race') {
+      paintIndicators(reduced)
+      paintMarket()
+    }
     const w = root.clientWidth || 800
     const h = root.clientHeight || 600
     const dpr = Math.min(2, globalThis.devicePixelRatio || 1)
@@ -1319,10 +1758,16 @@ export function createRabbit() {
 
   function enterRace() {
     phase = 'race'
+    const closes = closesOf(series())
+    const ready = macdSeries(closes).hist.findIndex((v) => Number.isFinite(v))
+    priceIndex = ready >= 0 ? ready : closes.length > BB_PERIOD ? BB_PERIOD - 1 : 0
+    priceDebt = 0
     for (const rider of riders) {
       rider.y = 0
       rider.spin = 0
+      rider.cam = { pan: 0, roll: 0 }
     }
+    baselineMarket()
   }
 
   function start(count = 1) {
@@ -1335,7 +1780,7 @@ export function createRabbit() {
       jumpT = 0
     }
     paint()
-    kick()
+    if (!inFrame) kick()
     return true
   }
 
@@ -1376,6 +1821,8 @@ export function createRabbit() {
   }, { passive: false })
 
   function tickRider(rider, dt, reduced) {
+    const offset = rider.side === 'buy' ? 0.5 : rider.side === 'sell' ? -0.5 : 0
+    rider.cam = chaseCamera(rider.cam, offset, dt, reduced)
     if (!reduced) {
       rider.y += fallRate(rider.leverage, false)
       rider.spin += dt
@@ -1397,6 +1844,7 @@ export function createRabbit() {
     while (priceDebt >= BAR_SEC && guard++ < 4) {
       priceDebt -= BAR_SEC
       priceIndex = (priceIndex + 1) % series().length
+      noteBar()
       moved = true
     }
     if (!moved) return
@@ -1410,6 +1858,7 @@ export function createRabbit() {
 
   function frame(now) {
     if (!visible || frozen) return
+    inFrame = true
     const stamp = typeof now === 'number' ? now : performance.now()
     const dt = lastFrame ? Math.min(0.05, (stamp - lastFrame) / 1000) : 0.016
     lastFrame = stamp
@@ -1422,8 +1871,12 @@ export function createRabbit() {
     } else {
       for (const rider of activeRiders()) tickRider(rider, dt, reduced)
       advancePrice(dt)
+      decayMarks(dt)
+      pollPads()
     }
+    if (phase === 'home') pollPads()
     paint()
+    inFrame = false
     raf = requestAnimationFrame(frame)
   }
 
@@ -1445,6 +1898,7 @@ export function createRabbit() {
     riders = [freshRider(), freshRider()]
     buildIndicators()
     copyChrome()
+    baselineMarket()
   }
 
   onLang(() => {
@@ -1496,6 +1950,7 @@ export function createRabbit() {
         for (const rider of activeRiders()) tickRider(rider, slice, reduced)
       }
       advancePrice(dt)
+      decayMarks(dt)
       paint()
     },
     state() {
@@ -1504,8 +1959,8 @@ export function createRabbit() {
       const reduced = reducedMotion()
       const lead = riders[0]
       const span = players === 2 ? w / 2 : w
-      const lanes = steerLanes(span, 'right')
-      const info = movementIndicators({ side: lead.side, leverage: lead.leverage, width: span, reduced })
+      const walls = shaftBorder(span, bollingerPoint(closesOf(series()), priceIndex))
+      const info = movementIndicators({ side: lead.side, leverage: lead.leverage, width: span, reduced, lanes: walls })
       return {
         phase,
         players,
@@ -1515,7 +1970,11 @@ export function createRabbit() {
         y: lead.y,
         hp: lead.hp,
         x: info.x,
-        ...lanes,
+        buy: walls.buy,
+        sell: walls.sell,
+        flat: walls.flat,
+        border: walls,
+        region: shaftRegion(info.x, walls),
         markerY: markerScreenY(lead.y, reduced),
         spiral: spiralAngle(lead.spin, reduced),
         sprite: lastSprite || rabbitSprite(),
@@ -1529,7 +1988,7 @@ export function createRabbit() {
           leverage: rider.leverage,
           y: rider.y,
           result: rider.result,
-          indicators: movementIndicators({ side: rider.side, leverage: rider.leverage, width: span, reduced }),
+          indicators: movementIndicators({ side: rider.side, leverage: rider.leverage, width: span, reduced, lanes: walls }),
         })),
       }
     },

@@ -183,11 +183,16 @@ test('start, hopp och indikatorer: hemma, sedan fall med sidläge', async () => 
     'rh.fall', 'rh.fallStill', 'rh.fallSlow', 'rh.fallSteady', 'rh.fallFast',
     'rh.lane', 'rh.left', 'rh.center', 'rh.right', 'rh.decision',
     'rh.cue.sell', 'rh.cue.flat', 'rh.cue.buy', 'rh.p1', 'rh.p2',
+    'rh.band', 'rh.bandRole', 'rh.bandWait', 'rh.tunnel', 'rh.hole',
+    'rh.wallUpper', 'rh.wallLower', 'rh.touchUpper', 'rh.touchLower',
+    'rh.nearUpper', 'rh.nearLower', 'rh.rsi', 'rh.rsiHigh', 'rh.rsiLow',
+    'rh.macd', 'rh.macdUp', 'rh.macdDown',
   ]
   for (const lang of ['sv', 'en', 'uk']) {
     for (const key of keys) assert.equal(typeof STRINGS[lang][key], 'string', `${lang} ${key}`)
     assert.match(STRINGS[lang]['rh.homeBody'], /hävstång|leverage|плече/i)
   }
+  w.__trEngine = { quote: { candles: Array.from({ length: 40 }, (_, i) => ({ c: 100 + Math.sin(i / 5) * 3 })) } }
   const rabbit = createRabbit()
   rabbit.show()
   const view = () => document.querySelector('.nlr-rh.on')
@@ -205,6 +210,14 @@ test('start, hopp och indikatorer: hemma, sedan fall med sidläge', async () => 
   w.dispatchEvent(new w.KeyboardEvent('keydown', { code: 'KeyW' }))
   const faster = rabbit.state().indicators.fallRate
   assert.ok(faster > slow)
+  w.dispatchEvent(new w.KeyboardEvent('keydown', { code: 'ArrowDown' }))
+  assert.ok(rabbit.state().indicators.fallRate < faster)
+  assert.equal(rabbit.state().border.hasBand, true)
+  assert.equal(rabbit.state().region, 'border')
+  assert.ok(Math.abs(rabbit.state().x - rabbit.state().buy) < 0.01)
+  assert.match(view().querySelector('[data-rh-bb]').textContent, /tunnel/)
+  assert.match(view().querySelector('[data-rh-rsi]').textContent, /RSI/)
+  assert.match(view().querySelector('[data-rh-macd]').textContent, /MACD/)
   assert.equal(fallRate(4, false) > fallRate(1, false), true)
   const panel = view().querySelector('[data-rh-decision="1"]')
   assert.equal(panel.textContent, STRINGS.sv['btn.buy'])

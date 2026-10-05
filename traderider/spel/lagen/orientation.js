@@ -42,7 +42,7 @@ export const MODES = {
     hash: 'rabbit-hole',
     aliases: [],
     nameKey: 'mode.rabbitHole.name',
-    orientation: { movement: 'down', highPriceSide: 'right' },
+    orientation: { movement: 'up', highPriceSide: 'right' },
   },
 }
 
