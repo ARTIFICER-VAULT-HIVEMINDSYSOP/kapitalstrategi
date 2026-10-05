@@ -17,6 +17,7 @@ import { noteTradeRider, noteTradeRiderDuo, resetTradeRiderHook } from './hooks/
 import { noteRaceXEnd, resetRaceXHook } from './hooks/racex.js'
 import { noteAcademySeriesEnd, resetAcademyHook } from './hooks/academy.js'
 import { noteRabbitLap, resetRabbitHook } from './hooks/rabbit.js'
+import { noteTradeRiderAcademy, resetTradeRiderAcademyHook } from './hooks/tra.js'
 import { t, setLang } from '../lagen/i18n.js'
 import { isYahooAllowed, isCryptoAllowed, corsOrigin, nextBackoff, normalizeYahooChart, CACHE_TTL_SECONDS } from '../../../worker/gransland-data/src/logic.js'
 import { formatHm } from './labels.js'
@@ -72,6 +73,7 @@ function resetHooks() {
   resetRaceXHook()
   resetAcademyHook()
   resetRabbitHook()
+  resetTradeRiderAcademyHook()
 }
 
 function priceNodes(root) {
@@ -79,7 +81,7 @@ function priceNodes(root) {
 }
 
 export const cases = [
-  ['faserna historia, gransland och live i alla fyra varianterna', async (assert) => {
+  ['faserna historia, gransland och live i alla fem varianterna', async (assert) => {
     assert.deepEqual(PHASES, ['historia', 'gransland', 'live'])
     for (const variant of VARIANTS) {
       const session = createGransland({
@@ -110,7 +112,7 @@ export const cases = [
     }
   }],
 
-  ['slutet av loppet visar valet i alla fyra varianterna', async (assert) => {
+  ['slutet av loppet visar valet i alla fem varianterna', async (assert) => {
     await ensureDom()
     setLang('sv')
     resetHooks()
@@ -128,6 +130,7 @@ export const cases = [
       () => noteRaceXEnd({ ended: true, players: 2, bars, decisions: [{ side: 'buy', leverage: 1 }, { side: 'flat', leverage: 1 }], poll: false }),
       () => noteAcademySeriesEnd({ reachedEnd: true, bars, side: 'long', poll: false }),
       () => noteRabbitLap({ atEnd: true, bars, decisions: [{ side: 'sell', leverage: 1 }], poll: false }),
+      () => noteTradeRiderAcademy({ reachedEnd: true, bars, poll: false }),
     ]
     for (const fire of specs) {
       resetHooks()
@@ -163,6 +166,7 @@ export const cases = [
       () => noteRaceXEnd({ ended: true, bars, decisions: [{ side: 'buy', leverage: 1 }], poll: false }),
       () => noteAcademySeriesEnd({ reachedEnd: true, bars, side: 'long', poll: false }),
       () => noteRabbitLap({ atEnd: true, bars, decisions: [{ side: 'sell', leverage: 1 }], poll: false }),
+      () => noteTradeRiderAcademy({ reachedEnd: true, bars, poll: false }),
     ]
     for (const fire of fires) {
       resetHooks()
@@ -518,13 +522,15 @@ export const cases = [
     assert.equal(parseKrakenPrice({ result: { XXBTZUSD: { c: ['84957.7', '0.1'] } } }), 84957.7)
   }],
 
-  ['varianthookarna sitter i de fyra spelen', async (assert) => {
+  ['varianthookarna sitter i de fem spelen', async (assert) => {
     const read = (name) => readFileSync(join(HERE, '../lagen', name), 'utf8')
     assert.match(read('panel.js'), /noteTradeRider\(/)
     assert.match(read('duo.js'), /noteTradeRiderDuo\(/)
     assert.match(read('raket.js'), /noteRaceXEnd\(/)
     assert.match(read('akademin.js'), /noteAcademySeriesEnd\(/)
     assert.match(read('rabbit.js'), /noteRabbitLap\(/)
+    assert.match(read('tra.js'), /noteTradeRiderAcademy\(/)
+    assert.equal(read('rabbit.js').includes('Samma takttid'), false)
     await ensureDom()
     setLang('sv')
     resetHooks()
@@ -533,7 +539,8 @@ export const cases = [
     const off = onRaceEnd((detail) => seen.push(detail.variant))
     noteRabbitLap({ atEnd: true, bars: historyBars(), poll: false })
     noteAcademySeriesEnd({ reachedEnd: true, bars: historyBars(), side: 'long', poll: false })
-    assert.deepEqual(seen, ['rabbit', 'academy'])
+    noteTradeRiderAcademy({ reachedEnd: true, bars: historyBars(), poll: false })
+    assert.deepEqual(seen, ['rabbit', 'academy', 'tra'])
     off()
     resetHooks()
   }],

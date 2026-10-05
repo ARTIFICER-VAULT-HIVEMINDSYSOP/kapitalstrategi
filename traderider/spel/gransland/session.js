@@ -9,7 +9,7 @@ import { indicatorPack } from './indicators.js'
 import { phaseLabel, courseSegments, moneySentence } from './labels.js'
 import { attachLiveFeed, resetLiveFeedForTests } from '../lagen/live-port.js'
 
-export const VARIANTS = ['trade-rider', 'racex', 'academy', 'rabbit']
+export const VARIANTS = ['trade-rider', 'racex', 'academy', 'rabbit', 'tra']
 
 function sideOf(value) {
   if (value === 'sell' || value === 'short') return 'sell'
