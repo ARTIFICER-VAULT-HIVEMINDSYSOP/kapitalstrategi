@@ -1,0 +1,106 @@
+{
+  "date": "2026-09-28",
+  "title": "Nyhetsbrev",
+  "dateLabel": "28 september 2026",
+  "subtitle": "Linjemontage when-issued sista dag | Hormuz och råvaror | Skolan",
+  "closingNote": "Utgåvan finns också som modulartiklar. Varje kort slutar med sökvägen till sin modul.",
+  "sections": [
+    {
+      "category": "IPO",
+      "cards": [
+        {
+          "title": "IPO / nytt på börsen",
+          "body": "Linjemontage (LMGAB) — handel pågår (debut 25 sep, Nasdaq Stockholm Mid Cap). Erbjudandepris 46 kr; övertecknat flera gånger enligt MFN. Erbjudande = befintliga aktier (bolaget tillförs ingen likvid). Bas ca 658 MSEK; övertilldelning ca 99 MSEK. Fler än 5 500 nya aktieägare. Bolagsvärdering vid erbjudandepris ca 2,36 mdr kr. When-issued 25–28 sep (sista dag i dag). Förväntad likviddag 29 sep. Fredagsstängning (EFN 26 sep): 46,00 kr. Intradag i dag: saknas.\nNordAmps (NRDAMP) — utfall publicerat 23 sep (MFN): 4 424 678 nya aktier tecknade (91,2 % av erbjudandet) à 15,50 kr → ca 68,6 MSEK brutto. Cirka 520 nya aktieägare. Planerad första handelsdag 30 sep (First North). Halvledare / Lund. Intradag: saknas (handel har inte startat).\nDormy (DORMY) — handel pågår efter debut 24 sep (First North Premier). Erbjudandepris 70 kr. Fredagsstängning (EFN): 72,40 kr. Intradag i dag: saknas.\nSvevik Industri (SVEVIK) — handel pågår efter debut 23 sep (First North Premier). Utfall övertecknat ca fem gånger; ~97,7 MSEK före kostnader à 55 kr. Fredagsstängning (EFN): 52,70 kr. Intradag i dag: saknas.\nAxvik Group (AXVIK) — handel pågår (debut 21 sep). Erbjudande ~27,5 MSEK à 55 kr. Fredagsstängning (EFN): 67,00 kr. Flyg och försvar. Intradag i dag: saknas.\nHela modulen: /nyheter/2026-09-28/ipo/",
+          "stats": [
+            {
+              "label": "Linjemontage",
+              "value": "when-issued sista dag"
+            },
+            {
+              "label": "NordAmps",
+              "value": "första handelsdag 30 sep"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "OLJA",
+      "cards": [
+        {
+          "title": "Vad som rör olja",
+          "body": "SVT (WSJ-källor, 26 sep): USA:s president har avvisat Irans förslag om öppning av Hormuz inom sju dagar mot villkor (hävdad blockad av iranska hamnar, sanktioner mot iransk olja, vapenvila även i Libanon, därefter kärnsamtal). Iran bekräftade villkoren via utrikesministern i New York; DI noterade tidigare Irans krav på frysta tillgångar motsvarande nästan 120 miljarder kronor. Fredag kväll: DI/Direkt om att Hormuzsamtalen gått in i en mer detaljerad teknisk fas och att oljan föll över 3 procent. Parallellt: Frankrike lovar soldater, radar och försvarssystem till saudiska oljehamnen Yanbu efter huthiska attacker (TT/TV4); Storbritannien har lovat lufttankning till saudiskt flyg (SVT).\nDI spot (28 sep, visad tid 06:50): Brent 99,09 USD/fat (−5,01 %); WTI 94,05 (+1,81 %).\nBaha.com: saknas (ingen säker siffra hämtad till utkastet).\nHela modulen: /nyheter/2026-09-28/olja/",
+          "stats": [
+            {
+              "label": "Brent",
+              "value": "99,09 USD/fat"
+            },
+            {
+              "label": "WTI",
+              "value": "94,05"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "GULD",
+      "cards": [
+        {
+          "title": "Guld",
+          "body": "DI spot (28 sep, visad tid 06:50): 4 197,36 dollar/uns (−2,04 %). Senaste DI-visning: 06:50; öppna terminalen för livekurs.\nHela modulen: /nyheter/2026-09-28/guld/",
+          "stats": [
+            {
+              "label": "Spot",
+              "value": "4 197,36 dollar/uns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "RÅVAROR",
+      "cards": [
+        {
+          "title": "Övriga råvaror",
+          "body": "DI (28 sep): silver spot 61,98 dollar/uns (−3,55 %, 06:50); platina spot 1 733,80 dollar/uns (−2,65 %, 06:50); koppar 14 647 dollar/ton (−0,80 %, 3 mån termin, 18:00).\nHela modulen: /nyheter/2026-09-28/ovriga-ravaror/",
+          "stats": [
+            {
+              "label": "Silver",
+              "value": "61,98 dollar/uns"
+            },
+            {
+              "label": "Koppar",
+              "value": "14 647 dollar/ton"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "SKOLAN",
+      "cards": [
+        {
+          "title": "Prova först · skolan",
+          "body": "Robban: först säkerhetsutrustning. Sedan fart.\nSKOLA — Tradingskolan: /tradingskolan\nNytt i skolan: tredjepart och escrow — villkor och bevis före frisläppning. Kapital och Strategi utbildar dig i spelet. Escrow sköts av tredjepart.\nHela modulen: /nyheter/2026-09-28/skolan/",
+          "stats": [
+            {
+              "label": "Skolan",
+              "value": "/tradingskolan"
+            }
+          ]
+        },
+        {
+          "title": "Tyst tid före beslut",
+          "body": "En forskargrupp beskrev 2001 ett grundläge, ett viloläge när uppmärksamheten inte är låst vid något yttre. Talat ljud tar mer plats än musik. Ta en kort paus utan hörlurar innan ett övningsbeslut.\nHela modulen: /nyheter/2026-09-28/tyst-tid/",
+          "stats": [
+            {
+              "label": "Kategori",
+              "value": "Skolan"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

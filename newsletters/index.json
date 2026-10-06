@@ -1,6 +1,14 @@
 {
-  "today": "2026-09-08",
+  "today": "2026-09-28",
   "editions": [
+    {
+      "date": "2026-09-28",
+      "title": "Nyhetsbrev",
+      "kind": "text",
+      "hasPdf": false,
+      "hasWeb": true,
+      "updatedAt": "2026-09-28T08:45:00.000Z"
+    },
     {
       "date": "2026-09-08",
       "title": "Nyhetsbrev",

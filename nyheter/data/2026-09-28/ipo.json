@@ -17,15 +17,7 @@
         },
         {
           "type": "p",
-          "text": "Källa: [MFN Linjemontage första handelsdag](https://mfn.se/all/a/linjemontage/first-day-of-trading-in-linjemontages-shares-on-nasdaq-stockholm) · [Nasdaq listing notice 24 sep](https://www.finanznachrichten.de/nachrichten-2026-09/69667583-listing-of-linjemontage-i-graestorp-aktiebolag-on-nasdaq-stockholm-252.htm) · [EFN 26 sep: nykomlingar](https://efn.se/nykomlingarna-lyfter-utan-att-rusa-ett-ganska-sunt-tecken)"
-        },
-        {
-          "type": "p",
           "text": "**NordAmps (NRDAMP)** — utfall publicerat **23 sep** (MFN): **4 424 678** nya aktier tecknade (**91,2 %** av erbjudandet) à **15,50 kr** → ca **68,6 MSEK** brutto. Cirka **520** nya aktieägare. Planerad första handelsdag **30 sep** (First North). Halvledare / Lund. Intradag: **saknas** (handel har inte startat)."
-        },
-        {
-          "type": "p",
-          "text": "Källa: [MFN NordAmps utfall 23 sep](https://mfn.se/all/a/nordamps/nordamps-welcomes-new-shareholders-ahead-of-the-planned-listing-at-nasdaq-first-north-growth-market) · [Börsvärlden/Finwire](https://www.borsvarlden.com/artiklar/nordamps-ipo-erbjudande-tecknat-till-drygt-91-procent-far-cirka-520-nya-aktieagare)"
         },
         {
           "type": "p",
@@ -33,15 +25,7 @@
         },
         {
           "type": "p",
-          "text": "Källa: [Affärsvärlden 24 sep](https://www.affarsvarlden.se/artikel/dormy-overtecknat-infor-borsdebut--borjar-handlas-idag) · [EFN 26 sep](https://efn.se/nykomlingarna-lyfter-utan-att-rusa-ett-ganska-sunt-tecken)"
-        },
-        {
-          "type": "p",
           "text": "**Svevik Industri (SVEVIK)** — handel pågår efter debut **23 sep** (First North Premier). Utfall övertecknat ca fem gånger; ~**97,7 MSEK** före kostnader à **55 kr**. Fredagsstängning (EFN): **52,70 kr**. Intradag i dag: **saknas**."
-        },
-        {
-          "type": "p",
-          "text": "Källa: [MFN Svevik](https://mfn.se/a/svevikindustri/svevik-industris-erbjudande-kraftigt-overtecknat-och-utokningsoptionen-nyttjas) · [EFN 26 sep](https://efn.se/nykomlingarna-lyfter-utan-att-rusa-ett-ganska-sunt-tecken)"
         },
         {
           "type": "p",
@@ -49,13 +33,55 @@
         },
         {
           "type": "p",
-          "text": "Källa: [MFN Axvik](https://mfn.se/all/a/axvik/axvik-group-offentliggor-utfallet-av-erbjudandet-samt-meddelar-att-handel-pa-nasdaq-first-north-growth-market-inleds-den-21-september) · [EFN 26 sep](https://efn.se/nykomlingarna-lyfter-utan-att-rusa-ett-ganska-sunt-tecken)"
-        },
-        {
-          "type": "p",
           "text": "IPO-översikt: [IPO-kalender](/nyheter#ipo-cal-heading)"
         }
       ]
     }
-  }
+  },
+  "hiddenSources": [
+    {
+      "label": "MFN Linjemontage första handelsdag",
+      "href": "https://mfn.se/all/a/linjemontage/first-day-of-trading-in-linjemontages-shares-on-nasdaq-stockholm"
+    },
+    {
+      "label": "Nasdaq listing notice 24 sep",
+      "href": "https://www.finanznachrichten.de/nachrichten-2026-09/69667583-listing-of-linjemontage-i-graestorp-aktiebolag-on-nasdaq-stockholm-252.htm"
+    },
+    {
+      "label": "EFN 26 sep: nykomlingar",
+      "href": "https://efn.se/nykomlingarna-lyfter-utan-att-rusa-ett-ganska-sunt-tecken"
+    },
+    {
+      "label": "MFN NordAmps utfall 23 sep",
+      "href": "https://mfn.se/all/a/nordamps/nordamps-welcomes-new-shareholders-ahead-of-the-planned-listing-at-nasdaq-first-north-growth-market"
+    },
+    {
+      "label": "Börsvärlden/Finwire",
+      "href": "https://www.borsvarlden.com/artiklar/nordamps-ipo-erbjudande-tecknat-till-drygt-91-procent-far-cirka-520-nya-aktieagare"
+    },
+    {
+      "label": "Affärsvärlden 24 sep",
+      "href": "https://www.affarsvarlden.se/artikel/dormy-overtecknat-infor-borsdebut--borjar-handlas-idag"
+    },
+    {
+      "label": "EFN 26 sep",
+      "href": "https://efn.se/nykomlingarna-lyfter-utan-att-rusa-ett-ganska-sunt-tecken"
+    },
+    {
+      "label": "MFN Svevik",
+      "href": "https://mfn.se/a/svevikindustri/svevik-industris-erbjudande-kraftigt-overtecknat-och-utokningsoptionen-nyttjas"
+    },
+    {
+      "label": "EFN 26 sep",
+      "href": "https://efn.se/nykomlingarna-lyfter-utan-att-rusa-ett-ganska-sunt-tecken"
+    },
+    {
+      "label": "MFN Axvik",
+      "href": "https://mfn.se/all/a/axvik/axvik-group-offentliggor-utfallet-av-erbjudandet-samt-meddelar-att-handel-pa-nasdaq-first-north-growth-market-inleds-den-21-september"
+    },
+    {
+      "label": "EFN 26 sep",
+      "href": "https://efn.se/nykomlingarna-lyfter-utan-att-rusa-ett-ganska-sunt-tecken"
+    }
+  ]
 }

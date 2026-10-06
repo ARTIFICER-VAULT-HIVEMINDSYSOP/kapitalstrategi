@@ -48,9 +48,8 @@ const required = [
   "18:00",
   "120 miljarder kronor",
   "saknas",
-  "Utbildning och information, inte investeringsråd.",
   "Kapital och Strategi",
-  "https://live.kapitalstrategi.com/tradingskolan",
+  'href="/tradingskolan"',
   "https://www.di.se/ravaror/",
   "https://mfn.se/all/a/linjemontage/first-day-of-trading-in-linjemontages-shares-on-nasdaq-stockholm",
   "/nyheter#ipo-cal-heading",
@@ -63,6 +62,8 @@ const banned = [
   "rådgivning",
   "rådgivare",
   "investeringsrekommendation",
+  "investeringsråd",
+  "live.kapitalstrategi.com",
   "Fraunces",
   "Trade Rider",
   "trade-rider",
@@ -128,11 +129,10 @@ const expectedHrefs = [
 const tyst = editions.editions[0].modules.find((mod) => mod.slug === "tyst-tid");
 if (tyst?.category?.sv !== "Skolan") fail("tyst-tid ska ligga i kategorin Skolan");
 const tystHtml = fs.readFileSync(path.join(here, "2026-09-28/tyst-tid/index.html"), "utf8");
-if (!tystHtml.includes("https://doi.org/10.1073/pnas.98.2.676")) fail("saknar Raichle-källan");
+if (!tystHtml.includes("https://doi.org/10.1073/pnas.98.2.676")) fail("saknar PNAS-källan");
 if (!tystHtml.includes("slopa-hörlurarna-vad-som-verkligen-händer-med-din-hjärna-utan-tysta-stunder/ar-AA2d3RyU") && !tystHtml.includes("slopa-h%C3%B6rlurarna")) {
   fail("saknar Dagens.se/MSN-källan");
 }
-if (!tystHtml.includes("Utbildning och information, inte investeringsråd.")) fail("tyst-tid saknar utbildningsraden");
 const tystJson = JSON.parse(fs.readFileSync(path.join(here, "data/2026-09-28/tyst-tid.json"), "utf8"));
 const tystBody = tystJson.translations.sv.blocks
   .filter((block) => !block.text.startsWith("Källor:"))
@@ -152,6 +152,37 @@ if (!newsShell.includes("/nyheter/embed.js")) fail("nyheter/index.html saknar em
 if (!newsShell.includes("history.replaceState")) fail("nyheter/index.html saknar slash-fix");
 const root = fs.readFileSync(path.join(here, "../index.html"), "utf8");
 if (!root.includes("/nyheter/embed.js")) fail("rotens index.html saknar embed");
+
+function visibleText(raw) {
+  return raw
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "");
+}
+
+for (const file of files) {
+  if (!file.endsWith(".html")) continue;
+  const visible = visibleText(fs.readFileSync(file, "utf8"));
+  const rel = path.relative(here, file);
+  if (visible.includes("Källor:") || visible.includes("Källa:")) fail(`${rel} har synlig källrad`);
+  if (visible.includes("investeringsråd")) fail(`${rel} har synlig investeringsråd-rad`);
+  if (visible.includes("live.kapitalstrategi.com")) fail(`${rel} har död live-länk`);
+}
+
+const nlIndex = JSON.parse(fs.readFileSync(path.join(here, "../newsletters/index.json"), "utf8"));
+if (nlIndex.today !== "2026-09-28") fail(`newsletters today är ${nlIndex.today}`);
+if (nlIndex.editions?.[0]?.date !== "2026-09-28") fail("senaste arkivutgåvan ska vara 2026-09-28");
+const sep28 = JSON.parse(fs.readFileSync(path.join(here, "../newsletters/2026-09-28.json"), "utf8"));
+if (!sep28.sections?.length) fail("2026-09-28.json saknar sections");
+if (!JSON.stringify(sep28).includes("/nyheter/2026-09-28/")) fail("2026-09-28.json pekar inte på modulartiklar");
+for (const date of ["2026-08-28", "2026-09-08", "2026-09-28"]) {
+  const edition = JSON.parse(fs.readFileSync(path.join(here, `../newsletters/${date}.json`), "utf8"));
+  for (const section of edition.sections || []) {
+    for (const card of section.cards || []) {
+      if (card.source) fail(`${date} har synligt source-fält`);
+    }
+  }
+}
 
 if (failures.length) {
   console.error(failures.join("\n"));
