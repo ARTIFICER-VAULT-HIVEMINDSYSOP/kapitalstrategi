@@ -89,7 +89,8 @@ test('ingen inloggning: sessionsfr책gan besvaras lokalt och inloggningsl채nken �
 
 test('ing책ngen /traderider/ l채nkar till alla fyra l채gen och lovar inga fler', () => {
   const t = read('index.html')
-  for (const h of ['/traderider/spel/#trade-rider', '/traderider/spel/#racex', '/traderider/spel/#academy', '/traderider/spel/#rabbit-hole']) assert.ok(t.includes(`href="${h}"`), h)
+  for (const h of ['/traderider/spel/#trade-rider', '/traderider/spel/#racex', '/traderider/spel/#tra', '/traderider/spel/#rabbit-hole']) assert.ok(t.includes(`href="${h}"`), h)
+  assert.equal(t.includes('href="/traderider/spel/#academy"'), false)
   assert.ok(!t.includes('Fler l채gen kommer'))
   assert.ok(!t.includes('>Raket<') && !t.includes('>Rocket<'))
 })

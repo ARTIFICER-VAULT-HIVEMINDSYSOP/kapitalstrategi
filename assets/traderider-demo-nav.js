@@ -1,8 +1,8 @@
 (function () {
   var titles = {
-    sv: 'Traderider: Trade Rider, RaceX, Akademin och Rabbit Hole – övning på simulerade kurser, inte verkliga marknadsdata. Inga riktiga pengar.',
-    en: 'Traderider: Trade Rider, RaceX, Academy and Rabbit Hole – practice on simulated prices, not real market data. No real money.',
-    uk: 'Traderider: Trade Rider, RaceX, Академія і Rabbit Hole – тренування на симульованих курсах, не реальні ринкові дані. Без справжніх грошей.',
+    sv: 'Traderider: Trade Rider, RaceX, Trade Rider Academy och Rabbit Hole – övning på simulerade kurser, inte verkliga marknadsdata. Inga riktiga pengar.',
+    en: 'Traderider: Trade Rider, RaceX, Trade Rider Academy and Rabbit Hole – practice on simulated prices, not real market data. No real money.',
+    uk: 'Traderider: Trade Rider, RaceX, Trade Rider Academy і Rabbit Hole – тренування на симульованих курсах, не реальні ринкові дані. Без справжніх грошей.',
   }
   function lang() {
     try {
@@ -19,7 +19,7 @@
       var nav = document.querySelector('nav.main-nav')
       if (!nav) return
       // En enda Traderider-post: den gamla «Trade Rider» (/trade-rider) döljs i huvudmenyn och
-      // «Traderider» tar dess plats och leder till ingången /traderider/ (Trade Rider, Raket och Akademin).
+      // «Traderider» tar dess plats och leder till ingången /traderider/ (Trade Rider, RaceX, Trade Rider Academy och Rabbit Hole).
       var old = nav.querySelector('a.main-nav-link[href="/trade-rider"]')
       if (old && old.style.display !== 'none') {
         // .main-nav-link sätter display:inline-flex, så hidden-attributet räcker inte

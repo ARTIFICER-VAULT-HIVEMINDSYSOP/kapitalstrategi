@@ -709,6 +709,18 @@
       "datum": "2026-10-02"
     },
     {
+      "path": "traderider/spel/assets/academy-robot-sprite.webp",
+      "md5": "a10697fc930a3c4b4305514f4156b1fe",
+      "ocr": "ren",
+      "datum": "2026-10-06"
+    },
+    {
+      "path": "traderider/spel/assets/academy-robot.webp",
+      "md5": "b82fdbad6cf00f22eb4e2e96c6ce8da0",
+      "ocr": "ren",
+      "datum": "2026-10-06"
+    },
+    {
       "path": "traderider/spel/favicon.svg",
       "md5": "e5666c2ab2237dbb261a851226024237",
       "ocr": "ren",

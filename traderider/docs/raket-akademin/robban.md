@@ -1,13 +1,9 @@
-# Robban i Trade Rider Academy
+# Figuren i Trade Rider Academy
 
-Robban Robotsson är guiden i Trade Rider Academy (`#tra`, även `#trade-rider-academy`). Det är ett eget spår. Akademin (`#academy`) är oförändrad.
+Trade Rider Academy är ett läge. Adressen är `#tra`. Äldre adresserna `#academy`, `#akademin` och `#trade-rider-academy` öppnar samma läge.
 
-Han anropas med en knapp som sitter kvar nere till höger. Öppnas den hoppar panelen upp, med hela kroppen ovanför talbubblan och en enda stängknapp. Stängning lägger tillbaka honom i knappen. På framsidan står samma figur där den dekorativa personen skulle ha stått.
-
-Figuren är en egen teckning: vitt skal, guldantenn, cyanvisir och blå ryggsäck. I loppet flyger en raket från vänster till höger, och samma figur åker på en liten farkost längs linjen.
+Figuren sitter i rutan till vänster, med samma mått som tidigare. Stillbilden är `traderider/spel/assets/academy-robot.webp`. Den är genomskinlig och ligger på en glasruta med violett glöd, så den inte sitter i en svart låda. Attackcykeln läses från `traderider/spel/assets/academy-robot-sprite.webp`, åtta rutor i rad. Cykeln spelas en gång när läget öppnas, igen när en lektions frågor är rätt, och igen vid klick på figuren. Sedan vilar bilden på första rutan. Den som bett om mindre rörelse får bara stillbilden.
 
 ## Koppling
 
-Frågorna före loppet kommer från Robbans manus, i fast ordning. De är en rekommendation, inte ett krav. Loppet går att starta ändå, och Trade Rider går att öppna ändå.
-
-Rösten följer Robban-linjen: säkerhet före fart. Nämns en uppgång står risken i samma mening.
+Lektionerna är risk och positionsstorlek, stop-loss och take-profit, Bollingerband och RSI. Varje lektion har egna kontrollfrågor. Övningen på kurvan styrs ett steg i taget. Hansan ligger kvar som kapitel i samma läge.
