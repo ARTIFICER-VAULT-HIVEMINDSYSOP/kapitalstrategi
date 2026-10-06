@@ -24,6 +24,12 @@ Fem källor. Bara det som listas här används. Inget av referensbilderna ligger
 4. **John Tenniel, 1865, den vita kaninen.** Public domain. Bidrar med långa upprätta öron, ett huvud som är skilt från kroppen, armar och ben, och motivet att falla ned i ett kaninhål. Filmversionen är inte en källa.
 5. **Lisebergs vita kanin, inklusive Julius, bara som lös stilimpuls.** Bidrar med vit päls, stora vänliga öron, tecknade proportioner och något framför ögonen. Rock, krage, färgkombination och namn kopieras inte och står inte i sajttexten.
 
+## Bildruta
+
+Bildrutan är 256×224 och skalas med ett heltalssteg, närmaste granne, så att pixlarna hålls jämna. Färgerna ligger på 5 bitar per kanal. Kaninen, moroten och chilin har egna paletter med högst 16 färger. Bakgrunden är 16×16-plattor i tre lager som rör sig olika fort. Schaktets golv är en perspektivsampling som roterar under fallet. Himlen byter färg rad för rad. Vattnet och hålets kant byter palettsteg. En egen bitkarta ritar texterna i bilden. Ljudet är korta vågformer: en slinga ovan jord, en i schaktet, och korta ljud för hopp, morot, KÖP-kanten, SÄLJ-kanten och menyn. Volymen är låg från start och kan stängas av.
+
+`prefers-reduced-motion` stannar blink, skak, palettbyte och perspektivets rotation tillsammans med spiralen.
+
 ## Koppling
 
 Samma övning som de andra lägena, med fallet nedåt. Gränslandet är hålets botten.

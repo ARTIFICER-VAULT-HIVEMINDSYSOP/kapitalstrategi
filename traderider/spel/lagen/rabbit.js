@@ -12,6 +12,17 @@ import { t, onLang } from './i18n.js'
 import { createGestureLock } from './styrmotor.js'
 import { positionFor, steerLanes } from './spar.js'
 import { rsi, rsiZone } from './rsi.js'
+import {
+  createStage,
+  createChiptune,
+  renderScene,
+  fixedStep,
+  coyoteLeft,
+  rememberInput,
+  readBuffered,
+  animFrame,
+  STEP_SEC,
+} from './pixel-stage.js'
 
 const O = MODES.rabbitHole.orientation
 const steering = createSteering(O)
@@ -26,67 +37,82 @@ const FRAME_RED = '#e10600'
 const FRAME_BLACK = '#161616'
 
 const css = `
-.nlr-rh{display:none;position:fixed;inset:0;z-index:55;background:#07060c;color:#f4efe6}
+.nlr-rh{display:none;position:fixed;inset:0;z-index:55;background:#100810;color:#f8f0d8;--rh-pic-w:512px;--rh-pic-h:448px}
 .nlr-rh.on{display:block}
-.nlr-rh canvas{width:100%;height:100%;display:block}
-.nlr-rh-hud{position:absolute;left:12px;right:12px;top:12px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 12px;pointer-events:none;font:600 12px/1.35 "IBM Plex Sans",sans-serif}
-.nlr-rh-hud b{color:#e7b15a}
-.nlr-rh-note{position:absolute;left:12px;right:12px;bottom:12px;max-width:min(520px,calc(100% - 24px));font:500 12px/1.35 "IBM Plex Sans",sans-serif;color:#f4efe6;text-shadow:0 1px 2px #07060c;pointer-events:none}
-.nlr-rh[data-phase="race"] .nlr-rh-note{bottom:auto;top:34px}
-.nlr-rh-home{position:absolute;left:50%;top:12px;transform:translateX(-50%);width:min(360px,calc(100% - 24px));pointer-events:none;z-index:2}
-.nlr-rh-card{pointer-events:auto;background:rgba(246,242,234,.97);color:#1c1915;border:1px solid rgba(28,25,21,.16);border-radius:16px;padding:12px 14px 14px;box-shadow:0 12px 28px rgba(7,6,12,.28)}
-.nlr-rh-claim{margin:0 0 6px;font:700 11px/1.3 "IBM Plex Sans",sans-serif;letter-spacing:.04em;color:#8a5a22}
-.nlr-rh-card h2{margin:0 0 6px;font:600 20px/1.15 Fraunces,Georgia,serif}
-.nlr-rh-card p{margin:0 0 8px;font:500 13px/1.4 "IBM Plex Sans",sans-serif}
-.nlr-rh-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-.nlr-rh-start,.nlr-rh-two{border:0;border-radius:999px;font:700 14px/1 "IBM Plex Sans",sans-serif;padding:10px 14px;cursor:pointer}
-.nlr-rh-start{background:#e7b15a;color:#1c1915}
-.nlr-rh-two{background:#1c1915;color:#f4efe6}
-.nlr-rh-start:focus-visible,.nlr-rh-two:focus-visible{outline:3px solid #2ee6d6;outline-offset:2px}
-.nlr-rh-keys{margin:8px 0 0;font:500 12px/1.35 "IBM Plex Sans",sans-serif;color:#5c564c}
-.nlr-rh-indicators{position:absolute;left:12px;right:12px;bottom:40px;display:grid;gap:8px;pointer-events:none;z-index:2}
+.nlr-rh canvas{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:block;image-rendering:pixelated;image-rendering:crisp-edges;background:#100810}
+.nlr-rh-hud{position:absolute;left:50%;top:calc(50% - var(--rh-pic-h) / 2 + 4px);transform:translateX(-50%);width:min(var(--rh-pic-w),calc(100% - 8px));display:flex;justify-content:space-between;gap:8px;pointer-events:none;font:700 11px/1.2 ui-monospace,monospace;color:#f8f0d8;text-shadow:2px 2px 0 #181018}
+.nlr-rh-hud b{color:#f8d048}
+.nlr-rh-note{position:absolute;left:50%;bottom:calc(50% - var(--rh-pic-h) / 2 + 4px);transform:translateX(-50%);width:min(var(--rh-pic-w),calc(100% - 8px));font:600 11px/1.3 ui-monospace,monospace;color:#f8f0d8;text-shadow:2px 2px 0 #181018;pointer-events:none}
+.nlr-rh[data-phase="home"] .nlr-rh-note,.nlr-rh[data-phase="jump"] .nlr-rh-note{bottom:auto;top:8px}
+.nlr-rh[data-phase="race"] .nlr-rh-note{bottom:auto;top:calc(50% - var(--rh-pic-h) / 2 + 18px)}
+.nlr-rh-home{position:absolute;left:50%;top:calc(50% - var(--rh-pic-h) / 2 + 36px);transform:translateX(-50%);width:min(340px,calc(var(--rh-pic-w) - 12px));pointer-events:none;z-index:2}
+.nlr-rh-card{pointer-events:auto;background:#f8e8c0;color:#281810;border:4px solid #181018;border-radius:0;padding:8px 10px 10px;box-shadow:inset -4px -4px 0 #a08050,inset 4px 4px 0 #fff8e0}
+.nlr-rh-claim{margin:0 0 4px;font:700 10px/1.3 ui-monospace,monospace;letter-spacing:.04em;color:#784818}
+.nlr-rh-card h2{margin:0 0 4px;font:700 16px/1.1 ui-monospace,monospace}
+.nlr-rh-card p{margin:0 0 6px;font:500 12px/1.35 ui-monospace,monospace}
+.nlr-rh-press{margin:0 0 6px;font:700 13px/1 ui-monospace,monospace;letter-spacing:.08em;color:#d02030;animation:nlr-rh-blink 1s steps(2,end) infinite}
+.nlr-rh-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.nlr-rh-start,.nlr-rh-two,.nlr-rh-mute,.nlr-rh-resume{border:3px solid #181018;border-radius:0;font:700 12px/1 ui-monospace,monospace;padding:8px 10px;cursor:pointer;box-shadow:inset -3px -3px 0 rgba(0,0,0,.25)}
+.nlr-rh-start,.nlr-rh-resume{background:#f8d048;color:#281810}
+.nlr-rh-two,.nlr-rh-mute{background:#281810;color:#f8f0d8}
+.nlr-rh-start:focus-visible,.nlr-rh-two:focus-visible,.nlr-rh-mute:focus-visible,.nlr-rh-resume:focus-visible{outline:3px solid #40d0c8;outline-offset:2px}
+.nlr-rh-keys{margin:6px 0 0;font:500 11px/1.35 ui-monospace,monospace;color:#584838}
+.nlr-rh-indicators{position:absolute;left:50%;bottom:calc(50% - var(--rh-pic-h) / 2 + 22px);transform:translateX(-50%);width:min(var(--rh-pic-w),calc(100% - 8px));display:grid;gap:6px;pointer-events:none;z-index:2}
 .nlr-rh-indicators[data-players="1"]{grid-template-columns:minmax(0,1fr)}
 .nlr-rh-indicators[data-players="2"]{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-.nlr-rh-player{background:rgba(8,6,14,.82);border:1px solid rgba(46,230,214,.55);border-radius:14px;padding:8px 10px 10px;display:grid;gap:4px}
-.nlr-rh-who{margin:0;font:700 11px/1.2 "IBM Plex Sans",sans-serif;letter-spacing:.06em;color:#e7b15a}
-.nlr-rh-fall{margin:0;font:600 13px/1.3 "IBM Plex Sans",sans-serif}
-.nlr-rh-meter{height:8px;border-radius:99px;background:rgba(255,255,255,.16);overflow:hidden}
-.nlr-rh-meter > span{display:block;height:100%;width:0;background:linear-gradient(90deg,#2ee6d6,#ff4fa8)}
-.nlr-rh-lane-labels{display:flex;justify-content:space-between;gap:6px;font:700 11px/1.2 "IBM Plex Sans",sans-serif}
-.nlr-rh-lane-labels [data-on="sell"]{color:#ff4fa8}
-.nlr-rh-lane-labels [data-on="flat"]{color:#e7b15a}
-.nlr-rh-lane-labels [data-on="buy"]{color:#2ee6d6}
-.nlr-rh-track{position:relative;height:14px;border-radius:99px;background:linear-gradient(90deg,#ff4fa8 0%,#f4efe6 50%,#2ee6d6 100%)}
-.nlr-rh-marker{position:absolute;top:-5px;width:8px;height:24px;margin-left:-4px;border-radius:4px;background:#1c1915;box-shadow:0 0 0 2px #fff;transition:left 120ms linear}
-.nlr-rh-decision{margin:2px 0 0;font:700 22px/1 Fraunces,Georgia,serif}
-.nlr-rh-decision[data-side="sell"]{color:#ff4fa8}
-.nlr-rh-decision[data-side="flat"]{color:#e7b15a}
-.nlr-rh-decision[data-side="buy"]{color:#2ee6d6}
-.nlr-rh-cue,.nlr-rh-risk{margin:0;font:500 12px/1.35 "IBM Plex Sans",sans-serif;color:#f4efe6}
-.nlr-rh-market{position:absolute;left:12px;top:72px;max-width:min(320px,46%);display:grid;gap:2px;pointer-events:none;z-index:2;font:600 12px/1.35 "IBM Plex Sans",sans-serif;color:#f4efe6;text-shadow:0 1px 2px #07060c}
+.nlr-rh-player{background:#201018;border:4px solid #f8d048;border-radius:0;padding:4px 6px 6px;display:grid;gap:2px;color:#f8f0d8}
+.nlr-rh-who{margin:0;font:700 10px/1.2 ui-monospace,monospace;letter-spacing:.06em;color:#f8d048}
+.nlr-rh-fall{margin:0;font:600 12px/1.3 ui-monospace,monospace}
+.nlr-rh-meter{height:8px;border-radius:0;background:#181018;border:2px solid #f8f0d8;overflow:hidden}
+.nlr-rh-meter > span{display:block;height:100%;width:0;background:#40d0c8}
+.nlr-rh-lane-labels{display:flex;justify-content:space-between;gap:6px;font:700 11px/1.2 ui-monospace,monospace}
+.nlr-rh-lane-labels [data-on="sell"]{color:#f04090}
+.nlr-rh-lane-labels [data-on="flat"]{color:#f8d048}
+.nlr-rh-lane-labels [data-on="buy"]{color:#40d0c8}
+.nlr-rh-track{position:relative;height:10px;border-radius:0;background:linear-gradient(90deg,#f04090 0%,#f8f0d8 50%,#40d0c8 100%);border:2px solid #181018}
+.nlr-rh-marker{position:absolute;top:-4px;width:6px;height:18px;margin-left:-3px;border-radius:0;background:#f8f0d8;box-shadow:0 0 0 2px #181018}
+.nlr-rh-decision{margin:2px 0 0;font:700 18px/1 ui-monospace,monospace}
+.nlr-rh-decision[data-side="sell"]{color:#f04090}
+.nlr-rh-decision[data-side="flat"]{color:#f8d048}
+.nlr-rh-decision[data-side="buy"]{color:#40d0c8}
+.nlr-rh-cue,.nlr-rh-risk{margin:0;font:500 11px/1.3 ui-monospace,monospace;color:#f8f0d8}
+.nlr-rh-market{position:absolute;left:calc(50% - var(--rh-pic-w) / 2 + 6px);top:calc(50% - var(--rh-pic-h) / 2 + 16px);max-width:min(220px,46%);display:grid;gap:2px;pointer-events:none;z-index:2;font:700 11px/1.3 ui-monospace,monospace;color:#f8f0d8;text-shadow:2px 2px 0 #181018;background:#201018cc;border:3px solid #f8d048;padding:4px 6px}
 .nlr-rh-market p{margin:0}
 .nlr-rh-market[hidden]{display:none}
-.nlr-rh-signal{color:#ffd27a}
-.nlr-rh-bat{width:28px;height:14px}
+.nlr-rh-signal{color:#f8d048}
+.nlr-rh-pause{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;display:grid;gap:8px;background:#201018;border:4px solid #f8d048;padding:12px;min-width:160px}
+.nlr-rh-pause[hidden]{display:none}
+.nlr-rh-pause p{margin:0;font:700 14px/1 ui-monospace,monospace;color:#f8f0d8;text-align:center}
+.nlr-rh-pad{display:none}
+@keyframes nlr-rh-blink{50%{opacity:0}}
+@media (pointer:coarse){
+  .nlr-rh-pad{display:grid;position:absolute;right:8px;bottom:8px;z-index:5;grid-template-columns:44px 44px 44px;grid-template-rows:44px 44px 44px;gap:4px}
+  .nlr-rh-pad button{border:3px solid #181018;background:#f8e8c0;color:#281810;font:700 16px/1 ui-monospace,monospace;border-radius:0}
+  .nlr-rh-pad [data-rh-pad="FORWARD"]{grid-column:2;grid-row:1}
+  .nlr-rh-pad [data-rh-pad="STEER_TOWARD_LOW"]{grid-column:1;grid-row:2}
+  .nlr-rh-pad [data-rh-pad="FLAT"]{grid-column:2;grid-row:2}
+  .nlr-rh-pad [data-rh-pad="STEER_TOWARD_HIGH"]{grid-column:3;grid-row:2}
+  .nlr-rh-pad [data-rh-pad="BACKWARD"]{grid-column:2;grid-row:3}
+}
 @media (max-width:640px){
   .nlr-rh-indicators[data-players="2"]{grid-template-columns:minmax(0,1fr)}
-  .nlr-rh-home{width:min(340px,calc(100% - 16px))}
-  .nlr-rh-card{padding:10px 12px}
-  .nlr-rh-card h2{font-size:18px}
-  .nlr-rh-card p{font-size:12px}
-  .nlr-rh-keys{font-size:11px}
-  .nlr-rh-decision{font-size:18px}
+  .nlr-rh-card{padding:8px}
+  .nlr-rh-card h2{font-size:14px}
+  .nlr-rh-card p{font-size:11px}
+  .nlr-rh-decision{font-size:16px}
 }
 @media (max-height:520px){
-  .nlr-rh-home{left:12px;transform:none;width:min(280px,48vw)}
-  .nlr-rh-card{padding:8px 10px}
-  .nlr-rh-card p{font-size:12px}
+  .nlr-rh-home{top:4px;transform:translateX(-50%);max-height:calc(100% - 8px)}
+  .nlr-rh-card{padding:6px 8px}
+  .nlr-rh-card p{font-size:11px}
+  .nlr-rh-card [data-rh-home-body],.nlr-rh-keys{display:none}
+  .nlr-rh-actions{flex-wrap:wrap}
+  .nlr-rh-start,.nlr-rh-two,.nlr-rh-mute,.nlr-rh-resume{padding:6px 8px}
   .nlr-rh-indicators{bottom:8px}
   .nlr-rh-risk{display:none}
-  .nlr-rh[data-phase="race"] .nlr-rh-note{top:28px}
 }
 @media (prefers-reduced-motion: reduce){
-  .nlr-rh,.nlr-rh canvas,.nlr-rh-marker{animation:none;transition:none;scroll-behavior:auto}
+  .nlr-rh,.nlr-rh canvas,.nlr-rh-marker,.nlr-rh-press{animation:none;transition:none;scroll-behavior:auto}
 }
 `
 
@@ -590,6 +616,7 @@ export function rabbitSprite({ eating = false } = {}) {
   }
 }
 
+/* Äldre vektorritning. Den synliga bilden ritas av pixel-stage. */
 function part(sprite, id) {
   return sprite.parts.find((p) => p.id === id)
 }
@@ -1344,9 +1371,48 @@ export function createRabbit() {
   const keys = document.createElement('p')
   keys.className = 'nlr-rh-keys'
   keys.dataset.rhKeys = '1'
-  actions.append(startBtn, twoBtn)
-  card.append(claim, title, body, actions, keys)
+  const press = document.createElement('p')
+  press.className = 'nlr-rh-press'
+  press.dataset.rhPress = '1'
+  const muteBtn = document.createElement('button')
+  muteBtn.type = 'button'
+  muteBtn.className = 'nlr-rh-mute'
+  muteBtn.dataset.rhMute = '1'
+  actions.append(startBtn, twoBtn, muteBtn)
+  card.append(claim, title, press, body, actions, keys)
   home.append(card)
+  const pauseBox = document.createElement('div')
+  pauseBox.className = 'nlr-rh-pause'
+  pauseBox.dataset.rhPause = '1'
+  pauseBox.hidden = true
+  const pauseTitle = document.createElement('p')
+  pauseTitle.dataset.rhPauseTitle = '1'
+  const resumeBtn = document.createElement('button')
+  resumeBtn.type = 'button'
+  resumeBtn.className = 'nlr-rh-resume'
+  resumeBtn.dataset.rhResume = '1'
+  const pauseMute = document.createElement('button')
+  pauseMute.type = 'button'
+  pauseMute.className = 'nlr-rh-mute'
+  pauseMute.dataset.rhMute = '1'
+  pauseBox.append(pauseTitle, resumeBtn, pauseMute)
+  const pad = document.createElement('div')
+  pad.className = 'nlr-rh-pad'
+  pad.dataset.rhPad = '1'
+  for (const [intent, glyph] of [
+    ['FORWARD', '▲'],
+    ['STEER_TOWARD_LOW', '◀'],
+    ['FLAT', '●'],
+    ['STEER_TOWARD_HIGH', '▶'],
+    ['BACKWARD', '▼'],
+  ]) {
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.dataset.rhPad = intent
+    b.textContent = glyph
+    b.setAttribute('aria-label', intent)
+    pad.append(b)
+  }
   const indicators = document.createElement('div')
   indicators.className = 'nlr-rh-indicators'
   indicators.dataset.rhIndicators = '1'
@@ -1363,7 +1429,7 @@ export function createRabbit() {
   sigLine.className = 'nlr-rh-signal'
   sigLine.dataset.rhSignal = '1'
   market.append(bbLine, rsiLine, macdLine, sigLine)
-  root.append(canvas, home, indicators, market, hud, note)
+  root.append(canvas, home, indicators, market, hud, note, pauseBox, pad)
   document.body.appendChild(root)
 
   let visible = false
@@ -1389,6 +1455,24 @@ export function createRabbit() {
   let prevHist = null
   const padLock = [createGestureLock(480), createGestureLock(480)]
   let riders = [freshRider(), freshRider()]
+  const stage = createStage()
+  const audio = createChiptune()
+  let acc = 0
+  let clock = 0
+  let frameCount = 0
+  let airFrames = 0
+  let jumpLock = 0
+  let hitLeft = 0
+  let shake = 0
+  let paused = false
+  let heard = false
+  let inputBuf = null
+  let bufPlayer = 0
+  try {
+    if (localStorage.getItem('tr-rh-sound') === '0') audio.setMuted(true)
+  } catch {
+    /* ljudet följer volymen om lagringen saknas */
+  }
 
   function activeRiders() {
     return players === 2 ? riders : [riders[0]]
@@ -1483,6 +1567,12 @@ export function createRabbit() {
     startBtn.textContent = t('rh.jump')
     twoBtn.textContent = t('rh.two')
     keys.textContent = `${t('rh.jumpKey')} · ${t('rh.twoHint')}`
+    press.textContent = t('rh.pressStart')
+    pauseTitle.textContent = t('rh.pause')
+    resumeBtn.textContent = t('rh.resume')
+    const soundLabel = audio.muted() ? t('rh.soundOff') : t('rh.soundOn')
+    muteBtn.textContent = soundLabel
+    pauseMute.textContent = soundLabel
     note.textContent = t('sim.claim')
     for (const el of indicators.querySelectorAll('[data-rh-who]')) {
       el.textContent = t(el.dataset.rhWho === '2' ? 'rh.p2' : 'rh.p1')
@@ -1597,7 +1687,7 @@ export function createRabbit() {
     }
     if (!pads) return
     ;[pads[0], pads[1]].forEach((pad, i) => {
-      if (!pad || phase === 'jump' || frozen) return
+      if (!pad || phase === 'jump' || frozen || paused || hitLeft > 0) return
       const reading = gamepadIntent(pad)
       if (!reading || !padLock[i].allow()) return
       if (phase === 'home') {
@@ -1636,6 +1726,86 @@ export function createRabbit() {
     const closes = closesOf(series())
     const band = bollingerPoint(closes, priceIndex)
     return { closes, band, walls: shaftBorder(width, band), reading: marketReading(closes, priceIndex) }
+  }
+
+  function armAudio() {
+    heard = true
+    audio.resume()
+  }
+
+  function togglePause(force) {
+    const next = typeof force === 'boolean' ? force : !paused
+    if (next === paused) return
+    paused = next
+    pauseBox.hidden = !paused
+    armAudio()
+    audio.sfx('menu')
+    paint()
+  }
+
+  function setMuted(next) {
+    audio.setMuted(next)
+    try {
+      localStorage.setItem('tr-rh-sound', next ? '0' : '1')
+    } catch {
+      /* volymen gäller bara den här sidan */
+    }
+    copyChrome()
+    armAudio()
+    audio.sfx('menu')
+  }
+
+  function syncRider(rider, width, height, reduced) {
+    const view = currentWalls(width)
+    const info = movementIndicators({ side: rider.side, leverage: rider.leverage, width, reduced, lanes: view.walls })
+    const rabbitY = height * 0.4
+    const items = collect(width, height, rider.y, reduced).map((item) => ({
+      ...item,
+      front: drawsInFront(item, info.x, rabbitY, 1),
+    }))
+    const picked = applyPickups(items, { x: info.x, y: rabbitY }, rider.hp, rider.eaten)
+    if (picked.gained) {
+      rider.hp = picked.hp
+      rider.eatLeft = Math.max(rider.eatLeft, 0.9)
+      rider.floater = { life: 1, x: info.x + 28, y: rabbitY - 18 }
+      if (!reduced) {
+        hitLeft = Math.max(hitLeft, 5)
+        shake = 3
+        rider.flash = true
+        rider.bits = Array.from({ length: 6 }, (_, i) => ({
+          x: info.x + (i - 2.5) * 6,
+          y: rabbitY - 8,
+          vx: (i - 2.5) * 16,
+          vy: -28,
+          life: 0.35,
+          color: i % 2 ? [248, 208, 72] : [240, 128, 32],
+        }))
+        armAudio()
+        audio.sfx('pickup')
+      }
+    } else if (hitLeft <= 0) rider.flash = false
+    rider.eaten = picked.eaten.slice(-48)
+    const priceX = view.walls.hasBand ? priceOnShaft(view.reading.close, view.band, view.walls) : null
+    return {
+      walls: view.walls,
+      x: info.x,
+      rabbitY,
+      priceX,
+      region: shaftRegion(priceX, view.walls),
+      items,
+      eating: rider.eatLeft > 0,
+      scroll: rider.y,
+      spin: rider.spin,
+      pan: rider.cam?.pan || 0,
+      roll: rider.cam?.roll || 0,
+      juice: rider.eatLeft > 0.6 ? 'wide' : 'none',
+      floater: rider.floater,
+      hp: rider.hp,
+      bits: rider.bits || [],
+      flash: !!rider.flash,
+      logicW: width,
+      logicH: height,
+    }
   }
 
   function paintRider(c, rider, box, h, reduced) {
@@ -1700,10 +1870,12 @@ export function createRabbit() {
     root.dataset.players = String(players)
     root.dataset.above = phase === 'home' ? '1' : '0'
     root.dataset.motion = phase === 'home' ? 'home' : phase === 'jump' ? 'jump' : reduced ? 'reduced' : 'fall'
+    root.dataset.paused = paused ? '1' : '0'
     home.hidden = phase !== 'home'
     indicators.hidden = phase !== 'race'
     market.hidden = phase !== 'race'
     hud.hidden = phase !== 'race'
+    pauseBox.hidden = !paused
     copyChrome()
     const price = priceAt(priceIndex)
     hud.innerHTML = `<span><b>${t('sim.price')}</b> ${fmtPrice(price)}</span><span><b>${t('hud.result')}</b> ${fmtResult(riders[0].result)}</span>`
@@ -1713,46 +1885,88 @@ export function createRabbit() {
     }
     const w = root.clientWidth || 800
     const h = root.clientHeight || 600
-    const dpr = Math.min(2, globalThis.devicePixelRatio || 1)
-    canvas.width = Math.round(w * dpr)
-    canvas.height = Math.round(h * dpr)
-    const c = canvas.getContext('2d')
-    if (!c) return
-    c.setTransform(dpr, 0, 0, dpr, 0, 0)
-    if (phase === 'home' || phase === 'jump') {
-      const layout = homeLayout(w, h)
-      const glow = reduced ? 0 : (Math.sin(glowT * 2) + 1) / 2
-      drawMeadow(c, w, h, layout, riders[0].side, glow, phase === 'home')
-      if (phase === 'jump') {
-        const from = standPoint(riders[0].side, layout)
-        const pose = jumpPose(jumpProgress(jumpT, reduced), from, layout.hole)
-        const scale = Math.max(0.95, Math.min(1.35, w / 720))
-        if (pose.drop > 0.42) drawRabbit(c, pose.x, pose.y, scale * (1 - pose.drop * 0.25), rabbitSprite())
-        else drawStandingRabbit(c, pose.x, pose.y, scale)
+    const layout = homeLayout(w, h)
+    const lanes = steerLanes(w, 'right')
+    const jumpP = phase === 'jump' ? jumpProgress(jumpT, reduced) : 0
+    const from = standPoint(riders[0].side, layout)
+    const pose = phase === 'jump' ? jumpPose(jumpP, from, layout.hole) : null
+    let rabbitPose = 'stand'
+    let juice = 'none'
+    if (phase === 'jump') {
+      if (jumpP < 0.22) {
+        rabbitPose = 'stretch'
+        juice = 'tall'
+      } else if (jumpP > 0.78) {
+        rabbitPose = 'squash'
+        juice = 'wide'
       }
-      return
     }
-    const boxes = splitLayout(w, players)
-    boxes.forEach((box, i) => paintRider(c, riders[i], box, h, reduced))
-    if (players === 2) {
-      c.strokeStyle = 'rgba(244,239,230,0.75)'
-      c.lineWidth = 2
-      c.beginPath()
-      c.moveTo(w / 2, 0)
-      c.lineTo(w / 2, h)
-      c.stroke()
-    }
+    const sideWord = t(riders[0].side === 'buy' ? 'btn.buy' : riders[0].side === 'sell' ? 'btn.sell' : 'btn.flat')
+    const reading = marketReading(closesOf(series()), priceIndex)
+    const hudLine = `${fmtPrice(price)} ${sideWord} x${riders[0].leverage} RSI ${reading.rsi == null ? '-' : reading.rsi.toFixed(0)}`
+    const span = players === 2 ? w / 2 : w
+    const sceneRiders = phase === 'race'
+      ? activeRiders().map((rider) => syncRider(rider, span, h, reduced))
+      : []
+    if (phase === 'race') lastSprite = rabbitSprite({ eating: riders[0].eatLeft > 0 })
+    renderScene(stage.buffer, {
+      phase: phase === 'race' ? 'race' : phase,
+      players,
+      reduced,
+      paused,
+      time: clock,
+      frame: animFrame(clock, 8, 4, reduced),
+      shake: reduced ? 0 : shake,
+      logicW: w,
+      logicH: h,
+      groundY: layout.groundY,
+      hole: layout.hole,
+      lanes,
+      side: riders[0].side,
+      stand: pose || standPoint(riders[0].side, layout),
+      showRabbit: true,
+      rabbitPose,
+      juice,
+      eating: riders[0].eatLeft > 0,
+      jump: jumpP,
+      hud: hudLine,
+      labels: {
+        title: t('mode.rabbitHole.name'),
+        press: t('rh.pressStart'),
+        sell: t('btn.sell'),
+        flat: t('btn.flat'),
+        buy: t('btn.buy'),
+        tunnel: t('rh.tunnel'),
+        hole: t('rh.hole'),
+        upper: t('rh.wallUpper'),
+        lower: t('rh.wallLower'),
+        hp: '+HP',
+        pause: t('rh.pause'),
+        resume: t('rh.resume'),
+        sound: audio.muted() ? t('rh.soundOff') : t('rh.soundOn'),
+      },
+      riders: sceneRiders,
+    })
+    const fit = stage.flush(canvas, w, h, reduced)
+    root.style.setProperty('--rh-pic-w', `${fit.w}px`)
+    root.style.setProperty('--rh-pic-h', `${fit.h}px`)
   }
 
   function applyTo(index, intent) {
     const rider = riders[index] || riders[0]
     const next = steering.applyIntent({ side: rider.side, leverage: rider.leverage }, intent)
     const was = rider.side
+    const prevLev = rider.leverage
     rider.side = next.side
     rider.leverage = next.leverage
     if (rider.side === 'flat') rider.entry = null
     else if (was !== rider.side) rider.entry = priceAt(priceIndex)
     else if (rider.entry == null) rider.entry = priceAt(priceIndex)
+    if (heard && was !== rider.side) {
+      if (rider.side === 'buy') audio.sfx('tp')
+      else if (rider.side === 'sell') audio.sfx('sl')
+    }
+    if (heard && prevLev !== rider.leverage) audio.sfx('menu')
     paint()
   }
 
@@ -1768,16 +1982,22 @@ export function createRabbit() {
       rider.cam = { pan: 0, roll: 0 }
     }
     baselineMarket()
+    audio.setArea('fall')
+    if (!reducedMotion()) shake = 4
   }
 
   function start(count = 1) {
-    if (!visible || phase !== 'home' || frozen) return false
+    if (!visible || phase !== 'home' || frozen || paused) return false
     players = count === 2 ? 2 : 1
     buildIndicators()
+    armAudio()
+    audio.sfx('jump')
     if (reducedMotion()) enterRace()
     else {
       phase = advancePhase('home', 'start')
       jumpT = 0
+      jumpLock = 4
+      airFrames = 0
     }
     paint()
     if (!inFrame) kick()
@@ -1786,6 +2006,20 @@ export function createRabbit() {
 
   function onKey(e) {
     if (!visible || frozen) return
+    if ((e.code === 'KeyP' || e.code === 'Escape') && !e.repeat && !isTypingTarget(e.target)) {
+      if (e.code === 'Escape' && phase === 'home' && !paused) return
+      e.preventDefault()
+      e.stopPropagation()
+      togglePause()
+      return
+    }
+    if (paused) {
+      if (e.code === 'Enter' && !e.repeat) {
+        e.preventDefault()
+        togglePause(false)
+      }
+      return
+    }
     if (phase === 'home' && e.code === 'Enter' && !e.repeat) {
       const tag = (e.target?.tagName || '').toUpperCase()
       if (tag !== 'BUTTON' && tag !== 'A' && !isTypingTarget(e.target)) {
@@ -1801,6 +2035,14 @@ export function createRabbit() {
     e.preventDefault()
     e.stopPropagation()
     const index = players === 2 && racing && a.player === 2 ? 1 : 0
+    const steer = a.intent === 'STEER_TOWARD_HIGH' || a.intent === 'STEER_TOWARD_LOW' || a.intent === 'FLAT'
+    const locked = hitLeft > 0 || jumpLock > 0
+    if (locked && !(phase === 'jump' && steer && coyoteLeft(airFrames) > 0)) {
+      inputBuf = rememberInput(a.intent, frameCount)
+      bufPlayer = index
+      return
+    }
+    armAudio()
     applyTo(index, a.intent)
   }
   addEventListener('keydown', onKey, true)
@@ -1808,12 +2050,64 @@ export function createRabbit() {
     if (visible && PREVENT_DEFAULT.has(e.code) && keyAction(e, '1p', O)) e.preventDefault()
   }, true)
   root.addEventListener('click', (e) => {
+    armAudio()
+    if (e.target.closest?.('[data-rh-resume]')) {
+      togglePause(false)
+      return
+    }
+    if (e.target.closest?.('[data-rh-mute]')) {
+      setMuted(!audio.muted())
+      return
+    }
+    const padBtn = e.target.closest?.('[data-rh-pad]')
+    if (padBtn && padBtn.dataset.rhPad && pad.contains(padBtn)) {
+      const intent = padBtn.dataset.rhPad
+      if (paused) return
+      if (intent === 'FLAT' && phase === 'home') {
+        start(1)
+        return
+      }
+      const index = 0
+      if (phase === 'home' && intent !== 'FORWARD' && intent !== 'BACKWARD' && intent !== 'FLAT') applyTo(index, intent)
+      else if (phase !== 'home') applyTo(index, intent)
+      else if (intent === 'FORWARD' || intent === 'BACKWARD') applyTo(index, intent)
+      return
+    }
     const btn = e.target.closest?.('[data-rh-start]')
     if (!btn) return
     start(btn.dataset.rhStart === '2' ? 2 : 1)
   })
+  let touchX = null
+  let touchY = null
+  canvas.addEventListener('touchstart', (e) => {
+    const p = e.changedTouches?.[0]
+    if (!p) return
+    touchX = p.clientX
+    touchY = p.clientY
+  }, { passive: true })
+  canvas.addEventListener('touchend', (e) => {
+    if (touchX == null || paused || frozen) {
+      touchX = null
+      touchY = null
+      return
+    }
+    const p = e.changedTouches?.[0]
+    if (!p) return
+    const dx = p.clientX - touchX
+    const dy = p.clientY - touchY
+    touchX = null
+    touchY = null
+    armAudio()
+    if (Math.hypot(dx, dy) < 28) {
+      if (phase === 'home') start(1)
+      else applyTo(0, 'FLAT')
+      return
+    }
+    if (Math.abs(dx) > Math.abs(dy)) applyTo(0, dx > 0 ? 'STEER_TOWARD_HIGH' : 'STEER_TOWARD_LOW')
+    else applyTo(0, dy < 0 ? 'FORWARD' : 'BACKWARD')
+  }, { passive: true })
   root.addEventListener('wheel', (e) => {
-    if (!visible || frozen) return
+    if (!visible || frozen || paused) return
     const intent = wheelToIntent(e.deltaY)
     if (!intent || !lock.allow()) return
     e.preventDefault()
@@ -1828,6 +2122,11 @@ export function createRabbit() {
       rider.spin += dt
     }
     if (rider.eatLeft > 0) rider.eatLeft = Math.max(0, rider.eatLeft - dt)
+    if (rider.bits?.length) {
+      rider.bits = rider.bits
+        .map((bit) => ({ ...bit, x: bit.x + bit.vx * dt, y: bit.y + bit.vy * dt, vy: bit.vy + 40 * dt, life: bit.life - dt }))
+        .filter((bit) => bit.life > 0)
+    }
     if (rider.floater) {
       rider.floater.life -= dt
       rider.floater.y -= reduced ? 0 : 28 * dt
@@ -1856,25 +2155,64 @@ export function createRabbit() {
     }
   }
 
+  function simTick(dt) {
+    frameCount += 1
+    const reduced = reducedMotion()
+    if (!reduced) clock += dt
+    if (shake > 0) shake = Math.max(0, shake - 1)
+    if (hitLeft > 0) {
+      hitLeft -= 1
+      if (hitLeft === 0) {
+        const pending = readBuffered(inputBuf, frameCount)
+        if (pending) {
+          inputBuf = null
+          applyTo(bufPlayer, pending)
+        }
+      }
+      return
+    }
+    if (phase === 'home') {
+      airFrames = 0
+      jumpLock = 0
+      if (!reduced) glowT += dt
+      return
+    }
+    if (phase === 'jump') {
+      airFrames += 1
+      if (jumpLock > 0) jumpLock -= 1
+      jumpT += dt
+      if (jumpProgress(jumpT, reduced) >= 1) enterRace()
+      const pending = readBuffered(inputBuf, frameCount)
+      if (pending && jumpLock <= 0) {
+        inputBuf = null
+        applyTo(bufPlayer, pending)
+      }
+      return
+    }
+    for (const rider of activeRiders()) tickRider(rider, dt, reduced)
+    advancePrice(dt)
+    decayMarks(dt)
+    pollPads()
+    const pending = readBuffered(inputBuf, frameCount)
+    if (pending) {
+      inputBuf = null
+      applyTo(bufPlayer, pending)
+    }
+  }
+
   function frame(now) {
     if (!visible || frozen) return
     inFrame = true
     const stamp = typeof now === 'number' ? now : performance.now()
-    const dt = lastFrame ? Math.min(0.05, (stamp - lastFrame) / 1000) : 0.016
+    const dt = lastFrame ? Math.min(0.05, (stamp - lastFrame) / 1000) : STEP_SEC
     lastFrame = stamp
-    const reduced = reducedMotion()
-    if (phase === 'home') {
-      if (!reduced) glowT += dt
-    } else if (phase === 'jump') {
-      jumpT += dt
-      if (jumpProgress(jumpT, reduced) >= 1) enterRace()
-    } else {
-      for (const rider of activeRiders()) tickRider(rider, dt, reduced)
-      advancePrice(dt)
-      decayMarks(dt)
-      pollPads()
+    if (!paused) {
+      const stepped = fixedStep(acc, dt)
+      acc = stepped.accumulator
+      for (let i = 0; i < stepped.steps; i++) simTick(STEP_SEC)
+      if (heard) audio.tick()
     }
-    if (phase === 'home') pollPads()
+    if (phase === 'home' && !paused) pollPads()
     paint()
     inFrame = false
     raf = requestAnimationFrame(frame)
@@ -1895,7 +2233,18 @@ export function createRabbit() {
     priceIndex = 0
     priceDebt = 0
     lastFrame = 0
+    acc = 0
+    clock = 0
+    frameCount = 0
+    airFrames = 0
+    jumpLock = 0
+    hitLeft = 0
+    shake = 0
+    paused = false
+    inputBuf = null
+    pauseBox.hidden = true
     riders = [freshRider(), freshRider()]
+    audio.setArea('meadow')
     buildIndicators()
     copyChrome()
     baselineMarket()
@@ -1929,10 +2278,18 @@ export function createRabbit() {
       if (visible) kick()
     },
     start,
+    pause(force) {
+      togglePause(force)
+    },
     anchor: () => 'bottom',
     step(n = 1) {
       const dt = Math.max(0, Number(n) || 0)
       const reduced = reducedMotion()
+      if (!reduced) clock += dt
+      const feelTicks = Math.max(1, Math.round((dt || STEP_SEC) / STEP_SEC))
+      airFrames += phase === 'home' ? 0 : feelTicks
+      if (jumpLock > 0) jumpLock = Math.max(0, jumpLock - feelTicks)
+      frameCount += feelTicks
       if (phase === 'home') {
         if (!reduced) glowT += dt
         paint()
