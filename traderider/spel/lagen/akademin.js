@@ -126,11 +126,12 @@ const css = `
 .nlr-ak .bridge a{display:inline-block;max-width:100%}
 .nlr-ak-claim{display:none;margin:0;padding:10px 12px;border-radius:0;background:rgba(92,194,154,.12);border:1px solid rgba(92,194,154,.45);color:#e8eef7;font-size:13px;line-height:1.45}
 html[data-nlr-view="akademin"] .tr-chrome{background:linear-gradient(180deg,rgba(26,18,52,.92),rgba(15,22,44,.96)) !important;border-bottom:1px solid rgba(155,107,255,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-html[data-nlr-view="akademin"] .nlr-toggle button{color:#e8eef7 !important;font-family:${FONT} !important}
-html[data-nlr-view="akademin"] .nlr-toggle button[aria-pressed="true"]{background:#c4a35a !important;color:#1a1405 !important}
-html[data-nlr-view="akademin"] .tr-skal a,html[data-nlr-view="akademin"] .tr-skal .lang-switcher-btn{color:#e8eef7 !important}
-html[data-nlr-view="akademin"] .tr-skal .lang-switcher-btn.active{background:#c4a35a !important;color:#1a1405 !important}
-html[data-nlr-view="akademin"] .tr-sim{color:#e8eef7 !important;background:rgba(15,22,44,.96) !important;border-color:rgba(155,107,255,.55) !important}
+html[data-nlr-view="akademin"] .tr-chrome .nlr-pill{background:rgba(10,22,40,.72) !important;background-color:rgba(10,22,40,.72) !important;border:1px solid rgba(155,107,255,.55) !important;box-shadow:0 0 18px rgba(140,90,255,.22) !important;backdrop-filter:blur(4px) !important;-webkit-backdrop-filter:blur(4px) !important;color:#e8eef7 !important}
+html[data-nlr-view="akademin"] .nlr-toggle button{color:#e8eef7 !important;background:transparent !important;background-color:transparent !important;font-family:${FONT} !important}
+html[data-nlr-view="akademin"] .nlr-toggle button[aria-pressed="true"]{background:#c4a35a !important;background-color:#c4a35a !important;color:#1a1405 !important}
+html[data-nlr-view="akademin"] .tr-skal a,html[data-nlr-view="akademin"] .tr-skal .tr-fs,html[data-nlr-view="akademin"] .tr-skal .lang-switcher-btn{color:#e8eef7 !important;background:transparent !important;background-color:transparent !important}
+html[data-nlr-view="akademin"] .tr-skal .lang-switcher-btn.active{background:#c4a35a !important;background-color:#c4a35a !important;color:#1a1405 !important}
+html[data-nlr-view="akademin"] .tr-sim{color:#e8eef7 !important;background:rgba(10,22,40,.72) !important;background-color:rgba(10,22,40,.72) !important;border:1px solid rgba(155,107,255,.55) !important}
 @media (max-width:820px){.nlr-ak-in{grid-template-columns:minmax(0,1fr);padding-top:60px}.nlr-ak aside{order:2}.nlr-ak-claim{display:block}.nlr-ak-chart canvas{height:300px}.nlr-ak h1{font-size:1.5rem}.nlr-ak-choice>span{min-width:100%}.nlr-ak kbd{display:none}}
 @media (max-height:520px){.nlr-ak-claim{display:block}}
 @media (max-width:480px){.nlr-ak-chart canvas{height:210px}}
