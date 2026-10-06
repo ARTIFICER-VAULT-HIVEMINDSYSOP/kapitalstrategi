@@ -1,0 +1,20 @@
+/* Språkväxel för hela sajten – fast i nedre vänstra hörnet. */
+.ks-sprakvaxel{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));z-index:2147483000;display:flex;gap:2px;padding:4px;border-radius:999px;background:rgba(10,22,40,.92);border:1px solid rgba(196,163,90,.55);box-shadow:0 6px 24px rgba(0,0,0,.35);font:700 12px/1 "IBM Plex Sans","Source Sans 3",system-ui,sans-serif;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:opacity .15s,transform .15s}
+.ks-sprakvaxel button{appearance:none;border:0;background:transparent;color:#d8dee9;min-width:36px;min-height:32px;padding:0 9px;border-radius:999px;font:inherit;letter-spacing:.04em;cursor:pointer}
+.ks-sprakvaxel button:hover{background:rgba(255,255,255,.08);color:#fff}
+.ks-sprakvaxel button:focus-visible{outline:2px solid #c4a35a;outline-offset:1px}
+.ks-sprakvaxel button.is-active{background:linear-gradient(135deg,#e6cf8f,#c4a35a);color:#0a1628}
+html[data-theme="light"] .ks-sprakvaxel{background:rgba(255,255,255,.95);border-color:#d9c48f}
+html[data-theme="light"] .ks-sprakvaxel button{color:#334155}
+html[data-theme="light"] .ks-sprakvaxel button.is-active{color:#0a1628}
+html.ks-sprakvaxel-header-synlig .ks-sprakvaxel{opacity:0;transform:translateY(8px);pointer-events:none}
+html.ks-sprakvaxel-header-synlig.ks-sprak-notis-open .ks-sprakvaxel{opacity:1;transform:none;pointer-events:auto}
+.ks-sprak-notis{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 50px);z-index:2147483000;max-width:min(440px,calc(100vw - 24px - 96px));display:flex;gap:10px;align-items:flex-start;padding:12px 12px 12px 14px;border-radius:14px;background:rgba(10,22,40,.96);border:1px solid rgba(196,163,90,.55);color:#e8edf5;box-shadow:0 10px 30px rgba(0,0,0,.4);font:400 14px/1.45 "Source Sans 3","IBM Plex Sans",system-ui,sans-serif}
+.ks-sprak-notis p{margin:0}
+.ks-sprak-notis-close{appearance:none;flex:none;border:0;background:rgba(255,255,255,.08);color:#fff;width:28px;height:28px;border-radius:999px;font:700 18px/1 system-ui,sans-serif;cursor:pointer}
+.ks-sprak-notis-close:hover{background:rgba(255,255,255,.16)}
+html[data-theme="light"] .ks-sprak-notis{background:#fff;color:#0f172a;border-color:#d9c48f}
+html[data-theme="light"] .ks-sprak-notis-close{background:#f1f5f9;color:#0f172a}
+.ks-sprak-rad{margin:1.25rem 0 0;font-size:.9rem;opacity:.8}
+@media print{.ks-sprakvaxel,.ks-sprak-notis{display:none!important}}
+html.ks-sprak-pad body::after{content:"";display:block;height:64px}

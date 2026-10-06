@@ -1,21 +1,32 @@
-/* Language for the public model page. Shares ig.app.language with the app. */
+/* Language for the public model page. Shares ig.app.language with the app.
+   SV · NO · EN · FR · UA. Missing text falls back: NO → SV, FR/UA → EN. */
 (function () {
   var KEY = "ig.app.language";
+  var LANGS = ["sv", "no", "en", "fr", "uk"];
+  var CHAIN = { sv: ["sv", "en"], no: ["no", "sv", "en"], en: ["en", "sv"], fr: ["fr", "en", "sv"], uk: ["uk", "en", "sv"] };
+
+  function valid(v) { return LANGS.indexOf(v) >= 0; }
 
   function read() {
     try {
       var value = JSON.parse(localStorage.getItem(KEY) || '"sv"');
-      if (value === "en" || value === "uk" || value === "sv") return value;
+      if (valid(value)) return value;
     } catch (e) {}
     return "sv";
   }
 
   function apply(lang) {
-    document.documentElement.lang = lang === "uk" ? "uk" : lang;
-    var attr = lang === "en" ? "data-en" : lang === "uk" ? "data-uk" : "data-sv";
+    document.documentElement.lang = lang === "no" ? "nb" : lang;
+    var chain = CHAIN[lang] || CHAIN.sv;
     document.querySelectorAll("[data-sv]").forEach(function (el) {
-      var value = el.getAttribute(attr) || el.getAttribute("data-sv");
-      if (value != null) el.textContent = value;
+      for (var i = 0; i < chain.length; i++) {
+        var value = el.getAttribute("data-" + chain[i]);
+        if (value != null) {
+          if (el.tagName === "TITLE") document.title = value;
+          el.textContent = value;
+          return;
+        }
+      }
     });
     document.querySelectorAll(".lang-switcher-btn").forEach(function (btn) {
       var on = btn.getAttribute("data-lang") === lang;
@@ -30,19 +41,27 @@
     } catch (e) {}
   }
 
+  function choose(lang) {
+    if (window.KSLang) window.KSLang.set(lang);
+    else persist(lang);
+    apply(lang);
+  }
+
   document.addEventListener("click", function (event) {
     var btn = event.target.closest(".lang-switcher-btn");
     if (!btn) return;
     var lang = btn.getAttribute("data-lang");
-    if (lang !== "sv" && lang !== "en" && lang !== "uk") return;
-    persist(lang);
-    apply(lang);
+    if (!valid(lang)) return;
+    choose(lang);
+  });
+
+  window.addEventListener("ks:lang-changed", function (e) {
+    if (e && valid(e.detail)) apply(e.detail);
   });
 
   var query = new URLSearchParams(location.search).get("lang");
-  if (query === "sv" || query === "en" || query === "uk") {
-    persist(query);
-    apply(query);
+  if (valid(query)) {
+    choose(query);
   } else {
     apply(read());
   }

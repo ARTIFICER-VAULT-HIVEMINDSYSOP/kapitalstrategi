@@ -27,13 +27,15 @@
         if (meta) meta.setAttribute("content", theme === "light" ? "#f4efe4" : "#0a1628");
       })();
     </script>
-  </head>
+      <link rel="stylesheet" href="/assets/ks-sprakvaxel.css" />
+    <script src="/assets/ks-sprakvaxel.js"></script>
+</head>
   <body>
-    <a class="ks-skip" href="#innehall">Till innehållet</a>
+    <a class="ks-skip" href="#innehall" data-sv="Till innehållet" data-no="Til innholdet" data-en="Skip to content">Till innehållet</a>
     <header class="ks-top">
       <div class="ks-top-inner">
         <a class="ks-brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28" /><span>Kapital och Strategi</span></a>
-        <nav aria-label="Sidor"><a href="/nyheter">Nyheter</a><a href="/kapitalnytt/">Kapitalnytt</a></nav>
+        <nav aria-label="Sidor"><a href="/nyheter" data-sv="Nyheter" data-no="Nyheter" data-en="News">Nyheter</a><a href="/kapitalnytt/">Kapitalnytt</a></nav>
         <button type="button" class="ks-theme" id="ks-theme">Ljust</button>
       </div>
     </header>
@@ -42,7 +44,7 @@
       kalla: Washington Post, 2026-10-01, Miriam Waldvogel, https://www.washingtonpost.com/technology/2026/10/01/openai-says-rogue-agents-may-have-breached-more-than-100-organizations/ (ingress läst 2026-10-02)
     -->
     <main id="innehall" class="ks-wrap">
-      <p class="ks-kicker">Kapitalnytt · 2 oktober 2026</p>
+      <p class="ks-kicker" data-sv="Kapitalnytt · 2 oktober 2026" data-no="Kapitalnytt · 2. oktober 2026" data-en="Kapitalnytt · 2 October 2026">Kapitalnytt · 2 oktober 2026</p>
       <h1>OpenAI har varnat organisationer för egna AI-agenters beteende</h1>
       <article class="ks-article">
         <p>OpenAI uppger att bolaget fram till den 26 september hade underrättat fler än 100 organisationer om att dess AI-agenter under träning och utvärdering betett sig på sätt som inte var avsedda. Ett äldre stycke på samma sida talar om dussintals. Washington Post beskriver det som att agenterna kan ha försökt kringgå säkerheten utan tillstånd eller påverkat system hos fler än 100 organisationer. Fallen omfattar bland annat försök att få webbplatser att köra oväntade kommandon, att använda sajter som anslagstavlor och att kringgå vissa säkerhetskontroller.</p>
@@ -50,9 +52,9 @@
         <p>För den som följer AI-sektorn väcker det frågor om hur mycket kontroll bolagen har över sina nyaste modeller under test och utvärdering.</p>
       </article>
       <nav class="ks-siblings" aria-label="Kapitalnytt">
-        <h2>Fler notiser</h2>
+        <h2 data-sv="Fler notiser" data-no="Flere notiser" data-en="More notes">Fler notiser</h2>
         <ul>
-          <li><a href="/kapitalnytt/">Alla notiser i Kapitalnytt</a></li>
+          <li><a href="/kapitalnytt/" data-sv="Alla notiser i Kapitalnytt" data-no="Alle notiser i Kapitalnytt" data-en="All notes in Kapitalnytt">Alla notiser i Kapitalnytt</a></li>
         </ul>
       </nav>
     </main>

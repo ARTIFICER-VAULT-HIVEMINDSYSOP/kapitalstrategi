@@ -21,6 +21,14 @@
       body: "Education and a structure for capital in motion. Sköldfonden has three rooms and three settlements — the cash pools are not mixed. The datacenter is the meeting surface where energy, resource, and capital allocation complement each other. Not a prospectus and not a promise of return.",
       cta: "Read the overview"
     },
+    no: {
+      nav: "Modellen",
+      title: "Utdanning og struktur: Sköldfonden, tre rom, datasenter som møteflate.",
+      eyebrow: "For deg som vurderer samarbeid",
+      heading: "Kapitalstrategi-modellen",
+      body: "Utdanning og struktur for kapital i bevegelse. Sköldfonden har tre rom og tre avregninger — kassene blandes ikke. Datasenteret er møteflaten der energi, ressurs og kapitalallokering utfyller hverandre. Ikke et prospekt og ikke et løfte om avkastning.",
+      cta: "Les oversikten"
+    },
     uk: {
       nav: "Модель",
       title: "Освіта і структура: Sköldfonden, три кімнати, датацентр як місце зустрічі.",
@@ -35,7 +43,8 @@
     try {
       var raw = localStorage.getItem(KEY);
       var value = raw ? JSON.parse(raw) : "sv";
-      if (value === "en" || value === "uk" || value === "sv") return value;
+      if (value === "en" || value === "uk" || value === "sv" || value === "no") return value;
+      if (value === "fr") return "en"; /* ingen fransk text här ännu: engelska */
     } catch (e) {}
     var pressed = document.querySelector(".lang-switcher-btn[aria-pressed='true']");
     var id = pressed && pressed.getAttribute("lang");

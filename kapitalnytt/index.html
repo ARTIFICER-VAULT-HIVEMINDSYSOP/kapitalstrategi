@@ -27,22 +27,24 @@
         if (meta) meta.setAttribute("content", theme === "light" ? "#f4efe4" : "#0a1628");
       })();
     </script>
-  </head>
+      <link rel="stylesheet" href="/assets/ks-sprakvaxel.css" />
+    <script src="/assets/ks-sprakvaxel.js"></script>
+</head>
   <body>
-    <a class="ks-skip" href="#innehall">Till innehållet</a>
+    <a class="ks-skip" href="#innehall" data-sv="Till innehållet" data-no="Til innholdet" data-en="Skip to content">Till innehållet</a>
     <header class="ks-top">
       <div class="ks-top-inner">
         <a class="ks-brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28" /><span>Kapital och Strategi</span></a>
-        <nav aria-label="Sidor"><a href="/nyheter">Nyheter</a><a href="/kapitalnytt/" aria-current="page">Kapitalnytt</a></nav>
+        <nav aria-label="Sidor"><a href="/nyheter" data-sv="Nyheter" data-no="Nyheter" data-en="News">Nyheter</a><a href="/kapitalnytt/" aria-current="page">Kapitalnytt</a></nav>
         <button type="button" class="ks-theme" id="ks-theme">Ljust</button>
       </div>
     </header>
     <main id="innehall" class="ks-wrap">
       <p class="ks-kicker">Kapital och Strategi</p>
       <h1>Kapitalnytt</h1>
-      <p>Korta notiser om kapitalallokering och tillväxt.</p>
+      <p data-sv="Korta notiser om kapitalallokering och tillväxt." data-no="Korte notiser om kapitalallokering og vekst." data-en="Short notes on capital allocation and growth.">Korta notiser om kapitalallokering och tillväxt.</p>
       <nav class="ks-siblings" aria-label="Notiser">
-        <h2>Notiser</h2>
+        <h2 data-sv="Notiser" data-no="Notiser" data-en="Notes">Notiser</h2>
         <ul>
           <li><a href="/kapitalnytt/2026-10-02-openai-agenter/"><span class="ks-kicker">2 oktober 2026</span><br />OpenAI har varnat organisationer för egna AI-agenters beteende</a></li>
         </ul>
