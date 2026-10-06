@@ -1,12 +1,17 @@
 import { expect, test } from 'vitest'
 import {
+  accountRiskPct,
+  breakEvenWinRate,
   createGame,
+  DEFAULT_TARGETS,
   gameBuy,
   gameFlat,
   gameSell,
   gasSpeed,
   liquidationPrice,
+  MAX_ACCOUNT_RISK_PCT,
   moveLine,
+  RAKET_MODES,
   startRide,
   stepGame,
   togglePauseGame,
@@ -42,7 +47,7 @@ test('gas styr farten, hävstången gör det inte', () => {
   expect(gasSpeed(0)).toBe(GAS_MIN_CPS)
   expect(gasSpeed(1)).toBe(GAS_MAX_CPS)
   const a = startRide(createGame(series(0.5), 'niva', { gas: 0.5, leverage: 1 }))
-  const b = startRide(createGame(series(0.5), 'niva', { gas: 0.5, leverage: 4 }))
+  const b = startRide(createGame(series(0.5), 'niva', { gas: 0.5, leverage: 4, targets: { tpPct: 2, slPct: 0.5 } }))
   expect(stepGame(a, 1000).desk.progress).toBeCloseTo(stepGame(b, 1000).desk.progress, 9)
 })
 
@@ -148,6 +153,28 @@ test('stort drag: start före seriens största timdrag, riktningen dold tills de
   g = ride(gameSell(g), 9)
   expect(g.shock?.revealed).toBe(true)
   expect(g.phase).toBe('won')
+})
+
+test('förval är 1:2 med SL satt, och hävstången håller förlusten inom taket', () => {
+  expect(breakEvenWinRate(2)).toBeCloseTo(1 / 3, 6)
+  expect(breakEvenWinRate(1.5)).toBeCloseTo(0.4, 6)
+  expect(breakEvenWinRate(3)).toBeCloseTo(0.25, 6)
+  for (const mode of RAKET_MODES) {
+    const t = DEFAULT_TARGETS[mode]
+    expect(t.slPct).not.toBeNull()
+    expect(t.tpPct / (t.slPct as number)).toBeCloseTo(2, 6)
+    const g = createGame(series(0.2), mode)
+    expect(g.targets).toEqual(t)
+    expect(g.desk.leverage).toBe(1)
+    expect(accountRiskPct(t.slPct as number, g.desk.leverage)).toBeLessThanOrEqual(MAX_ACCOUNT_RISK_PCT)
+    expect(validateTargets(g)).toEqual([])
+  }
+  const wide = createGame(series(0.2), 'niva', { leverage: 4, targets: { tpPct: 2, slPct: 1 } })
+  expect(validateTargets(wide).some((e) => e.includes('övningsinsatsen'))).toBe(true)
+  expect(startRide(wide).phase).toBe('setup')
+  const fitted = createGame(series(0.2), 'niva', { leverage: 4, targets: { tpPct: 1, slPct: 0.5 } })
+  expect(accountRiskPct(0.5, 4)).toBe(MAX_ACCOUNT_RISK_PCT)
+  expect(validateTargets(fitted)).toEqual([])
 })
 
 test('tangentschema', () => {

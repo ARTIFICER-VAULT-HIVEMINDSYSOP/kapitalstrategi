@@ -99,6 +99,17 @@ test('positionsandel ur risk och stopp, utan påhittat saldo', () => {
   assert.ok(A.riskAllowed(2) && !A.riskAllowed(5))
 })
 
+test('förvalets mål är minst 1,5R och vanliga 2R, med jämnt utfall över en av tre', () => {
+  assert.ok(A.TP_R_MULTIPLES.every((r) => r >= 1.5))
+  assert.equal(A.DEFAULT_TP_R, 2)
+  assert.ok(A.TP_R_MULTIPLES.includes(A.DEFAULT_TP_R))
+  assert.ok(Math.abs(A.breakEvenWinRate(2) - 1 / 3) < 1e-9)
+  assert.ok(Math.abs(A.breakEvenWinRate(1.5) - 0.4) < 1e-9)
+  assert.ok(Math.abs(A.breakEvenWinRate(3) - 0.25) < 1e-9)
+  const stop = A.stopPrice(100, 2, 1, 'long')
+  assert.equal(A.takeProfitPrice(100, stop, A.DEFAULT_TP_R, 'long'), 104)
+})
+
 test('stop/mål och övningsaffär på stängningskurser', () => {
   const stop = A.stopPrice(100, 2, 1.5, 'long')
   assert.equal(stop, 97)
