@@ -1,14 +1,17 @@
 /**
- * Rabbit Hole. Samma styrmotor som de andra lägena, orientation movement down.
- * Kaninen faller nedåt: tunneln, morötterna och chilin rullar uppåt förbi den.
- * Morot = stigande stapel, chili = fallande. Ett neutralt batteri utan logotyp.
- * prefers-reduced-motion: spiralen, virveln och parallaxen står stilla.
+ * Rabbit Hole. Samma styrmotor som de andra lägena.
+ * Form A: framåt längs fallet är pil upp / W (snabbare fall). Bilden rullar ändå uppåt.
+ * Bollingerbandens kanter är gränsen mellan tunnel och hål, på samma stängningar som priset.
+ * RSI och MACD är jämförelsetal. Morot = stigande stapel, chili = fallande.
+ * prefers-reduced-motion: spiralen, virveln, parallaxen och kamerans lerp står stilla, och hoppet hoppas över.
+ * Start: kaninen står ovanför hålet. Enter eller knappen börjar fallet.
  */
-import { keyAction, PREVENT_DEFAULT } from './keys.js'
+import { isTypingTarget, keyAction, PREVENT_DEFAULT } from './keys.js'
 import { MODES, createSteering, wheelToIntent } from './orientation.js'
 import { t, onLang } from './i18n.js'
 import { createGestureLock } from './styrmotor.js'
 import { positionFor, steerLanes } from './spar.js'
+import { rsi, rsiZone } from './rsi.js'
 
 const O = MODES.rabbitHole.orientation
 const steering = createSteering(O)
@@ -26,11 +29,65 @@ const css = `
 .nlr-rh{display:none;position:fixed;inset:0;z-index:55;background:#07060c;color:#f4efe6}
 .nlr-rh.on{display:block}
 .nlr-rh canvas{width:100%;height:100%;display:block}
-.nlr-rh-hud{position:absolute;left:12px;right:12px;top:calc(var(--tr-chrome-b, 96px) + 12px);display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 12px;pointer-events:none;font:600 12px/1.35 "IBM Plex Sans",sans-serif}
+.nlr-rh-hud{position:absolute;left:12px;right:12px;top:12px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 12px;pointer-events:none;font:600 12px/1.35 "IBM Plex Sans",sans-serif}
 .nlr-rh-hud b{color:#e7b15a}
 .nlr-rh-note{position:absolute;left:12px;right:12px;bottom:12px;max-width:min(520px,calc(100% - 24px));font:500 12px/1.35 "IBM Plex Sans",sans-serif;color:#f4efe6;text-shadow:0 1px 2px #07060c;pointer-events:none}
+.nlr-rh[data-phase="race"] .nlr-rh-note{bottom:auto;top:34px}
+.nlr-rh-home{position:absolute;left:50%;top:12px;transform:translateX(-50%);width:min(360px,calc(100% - 24px));pointer-events:none;z-index:2}
+.nlr-rh-card{pointer-events:auto;background:rgba(246,242,234,.97);color:#1c1915;border:1px solid rgba(28,25,21,.16);border-radius:16px;padding:12px 14px 14px;box-shadow:0 12px 28px rgba(7,6,12,.28)}
+.nlr-rh-claim{margin:0 0 6px;font:700 11px/1.3 "IBM Plex Sans",sans-serif;letter-spacing:.04em;color:#8a5a22}
+.nlr-rh-card h2{margin:0 0 6px;font:600 20px/1.15 Fraunces,Georgia,serif}
+.nlr-rh-card p{margin:0 0 8px;font:500 13px/1.4 "IBM Plex Sans",sans-serif}
+.nlr-rh-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.nlr-rh-start,.nlr-rh-two{border:0;border-radius:999px;font:700 14px/1 "IBM Plex Sans",sans-serif;padding:10px 14px;cursor:pointer}
+.nlr-rh-start{background:#e7b15a;color:#1c1915}
+.nlr-rh-two{background:#1c1915;color:#f4efe6}
+.nlr-rh-start:focus-visible,.nlr-rh-two:focus-visible{outline:3px solid #2ee6d6;outline-offset:2px}
+.nlr-rh-keys{margin:8px 0 0;font:500 12px/1.35 "IBM Plex Sans",sans-serif;color:#5c564c}
+.nlr-rh-indicators{position:absolute;left:12px;right:12px;bottom:40px;display:grid;gap:8px;pointer-events:none;z-index:2}
+.nlr-rh-indicators[data-players="1"]{grid-template-columns:minmax(0,1fr)}
+.nlr-rh-indicators[data-players="2"]{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.nlr-rh-player{background:rgba(8,6,14,.82);border:1px solid rgba(46,230,214,.55);border-radius:14px;padding:8px 10px 10px;display:grid;gap:4px}
+.nlr-rh-who{margin:0;font:700 11px/1.2 "IBM Plex Sans",sans-serif;letter-spacing:.06em;color:#e7b15a}
+.nlr-rh-fall{margin:0;font:600 13px/1.3 "IBM Plex Sans",sans-serif}
+.nlr-rh-meter{height:8px;border-radius:99px;background:rgba(255,255,255,.16);overflow:hidden}
+.nlr-rh-meter > span{display:block;height:100%;width:0;background:linear-gradient(90deg,#2ee6d6,#ff4fa8)}
+.nlr-rh-lane-labels{display:flex;justify-content:space-between;gap:6px;font:700 11px/1.2 "IBM Plex Sans",sans-serif}
+.nlr-rh-lane-labels [data-on="sell"]{color:#ff4fa8}
+.nlr-rh-lane-labels [data-on="flat"]{color:#e7b15a}
+.nlr-rh-lane-labels [data-on="buy"]{color:#2ee6d6}
+.nlr-rh-track{position:relative;height:14px;border-radius:99px;background:linear-gradient(90deg,#ff4fa8 0%,#f4efe6 50%,#2ee6d6 100%)}
+.nlr-rh-marker{position:absolute;top:-5px;width:8px;height:24px;margin-left:-4px;border-radius:4px;background:#1c1915;box-shadow:0 0 0 2px #fff;transition:left 120ms linear}
+.nlr-rh-decision{margin:2px 0 0;font:700 22px/1 Fraunces,Georgia,serif}
+.nlr-rh-decision[data-side="sell"]{color:#ff4fa8}
+.nlr-rh-decision[data-side="flat"]{color:#e7b15a}
+.nlr-rh-decision[data-side="buy"]{color:#2ee6d6}
+.nlr-rh-cue,.nlr-rh-risk{margin:0;font:500 12px/1.35 "IBM Plex Sans",sans-serif;color:#f4efe6}
+.nlr-rh-market{position:absolute;left:12px;top:72px;max-width:min(320px,46%);display:grid;gap:2px;pointer-events:none;z-index:2;font:600 12px/1.35 "IBM Plex Sans",sans-serif;color:#f4efe6;text-shadow:0 1px 2px #07060c}
+.nlr-rh-market p{margin:0}
+.nlr-rh-market[hidden]{display:none}
+.nlr-rh-signal{color:#ffd27a}
 .nlr-rh-bat{width:28px;height:14px}
-@media (prefers-reduced-motion: reduce){.nlr-rh,.nlr-rh canvas{animation:none;scroll-behavior:auto}}
+@media (max-width:640px){
+  .nlr-rh-indicators[data-players="2"]{grid-template-columns:minmax(0,1fr)}
+  .nlr-rh-home{width:min(340px,calc(100% - 16px))}
+  .nlr-rh-card{padding:10px 12px}
+  .nlr-rh-card h2{font-size:18px}
+  .nlr-rh-card p{font-size:12px}
+  .nlr-rh-keys{font-size:11px}
+  .nlr-rh-decision{font-size:18px}
+}
+@media (max-height:520px){
+  .nlr-rh-home{left:12px;transform:none;width:min(280px,48vw)}
+  .nlr-rh-card{padding:8px 10px}
+  .nlr-rh-card p{font-size:12px}
+  .nlr-rh-indicators{bottom:8px}
+  .nlr-rh-risk{display:none}
+  .nlr-rh[data-phase="race"] .nlr-rh-note{top:28px}
+}
+@media (prefers-reduced-motion: reduce){
+  .nlr-rh,.nlr-rh canvas,.nlr-rh-marker{animation:none;transition:none;scroll-behavior:auto}
+}
 `
 
 let styled = false
@@ -75,6 +132,343 @@ export function reducedMotion() {
 
 export function markerScreenY(fall, reduced = false) {
   return 480 + scrollDelta(0, fall, reduced)
+}
+
+export const JUMP_SEC = 0.72
+export const PHASES = ['home', 'jump', 'race']
+
+/** Fall per tick. Varje steg i hävstången syns. Reducerad rörelse står stilla. */
+export function fallRate(leverage, reduced = false) {
+  if (reduced) return 0
+  const lev = Math.max(1, Number.isFinite(Number(leverage)) ? Number(leverage) : 1)
+  return 1.15 + (lev - 1) * 0.55
+}
+
+export function fallBand(rate) {
+  const n = Number(rate) || 0
+  if (n <= 0) return 'still'
+  if (n < 1.5) return 'slow'
+  if (n < 2.4) return 'steady'
+  return 'fast'
+}
+
+/** home → jump → race. Enter och knappen är start. */
+export function advancePhase(phase, event) {
+  if (phase === 'home' && (event === 'start' || event === 'jump')) return 'jump'
+  if (phase === 'jump' && event === 'landed') return 'race'
+  return phase
+}
+
+export function jumpProgress(elapsed, reduced = false) {
+  if (reduced) return 1
+  const t = Math.max(0, Number(elapsed) || 0)
+  return Math.min(1, t / JUMP_SEC)
+}
+
+export function homeLayout(width, height) {
+  const w = Math.max(1, Number(width) || 1)
+  const h = Math.max(1, Number(height) || 1)
+  const groundY = Math.round(h * 0.7)
+  const hole = {
+    x: w * 0.5,
+    y: groundY + Math.min(28, h * 0.045),
+    rx: Math.max(46, Math.min(110, w * 0.11)),
+    ry: Math.max(16, Math.min(32, h * 0.04)),
+  }
+  return { groundY, hole }
+}
+
+/** Kaninen står på gräset. FLAT är ovanför hålet, SÄLJ till vänster, KÖP till höger. */
+export function standPoint(side, layout) {
+  const hole = layout.hole
+  const gap = hole.rx + 64
+  const x = side === 'sell' ? hole.x - gap : side === 'buy' ? hole.x + gap : hole.x
+  return { x, y: layout.groundY - 4 }
+}
+
+export function jumpPose(progress, from, hole) {
+  const p = Math.min(1, Math.max(0, Number(progress) || 0))
+  const arc = Math.sin(p * Math.PI) * 28
+  return {
+    x: from.x + (hole.x - from.x) * p,
+    y: from.y + (hole.y + 36 - from.y) * p - arc,
+    drop: p,
+    done: p >= 1,
+  }
+}
+
+export function splitLayout(width, players) {
+  const w = Math.max(1, Number(width) || 1)
+  if (players === 2) {
+    const half = w / 2
+    return [
+      { player: 1, left: 0, width: half },
+      { player: 2, left: half, width: half },
+    ]
+  }
+  return [{ player: 1, left: 0, width: w }]
+}
+
+export function lateralRead(side, width) {
+  const lanes = steerLanes(Math.max(1, Number(width) || 1), 'right')
+  const x = positionFor(side, lanes.buy, lanes.sell)
+  const span = lanes.buy - lanes.sell || 1
+  const t = (x - lanes.sell) / span
+  return { x, t, offset: t - 0.5, lanes }
+}
+
+function lateralFromLanes(side, lanes) {
+  const x = positionFor(side, lanes.buy, lanes.sell)
+  const span = lanes.buy - lanes.sell || 1
+  const t = (x - lanes.sell) / span
+  return { x, t, offset: t - 0.5, lanes }
+}
+
+export function movementIndicators({ side = 'flat', leverage = 1, width = 800, reduced = false, lanes = null } = {}) {
+  const decision = side === 'buy' || side === 'sell' ? side : 'flat'
+  const read = lanes && Number.isFinite(lanes.buy) && Number.isFinite(lanes.sell)
+    ? lateralFromLanes(decision, lanes)
+    : lateralRead(decision, width)
+  const rate = fallRate(leverage, reduced)
+  return {
+    fallRate: rate,
+    band: fallBand(rate),
+    lateral: read.t,
+    offset: read.offset,
+    decision,
+    x: read.x,
+    lanes: read.lanes,
+  }
+}
+
+export const BB_PERIOD = 20
+export const BB_K = 2
+export const MACD_FAST = 12
+export const MACD_SLOW = 26
+export const MACD_SIGNAL = 9
+export const MARK_HOLD = 2.2
+const PAD_DEADZONE = 0.35
+
+export function closesOf(candles) {
+  return (Array.isArray(candles) ? candles : []).map((candle) => {
+    const value = Number(candle?.c ?? candle?.close)
+    return Number.isFinite(value) ? value : NaN
+  })
+}
+
+/** Population standard deviation, period 20, k = 2. Same definition as the app Bollinger helper. */
+export function bollingerPoint(closes, index, period = BB_PERIOD, k = BB_K) {
+  const src = Array.isArray(closes) ? closes : []
+  const i = index | 0
+  if (!Number.isInteger(period) || period < 2 || i < period - 1 || i >= src.length) return null
+  let sum = 0
+  for (let j = i - period + 1; j <= i; j++) {
+    const v = src[j]
+    if (!Number.isFinite(v)) return null
+    sum += v
+  }
+  const sma = sum / period
+  let varSum = 0
+  for (let j = i - period + 1; j <= i; j++) {
+    const d = src[j] - sma
+    varSum += d * d
+  }
+  const stdev = Math.sqrt(varSum / period)
+  return { sma, stdev, upper: sma + k * stdev, lower: sma - k * stdev }
+}
+
+export function bandTouch(close, band) {
+  if (!band || !Number.isFinite(close) || !(band.upper > band.lower)) return null
+  const pb = (close - band.lower) / (band.upper - band.lower)
+  if (pb >= 0.95) return 'upper'
+  if (pb <= 0.05) return 'lower'
+  if (pb >= 0.9) return 'near-upper'
+  if (pb <= 0.1) return 'near-lower'
+  return null
+}
+
+function touchSide(kind) {
+  if (kind === 'upper' || kind === 'near-upper') return 'high'
+  if (kind === 'lower' || kind === 'near-lower') return 'low'
+  return null
+}
+
+/** One mark when price enters a band edge, not again while it stays there. */
+export function edgeSignal(prev, next) {
+  const side = touchSide(next)
+  if (!side || side === touchSide(prev)) return null
+  return next
+}
+
+function ema(values, period) {
+  const out = new Array(values.length).fill(null)
+  const alpha = 2 / (period + 1)
+  let sum = 0
+  let n = 0
+  let prev = null
+  for (let i = 0; i < values.length; i++) {
+    const v = values[i]
+    if (!Number.isFinite(v)) {
+      sum = 0
+      n = 0
+      prev = null
+      continue
+    }
+    if (prev == null) {
+      sum += v
+      n += 1
+      if (n === period) {
+        prev = sum / period
+        out[i] = prev
+      }
+    } else {
+      prev = v * alpha + prev * (1 - alpha)
+      out[i] = prev
+    }
+  }
+  return out
+}
+
+export function macdSeries(closes) {
+  const src = Array.isArray(closes) ? closes : []
+  const fast = ema(src, MACD_FAST)
+  const slow = ema(src, MACD_SLOW)
+  const line = src.map((_, i) => (fast[i] != null && slow[i] != null ? fast[i] - slow[i] : null))
+  const signal = new Array(src.length).fill(null)
+  const hist = new Array(src.length).fill(null)
+  const start = line.findIndex((v) => v != null)
+  if (start < 0) return { line, signal, hist }
+  const subset = []
+  for (let i = start; i < line.length; i++) {
+    if (line[i] == null) break
+    subset.push(line[i])
+  }
+  const sig = ema(subset, MACD_SIGNAL)
+  for (let i = 0; i < subset.length; i++) {
+    signal[start + i] = sig[i]
+    if (sig[i] != null) hist[start + i] = subset[i] - sig[i]
+  }
+  return { line, signal, hist }
+}
+
+export function macdCross(prev, next) {
+  if (!Number.isFinite(prev) || !Number.isFinite(next)) return null
+  if (prev <= 0 && next > 0) return 'up'
+  if (prev >= 0 && next < 0) return 'down'
+  return null
+}
+
+export function macdPoint(closes, index) {
+  const series = macdSeries(closes)
+  const i = Math.max(0, index | 0)
+  const hist = series.hist[i] ?? null
+  const prev = i > 0 ? series.hist[i - 1] : null
+  return {
+    line: series.line[i] ?? null,
+    signal: series.signal[i] ?? null,
+    hist,
+    cross: macdCross(prev, hist),
+  }
+}
+
+export function marketReading(closes, index) {
+  const src = Array.isArray(closes) ? closes : []
+  const i = Math.max(0, Math.min(src.length - 1, index | 0))
+  const band = src.length ? bollingerPoint(src, i) : null
+  const close = src.length && Number.isFinite(src[i]) ? src[i] : null
+  const rsiSeries = rsi(src)
+  const rsiValue = rsiSeries[i] ?? null
+  const macd = macdPoint(src, i)
+  return {
+    band,
+    close,
+    touch: bandTouch(close, band),
+    rsi: rsiValue,
+    rsiZone: rsiZone(rsiValue),
+    macd,
+  }
+}
+
+/**
+ * Tunnel inside the bands, hole outside. Lower band is the left wall (SÄLJ), upper band the right wall (KÖP).
+ * Narrow bandwidth draws a narrower shaft. Without a band yet, the lanes fall back to the fixed steer span.
+ */
+export function shaftBorder(width, band) {
+  const w = Math.max(1, Number(width) || 1)
+  if (!band || !(band.upper > band.lower)) {
+    const lanes = steerLanes(w, 'right')
+    return { ...lanes, hasBand: false }
+  }
+  const mid = band.sma > 0 ? band.sma : (band.upper + band.lower) / 2
+  const bw = mid > 0 ? (band.upper - band.lower) / mid : 0.04
+  const t = Math.min(1, Math.max(0, (bw - 0.008) / 0.1))
+  const half = w * (0.16 + t * 0.26)
+  const margin = Math.max(24, w * 0.06)
+  let sell = w / 2 - half
+  let buy = w / 2 + half
+  if (sell < margin) {
+    buy += margin - sell
+    sell = margin
+  }
+  if (buy > w - margin) {
+    sell -= buy - (w - margin)
+    buy = w - margin
+  }
+  sell = Math.max(margin, sell)
+  buy = Math.min(w - margin, Math.max(sell + 8, buy))
+  return { buy, sell, flat: (buy + sell) / 2, hasBand: true, bandwidth: bw }
+}
+
+export function shaftRegion(x, walls) {
+  if (!walls || !Number.isFinite(x) || !Number.isFinite(walls.sell) || !Number.isFinite(walls.buy)) return 'tunnel'
+  const eps = 0.75
+  if (Math.abs(x - walls.sell) <= eps || Math.abs(x - walls.buy) <= eps) return 'border'
+  if (x < walls.sell || x > walls.buy) return 'hole'
+  return 'tunnel'
+}
+
+export function priceOnShaft(close, band, walls) {
+  if (!walls || !Number.isFinite(walls.sell) || !Number.isFinite(walls.buy)) return null
+  if (!band || !Number.isFinite(close) || !(band.upper > band.lower)) return walls.flat
+  return walls.sell + ((close - band.lower) / (band.upper - band.lower)) * (walls.buy - walls.sell)
+}
+
+/** Chase along the fall. Reduced motion keeps the camera fixed. */
+export function chaseCamera(prev, offset, dt, reduced = false) {
+  if (reduced) return { pan: 0, roll: 0 }
+  const lateral = Number(offset) || 0
+  const targetPan = -lateral * 56
+  const targetRoll = lateral * 0.12
+  const from = prev && Number.isFinite(prev.pan) ? prev : { pan: 0, roll: 0 }
+  const step = 1 - Math.exp(-8 * Math.max(0, Number(dt) || 0))
+  return {
+    pan: from.pan + (targetPan - from.pan) * step,
+    roll: from.roll + (targetRoll - from.roll) * step,
+  }
+}
+
+/** First gamepad follows Form A. Button 0 confirms. Missing pads return null. */
+export function gamepadIntent(pad, deadzone = PAD_DEADZONE) {
+  if (!pad) return null
+  const axes = pad.axes || []
+  const buttons = pad.buttons || []
+  const pressed = (i) => {
+    const button = buttons[i]
+    if (!button) return false
+    return typeof button === 'object' ? !!button.pressed : !!button
+  }
+  const x = Number(axes[0])
+  const y = Number(axes[1])
+  const nx = Number.isFinite(x) ? x : 0
+  const ny = Number.isFinite(y) ? y : 0
+  let move = null
+  if (ny < -deadzone || pressed(12)) move = 'FORWARD'
+  else if (ny > deadzone || pressed(13)) move = 'BACKWARD'
+  else if (nx > deadzone || pressed(15)) move = 'STEER_TOWARD_HIGH'
+  else if (nx < -deadzone || pressed(14)) move = 'STEER_TOWARD_LOW'
+  const confirm = pressed(0)
+  if (!move && !confirm) return null
+  return { move, confirm }
 }
 
 export const CARROT_HP = 1
@@ -612,6 +1006,76 @@ function drawTunnel(c, w, h, fall, spin, reduced) {
   c.restore()
 }
 
+function drawShaftBorder(c, w, h, walls, marks) {
+  if (!walls?.hasBand) return
+  const vpX = w / 2
+  const vpY = h * 0.76
+  const nearY = h * 0.4
+  const at = (edge, y) => vpX + (edge - vpX) * ((y - vpY) / (nearY - vpY || 1))
+  const l0 = at(walls.sell, 0)
+  const l1 = at(walls.sell, h)
+  const r0 = at(walls.buy, 0)
+  const r1 = at(walls.buy, h)
+  c.save()
+  c.fillStyle = 'rgba(2, 1, 6, 0.78)'
+  c.beginPath()
+  c.moveTo(0, 0)
+  c.lineTo(l0, 0)
+  c.lineTo(l1, h)
+  c.lineTo(0, h)
+  c.closePath()
+  c.fill()
+  c.beginPath()
+  c.moveTo(w, 0)
+  c.lineTo(r0, 0)
+  c.lineTo(r1, h)
+  c.lineTo(w, h)
+  c.closePath()
+  c.fill()
+  c.lineWidth = 3
+  c.strokeStyle = PINK
+  c.beginPath()
+  c.moveTo(l0, 0)
+  c.lineTo(l1, h)
+  c.stroke()
+  c.strokeStyle = CYAN
+  c.beginPath()
+  c.moveTo(r0, 0)
+  c.lineTo(r1, h)
+  c.stroke()
+  c.font = '700 12px "IBM Plex Sans", sans-serif'
+  c.textAlign = 'center'
+  c.textBaseline = 'middle'
+  c.fillStyle = 'rgba(244,239,230,0.72)'
+  c.fillText(t('rh.hole'), Math.max(22, walls.sell * 0.38), h * 0.58)
+  c.fillText(t('rh.hole'), Math.min(w - 22, walls.buy + (w - walls.buy) * 0.55), h * 0.58)
+  c.fillStyle = '#f4efe6'
+  c.fillText(t('rh.tunnel'), w / 2, h * 0.18)
+  c.fillStyle = PINK
+  c.fillText(t('rh.wallLower'), walls.sell, h * 0.4 + 48)
+  c.fillStyle = CYAN
+  c.fillText(t('rh.wallUpper'), walls.buy, h * 0.4 + 48)
+  if (marks?.band?.life > 0 && marks.band.key) {
+    const x = marks.band.side === 'sell' ? walls.sell : walls.buy
+    c.fillStyle = '#ffd27a'
+    c.fillText(t(marks.band.key), x, h * 0.4 - 44)
+  }
+  c.restore()
+}
+
+function drawPricePip(c, x, y, region) {
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return
+  c.save()
+  c.fillStyle = region === 'hole' ? '#ffd27a' : '#f4efe6'
+  c.strokeStyle = '#07060c'
+  c.lineWidth = 2
+  c.beginPath()
+  c.arc(x, y, region === 'hole' ? 7 : 5, 0, Math.PI * 2)
+  c.fill()
+  c.stroke()
+  c.restore()
+}
+
 function drawFloater(c, floater) {
   if (!floater || floater.life <= 0) return
   c.save()
@@ -642,6 +1106,195 @@ function hpRowTop(hud, root) {
   return top
 }
 
+function drawStandingRabbit(c, x, feetY, scale) {
+  c.save()
+  c.translate(x, feetY)
+  c.scale(scale, scale)
+  c.fillStyle = FUR
+  c.beginPath()
+  c.ellipse(-12, -4, 9, 5, -0.3, 0, Math.PI * 2)
+  c.ellipse(12, -4, 9, 5, 0.3, 0, Math.PI * 2)
+  c.fill()
+  c.strokeStyle = FUR
+  c.lineWidth = 7
+  c.beginPath()
+  c.moveTo(-8, -8)
+  c.lineTo(-10, -28)
+  c.moveTo(8, -8)
+  c.lineTo(10, -28)
+  c.stroke()
+  c.fillStyle = FUR
+  c.beginPath()
+  c.ellipse(0, -48, 22, 24, 0, 0, Math.PI * 2)
+  c.fill()
+  c.fillStyle = FUR_SHADE
+  c.beginPath()
+  c.arc(16, -40, 7, 0, Math.PI * 2)
+  c.fill()
+  c.strokeStyle = FUR
+  c.lineWidth = 6
+  c.beginPath()
+  c.moveTo(-14, -42)
+  c.quadraticCurveTo(-28, -30, -34, -18)
+  c.moveTo(14, -40)
+  c.quadraticCurveTo(30, -28, 36, -16)
+  c.stroke()
+  c.beginPath()
+  c.arc(-34, -18, 5, 0, Math.PI * 2)
+  c.arc(36, -16, 5, 0, Math.PI * 2)
+  c.fill()
+  drawBattery(c, { x: 36, y: -16 })
+  c.fillStyle = FUR
+  c.beginPath()
+  c.ellipse(0, -84, 20, 18, 0, 0, Math.PI * 2)
+  c.fill()
+  for (const side of [-1, 1]) {
+    const baseX = side * 10
+    const baseY = -96
+    c.fillStyle = FUR
+    c.beginPath()
+    c.moveTo(baseX - side * 7, baseY)
+    c.quadraticCurveTo(baseX - side * 16, baseY - 34, baseX, baseY - 62)
+    c.quadraticCurveTo(baseX + side * 18, baseY - 32, baseX + side * 8, baseY)
+    c.closePath()
+    c.fill()
+    c.strokeStyle = FUR_SHADE
+    c.lineWidth = 1.2
+    c.stroke()
+    c.fillStyle = INNER
+    c.beginPath()
+    c.moveTo(baseX - side * 2, baseY - 8)
+    c.quadraticCurveTo(baseX - side * 7, baseY - 32, baseX + side * 1, baseY - 50)
+    c.quadraticCurveTo(baseX + side * 9, baseY - 30, baseX + side * 3, baseY - 6)
+    c.closePath()
+    c.fill()
+  }
+  c.fillStyle = 'rgba(255, 150, 176, 0.85)'
+  c.beginPath()
+  c.ellipse(-12, -78, 5, 3.2, 0, 0, Math.PI * 2)
+  c.ellipse(12, -78, 5, 3.2, 0, 0, Math.PI * 2)
+  c.fill()
+  c.fillStyle = NOSE
+  c.beginPath()
+  c.moveTo(0, -76)
+  c.lineTo(4, -70)
+  c.lineTo(-4, -70)
+  c.closePath()
+  c.fill()
+  c.strokeStyle = '#c45b74'
+  c.lineWidth = 1.4
+  c.beginPath()
+  c.moveTo(-4, -66)
+  c.quadraticCurveTo(0, -62, 4, -66)
+  c.stroke()
+  c.strokeStyle = FRAME_RED
+  c.lineWidth = 2.2
+  for (const eyeX of [-8, 8]) {
+    c.fillStyle = FRAME_RED
+    roundRect(c, eyeX - 9, -90, 18, 12, 5)
+    c.fill()
+    c.fillStyle = '#140e16'
+    c.beginPath()
+    c.ellipse(eyeX, -84, 6, 4.2, 0, 0, Math.PI * 2)
+    c.fill()
+    c.fillStyle = '#fff'
+    c.beginPath()
+    c.ellipse(eyeX - 2, -86, 1.8, 1.1, -0.4, 0, Math.PI * 2)
+    c.fill()
+  }
+  c.restore()
+}
+
+function drawMeadow(c, w, h, layout, side, glow, showRabbit = true) {
+  const { groundY, hole } = layout
+  const sky = c.createLinearGradient(0, 0, 0, groundY)
+  sky.addColorStop(0, '#7eb7e0')
+  sky.addColorStop(0.55, '#d7f0ea')
+  sky.addColorStop(1, '#c6e4a4')
+  c.fillStyle = sky
+  c.fillRect(0, 0, w, groundY)
+  c.fillStyle = 'rgba(255,255,255,0.72)'
+  c.beginPath()
+  c.ellipse(w * 0.22, groundY * 0.28, 54, 16, 0, 0, Math.PI * 2)
+  c.ellipse(w * 0.78, groundY * 0.2, 42, 13, 0, 0, Math.PI * 2)
+  c.fill()
+  c.fillStyle = '#3c7a46'
+  c.fillRect(0, groundY, w, h - groundY)
+  c.fillStyle = '#8fce73'
+  c.fillRect(0, groundY, w, 8)
+  const lanes = steerLanes(w, 'right')
+  c.font = '700 12px "IBM Plex Sans", sans-serif'
+  c.textAlign = 'center'
+  c.textBaseline = 'middle'
+  for (const key of ['sell', 'flat', 'buy']) {
+    const x = key === 'sell' ? lanes.sell : key === 'buy' ? lanes.buy : lanes.flat
+    const on = side === key
+    c.fillStyle = on ? (key === 'sell' ? PINK : key === 'buy' ? CYAN : '#e7b15a') : 'rgba(255,255,255,0.55)'
+    c.beginPath()
+    c.ellipse(x, groundY + 28, on ? 16 : 10, on ? 7 : 5, 0, 0, Math.PI * 2)
+    c.fill()
+    const label = t(key === 'sell' ? 'btn.sell' : key === 'buy' ? 'btn.buy' : 'btn.flat')
+    c.lineWidth = 3
+    c.strokeStyle = '#14301a'
+    c.strokeText(label, x, groundY + 50)
+    c.fillStyle = '#f4efe6'
+    c.fillText(label, x, groundY + 50)
+  }
+  if (showRabbit) {
+    const stand = standPoint(side, layout)
+    drawStandingRabbit(c, stand.x, stand.y, Math.max(0.95, Math.min(1.35, w / 720)))
+  }
+  c.save()
+  c.translate(hole.x, hole.y)
+  const rim = c.createRadialGradient(0, 0, 8, 0, 0, hole.rx)
+  rim.addColorStop(0, '#050308')
+  rim.addColorStop(0.72, '#1a0c18')
+  rim.addColorStop(1, 'rgba(0,0,0,0)')
+  c.fillStyle = rim
+  c.beginPath()
+  c.ellipse(0, 0, hole.rx, hole.ry, 0, 0, Math.PI * 2)
+  c.fill()
+  c.strokeStyle = `rgba(255,79,168,${0.45 + glow * 0.35})`
+  c.lineWidth = 4
+  c.beginPath()
+  c.ellipse(0, 0, hole.rx * 0.92, hole.ry * 0.86, 0, 0, Math.PI * 2)
+  c.stroke()
+  c.strokeStyle = `rgba(46,230,214,${0.35 + glow * 0.25})`
+  c.lineWidth = 2
+  c.beginPath()
+  c.ellipse(0, 2, hole.rx * 0.7, hole.ry * 0.55, 0, 0, Math.PI * 2)
+  c.stroke()
+  c.restore()
+}
+
+function drawLaneGuides(c, w, h, read) {
+  const lanes = read.lanes
+  c.save()
+  c.font = '700 13px "IBM Plex Sans", sans-serif'
+  c.textAlign = 'center'
+  c.textBaseline = 'top'
+  const marks = [
+    [lanes.sell, 'btn.sell', PINK],
+    [lanes.flat, 'btn.flat', '#e7b15a'],
+    [lanes.buy, 'btn.buy', CYAN],
+  ]
+  for (const [x, key, color] of marks) {
+    c.strokeStyle = color
+    c.globalAlpha = 0.45
+    c.lineWidth = 2
+    c.setLineDash([5, 8])
+    c.beginPath()
+    c.moveTo(x, 28)
+    c.lineTo(x, h - 120)
+    c.stroke()
+    c.setLineDash([])
+    c.globalAlpha = 1
+    c.fillStyle = color
+    c.fillText(t(key), x, 8)
+  }
+  c.restore()
+}
+
 function drawHp(c, hp, w, top) {
   const x0 = Math.max(16, w - 28 - HP_MAX * 16)
   const y = top
@@ -667,27 +1320,79 @@ export function createRabbit() {
   const note = document.createElement('p')
   note.className = 'nlr-rh-note'
   note.setAttribute('data-tr-claim', '1')
-  root.append(canvas, hud, note)
+  const home = document.createElement('div')
+  home.className = 'nlr-rh-home'
+  home.dataset.rhHome = '1'
+  const card = document.createElement('div')
+  card.className = 'nlr-rh-card'
+  const claim = document.createElement('p')
+  claim.className = 'nlr-rh-claim'
+  claim.dataset.trClaim = '1'
+  const title = document.createElement('h2')
+  const body = document.createElement('p')
+  body.dataset.rhHomeBody = '1'
+  const actions = document.createElement('div')
+  actions.className = 'nlr-rh-actions'
+  const startBtn = document.createElement('button')
+  startBtn.type = 'button'
+  startBtn.className = 'nlr-rh-start'
+  startBtn.dataset.rhStart = '1'
+  const twoBtn = document.createElement('button')
+  twoBtn.type = 'button'
+  twoBtn.className = 'nlr-rh-two'
+  twoBtn.dataset.rhStart = '2'
+  const keys = document.createElement('p')
+  keys.className = 'nlr-rh-keys'
+  keys.dataset.rhKeys = '1'
+  actions.append(startBtn, twoBtn)
+  card.append(claim, title, body, actions, keys)
+  home.append(card)
+  const indicators = document.createElement('div')
+  indicators.className = 'nlr-rh-indicators'
+  indicators.dataset.rhIndicators = '1'
+  const market = document.createElement('div')
+  market.className = 'nlr-rh-market'
+  market.dataset.rhMarket = '1'
+  const bbLine = document.createElement('p')
+  bbLine.dataset.rhBb = '1'
+  const rsiLine = document.createElement('p')
+  rsiLine.dataset.rhRsi = '1'
+  const macdLine = document.createElement('p')
+  macdLine.dataset.rhMacd = '1'
+  const sigLine = document.createElement('p')
+  sigLine.className = 'nlr-rh-signal'
+  sigLine.dataset.rhSignal = '1'
+  market.append(bbLine, rsiLine, macdLine, sigLine)
+  root.append(canvas, home, indicators, market, hud, note)
   document.body.appendChild(root)
 
   let visible = false
   let frozen = false
+  let inFrame = false
   let raf = 0
-  let y = 40
-  let spin = 0
-  let side = 'flat'
-  let leverage = 1
-  let lastX = null
+  let phase = 'home'
+  let players = 1
+  let jumpT = 0
+  let glowT = 0
   let priceIndex = 0
-  let entry = null
-  let result = null
-  let hp = 0
-  let eatLeft = 0
-  let floater = null
-  let eaten = []
+  let priceDebt = 0
+  let lastFrame = 0
   let lastSprite = null
   const lock = createGestureLock(480)
 
+  function freshRider() {
+    return { side: 'flat', leverage: 1, entry: null, result: null, y: 0, spin: 0, hp: 0, eatLeft: 0, floater: null, eaten: [], cam: { pan: 0, roll: 0 } }
+  }
+  let marks = { band: { life: 0, key: '', side: '' }, rsi: { life: 0, key: '' }, macd: { life: 0, key: '' } }
+  let prevTouch = null
+  let prevZone = 'saknas'
+  let prevHist = null
+  const padLock = [createGestureLock(480), createGestureLock(480)]
+  let riders = [freshRider(), freshRider()]
+
+  function activeRiders() {
+    return players === 2 ? riders : [riders[0]]
+  }
   function series() {
     const candles = window.__trEngine?.quote?.candles
     return Array.isArray(candles) ? candles : []
@@ -699,30 +1404,6 @@ export function createRabbit() {
     const value = Number(candle?.c ?? candle?.close)
     return Number.isFinite(value) ? value : null
   }
-  function markEntry() {
-    if (side === 'flat') return
-    const price = priceAt(priceIndex)
-    if (entry == null && price != null) entry = price
-  }
-  let priceDebt = 0
-  let lastFrame = 0
-  const BAR_SEC = 0.28
-  function advancePrice(dt) {
-    if (!series().length) return
-    priceDebt += Math.max(0, Number(dt) || 0)
-    let guard = 0
-    let moved = false
-    while (priceDebt >= BAR_SEC && guard++ < 4) {
-      priceDebt -= BAR_SEC
-      priceIndex = (priceIndex + 1) % series().length
-      moved = true
-    }
-    if (!moved) return
-    const price = priceAt(priceIndex)
-    if (price == null || side === 'flat' || entry == null || entry === 0) return
-    const sign = side === 'buy' ? 1 : -1
-    result = sign * (price / entry - 1) * leverage * 100
-  }
   function fmtPrice(price) {
     return price == null ? '—' : price.toFixed(2)
   }
@@ -730,18 +1411,216 @@ export function createRabbit() {
     if (!Number.isFinite(value)) return '—'
     return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`
   }
-  function fallStep() {
-    return 2.6 * Math.max(0.45, leverage / 4)
+  function bandKey(band) {
+    if (band === 'slow') return 'rh.fallSlow'
+    if (band === 'steady') return 'rh.fallSteady'
+    if (band === 'fast') return 'rh.fallFast'
+    return 'rh.fallStill'
+  }
+  function placeKey(offset) {
+    if (offset < -0.2) return 'rh.left'
+    if (offset > 0.2) return 'rh.right'
+    return 'rh.center'
   }
 
-  function collect(w, h, reduced) {
+  function buildIndicators() {
+    indicators.replaceChildren()
+    indicators.dataset.players = String(players)
+    const count = players === 2 ? 2 : 1
+    for (let n = 1; n <= count; n++) {
+      const box = document.createElement('section')
+      box.className = 'nlr-rh-player'
+      box.dataset.rhPlayer = String(n)
+      const who = document.createElement('p')
+      who.className = 'nlr-rh-who'
+      who.dataset.rhWho = String(n)
+      const fall = document.createElement('p')
+      fall.className = 'nlr-rh-fall'
+      fall.dataset.rhFall = String(n)
+      const meter = document.createElement('div')
+      meter.className = 'nlr-rh-meter'
+      const bar = document.createElement('span')
+      bar.dataset.rhMeter = String(n)
+      meter.append(bar)
+      const laneName = document.createElement('p')
+      laneName.className = 'nlr-rh-fall'
+      laneName.dataset.rhLaneName = String(n)
+      const labels = document.createElement('div')
+      labels.className = 'nlr-rh-lane-labels'
+      labels.dataset.rhLane = String(n)
+      for (const key of ['sell', 'flat', 'buy']) {
+        const lab = document.createElement('span')
+        lab.dataset.lane = key
+        labels.append(lab)
+      }
+      const track = document.createElement('div')
+      track.className = 'nlr-rh-track'
+      const marker = document.createElement('span')
+      marker.className = 'nlr-rh-marker'
+      marker.dataset.rhMarker = String(n)
+      track.append(marker)
+      const decision = document.createElement('p')
+      decision.className = 'nlr-rh-decision'
+      decision.dataset.rhDecision = String(n)
+      const cue = document.createElement('p')
+      cue.className = 'nlr-rh-cue'
+      cue.dataset.rhCue = String(n)
+      const result = document.createElement('p')
+      result.className = 'nlr-rh-cue'
+      result.dataset.rhResult = String(n)
+      const risk = document.createElement('p')
+      risk.className = 'nlr-rh-risk'
+      risk.dataset.rhRisk = String(n)
+      box.append(who, fall, meter, laneName, labels, track, decision, cue, result, risk)
+      indicators.append(box)
+    }
+  }
+
+  function copyChrome() {
+    claim.textContent = t('sim.claim')
+    title.textContent = t('rh.homeTitle')
+    body.textContent = t('rh.homeBody')
+    startBtn.textContent = t('rh.jump')
+    twoBtn.textContent = t('rh.two')
+    keys.textContent = `${t('rh.jumpKey')} · ${t('rh.twoHint')}`
+    note.textContent = t('sim.claim')
+    for (const el of indicators.querySelectorAll('[data-rh-who]')) {
+      el.textContent = t(el.dataset.rhWho === '2' ? 'rh.p2' : 'rh.p1')
+    }
+    for (const el of indicators.querySelectorAll('[data-rh-risk]')) el.textContent = t('lev.risk')
+    for (const el of indicators.querySelectorAll('[data-lane]')) {
+      const key = el.dataset.lane
+      el.textContent = t(key === 'sell' ? 'btn.sell' : key === 'buy' ? 'btn.buy' : 'btn.flat')
+    }
+    root.setAttribute('aria-label', t('mode.rabbitHole.name'))
+  }
+
+  function paintIndicators(reduced) {
+    const w = root.clientWidth || 800
+    const span = players === 2 ? w / 2 : w
+    activeRiders().forEach((rider, i) => {
+      const n = String(i + 1)
+      const info = movementIndicators({ side: rider.side, leverage: rider.leverage, width: span, reduced })
+      const fall = indicators.querySelector(`[data-rh-fall="${n}"]`)
+      if (fall) fall.textContent = `${t('rh.fall')} ${info.fallRate.toFixed(1)} · ${t(bandKey(info.band))} · ×${rider.leverage}`
+      const meter = indicators.querySelector(`[data-rh-meter="${n}"]`)
+      const spanRate = fallRate(6, false)
+      if (meter) meter.style.width = `${Math.round(Math.min(1, info.fallRate / spanRate) * 100)}%`
+      const laneName = indicators.querySelector(`[data-rh-lane-name="${n}"]`)
+      if (laneName) laneName.textContent = `${t('rh.lane')} · ${t(placeKey(info.offset))}`
+      const labels = indicators.querySelector(`[data-rh-lane="${n}"]`)
+      if (labels) {
+        for (const lab of labels.querySelectorAll('[data-lane]')) {
+          lab.dataset.on = lab.dataset.lane === info.decision ? info.decision : ''
+        }
+      }
+      const marker = indicators.querySelector(`[data-rh-marker="${n}"]`)
+      if (marker) marker.style.left = `${Math.round(info.lateral * 1000) / 10}%`
+      const decision = indicators.querySelector(`[data-rh-decision="${n}"]`)
+      if (decision) {
+        decision.dataset.side = info.decision
+        decision.textContent = t(info.decision === 'buy' ? 'btn.buy' : info.decision === 'sell' ? 'btn.sell' : 'btn.flat')
+      }
+      const cue = indicators.querySelector(`[data-rh-cue="${n}"]`)
+      if (cue) cue.textContent = t(`rh.cue.${info.decision}`)
+      const result = indicators.querySelector(`[data-rh-result="${n}"]`)
+      if (result) result.textContent = `${t('hud.result')} ${fmtResult(rider.result)}`
+    })
+  }
+
+  function paintMarket() {
+    const reading = marketReading(closesOf(series()), priceIndex)
+    if (reading.band) {
+      bbLine.textContent = `${t('rh.band')} ${reading.band.lower.toFixed(2)} – ${reading.band.upper.toFixed(2)} · ${t('rh.bandRole')}`
+    } else {
+      bbLine.textContent = `${t('rh.band')} · ${t('rh.bandWait')}`
+    }
+    const rsiText = reading.rsi == null ? '—' : reading.rsi.toFixed(0)
+    let rsiLabel = `${t('rh.rsi')} ${rsiText}`
+    if (reading.rsiZone === 'overkopt') rsiLabel += ` · ${t('rh.rsiHigh')}`
+    if (reading.rsiZone === 'oversalt') rsiLabel += ` · ${t('rh.rsiLow')}`
+    rsiLine.textContent = rsiLabel
+    const hist = reading.macd.hist
+    macdLine.textContent = `${t('rh.macd')} ${hist == null ? '—' : hist.toFixed(3)}`
+    const bits = []
+    if (reading.touch === 'upper') bits.push(t('rh.touchUpper'))
+    else if (reading.touch === 'near-upper') bits.push(t('rh.nearUpper'))
+    else if (reading.touch === 'lower') bits.push(t('rh.touchLower'))
+    else if (reading.touch === 'near-lower') bits.push(t('rh.nearLower'))
+    if (marks.rsi.life > 0 && marks.rsi.key) bits.push(t(marks.rsi.key))
+    if (marks.macd.life > 0 && marks.macd.key) bits.push(t(marks.macd.key))
+    sigLine.textContent = bits.join(' · ')
+    sigLine.hidden = bits.length === 0
+  }
+
+  function baselineMarket() {
+    const reading = marketReading(closesOf(series()), priceIndex)
+    prevTouch = reading.touch
+    prevZone = reading.rsiZone
+    prevHist = reading.macd.hist
+    marks = { band: { life: 0, key: '', side: '' }, rsi: { life: 0, key: '' }, macd: { life: 0, key: '' } }
+  }
+
+  function noteBar() {
+    const reading = marketReading(closesOf(series()), priceIndex)
+    const edge = edgeSignal(prevTouch, reading.touch)
+    if (edge === 'upper' || edge === 'near-upper') {
+      marks.band = { life: MARK_HOLD, key: edge === 'upper' ? 'rh.touchUpper' : 'rh.nearUpper', side: 'buy' }
+    } else if (edge === 'lower' || edge === 'near-lower') {
+      marks.band = { life: MARK_HOLD, key: edge === 'lower' ? 'rh.touchLower' : 'rh.nearLower', side: 'sell' }
+    }
+    prevTouch = reading.touch
+    if (reading.rsiZone === 'overkopt' && prevZone !== 'overkopt') marks.rsi = { life: MARK_HOLD, key: 'rh.rsiHigh' }
+    if (reading.rsiZone === 'oversalt' && prevZone !== 'oversalt') marks.rsi = { life: MARK_HOLD, key: 'rh.rsiLow' }
+    prevZone = reading.rsiZone
+    const cross = macdCross(prevHist, reading.macd.hist)
+    if (cross === 'up') marks.macd = { life: MARK_HOLD, key: 'rh.macdUp' }
+    if (cross === 'down') marks.macd = { life: MARK_HOLD, key: 'rh.macdDown' }
+    prevHist = reading.macd.hist
+  }
+
+  function decayMarks(dt) {
+    const step = Math.max(0, Number(dt) || 0)
+    for (const key of ['band', 'rsi', 'macd']) {
+      if (marks[key].life > 0) marks[key].life = Math.max(0, marks[key].life - step)
+    }
+  }
+
+  function pollPads() {
+    const nav = globalThis.navigator
+    if (!nav || typeof nav.getGamepads !== 'function') return
+    let pads = null
+    try {
+      pads = nav.getGamepads()
+    } catch {
+      return
+    }
+    if (!pads) return
+    ;[pads[0], pads[1]].forEach((pad, i) => {
+      if (!pad || phase === 'jump' || frozen) return
+      const reading = gamepadIntent(pad)
+      if (!reading || !padLock[i].allow()) return
+      if (phase === 'home') {
+        if (i === 1 && !reading.confirm) return
+        if (reading.confirm) start(i === 1 ? 2 : 1)
+        else if (i === 0 && (reading.move === 'STEER_TOWARD_HIGH' || reading.move === 'STEER_TOWARD_LOW')) applyTo(0, reading.move)
+        return
+      }
+      if (i === 1 && players !== 2) return
+      const index = players === 2 ? i : 0
+      if (reading.confirm) applyTo(index, 'FLAT')
+      else if (reading.move) applyTo(index, reading.move)
+    })
+  }
+
+  function collect(w, h, fall, reduced) {
     const candles = series()
     const count = 14
     const items = []
     for (let i = 0; i < count; i++) {
       const candle = candles.length ? candles[i % candles.length] : null
       const kind = i % 8 === 0 ? 'sign' : candleKind(candle, i)
-      const projected = projectItem(i, count, y, w, h, reduced)
+      const projected = projectItem(i, count, fall, w, h, reduced)
       items.push({
         ...projected,
         kind,
@@ -749,43 +1628,44 @@ export function createRabbit() {
         reach: 28 + projected.scale * 18,
       })
     }
-    items.push(passingCarrot(y, w, h, reduced))
+    items.push(passingCarrot(fall, w, h, reduced))
     return items
   }
 
-  function paint() {
-    const reduced = reducedMotion()
-    const eating = eatLeft > 0
-    const sprite = rabbitSprite({ eating })
-    lastSprite = sprite
-    root.dataset.motion = reduced ? 'reduced' : 'fall'
-    root.setAttribute('aria-label', t('mode.rabbitHole.name'))
-    const price = priceAt(priceIndex)
-    hud.innerHTML = `<span><b>${t('sim.price')}</b> ${fmtPrice(price)}</span><span><b>${t('hud.result')}</b> ${fmtResult(result)}</span><span>${side === 'buy' ? t('btn.buy') : side === 'sell' ? t('btn.sell') : t('btn.flat')} · ${t('lev.risk')}</span>`
-    note.textContent = t('sim.claim')
-    const w = root.clientWidth || 800
-    const h = root.clientHeight || 600
-    const lanes = steerLanes(w, 'right')
-    const xPos = positionFor(side, lanes.buy, lanes.sell)
-    lastX = xPos
-    const rabbitY = h * 0.4
-    const items = collect(w, h, reduced)
-    const picked = applyPickups(items, { x: xPos, y: rabbitY }, hp, eaten)
-    if (picked.gained) {
-      hp = picked.hp
-      eatLeft = Math.max(eatLeft, 0.9)
-      floater = { life: 1, x: xPos + 46, y: rabbitY - 10 }
-    }
-    eaten = picked.eaten.slice(-48)
+  function currentWalls(width) {
+    const closes = closesOf(series())
+    const band = bollingerPoint(closes, priceIndex)
+    return { closes, band, walls: shaftBorder(width, band), reading: marketReading(closes, priceIndex) }
+  }
 
-    const dpr = Math.min(2, globalThis.devicePixelRatio || 1)
-    canvas.width = Math.round(w * dpr)
-    canvas.height = Math.round(h * dpr)
-    const c = canvas.getContext('2d')
-    if (!c) return
-    c.setTransform(dpr, 0, 0, dpr, 0, 0)
-    drawTunnel(c, w, h, y, spin, reduced)
-    const scale = Math.max(1.08, Math.min(1.5, w / 500))
+  function paintRider(c, rider, box, h, reduced) {
+    c.save()
+    c.beginPath()
+    c.rect(box.left, 0, box.width, h)
+    c.clip()
+    c.translate(box.left, 0)
+    const cam = reduced ? { pan: 0, roll: 0 } : rider.cam || { pan: 0, roll: 0 }
+    c.translate(box.width / 2, h * 0.4)
+    c.rotate(cam.roll || 0)
+    c.translate(-box.width / 2 + (cam.pan || 0), -h * 0.4)
+    drawTunnel(c, box.width, h, rider.y, rider.spin, reduced)
+    const view = currentWalls(box.width)
+    drawShaftBorder(c, box.width, h, view.walls, marks)
+    const info = movementIndicators({ side: rider.side, leverage: rider.leverage, width: box.width, reduced, lanes: view.walls })
+    drawLaneGuides(c, box.width, h, info)
+    const rabbitY = h * 0.4
+    const xPos = info.x
+    const items = collect(box.width, h, rider.y, reduced)
+    const picked = applyPickups(items, { x: xPos, y: rabbitY }, rider.hp, rider.eaten)
+    if (picked.gained) {
+      rider.hp = picked.hp
+      rider.eatLeft = Math.max(rider.eatLeft, 0.9)
+      rider.floater = { life: 1, x: xPos + 46, y: rabbitY - 10 }
+    }
+    rider.eaten = picked.eaten.slice(-48)
+    const scale = Math.max(0.85, Math.min(1.5, box.width / 420))
+    const sprite = rabbitSprite({ eating: rider.eatLeft > 0 })
+    if (box.player === 1) lastSprite = sprite
     const inFront = (item) => drawsInFront(item, xPos, rabbitY, scale)
     for (const item of items) {
       if (inFront(item)) continue
@@ -794,78 +1674,246 @@ export function createRabbit() {
       else drawSign(c, item.x, item.y, item.scale || 1, item.label)
     }
     drawRabbit(c, xPos, rabbitY, scale, sprite)
+    if (view.walls.hasBand) {
+      const px = priceOnShaft(view.reading.close, view.band, view.walls)
+      drawPricePip(c, px, rabbitY - 28, shaftRegion(px, view.walls))
+    }
     for (const item of items) {
       if (!inFront(item)) continue
       drawChili(c, item.x, item.y, item.scale || 1)
     }
-    drawFloater(c, floater)
-    drawHp(c, hp, w, hpRowTop(hud, root))
+    drawFloater(c, rider.floater)
+    drawHp(c, rider.hp, box.width, 58)
+    if (players === 2) {
+      c.fillStyle = '#e7b15a'
+      c.font = '700 14px "IBM Plex Sans", sans-serif'
+      c.textAlign = 'left'
+      c.textBaseline = 'top'
+      c.fillText(t(box.player === 2 ? 'rh.p2' : 'rh.p1'), 16, 36)
+    }
+    c.restore()
   }
 
-  function apply(intent) {
-    const next = steering.applyIntent({ side, leverage }, intent)
-    const was = side
-    side = next.side
-    leverage = next.leverage
-    if (side === 'flat') entry = null
-    else if (was !== side) entry = priceAt(priceIndex)
-    else markEntry()
+  function paint() {
+    const reduced = reducedMotion()
+    root.dataset.phase = phase
+    root.dataset.players = String(players)
+    root.dataset.above = phase === 'home' ? '1' : '0'
+    root.dataset.motion = phase === 'home' ? 'home' : phase === 'jump' ? 'jump' : reduced ? 'reduced' : 'fall'
+    home.hidden = phase !== 'home'
+    indicators.hidden = phase !== 'race'
+    market.hidden = phase !== 'race'
+    hud.hidden = phase !== 'race'
+    copyChrome()
+    const price = priceAt(priceIndex)
+    hud.innerHTML = `<span><b>${t('sim.price')}</b> ${fmtPrice(price)}</span><span><b>${t('hud.result')}</b> ${fmtResult(riders[0].result)}</span>`
+    if (phase === 'race') {
+      paintIndicators(reduced)
+      paintMarket()
+    }
+    const w = root.clientWidth || 800
+    const h = root.clientHeight || 600
+    const dpr = Math.min(2, globalThis.devicePixelRatio || 1)
+    canvas.width = Math.round(w * dpr)
+    canvas.height = Math.round(h * dpr)
+    const c = canvas.getContext('2d')
+    if (!c) return
+    c.setTransform(dpr, 0, 0, dpr, 0, 0)
+    if (phase === 'home' || phase === 'jump') {
+      const layout = homeLayout(w, h)
+      const glow = reduced ? 0 : (Math.sin(glowT * 2) + 1) / 2
+      drawMeadow(c, w, h, layout, riders[0].side, glow, phase === 'home')
+      if (phase === 'jump') {
+        const from = standPoint(riders[0].side, layout)
+        const pose = jumpPose(jumpProgress(jumpT, reduced), from, layout.hole)
+        const scale = Math.max(0.95, Math.min(1.35, w / 720))
+        if (pose.drop > 0.42) drawRabbit(c, pose.x, pose.y, scale * (1 - pose.drop * 0.25), rabbitSprite())
+        else drawStandingRabbit(c, pose.x, pose.y, scale)
+      }
+      return
+    }
+    const boxes = splitLayout(w, players)
+    boxes.forEach((box, i) => paintRider(c, riders[i], box, h, reduced))
+    if (players === 2) {
+      c.strokeStyle = 'rgba(244,239,230,0.75)'
+      c.lineWidth = 2
+      c.beginPath()
+      c.moveTo(w / 2, 0)
+      c.lineTo(w / 2, h)
+      c.stroke()
+    }
+  }
+
+  function applyTo(index, intent) {
+    const rider = riders[index] || riders[0]
+    const next = steering.applyIntent({ side: rider.side, leverage: rider.leverage }, intent)
+    const was = rider.side
+    rider.side = next.side
+    rider.leverage = next.leverage
+    if (rider.side === 'flat') rider.entry = null
+    else if (was !== rider.side) rider.entry = priceAt(priceIndex)
+    else if (rider.entry == null) rider.entry = priceAt(priceIndex)
     paint()
   }
 
+  function enterRace() {
+    phase = 'race'
+    const closes = closesOf(series())
+    const ready = macdSeries(closes).hist.findIndex((v) => Number.isFinite(v))
+    priceIndex = ready >= 0 ? ready : closes.length > BB_PERIOD ? BB_PERIOD - 1 : 0
+    priceDebt = 0
+    for (const rider of riders) {
+      rider.y = 0
+      rider.spin = 0
+      rider.cam = { pan: 0, roll: 0 }
+    }
+    baselineMarket()
+  }
+
+  function start(count = 1) {
+    if (!visible || phase !== 'home' || frozen) return false
+    players = count === 2 ? 2 : 1
+    buildIndicators()
+    if (reducedMotion()) enterRace()
+    else {
+      phase = advancePhase('home', 'start')
+      jumpT = 0
+    }
+    paint()
+    if (!inFrame) kick()
+    return true
+  }
+
   function onKey(e) {
-    if (!visible) return
-    const a = keyAction(e, '1p', O)
-    if (!a || !a.intent) return
+    if (!visible || frozen) return
+    if (phase === 'home' && e.code === 'Enter' && !e.repeat) {
+      const tag = (e.target?.tagName || '').toUpperCase()
+      if (tag !== 'BUTTON' && tag !== 'A' && !isTypingTarget(e.target)) {
+        e.preventDefault()
+        e.stopPropagation()
+        start(e.shiftKey ? 2 : 1)
+      }
+      return
+    }
+    const racing = phase !== 'home'
+    const a = keyAction(e, players === 2 && racing ? '2p' : '1p', O)
+    if (!a?.intent) return
     e.preventDefault()
     e.stopPropagation()
-    apply(a.intent)
+    const index = players === 2 && racing && a.player === 2 ? 1 : 0
+    applyTo(index, a.intent)
   }
   addEventListener('keydown', onKey, true)
   addEventListener('keyup', (e) => {
     if (visible && PREVENT_DEFAULT.has(e.code) && keyAction(e, '1p', O)) e.preventDefault()
   }, true)
+  root.addEventListener('click', (e) => {
+    const btn = e.target.closest?.('[data-rh-start]')
+    if (!btn) return
+    start(btn.dataset.rhStart === '2' ? 2 : 1)
+  })
   root.addEventListener('wheel', (e) => {
-    if (!visible) return
+    if (!visible || frozen) return
     const intent = wheelToIntent(e.deltaY)
     if (!intent || !lock.allow()) return
     e.preventDefault()
-    apply(intent)
+    applyTo(0, intent)
   }, { passive: false })
 
-  function tickMotion(dt) {
-    const reduced = reducedMotion()
+  function tickRider(rider, dt, reduced) {
+    const offset = rider.side === 'buy' ? 0.5 : rider.side === 'sell' ? -0.5 : 0
+    rider.cam = chaseCamera(rider.cam, offset, dt, reduced)
     if (!reduced) {
-      y += fallStep()
-      spin += dt
+      rider.y += fallRate(rider.leverage, false)
+      rider.spin += dt
     }
-    if (eatLeft > 0) eatLeft = Math.max(0, eatLeft - dt)
-    if (floater) {
-      floater.life -= dt
-      floater.y -= reduced ? 0 : 28 * dt
-      if (floater.life <= 0) floater = null
+    if (rider.eatLeft > 0) rider.eatLeft = Math.max(0, rider.eatLeft - dt)
+    if (rider.floater) {
+      rider.floater.life -= dt
+      rider.floater.y -= reduced ? 0 : 28 * dt
+      if (rider.floater.life <= 0) rider.floater = null
+    }
+  }
+
+  const BAR_SEC = 0.28
+  function advancePrice(dt) {
+    if (phase !== 'race' || !series().length) return
+    priceDebt += Math.max(0, Number(dt) || 0)
+    let guard = 0
+    let moved = false
+    while (priceDebt >= BAR_SEC && guard++ < 4) {
+      priceDebt -= BAR_SEC
+      priceIndex = (priceIndex + 1) % series().length
+      noteBar()
+      moved = true
+    }
+    if (!moved) return
+    const price = priceAt(priceIndex)
+    for (const rider of activeRiders()) {
+      if (price == null || rider.side === 'flat' || rider.entry == null || rider.entry === 0) continue
+      const sign = rider.side === 'buy' ? 1 : -1
+      rider.result = sign * (price / rider.entry - 1) * rider.leverage * 100
     }
   }
 
   function frame(now) {
     if (!visible || frozen) return
+    inFrame = true
     const stamp = typeof now === 'number' ? now : performance.now()
     const dt = lastFrame ? Math.min(0.05, (stamp - lastFrame) / 1000) : 0.016
     lastFrame = stamp
-    tickMotion(dt)
-    advancePrice(dt)
+    const reduced = reducedMotion()
+    if (phase === 'home') {
+      if (!reduced) glowT += dt
+    } else if (phase === 'jump') {
+      jumpT += dt
+      if (jumpProgress(jumpT, reduced) >= 1) enterRace()
+    } else {
+      for (const rider of activeRiders()) tickRider(rider, dt, reduced)
+      advancePrice(dt)
+      decayMarks(dt)
+      pollPads()
+    }
+    if (phase === 'home') pollPads()
     paint()
+    inFrame = false
     raf = requestAnimationFrame(frame)
   }
-  onLang(paint)
+
+  function kick() {
+    cancelAnimationFrame(raf)
+    if (!visible || frozen) return
+    lastFrame = 0
+    raf = requestAnimationFrame(frame)
+  }
+
+  function reset() {
+    phase = 'home'
+    players = 1
+    jumpT = 0
+    glowT = 0
+    priceIndex = 0
+    priceDebt = 0
+    lastFrame = 0
+    riders = [freshRider(), freshRider()]
+    buildIndicators()
+    copyChrome()
+    baselineMarket()
+  }
+
+  onLang(() => {
+    copyChrome()
+    if (visible) paint()
+  })
+  reset()
 
   return {
     show() {
       visible = true
+      reset()
       root.classList.add('on')
       paint()
-      cancelAnimationFrame(raf)
-      raf = requestAnimationFrame(frame)
+      kick()
     },
     hide() {
       visible = false
@@ -878,35 +1926,70 @@ export function createRabbit() {
     },
     resume() {
       frozen = false
-      if (visible) {
-        cancelAnimationFrame(raf)
-        raf = requestAnimationFrame(frame)
-      }
+      if (visible) kick()
     },
+    start,
     anchor: () => 'bottom',
     step(n = 1) {
       const dt = Math.max(0, Number(n) || 0)
+      const reduced = reducedMotion()
+      if (phase === 'home') {
+        if (!reduced) glowT += dt
+        paint()
+        return
+      }
+      if (phase === 'jump') {
+        jumpT += dt
+        if (jumpProgress(jumpT, reduced) >= 1) enterRace()
+        paint()
+        return
+      }
       const ticks = Math.max(1, Math.min(12, Math.round((dt || 0.016) / 0.016) || 1))
       const slice = dt > 0 ? dt / ticks : 0.016
-      for (let i = 0; i < ticks; i++) tickMotion(slice)
+      for (let i = 0; i < ticks; i++) {
+        for (const rider of activeRiders()) tickRider(rider, slice, reduced)
+      }
       advancePrice(dt)
+      decayMarks(dt)
       paint()
     },
     state() {
       const w = root.clientWidth || 800
-      const lanes = steerLanes(w, 'right')
+      const h = root.clientHeight || 600
       const reduced = reducedMotion()
+      const lead = riders[0]
+      const span = players === 2 ? w / 2 : w
+      const walls = shaftBorder(span, bollingerPoint(closesOf(series()), priceIndex))
+      const info = movementIndicators({ side: lead.side, leverage: lead.leverage, width: span, reduced, lanes: walls })
       return {
-        side,
-        leverage,
-        y,
-        hp,
-        x: positionFor(side, lanes.buy, lanes.sell),
-        ...lanes,
-        markerY: markerScreenY(y, reduced),
-        spiral: spiralAngle(spin, reduced),
+        phase,
+        players,
+        started: phase === 'race',
+        side: lead.side,
+        leverage: lead.leverage,
+        y: lead.y,
+        hp: lead.hp,
+        x: info.x,
+        buy: walls.buy,
+        sell: walls.sell,
+        flat: walls.flat,
+        border: walls,
+        region: shaftRegion(info.x, walls),
+        markerY: markerScreenY(lead.y, reduced),
+        spiral: spiralAngle(lead.spin, reduced),
         sprite: lastSprite || rabbitSprite(),
-        motion: reduced ? 'reduced' : 'fall',
+        motion: phase === 'home' ? 'home' : phase === 'jump' ? 'jump' : reduced ? 'reduced' : 'fall',
+        indicators: info,
+        home: homeLayout(w, h),
+        jump: phase === 'jump' ? jumpProgress(jumpT, reduced) : phase === 'race' ? 1 : 0,
+        above: phase === 'home',
+        riders: activeRiders().map((rider) => ({
+          side: rider.side,
+          leverage: rider.leverage,
+          y: rider.y,
+          result: rider.result,
+          indicators: movementIndicators({ side: rider.side, leverage: rider.leverage, width: span, reduced, lanes: walls }),
+        })),
       }
     },
   }
