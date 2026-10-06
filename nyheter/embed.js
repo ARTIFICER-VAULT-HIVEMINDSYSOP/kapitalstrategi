@@ -86,9 +86,13 @@
       lead.className = "ks-edition-lead";
       lead.textContent = tx(edition.lead);
 
-      var note = document.createElement("p");
-      note.className = "ks-edition-note";
-      note.textContent = tx(data.disclaimer);
+      var noteText = tx(data.disclaimer);
+      var note = null;
+      if (noteText) {
+        note = document.createElement("p");
+        note.className = "ks-edition-note";
+        note.textContent = noteText;
+      }
 
       var grid = document.createElement("div");
       grid.className = "ks-mod-grid";
@@ -121,7 +125,9 @@
         grid.append(card);
       });
 
-      block.append(brand, title, lead, note, grid);
+      block.append(brand, title, lead);
+      if (note) block.append(note);
+      block.append(grid);
       host.append(block);
     });
   }

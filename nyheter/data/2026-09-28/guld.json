@@ -18,12 +18,14 @@
         {
           "type": "p",
           "text": "Senaste DI-visning: **06:50**; öppna terminalen för livekurs."
-        },
-        {
-          "type": "p",
-          "text": "Källa: [DI råvaror 28 sep](https://www.di.se/ravaror/)"
         }
       ]
     }
-  }
+  },
+  "hiddenSources": [
+    {
+      "label": "DI råvaror 28 sep",
+      "href": "https://www.di.se/ravaror/"
+    }
+  ]
 }

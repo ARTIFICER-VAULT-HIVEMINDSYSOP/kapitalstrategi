@@ -2,9 +2,6 @@
   "brand": {
     "sv": "Kapital och Strategi"
   },
-  "disclaimer": {
-    "sv": "Utbildning och information, inte investeringsråd."
-  },
   "editions": [
     {
       "id": "2026-09-28",
@@ -38,7 +35,7 @@
             "sv": "Vad som rör olja"
           },
           "ingress": {
-            "sv": "SVT (WSJ-källor, 26 sep): Trump har avvisat Irans förslag om öppning av Hormuz inom sju dagar mot villkor (hävdad blockad av iranska hamnar, sanktioner mot iransk olja, vapenvila även i Libanon, därefter kärnsamtal)."
+            "sv": "SVT (WSJ-källor, 26 sep): USA:s president har avvisat Irans förslag om öppning av Hormuz inom sju dagar mot villkor (hävdad blockad av iranska hamnar, sanktioner mot iransk olja, vapenvila även i Libanon, därefter kärnsamtal)."
           }
         },
         {

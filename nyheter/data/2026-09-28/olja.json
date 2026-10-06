@@ -9,11 +9,11 @@
   "translations": {
     "sv": {
       "title": "Vad som rör olja",
-      "ingress": "SVT (WSJ-källor, 26 sep): Trump har avvisat Irans förslag om öppning av Hormuz inom sju dagar mot villkor (hävdad blockad av iranska hamnar, sanktioner mot iransk olja, vapenvila även i Libanon, därefter kärnsamtal).",
+      "ingress": "SVT (WSJ-källor, 26 sep): USA:s president har avvisat Irans förslag om öppning av Hormuz inom sju dagar mot villkor (hävdad blockad av iranska hamnar, sanktioner mot iransk olja, vapenvila även i Libanon, därefter kärnsamtal).",
       "blocks": [
         {
           "type": "p",
-          "text": "SVT (WSJ-källor, 26 sep): Trump har avvisat Irans förslag om öppning av Hormuz inom sju dagar mot villkor (hävdad blockad av iranska hamnar, sanktioner mot iransk olja, vapenvila även i Libanon, därefter kärnsamtal). Iran bekräftade villkoren via Araghchi i New York; DI noterade tidigare Irans krav på frysta tillgångar motsvarande nästan 120 miljarder kronor. Fredag kväll: DI/Direkt om att Hormuzsamtalen gått in i en mer detaljerad teknisk fas och att oljan föll över 3 procent. Parallellt: Frankrike lovar soldater, radar och försvarssystem till saudiska oljehamnen Yanbu efter huthiska attacker (TT/TV4); Storbritannien har lovat lufttankning till saudiskt flyg (SVT)."
+          "text": "SVT (WSJ-källor, 26 sep): USA:s president har avvisat Irans förslag om öppning av Hormuz inom sju dagar mot villkor (hävdad blockad av iranska hamnar, sanktioner mot iransk olja, vapenvila även i Libanon, därefter kärnsamtal). Iran bekräftade villkoren via utrikesministern i New York; DI noterade tidigare Irans krav på frysta tillgångar motsvarande nästan 120 miljarder kronor. Fredag kväll: DI/Direkt om att Hormuzsamtalen gått in i en mer detaljerad teknisk fas och att oljan föll över 3 procent. Parallellt: Frankrike lovar soldater, radar och försvarssystem till saudiska oljehamnen Yanbu efter huthiska attacker (TT/TV4); Storbritannien har lovat lufttankning till saudiskt flyg (SVT)."
         },
         {
           "type": "p",
@@ -22,12 +22,38 @@
         {
           "type": "p",
           "text": "**Baha.com:** saknas (ingen säker siffra hämtad till utkastet)."
-        },
-        {
-          "type": "p",
-          "text": "Källor: [SVT: Trump avvisar Irans sjudagarsplan](https://www.svt.se/nyheter/utrikes/kallor-trump-avvisar-vapenvila) · [SVT live Iran/USA](https://www.svt.se/nyheter/utrikes/senaste-nytt-om-iran-och-konflikten-med-usa-och-israel) · [DI: Irans pris för öppnat Hormuz](https://www.di.se/nyheter/irans-pris-for-ett-oppnat-hormuz-120-miljarder/) · [DI live: teknisk fas](https://www.di.se/live/hormuzsamtal-uppges-ha-gatt-in-i-teknisk-fas/) · [Al Jazeera 27 sep](https://www.aljazeera.com/news/2026/9/27/better-deal-whats-behind-trumps-rejection-of-irans-truce-offer) · [TT/TV4: Frankrike–Yanbu](https://www.tv4.se/artikel/tt-260924-saudifrankrike1-07851383/frankrike-ger-militart-stod-till-saudiarabien) · [DI råvaror 28 sep](https://www.di.se/ravaror/)"
         }
       ]
     }
-  }
+  },
+  "hiddenSources": [
+    {
+      "label": "SVT: USA:s president avvisar Irans sjudagarsplan",
+      "href": "https://www.svt.se/nyheter/utrikes/"
+    },
+    {
+      "label": "SVT live Iran/USA",
+      "href": "https://www.svt.se/nyheter/utrikes/senaste-nytt-om-iran-och-konflikten-med-usa-och-israel"
+    },
+    {
+      "label": "DI: Irans pris för öppnat Hormuz",
+      "href": "https://www.di.se/nyheter/irans-pris-for-ett-oppnat-hormuz-120-miljarder/"
+    },
+    {
+      "label": "DI live: teknisk fas",
+      "href": "https://www.di.se/live/hormuzsamtal-uppges-ha-gatt-in-i-teknisk-fas/"
+    },
+    {
+      "label": "Al Jazeera 27 sep",
+      "href": "https://www.aljazeera.com/news/2026/9/27/"
+    },
+    {
+      "label": "TT/TV4: Frankrike–Yanbu",
+      "href": "https://www.tv4.se/artikel/tt-260924-saudifrankrike1-07851383/frankrike-ger-militart-stod-till-saudiarabien"
+    },
+    {
+      "label": "DI råvaror 28 sep",
+      "href": "https://www.di.se/ravaror/"
+    }
+  ]
 }
