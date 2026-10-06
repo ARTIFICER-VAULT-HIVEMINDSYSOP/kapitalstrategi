@@ -98,8 +98,8 @@ const css = `
 .nlr-rk-bar button{border:0;background:transparent;cursor:pointer;color:${TEXT};font:600 13px ${MONO};height:32px;min-width:32px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;gap:4px}
 .nlr-rk-bar button:disabled{opacity:.4;cursor:default}
 .nlr-rk-bar .play{background:${CYAN};color:${ON_DARK};width:40px;height:40px;border-radius:4px;box-shadow:0 0 14px rgba(46,230,255,.5)}
-.nlr-rk-ref{padding:0 8px;letter-spacing:.04em;color:#ffb15a;border:1px solid rgba(255,177,90,.8);white-space:nowrap}
-.nlr-rk-ref.on{background:#ffb15a;color:${ON_DARK}}
+.nlr-rk-bar button.nlr-rk-ref{padding:0 8px;letter-spacing:.04em;color:#ffb15a;border:1px solid rgba(255,177,90,.85);background:transparent;white-space:nowrap}
+.nlr-rk-bar button.nlr-rk-ref.on{background:#ffb15a;color:${ON_DARK}}
 .nlr-rk-2p .nlr-rk-ref{display:none}
 .nlr-rk-lev{display:flex;align-items:center;gap:4px;background:rgba(46,230,255,.07);border:1px solid rgba(46,230,255,.2);border-radius:3px;padding:2px 6px}
 .nlr-rk-lev span{display:flex;flex-direction:column;align-items:center;min-width:34px;line-height:1.1}
