@@ -385,6 +385,14 @@ const sv = {
   'tra.raceTitle': 'Loppet',
   'tra.raceNote': 'Raketen flyger från vänster till höger. Linjen är simulerad. Det kan gå bra, och det kan gå dåligt.',
   'tra.canvas': 'Raket som flyger från vänster till höger längs en simulerad linje',
+  'face.aria': '{who}. {look}',
+  'face.neutral': 'Neutral',
+  'face.focused': 'Fokuserad',
+  'face.happy': 'Glad',
+  'face.cheer': 'Jubel',
+  'face.worried': 'Orolig',
+  'face.calm': 'Kontrollerad',
+  'face.surprised': 'Förvånad',
 }
 
 const en = {
@@ -764,6 +772,14 @@ const en = {
   'tra.raceTitle': 'The run',
   'tra.raceNote': 'The rocket flies from left to right. The line is simulated. It can go well, and it can go badly.',
   'tra.canvas': 'Rocket flying from left to right along a simulated line',
+  'face.aria': '{who}. {look}',
+  'face.neutral': 'Neutral',
+  'face.focused': 'Focused',
+  'face.happy': 'Glad',
+  'face.cheer': 'Cheering',
+  'face.worried': 'Worried',
+  'face.calm': 'Steady',
+  'face.surprised': 'Surprised',
 }
 
 const uk = {
@@ -1143,6 +1159,14 @@ const uk = {
   'tra.raceTitle': 'Заїзд',
   'tra.raceNote': 'Ракета летить зліва направо. Лінія симульована. Може піти добре, і може піти погано.',
   'tra.canvas': 'Ракета, що летить зліва направо вздовж симульованої лінії',
+  'face.aria': '{who}. {look}',
+  'face.neutral': 'Нейтрально',
+  'face.focused': 'Зосереджено',
+  'face.happy': 'Радісно',
+  'face.cheer': 'Радість',
+  'face.worried': 'Неспокійно',
+  'face.calm': 'Спокійно',
+  'face.surprised': 'Здивовано',
 }
 
 export const STRINGS = { sv, en, uk }
