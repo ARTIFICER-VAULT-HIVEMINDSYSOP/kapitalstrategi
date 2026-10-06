@@ -17,74 +17,84 @@ import { bindStepGestures } from './snapp.js'
 import { positionFor } from './spar.js'
 import { chapterHtml, gradeAnswer, gradeLabel } from '../../../school/hansan-riskskola/text.js'
 
+const TEXT = '#e8eef7'
+const MUTED = '#9aa8bc'
+const GREEN = '#5cc29a'
+const GREEN_D = '#5cc29a'
+const RED = '#e07a6a'
+const AMBER = '#c4a35a'
+const INK = '#1a1405'
 const PAPER = '#f3ede2'
-const INK = '#1c1915'
-const INK2 = '#4a453d'
-const MUTED = '#8a8478'
-const GREEN = '#76b900'
-const GREEN_D = '#4d7a00'
-const RED = '#9a3b2a'
-const AMBER = '#e8a33a'
 const PTS_PER_SEC = 3
+const FONT = 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif'
 
 const css = `
-.nlr-ak{position:fixed;inset:0;z-index:50;background:${PAPER};display:none;overflow:auto;font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:${INK}}
+.nlr-ak{position:fixed;inset:0;z-index:50;display:none;overflow:auto;color:#e8eef7;line-height:1.5;font-size:16px;font-family:${FONT};background:radial-gradient(ellipse at 50% -20%,rgba(155,107,255,.28),transparent 55%),radial-gradient(circle at 80% 40%,rgba(155,107,255,.06),transparent 42%),#0a1628;background-attachment:fixed}
 .nlr-ak.on{display:block}
 .nlr-ak-in{max-width:1180px;margin:0 auto;padding:66px 16px 28px;display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px}
-.nlr-ak-card{border-radius:22px;padding:14px 16px;box-sizing:border-box}
-.nlr-ak small,.nlr-ak .kick{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:${MUTED};font-weight:600}
-.nlr-ak h1{margin:2px 0 4px;font:600 30px/1.05 Fraunces,Georgia,serif}
-.nlr-ak h2{margin:4px 0 6px;font:600 24px/1.1 Fraunces,Georgia,serif}
-.nlr-ak h3{margin:0;font:600 16px "IBM Plex Sans",sans-serif}
-.nlr-ak p{margin:6px 0;font-size:14px;line-height:1.5;color:${INK2}}
-.nlr-ak .muted{color:${MUTED};font-size:12px;line-height:1.45}
+.nlr-ak-card{border-radius:16px;padding:14px 16px;box-sizing:border-box;background:linear-gradient(160deg,rgba(155,107,255,.16),rgba(60,40,120,.10) 45%,rgba(14,20,44,.86)) !important;border:1px solid rgba(155,107,255,.55) !important;box-shadow:0 0 18px rgba(140,90,255,.22),inset 0 0 22px rgba(155,107,255,.10) !important;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.nlr-ak small,.nlr-ak .kick{font:600 .74rem ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:#c4a35a}
+.nlr-ak h1,.nlr-ak h2,.nlr-ak h3,.nlr-ak h4{line-height:1.2;font-family:${FONT}}
+.nlr-ak h1{margin:.2rem 0 .6rem;font-weight:700;font-size:clamp(1.5rem,3.4vw,2.2rem);color:#c4a35a}
+.nlr-ak h2{margin:.2rem 0 .5rem;font-weight:700;font-size:1.3rem;color:#c4a35a}
+.nlr-ak h3{margin:.1rem 0 .4rem;font-weight:700;font-size:1.02rem;color:#c9b2ff;text-shadow:0 0 12px rgba(155,107,255,.5)}
+.nlr-ak p{margin:.35rem 0 .7rem;font-size:16px;line-height:1.5;color:#e8eef7}
+.nlr-ak .muted{color:#9aa8bc;font-size:.86rem;line-height:1.45}
+.nlr-ak a{color:#c9b2ff}
 .nlr-ak aside{display:flex;flex-direction:column;gap:10px}
 .nlr-ak main{display:flex;flex-direction:column;gap:12px;min-width:0}
-.nlr-ak-xp .row{display:flex;justify-content:space-between;font-size:13px}
-.nlr-ak-bar{height:6px;border-radius:3px;background:rgba(28,25,21,.08);overflow:hidden;margin:6px 0}
-.nlr-ak-bar i{display:block;height:100%;background:${GREEN}}
+.nlr-ak-xp .row{display:flex;justify-content:space-between;font-size:13px;color:#e8eef7}
+.nlr-ak-bar{height:6px;border-radius:3px;background:rgba(155,107,255,.18);overflow:hidden;margin:6px 0}
+.nlr-ak-bar i{display:block;height:100%;background:#7fc6e6}
 .nlr-ak-lessons{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-.nlr-ak-lesson{width:100%;display:flex;gap:10px;align-items:center;text-align:left;border:1px solid rgba(28,25,21,.1);background:rgba(246,242,234,.9);border-radius:16px;padding:10px 12px;cursor:pointer;font:500 14px "IBM Plex Sans",sans-serif;color:${INK}}
+.nlr-ak-lesson{width:100%;display:flex;gap:10px;align-items:center;text-align:left;border:1px solid rgba(190,160,255,.45);background:rgba(155,107,255,.10);border-radius:16px;padding:10px 12px;cursor:pointer;font:500 14px ${FONT};color:#e8eef7;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .nlr-ak-lesson small{display:block}
-.nlr-ak-lesson.on{border-color:${INK};box-shadow:inset 0 0 0 1px ${INK}}
+.nlr-ak-lesson.on{border-color:rgba(155,107,255,.55);box-shadow:0 0 14px rgba(155,107,255,.45)}
 .nlr-ak-lesson:disabled{opacity:.55;cursor:default}
-.nlr-ak-dot{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:600 12px "IBM Plex Sans",sans-serif;background:rgba(28,25,21,.07)}
-.nlr-ak-dot.done{background:${GREEN};color:${INK}}
-.nlr-ak-dot.open{background:${INK};color:${PAPER}}
-.nlr-ak-btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:14px;background:${INK};color:${PAPER};font:600 14px "IBM Plex Sans",sans-serif;padding:10px 16px;cursor:pointer}
-.nlr-ak-btn.ghost{background:rgba(246,242,234,.95);color:${INK};border:1px solid rgba(28,25,21,.14)}
+.nlr-ak-dot{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:600 12px ${FONT};background:rgba(155,107,255,.18);color:#e8eef7}
+.nlr-ak-dot.done{background:#5cc29a;color:#1a1405}
+.nlr-ak-dot.open{background:#7a4ee0;color:#fff}
+.nlr-ak-btn{display:inline-flex;align-items:center;gap:8px;border:0;background:#c4a35a;color:#1a1405;font-weight:700;font-size:.88rem;font-family:${FONT};border-radius:9px;padding:.42rem .8rem;cursor:pointer}
+.nlr-ak-btn:hover,.nlr-ak-btn:focus-visible{background:#e6c97f}
+.nlr-ak-btn.ghost{background:transparent;color:#e8eef7;border:1px solid rgba(190,160,255,.55);border-radius:8px}
+.nlr-ak-btn.ghost:hover,.nlr-ak-btn.ghost:focus-visible{background:transparent;border-color:#c9b2ff;color:#c9b2ff}
 .nlr-ak-btn:disabled{opacity:.45;cursor:default}
-.nlr-ak-chip{border:1px solid rgba(28,25,21,.12);background:rgba(246,242,234,.95);border-radius:999px;padding:6px 12px;font:500 13px "IBM Plex Sans",sans-serif;color:${INK};cursor:pointer;display:inline-flex;gap:6px;align-items:center}
-.nlr-ak-chip.on{background:${INK};color:${PAPER};border-color:${INK}}
-.nlr-ak-chip.on-green{background:${GREEN};border-color:${GREEN_D};color:${INK}}
-.nlr-ak-chip.on-red{background:${RED};border-color:${RED};color:${PAPER}}
+.nlr-ak-chip{border:1px solid rgba(190,160,255,.45);background:rgba(155,107,255,.10);border-radius:999px;padding:.3rem .75rem;font:500 .84rem ${FONT};color:#c9b2ff;cursor:pointer;display:inline-flex;gap:6px;align-items:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.nlr-ak-chip:hover,.nlr-ak-chip:focus-visible{border-color:#c9b2ff;box-shadow:0 0 14px rgba(155,107,255,.45)}
+.nlr-ak-chip.on{background:rgba(155,107,255,.35);color:#fff;border-color:#c9b2ff}
+.nlr-ak-chip.on-green{background:#5cc29a;border-color:#5cc29a;color:#1a1405}
+.nlr-ak-chip.on-red{background:#e07a6a;border-color:#e07a6a;color:#1a1405}
 .nlr-ak-chip:disabled{opacity:.45;cursor:default}
-.nlr-ak kbd{font:600 10px/1 "IBM Plex Sans",sans-serif;padding:2px 5px;border-radius:5px;border:1px solid currentColor;opacity:.55;white-space:nowrap}
-.nlr-ak-chart canvas{display:block;width:100%;height:360px}
-.nlr-ak-chart .head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;color:${MUTED};margin-bottom:6px}
-.nlr-ak-chart .head b{color:${INK};font-weight:600}
+.nlr-ak kbd{font:600 10px/1 ui-monospace,Menlo,Consolas,monospace;padding:2px 5px;border-radius:5px;border:1px solid rgba(190,160,255,.45);color:#c9b2ff;white-space:nowrap}
+.nlr-ak button:focus-visible{outline:2px solid #e6c97f;outline-offset:2px}
+.nlr-ak-chart canvas{display:block;width:100%;height:360px;background:transparent}
+.nlr-ak-chart .head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.86rem;color:#9aa8bc;margin-bottom:6px}
+.nlr-ak-chart .head b{color:#e8eef7;font-weight:600}
 .nlr-ak-transport{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px}
-.nlr-ak-task .top{display:flex;justify-content:space-between;align-items:center}
-.nlr-ak-badge{font:600 11px "IBM Plex Sans",sans-serif;padding:3px 9px;border-radius:999px;background:rgba(28,25,21,.07)}
-.nlr-ak-badge.done{background:${GREEN}}
+.nlr-ak-task .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.nlr-ak-badge{font:600 11px ${FONT};padding:3px 9px;border-radius:999px;background:rgba(155,107,255,.18);color:#e8eef7}
+.nlr-ak-badge.done{background:#5cc29a;color:#1a1405}
 .nlr-ak-row{display:flex;flex-direction:column;gap:10px;margin-top:8px}
 .nlr-ak-choice{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.nlr-ak-choice>span{min-width:130px;font-size:12px;color:${MUTED};font-weight:600}
-.nlr-ak-facts{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:${MUTED}}
-.nlr-ak-facts b{color:${INK};font-weight:600}
-.nlr-ak-note{margin-top:10px;padding:10px 12px;border-radius:14px;background:rgba(118,185,0,.1);font-size:14px;color:${INK}}
-.nlr-ak-quiz{display:flex;flex-direction:column;gap:6px}
-.nlr-ak-quiz button{text-align:left;border:1px solid rgba(28,25,21,.12);background:rgba(246,242,234,.95);border-radius:14px;padding:10px 12px;font:14px/1.4 "IBM Plex Sans",sans-serif;color:${INK};cursor:pointer}
+.nlr-ak-choice>span{min-width:130px;font-size:.86rem;color:#9aa8bc;font-weight:600}
+.nlr-ak-facts{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:#9aa8bc}
+.nlr-ak-facts b{color:#e8eef7;font-weight:600}
+.nlr-ak-note{margin-top:10px;padding:10px 12px;border-radius:14px;background:rgba(92,194,154,.12);border:1px solid rgba(92,194,154,.45);font-size:14px;color:#e8eef7}
+.nlr-ak-quiz{display:flex;flex-direction:column;gap:.35rem}
+.nlr-ak-quiz button,.nlr-ak fieldset button{text-align:left;background:#0d1a2e;border:1px solid #2a3f5f;color:#e8eef7;border-radius:9px;padding:.5rem .7rem;cursor:pointer;font-size:.92rem;font-family:${FONT};width:100%}
+.nlr-ak-quiz button:hover:not([disabled]),.nlr-ak fieldset button:hover:not([disabled]){border-color:#c4a35a}
+.nlr-ak-quiz button[aria-pressed="true"]{border-color:#9b6bff;box-shadow:0 0 14px rgba(155,107,255,.45)}
 .nlr-ak-quizbox{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-.nlr-ak-quizbox h3{font:600 15px "IBM Plex Sans",sans-serif}
-.nlr-ak-qset{margin:0;padding:8px 0 0;border:0;border-top:1px solid rgba(28,25,21,.08)}
-.nlr-ak-qset legend{font:600 14px/1.35 "IBM Plex Sans",sans-serif;padding:0 0 6px}
-.nlr-ak-quiz button[data-quiz-hit="ok"]{border-color:${GREEN_D};background:rgba(118,185,0,.18)}
-.nlr-ak-quiz button[data-quiz-hit="no"]{border-color:${RED}}
+.nlr-ak-qset,.nlr-ak fieldset{margin:0;padding:8px 0 0;border:0;border-top:1px solid #1e2d45}
+.nlr-ak-qset legend,.nlr-ak fieldset legend{font:600 .92rem/1.35 ${FONT};color:#e8eef7;padding:0 0 6px}
+.nlr-ak-quiz button[data-quiz-hit="ok"]{border-color:#5cc29a;background:rgba(92,194,154,.12)}
+.nlr-ak-quiz button[data-quiz-hit="no"]{border-color:#e07a6a;background:rgba(224,122,106,.12)}
+.nlr-ak [data-quiz-result="ok"]{color:#5cc29a}
+.nlr-ak [data-quiz-result="no"]{color:#e07a6a}
 .nlr-ak-hero-slot{display:flex}
-.nlr-ak-hero{--frame:168px;width:168px;height:320px;padding:0;border:0;background:#000;border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px rgba(180,120,255,.28);display:grid;place-items:center;cursor:pointer;justify-self:start;position:relative}
-.nlr-ak-hero:focus-visible{outline:3px solid #22d3ee;outline-offset:3px}
-.nlr-ak-hero-still{width:100%;height:100%;object-fit:contain;object-position:center;display:block;pointer-events:none;background:#000}
+.nlr-ak-hero{--frame:168px;width:168px;height:320px;padding:0;border:1px solid rgba(155,107,255,.55);background:linear-gradient(160deg,rgba(155,107,255,.16),rgba(60,40,120,.10) 45%,rgba(14,20,44,.86));border-radius:16px;overflow:hidden;box-shadow:0 0 18px rgba(140,90,255,.22),inset 0 0 22px rgba(155,107,255,.10);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:grid;place-items:center;cursor:pointer;justify-self:start;position:relative}
+.nlr-ak-hero:focus-visible{outline:2px solid #7fc6e6;outline-offset:3px}
+.nlr-ak-hero-still{width:100%;height:100%;object-fit:contain;object-position:center;display:block;pointer-events:none;background:transparent}
 .nlr-ak-hero-sprite{position:absolute;left:50%;top:50%;width:var(--frame);height:var(--frame);transform:translate(-50%,-50%);background-repeat:no-repeat;background-position:0 50%;opacity:0;pointer-events:none}
 .nlr-ak-hero.is-attack .nlr-ak-hero-still{opacity:0}
 .nlr-ak-hero.is-attack .nlr-ak-hero-sprite{opacity:1;background-size:calc(var(--frame) * 8) var(--frame);animation:academy-robot-attack .9s steps(8) 1}
@@ -95,33 +105,41 @@ const css = `
 @media (prefers-reduced-motion:reduce){
   .nlr-ak-hero.is-attack .nlr-ak-hero-sprite{animation:none;opacity:0;background-image:none}
   .nlr-ak-hero.is-attack .nlr-ak-hero-still{opacity:1}
+  .nlr-ak-btn,.nlr-ak-toast.on,.nlr-ak-toast svg,.nlr-ak-toast .shine{animation:none;transition:none}
 }
 .nlr-ak-dim{opacity:.6}
 .nlr-ak-aw{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin-top:8px}
-.nlr-ak-aw figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;font-size:10px;line-height:1.2;color:${INK2}}
+.nlr-ak-aw figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;font-size:10px;line-height:1.2;color:#9aa8bc}
 .nlr-ak-aw figure.locked{opacity:.35;filter:grayscale(1)}
 .nlr-ak-aw svg{width:40px;height:40px}
-.nlr-ak-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:70;display:none;align-items:center;gap:12px;padding:12px 16px;border-radius:20px;background:rgba(246,242,234,.97);border:1px solid rgba(28,25,21,.14);box-shadow:0 10px 30px rgba(28,25,21,.18);width:max-content;max-width:min(460px,calc(100vw - 24px));box-sizing:border-box;font-family:"IBM Plex Sans",sans-serif;color:${INK}}
+.nlr-ak-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:70;display:none;align-items:center;gap:12px;padding:12px 16px;border-radius:16px;background:linear-gradient(180deg,rgba(26,18,52,.92),rgba(15,22,44,.96));border:1px solid rgba(155,107,255,.55);box-shadow:0 0 40px rgba(130,80,255,.25);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);width:max-content;max-width:min(460px,calc(100vw - 24px));box-sizing:border-box;font-family:${FONT};color:#e8eef7}
 .nlr-ak-toast.on{display:flex;animation:nlrAkIn .35s ease-out}
 .nlr-ak-toast svg{width:56px;height:56px;flex:none;animation:nlrAkPop .7s cubic-bezier(.2,1.6,.4,1)}
 .nlr-ak-toast .shine{animation:nlrAkShine 1.2s ease-out .2s both}
-.nlr-ak-toast b{display:block;font-size:15px}
+.nlr-ak-toast b{display:block;font-size:15px;color:#c4a35a}
 .nlr-ak-toast small,.nlr-ak-toast span{display:block}
-.nlr-ak-toast span{font-size:13px;color:${INK2}}
+.nlr-ak-toast span{font-size:13px;color:#9aa8bc}
 @keyframes nlrAkIn{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
 @keyframes nlrAkPop{0%{transform:scale(.2) rotate(-25deg)}60%{transform:scale(1.18) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
 @keyframes nlrAkShine{from{transform:translateX(-40px)}to{transform:translateX(60px)}}
-@media (prefers-reduced-motion:reduce){.nlr-ak-toast.on,.nlr-ak-toast svg,.nlr-ak-toast .shine{animation:none}}
-.nlr-ak-claim{display:none;margin:0;padding:10px 12px;border-radius:0;background:rgba(118,185,0,.12);color:${INK};font-size:13px;line-height:1.45}
-@media (max-width:820px){.nlr-ak-in{grid-template-columns:minmax(0,1fr);padding-top:60px}.nlr-ak aside{order:2}.nlr-ak-claim{display:block}.nlr-ak-chart canvas{height:300px}.nlr-ak h1{font-size:24px}.nlr-ak-choice>span{min-width:100%}.nlr-ak kbd{display:none}}
+.nlr-ak,.nlr-ak *{box-sizing:border-box}
+.nlr-ak .bridge a{display:inline-block;max-width:100%}
+.nlr-ak-claim{display:none;margin:0;padding:10px 12px;border-radius:0;background:rgba(92,194,154,.12);border:1px solid rgba(92,194,154,.45);color:#e8eef7;font-size:13px;line-height:1.45}
+html[data-nlr-view="akademin"] .tr-chrome{background:linear-gradient(180deg,rgba(26,18,52,.92),rgba(15,22,44,.96)) !important;border-bottom:1px solid rgba(155,107,255,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+html[data-nlr-view="akademin"] .nlr-toggle button{color:#e8eef7 !important;font-family:${FONT} !important}
+html[data-nlr-view="akademin"] .nlr-toggle button[aria-pressed="true"]{background:#c4a35a !important;color:#1a1405 !important}
+html[data-nlr-view="akademin"] .tr-skal a,html[data-nlr-view="akademin"] .tr-skal .lang-switcher-btn{color:#e8eef7 !important}
+html[data-nlr-view="akademin"] .tr-skal .lang-switcher-btn.active{background:#c4a35a !important;color:#1a1405 !important}
+html[data-nlr-view="akademin"] .tr-sim{color:#e8eef7 !important;background:rgba(15,22,44,.96) !important;border-color:rgba(155,107,255,.55) !important}
+@media (max-width:820px){.nlr-ak-in{grid-template-columns:minmax(0,1fr);padding-top:60px}.nlr-ak aside{order:2}.nlr-ak-claim{display:block}.nlr-ak-chart canvas{height:300px}.nlr-ak h1{font-size:1.5rem}.nlr-ak-choice>span{min-width:100%}.nlr-ak kbd{display:none}}
 @media (max-height:520px){.nlr-ak-claim{display:block}}
 @media (max-width:480px){.nlr-ak-chart canvas{height:210px}}
 `
 
 function medalSvg(a, uid) {
-  const col = a.kind === 'medalj' ? AMBER : a.lesson % 2 ? GREEN : '#3d4a5c'
+  const col = a.kind === 'medalj' ? AMBER : a.lesson % 2 ? GREEN : '#7a4ee0'
   const inner = a.kind === 'medalj'
-    ? `<path d="M22 6 L28 22 L20 22 Z" fill="${RED}"/><path d="M42 6 L36 22 L44 22 Z" fill="${GREEN}"/><circle cx="32" cy="38" r="17" fill="${col}" stroke="${INK}" stroke-width="2"/><circle cx="32" cy="38" r="11" fill="none" stroke="${PAPER}" stroke-width="1.6"/><text x="32" y="43" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-weight="600" font-size="14" fill="${INK}">${a.lesson}</text>`
+    ? `<path d="M22 6 L28 22 L20 22 Z" fill="${RED}"/><path d="M42 6 L36 22 L44 22 Z" fill="${GREEN}"/><circle cx="32" cy="38" r="17" fill="${col}" stroke="${INK}" stroke-width="2"/><circle cx="32" cy="38" r="11" fill="none" stroke="${PAPER}" stroke-width="1.6"/><text x="32" y="43" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="600" font-size="14" fill="${INK}">${a.lesson}</text>`
     : `<path d="M32 6 L54 18 L54 42 L32 58 L10 42 L10 18 Z" fill="${col}" stroke="${INK}" stroke-width="2"/><path d="M22 32 l7 7 l13 -14" fill="none" stroke="${a.lesson % 2 ? INK : PAPER}" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>`
   return `<svg viewBox="0 0 64 64" aria-hidden="true"><defs><clipPath id="cl${uid}"><rect width="64" height="64" rx="32"/></clipPath></defs>${inner}<g clip-path="url(#cl${uid})"><rect class="shine" x="-10" y="0" width="10" height="64" fill="rgba(255,255,255,.55)" transform="skewX(-20)"/></g></svg>`
 }
@@ -605,7 +623,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     const x = (i) => ((i - i0) / Math.max(1, n - 1)) * (W - padR - 8) + 4
     const y = (v) => 6 + (1 - (v - lo) / (hi - lo)) * (ch - 12)
     // rutnät
-    c.strokeStyle = 'rgba(28,25,21,0.06)'
+    c.strokeStyle = 'rgba(232,238,247,0.10)'
     c.lineWidth = 1
     for (let gy = 0; gy < ch; gy += 48) {
       c.beginPath()
@@ -615,7 +633,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     }
     // squeeze-zoner (lektion 3)
     if (lesson === 3) {
-      c.fillStyle = 'rgba(232,163,58,0.16)'
+      c.fillStyle = 'rgba(196,163,90,0.16)'
       for (let i = i0; i <= i1; i++) if (A.bandwidthPct(pts[i]) <= sqThr) c.fillRect(x(i) - (W - padR) / n / 2, 0, (W - padR) / n + 0.5, ch)
     }
     // band + räls i NVDA Line-stil
@@ -627,39 +645,39 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     for (let i = i0; i <= i1; i++) (i === i0 ? c.moveTo : c.lineTo).call(c, x(i), y(pts[i].upper))
     for (let i = i1; i >= i0; i--) c.lineTo(x(i), y(pts[i].mid))
     c.closePath()
-    c.fillStyle = 'rgba(118,185,0,0.10)'
+    c.fillStyle = 'rgba(92,194,154,0.12)'
     c.fill()
     c.beginPath()
     for (let i = i0; i <= i1; i++) (i === i0 ? c.moveTo : c.lineTo).call(c, x(i), y(pts[i].mid))
     for (let i = i1; i >= i0; i--) c.lineTo(x(i), y(pts[i].lower))
     c.closePath()
-    c.fillStyle = 'rgba(154,59,42,0.08)'
+    c.fillStyle = 'rgba(224,122,106,0.10)'
     c.fill()
     const hl = lesson === 3
     c.lineWidth = hl ? 3 : 2.2
     c.strokeStyle = GREEN
     path('upper')
     c.stroke()
-    c.strokeStyle = '#b24a36'
+    c.strokeStyle = RED
     path('lower')
     c.stroke()
     c.setLineDash([5, 6])
     c.lineWidth = 1.2
-    c.strokeStyle = 'rgba(74,69,61,0.55)'
+    c.strokeStyle = MUTED
     path('mid')
     c.stroke()
     c.setLineDash([])
     c.lineWidth = 1.8
-    c.strokeStyle = INK
+    c.strokeStyle = TEXT
     path('price')
     c.stroke()
     const pt = pts[i1]
-    c.fillStyle = INK
+    c.fillStyle = TEXT
     c.beginPath()
     c.arc(x(i1), y(pt.price), 3.5, 0, Math.PI * 2)
     c.fill()
     const railFlat = positionFor('flat', y(pt.upper), y(pt.lower))
-    c.strokeStyle = 'rgba(28,25,21,0.35)'
+    c.strokeStyle = 'rgba(232,238,247,0.35)'
     c.setLineDash([2, 3])
     c.beginPath()
     c.moveTo(x(i1) - 8, railFlat)
@@ -667,10 +685,10 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     c.stroke()
     c.setLineDash([])
     const tag = (txt, v, col) => {
-      c.font = '600 11px "IBM Plex Sans", sans-serif'
+      c.font = '600 11px system-ui, sans-serif'
       const tw = c.measureText(txt).width + 12
       const yy = Math.max(10, Math.min(ch - 10, y(v)))
-      c.fillStyle = 'rgba(246,242,234,0.96)'
+      c.fillStyle = 'rgba(14,20,44,0.92)'
       c.strokeStyle = col
       c.beginPath()
       c.roundRect(W - tw - 2, yy - 9, tw, 18, 9)
@@ -680,7 +698,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
       c.textBaseline = 'middle'
       c.fillText(txt, W - tw + 4, yy + 0.5)
     }
-    tag(fmtP(pt.price), pt.price, INK)
+    tag(fmtP(pt.price), pt.price, TEXT)
     const hline = (v, col, label) => {
       if (!Number.isFinite(v)) return
       c.setLineDash([6, 5])
@@ -711,7 +729,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     // RSI-panel (70/30)
     const ry = ch + gap
     const yr = (v) => ry + 4 + (1 - v / 100) * (rsiH - 8)
-    c.fillStyle = lesson === 4 ? 'rgba(232,163,58,0.10)' : 'rgba(28,25,21,0.03)'
+    c.fillStyle = lesson === 4 ? 'rgba(155,107,255,0.10)' : 'rgba(155,107,255,0.06)'
     c.fillRect(0, ry, W - padR + 4, rsiH)
     c.setLineDash([3, 4])
     for (const [lv, col] of [[70, RED], [30, GREEN_D]]) {
@@ -721,11 +739,11 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
       c.lineTo(W - padR, yr(lv))
       c.stroke()
       c.fillStyle = col
-      c.font = '600 9px "IBM Plex Sans", sans-serif'
+      c.font = '600 9px system-ui, sans-serif'
       c.fillText(String(lv), W - padR + 8, yr(lv))
     }
     c.setLineDash([])
-    c.strokeStyle = INK
+    c.strokeStyle = TEXT
     c.lineWidth = 1.4
     c.beginPath()
     let pen = false
@@ -740,7 +758,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     }
     c.stroke()
     c.fillStyle = MUTED
-    c.font = '600 10px "IBM Plex Sans", sans-serif'
+    c.font = '600 10px system-ui, sans-serif'
     c.fillText('RSI 14', 6, ry + 10) // symbol, same in every language
     if (lesson === 4 || lesson === 3) {
       c.save()
