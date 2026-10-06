@@ -9,6 +9,7 @@ import { simTid } from './simtid.js'
 import { t, onLang } from './i18n.js'
 import { stepSide, readSide } from './styrmotor.js'
 import { bindStepGestures } from './snapp.js'
+import { mountPilot, trainTick } from './face-hud.js'
 
 const css = `
 .nlr-duo{position:fixed;inset:0;z-index:45;display:none;background:#f3ede2;font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:#1c1915}
@@ -172,6 +173,7 @@ export function createDuo({ engine: main, skinFrom }) {
     halves = [makeHalf(0), makeHalf(1)]
     layout()
     halves.forEach((hv, i) => {
+      hv.pilot = mountPilot(hv.el, { theme: 'paper', player: i + 1 })
       hv.eng = newEngine(hv.canvas)
       bindStepGestures(hv.canvas, {
         enabled: () => visible,
@@ -192,6 +194,7 @@ export function createDuo({ engine: main, skinFrom }) {
 
   function destroy() {
     for (const hv of halves) {
+      hv.pilot?.destroy()
       hv.eng?.destroy()
       hv.el.remove()
     }
@@ -232,6 +235,9 @@ export function createDuo({ engine: main, skinFrom }) {
     fb.setAttribute('aria-pressed', String(!!h.flat))
     fb.title = h.flat ? t('flat.already') : t('flat.close')
     q('flatIcon').innerHTML = h.flat ? ICON_CHECK : ICON_FLAT
+    const tick = trainTick(hv.eng)
+    const reason = hv.book?.exit?.reason
+    hv.pilot?.sync({ ...tick, hit: reason === 'stop' ? 'sl' : reason === 'target' ? 'tp' : null }, performance.now())
   }
 
   /** player: 1/2, 0 = båda (paus/omstart). */

@@ -25,6 +25,8 @@ import { t, onLang } from './i18n.js'
 import { stepSide, readSide } from './styrmotor.js'
 import { positionFor } from './spar.js'
 import { mountEntrySnap, bindStepGestures } from './snapp.js'
+import { sampleIndex } from './kurs.js'
+import { mountPilot } from './face-hud.js'
 
 // HUD-palett (kontrast mot BG_PANEL kontrolleras i test/raket-stil.test.mjs – WCAG AA)
 const BG_TOP = '#0d1238' // djupt marinblå
@@ -838,11 +840,16 @@ export function createRaket({ engine }) {
     clock.playing = false
     clock.started = false
     clock.ended = false
-    for (const pl of players) pl.dom.el.remove()
+    for (const pl of players) {
+      pl.pilot?.destroy()
+      pl.dom.el.remove()
+    }
     const n = mode === '2p' ? 2 : 1
     players = []
     for (let i = 0; i < n; i++) {
+      const dom = buildPlayerDom(i)
       players.push({
+        pilot: mountPilot(dom.el, { theme: 'hud', player: i + 1 }),
         st: newPlayerState(n === 1 ? engine.leverage || 1 : 1),
         rocks: [],
         shards: [],
@@ -865,7 +872,7 @@ export function createRaket({ engine }) {
         log: [],
         refX: null,
         fx: effectLevels(null),
-        dom: buildPlayerDom(i),
+        dom,
       })
     }
     root.classList.toggle('nlr-rk-2p', mode === '2p')
@@ -965,12 +972,26 @@ export function createRaket({ engine }) {
     endCard.classList.add('on')
   }
 
-  const priceAt = (p, f = 'price') => {
-    if (!pts.length) return NaN
-    const i = Math.max(0, Math.min(pts.length - 1, Math.floor(p)))
-    const j = Math.min(pts.length - 1, i + 1)
-    const t = Math.min(1, Math.max(0, p - i))
-    return pts[i][f] + (pts[j][f] - pts[i][f]) * t
+  const priceAt = (p, f = 'price') => sampleIndex(pts, p, f)
+
+  function syncPilots() {
+    const price = priceAt(clock.p)
+    const now = typeof performance !== 'undefined' ? performance.now() : 0
+    for (const pl of players) {
+      if (!pl.pilot) continue
+      const side = readSide(pl.st)
+      const reason = pl.book?.exit?.reason
+      const hit = reason === 'stop' ? 'sl' : reason === 'target' ? 'tp' : null
+      pl.pilot.sync({
+        price,
+        index: clock.p,
+        side,
+        openPct: openPct(pl.st, price),
+        lev: pl.st.lev,
+        hit,
+        reduced: reduced(),
+      }, now)
+    }
   }
   const L = (v) => (log ? Math.log(Math.max(v, 1e-9)) : v)
 
@@ -1073,6 +1094,7 @@ export function createRaket({ engine }) {
   }
 
   function render(dt = 0) {
+    syncPilots()
     const W = root.clientWidth
     const H = root.clientHeight
     dpr = Math.min(DPR_STEPS[quality], devicePixelRatio || 1)
@@ -1856,6 +1878,9 @@ export function createRaket({ engine }) {
     mode: () => mode,
     // för tester/skärmdumpar
     state: (i = 0) => (players[i] ? { ...players[i].st, p: clock.p, playing: clock.playing, flat: isFlat(players[i].st) } : null),
+    chartPrice: () => priceAt(clock.p),
+    facePrice: (i = 0) => players[i]?.pilot?.snap()?.price,
+    faceSnap: (i = 0) => players[i]?.pilot?.snap() ?? null,
     fx: (i = 0) => players[i]?.fx,
     rocks: (i = 0) => players[i]?.rocks.length ?? 0,
     visuals: (i = 0) => {

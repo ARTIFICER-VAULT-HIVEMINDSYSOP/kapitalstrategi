@@ -23,6 +23,7 @@ import { mountEntrySnap, bindStepGestures, mountRatt } from './snapp.js'
 import { mountInstruction } from './instruktion.js'
 import { mountFas } from './faser.js'
 import { scrubVisibleNames } from './synlig.js'
+import { mountPilot, trainTick } from './face-hud.js'
 
 const bootHash = typeof window !== 'undefined' ? window.__trBootHash || '' : ''
 
@@ -479,8 +480,24 @@ async function main() {
 
   const raket = createRaket({ engine: eng, skinFrom: periodPill })
   const duo = createDuo({ engine: eng, skinFrom: periodPill })
+  const linePilot = mountPilot(document.body, { theme: 'paper', player: 1, placement: 'fixed' })
+  let pilotRaf = 0
+  function pilotLoop(now) {
+    pilotRaf = 0
+    if (view === 'line' && mode === '1p') {
+      linePilot.setOn(true)
+      linePilot.sync({ ...trainTick(window.__trEngine || eng), reduced: matchMedia('(prefers-reduced-motion: reduce)').matches }, now)
+      pilotRaf = requestAnimationFrame(pilotLoop)
+    } else linePilot.setOn(false)
+  }
+  linePilot.setOn(false)
+  function kickPilot() {
+    const show = view === 'line' && mode === '1p'
+    linePilot.setOn(show)
+    if (show && !pilotRaf) pilotRaf = requestAnimationFrame(pilotLoop)
+  }
   const akademin = createAkademin({ engine: eng, skinFrom: periodPill })
-  const tra = createTradeRiderAcademy()
+  const tra = createTradeRiderAcademy({ engine: eng })
   const rabbit = createRabbit()
   let view = 'line'
   let mode = '1p'
@@ -666,6 +683,7 @@ async function main() {
         /* ignore */
       }
     }
+    kickPilot()
   }
   function viewTitle() {
     if (view === 'raket') return t(MODES.raket.nameKey)

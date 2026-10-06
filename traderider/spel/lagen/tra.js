@@ -5,6 +5,9 @@
 import { getLang, onLang, t } from './i18n.js'
 import { drawRobbanCraft, robbanSvg } from './robban-art.js'
 import { mountRobban } from './robban.js'
+import { sampleIndex } from './kurs.js'
+import { createFaceDriver } from './face-driver.js'
+import { drawRideSprite, sheetImage } from './face-hud.js'
 
 const SKY = '#070b16'
 const INK = '#e8f4ff'
@@ -108,7 +111,7 @@ function reducedMotion() {
   }
 }
 
-function drawRace(ctx, width, height, t) {
+function drawRace(ctx, width, height, t, pose) {
   ctx.clearRect(0, 0, width, height)
   ctx.fillStyle = SKY
   ctx.fillRect(0, 0, width, height)
@@ -130,11 +133,14 @@ function drawRace(ctx, width, height, t) {
   ctx.stroke()
   const rx = rocketX(width, t)
   const ry = laneY(width, rx, t) * height
-  drawRocket(ctx, rx, ry)
-  drawRobbanCraft(ctx, rx - 6, ry - 8, t)
+  const hero = pose ? drawRideSprite(ctx, pose, rx, ry, Math.min(168, height * 0.46)) : false
+  if (!hero) {
+    drawRocket(ctx, rx, ry)
+    drawRobbanCraft(ctx, rx - 6, ry - 8, t)
+  }
 }
 
-export function createTradeRiderAcademy() {
+export function createTradeRiderAcademy({ engine } = {}) {
   ensureStyle()
   const root = document.createElement('div')
   root.className = 'nlr-tra'
@@ -146,6 +152,26 @@ export function createTradeRiderAcademy() {
   let clock = 0
   let raf = 0
   let last = 0
+  const ride = createFaceDriver()
+
+  function ridePose() {
+    const points = engine?.track?.points
+    if (!points?.length) return null
+    sheetImage('ride')
+    const cursor = Math.min(points.length - 1, Math.max(0, clock) * 5)
+    const price = sampleIndex(points, cursor)
+    const lev = engine.leverage || 1
+    return ride.update({
+      price,
+      index: cursor,
+      side: 'flat',
+      openPct: 0,
+      lev,
+      now: clock * 1000,
+      reduced: reducedMotion(),
+      followMarket: true,
+    })
+  }
 
   const guide = mountRobban({
     onAnswer() {
@@ -189,6 +215,19 @@ export function createTradeRiderAcademy() {
     cv.dataset.robbanRide = playing ? 'on' : 'off'
     cv.dataset.rocketMotion = reducedMotion() ? 'off' : 'on'
     cv.dataset.rocketX = String(Math.round(rocketX(cv.clientWidth || 640, clock)))
+    const pose = ridePose()
+    if (pose) {
+      cv.dataset.rideClip = pose.ride.clip
+      cv.dataset.rideSheet = pose.ride.sheet
+      cv.dataset.rideFrame = String(pose.ride.frame)
+      cv.dataset.ridePrice = String(pose.price)
+      const img = sheetImage(pose.ride.sheet)
+      if (img && !img.complete) {
+        img.addEventListener('load', () => {
+          if (visible && phase === 'race') draw()
+        }, { once: true })
+      }
+    }
     const w = cv.clientWidth || 640
     const h = cv.clientHeight || 320
     const dpr = typeof devicePixelRatio === 'number' ? devicePixelRatio : 1
@@ -197,7 +236,7 @@ export function createTradeRiderAcademy() {
     const ctx = cv.getContext('2d')
     if (!ctx) return
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    drawRace(ctx, w, h, clock)
+    drawRace(ctx, w, h, clock, pose)
   }
 
   function resetScroll() {
