@@ -129,18 +129,29 @@ function cdp(url) {
 
 async function evaluate(client, expression) {
   const result = await client.send("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true });
-  if (result.exceptionDetails) throw new Error(result.exceptionDetails.text || "evaluate failed");
+  if (result.exceptionDetails) {
+    const detail = result.exceptionDetails.exception?.description || result.exceptionDetails.text || "evaluate failed";
+    throw new Error(detail);
+  }
   return result.result?.value;
 }
 
 async function waitFor(client, expression, timeout = 20000) {
   const started = Date.now();
+  let last = "";
   while (Date.now() - started < timeout) {
-    const value = await evaluate(client, expression);
-    if (value) return value;
+    try {
+      const value = await evaluate(client, expression);
+      if (value) return value;
+    } catch (error) {
+      last = error.message;
+    }
     await new Promise((resolve) => setTimeout(resolve, 200));
   }
-  const body = await evaluate(client, "document.body ? document.body.innerText.slice(0, 400) : ''");
+  let body = last;
+  try {
+    body = await evaluate(client, "document.body ? location.href + '\\n' + document.body.innerText.slice(0, 500) : ''");
+  } catch {}
   throw new Error(`timeout: ${expression}\n${body}`);
 }
 
@@ -233,28 +244,34 @@ test("lesson quiz, news quiz and streak render in Swedish and English", { timeou
       const newsNarrow = await evaluate(client, `(() => {
         const quiz = document.querySelector('#dagens-quiz');
         const top = quiz.getBoundingClientRect().top + window.scrollY;
-        return { x: 0, y: Math.max(0, top - 280), width: 390, height: 844 };
+        return { x: 0, y: Math.max(0, top - 560), width: 390, height: 980 };
       })()`);
       await shot(client, `news-quiz-${lang}-390.png`, newsNarrow);
 
       await setSize(client, 1280);
-      await evaluate(client, `(() => {
+      const finished = await evaluate(client, `(() => {
         const root = document.querySelector('#dagens-quiz');
         return new Promise((resolve) => {
           let guard = 0;
           const step = () => {
-            const teaser = root.querySelector('.ks-quiz-teaser');
-            if (teaser || guard++ > 8) { resolve(!!teaser); return; }
+            if (root.querySelector('.ks-quiz-teaser') || guard++ > 8) {
+              const teaser = root.querySelector('.ks-quiz-teaser')?.innerText || '';
+              const status = root.querySelector('.ks-quiz-status')?.innerText || '';
+              resolve(status + "\\n" + teaser);
+              return;
+            }
             const radio = root.querySelector('input[type=radio]');
-            const button = root.querySelector('button.btn.primary');
-            if (!radio || !button) { resolve(false); return; }
+            if (!radio) { resolve('no radio ' + root.innerText.slice(0, 400)); return; }
             radio.click();
+            const button = root.querySelector('button.btn.primary');
+            if (!button || button.disabled) { resolve('button not ready'); return; }
             button.click();
             setTimeout(step, 40);
           };
           step();
         });
       })()`);
+      assert.match(String(finished), lang === "en" ? /New quiz tomorrow/ : /Nytt quiz i morgon/);
       const done = await waitFor(client, `(() => {
         const root = document.querySelector('#dagens-quiz');
         const text = root ? root.innerText : '';
@@ -267,14 +284,14 @@ test("lesson quiz, news quiz and streak render in Swedish and English", { timeou
       const streakBox = await evaluate(client, `(() => {
         const el = document.querySelector('#dagens-quiz');
         const rect = el.getBoundingClientRect();
-        return { x: Math.max(0, rect.left + window.scrollX - 8), y: Math.max(0, rect.top + window.scrollY - 8), width: Math.min(window.innerWidth, rect.width + 16), height: Math.min(rect.height + 16, 2600) };
+        return { x: Math.max(0, rect.left + window.scrollX - 8), y: Math.max(0, rect.top + window.scrollY - 8), width: Math.min(window.innerWidth, rect.width + 16), height: rect.height + 16 };
       })()`);
       await shot(client, `streak-${lang}-1280.png`, streakBox);
       await setSize(client, 390);
       const streakNarrow = await evaluate(client, `(() => {
         const el = document.querySelector('#dagens-quiz');
         const rect = el.getBoundingClientRect();
-        return { x: 0, y: Math.max(0, rect.top + window.scrollY - 8), width: 390, height: Math.min(rect.height + 16, 3200) };
+        return { x: 0, y: Math.max(0, rect.top + window.scrollY - 8), width: 390, height: rect.height + 16 };
       })()`);
       await shot(client, `streak-${lang}-390.png`, streakNarrow);
       await evaluate(client, "document.querySelector('#dagens-quiz .btn.sm').click()");
