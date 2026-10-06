@@ -1,12 +1,13 @@
 /**
- * Akademin i NVDA Line-stil (tredje vyn i växeln «NVDA Line | Raket | Akademin»).
- * Lektioner, texter, uppgifter och pedagogik från KS Akademin (se akademin-logic.js); ombyggt på NVDA Lines
- * egna data och i NVDA Lines ljusa stil. Egen kod: inget porträtt, ingen mörk grafik, inget övningssaldo i dollar.
- * Tangenter: samma plan som övriga lägen (köp/sälj). Tempo är −/+, inte hävstångstangenterna.
- * Utmärkelser: märke per klarat delmoment + medalj per lektion, kort animation, sparas i localStorage.
- * All synlig text kommer från språkresursen.
+ * Trade Rider Academy (tidigare Akademin och det separata #tra-spåret) i NVDA Line-stil.
+ * Lektioner, övning och utmärkelser: akademin-logic.js. Kontrollfrågor: academy-quiz.js.
+ * Figuren: academy-robot.webp, attackcykel från academy-robot-sprite.webp.
+ * Tangenter: samma plan som övriga lägen. Tempo är −/+, inte hävstångstangenterna.
+ * Utmärkelser sparas i localStorage. All synlig text kommer från språkresursen.
  */
 import * as A from './akademin-logic.js'
+import { ACADEMY_LESSONS, lessonQuiz, quizComplete } from './academy-quiz.js'
+import { ACADEMY_HERO_SRC, ACADEMY_HERO_SPRITE } from './academy-hero.js'
 import { rsiAtPoints } from './rsi.js'
 import { isTypingTarget, HINTS, keyAction } from './keys.js'
 import { simTid } from './simtid.js'
@@ -74,6 +75,28 @@ const css = `
 .nlr-ak-note{margin-top:10px;padding:10px 12px;border-radius:14px;background:rgba(118,185,0,.1);font-size:14px;color:${INK}}
 .nlr-ak-quiz{display:flex;flex-direction:column;gap:6px}
 .nlr-ak-quiz button{text-align:left;border:1px solid rgba(28,25,21,.12);background:rgba(246,242,234,.95);border-radius:14px;padding:10px 12px;font:14px/1.4 "IBM Plex Sans",sans-serif;color:${INK};cursor:pointer}
+.nlr-ak-quizbox{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.nlr-ak-quizbox h3{font:600 15px "IBM Plex Sans",sans-serif}
+.nlr-ak-qset{margin:0;padding:8px 0 0;border:0;border-top:1px solid rgba(28,25,21,.08)}
+.nlr-ak-qset legend{font:600 14px/1.35 "IBM Plex Sans",sans-serif;padding:0 0 6px}
+.nlr-ak-quiz button[data-quiz-hit="ok"]{border-color:${GREEN_D};background:rgba(118,185,0,.18)}
+.nlr-ak-quiz button[data-quiz-hit="no"]{border-color:${RED}}
+.nlr-ak-hero-slot{display:flex}
+.nlr-ak-hero{--frame:168px;width:168px;height:320px;padding:0;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;justify-self:start;position:relative}
+.nlr-ak-hero:focus-visible{outline:3px solid #22d3ee;outline-offset:3px}
+.nlr-ak-hero-still{width:168px;height:320px;object-fit:contain;object-position:center;display:block;pointer-events:none}
+.nlr-ak-hero-sprite{position:absolute;left:50%;top:50%;width:var(--frame);height:var(--frame);transform:translate(-50%,-50%);background-repeat:no-repeat;background-position:0 50%;opacity:0;pointer-events:none}
+.nlr-ak-hero.is-attack .nlr-ak-hero-still{opacity:0}
+.nlr-ak-hero.is-attack .nlr-ak-hero-sprite{opacity:1;background-size:calc(var(--frame) * 8) var(--frame);animation:academy-robot-attack .9s steps(8) 1}
+@keyframes academy-robot-attack{from{background-position-x:0}to{background-position-x:calc(var(--frame) * -8)}}
+@media (max-width:720px){
+  .nlr-ak-hero{--frame:112px;width:112px;height:220px}
+  .nlr-ak-hero-still{width:112px;height:220px}
+}
+@media (prefers-reduced-motion:reduce){
+  .nlr-ak-hero.is-attack .nlr-ak-hero-sprite{animation:none;opacity:0;background-image:none}
+  .nlr-ak-hero.is-attack .nlr-ak-hero-still{opacity:1}
+}
 .nlr-ak-dim{opacity:.6}
 .nlr-ak-aw{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin-top:8px}
 .nlr-ak-aw figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;font-size:10px;line-height:1.2;color:${INK2}}
@@ -92,6 +115,7 @@ const css = `
 @media (prefers-reduced-motion:reduce){.nlr-ak-toast.on,.nlr-ak-toast svg,.nlr-ak-toast .shine{animation:none}}
 .nlr-ak-claim{display:none;margin:0;padding:10px 12px;border-radius:0;background:rgba(118,185,0,.12);color:${INK};font-size:13px;line-height:1.45}
 @media (max-width:820px){.nlr-ak-in{grid-template-columns:minmax(0,1fr);padding-top:60px}.nlr-ak aside{order:2}.nlr-ak-claim{display:block}.nlr-ak-chart canvas{height:300px}.nlr-ak h1{font-size:24px}.nlr-ak-choice>span{min-width:100%}.nlr-ak kbd{display:none}}
+@media (max-height:520px){.nlr-ak-claim{display:block}}
 @media (max-width:480px){.nlr-ak-chart canvas{height:210px}}
 `
 
@@ -121,6 +145,54 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
   toast.setAttribute('aria-live', 'polite')
   document.body.appendChild(toast)
 
+  const hero = document.createElement('button')
+  hero.type = 'button'
+  hero.className = 'nlr-ak-hero'
+  hero.dataset.academyHero = '1'
+  hero.dataset.act = 'hero'
+  hero.innerHTML = `<img class="nlr-ak-hero-still" src="${ACADEMY_HERO_SRC}" alt="" width="512" height="512" data-hero-src="${ACADEMY_HERO_SRC}"><span class="nlr-ak-hero-sprite" data-hero-sprite="1" aria-hidden="true"></span>`
+  hero.addEventListener('animationend', (e) => {
+    if (e.animationName !== 'academy-robot-attack') return
+    hero.classList.remove('is-attack')
+  })
+
+  function reducedMotion() {
+    try {
+      return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
+    } catch {
+      return false
+    }
+  }
+  function playHero() {
+    if (reducedMotion()) return
+    const sprite = hero.querySelector('[data-hero-sprite]')
+    if (sprite) sprite.style.backgroundImage = `url("${ACADEMY_HERO_SPRITE}")`
+    hero.classList.remove('is-attack')
+    void hero.offsetWidth
+    hero.classList.add('is-attack')
+  }
+  function placeHero() {
+    const slot = root.querySelector('[data-academy-hero-slot]')
+    const img = hero.querySelector('img')
+    if (img) img.alt = t('hero.alt')
+    if (slot && hero.parentNode !== slot) slot.appendChild(hero)
+  }
+  function quizBlock(n) {
+    const spec = lessonQuiz(n)
+    if (!spec) return ''
+    const items = spec.quiz.map((q) => {
+      const picked = quizPick[q.id]
+      const buttons = q.choices.map((c) => {
+        const on = picked === c.id
+        const hit = !on ? '' : c.id === q.answer ? ' data-quiz-hit="ok"' : ' data-quiz-hit="no"'
+        return `<button type="button" data-act="quiz" data-q="${q.id}" data-v="${c.id}" aria-pressed="${on ? 'true' : 'false'}"${hit}>${t(c.label)}</button>`
+      }).join('')
+      const result = picked ? `<p data-quiz-result="${picked === q.answer ? 'ok' : 'no'}">${t(picked === q.answer ? 'ak.quizOk' : 'ak.quizNo')}</p>` : ''
+      return `<fieldset class="nlr-ak-qset" data-quiz-id="${q.id}"><legend>${t(q.prompt)}</legend><div class="nlr-ak-quiz">${buttons}</div>${result}</fieldset>`
+    }).join('')
+    return `<section class="nlr-ak-quizbox" data-academy-quiz="${spec.id}" data-lesson-id="${spec.id}"><h3>${t('ak.quizTitle')}</h3>${items}</section>`
+  }
+
   let prog = A.loadProgress(storage)
   let lesson = [1, 2, 3, 4].find((l) => !A.lessonDone(l, prog.earned)) ?? 4
   let noteKey = ''
@@ -135,6 +207,8 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
   let tpSet = false
   let trade = null
   let quiz = null
+  const quizPick = {}
+  let introPlayed = false
   let pts = []
   let rsi = []
   let sqThr = 0
@@ -334,12 +408,14 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     }
     root.innerHTML = `<div class="nlr-ak-in">
       <aside>
-        <div class="nlr-ak-card sk"><span class="kick">${t('ak.kicker')}</span><h1>${t('mode.akademin')}</h1><p class="muted" data-tr-claim="1">${t('sim.claim')}</p><p class="muted">${t('ak.lead')}</p></div>
+        <div class="nlr-ak-hero-slot" data-academy-hero-slot></div>
+        <div class="nlr-ak-card sk"><span class="kick">${t('ak.kicker')}</span><h1>${t('mode.tra.name')}</h1><p class="muted" data-tr-claim="1">${t('sim.claim')}</p><p class="muted">${t('ak.lead')}</p></div>
         <div class="nlr-ak-card sk nlr-ak-xp"><div class="row"><b>${t('ak.level', { n: lv.level })}</b><span>${t('ak.xp', { xp, max: A.XP_MAX })}</span></div><div class="nlr-ak-bar"><i style="width:${lvPct}%"></i></div><p class="muted">${t('ak.xpNote')}</p></div>
         <ol class="nlr-ak-lessons">${[1, 2, 3, 4].map((l) => {
           const open = A.lessonUnlocked(l, prog.earned)
           const d = A.lessonDone(l, prog.earned)
-          return `<li><button type="button" class="nlr-ak-lesson ${lesson === l ? 'on' : ''}" data-act="pick" data-v="${l}" ${open ? '' : 'disabled'}><span class="nlr-ak-dot ${d ? 'done' : open ? 'open' : ''}">${d ? '✓' : open ? l : '🔒'}</span><span><small>${t('ak.lessonOf', { n: l })}</small>${A.lessonContent(l).title}</span></button></li>`
+          const meta = ACADEMY_LESSONS.find((item) => item.n === l)
+          return `<li><button type="button" class="nlr-ak-lesson ${lesson === l ? 'on' : ''}" data-act="pick" data-v="${l}" data-lesson-id="${meta?.id || ''}" ${open ? '' : 'disabled'}><span class="nlr-ak-dot ${d ? 'done' : open ? 'open' : ''}">${d ? '✓' : open ? l : '🔒'}</span><span><small>${t('ak.lessonOf', { n: l })}</small>${A.lessonContent(l).title}</span></button></li>`
         }).join('')}</ol>
         <div class="nlr-ak-card sk" data-k="awards"><div class="row" style="display:flex;justify-content:space-between"><h3>${t('ak.awards')}</h3><span class="muted">${unlocked.size} / ${A.AWARDS.length}</span></div>
           <div class="nlr-ak-aw">${A.AWARDS.map((raw) => { const a = A.awardView(raw); return `<figure class="${unlocked.has(a.id) ? '' : 'locked'}" title="${unlocked.has(a.id) ? a.learned : t('ak.locked')}" data-award="${a.id}">${medalSvg(a, 'o' + a.id)}<figcaption>${a.title}</figcaption></figure>` }).join('')}</div>
@@ -350,6 +426,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
         <p class="nlr-ak-claim" data-tr-claim="1">${t('sim.claim')}</p>
         <section class="nlr-ak-card sk"><div style="display:flex;justify-content:space-between;align-items:center"><span class="kick">${t('ak.lessonOf', { n: lesson })}</span><span class="muted">${[1, 2, 3, 4].map((l) => (A.lessonDone(l, prog.earned) ? '●' : l === lesson ? '◉' : '○')).join(' ')}</span></div>
           <h2>${L.title}</h2><p>${L.text}</p>
+          ${quizBlock(lesson)}
           ${!rd ? `<div><button type="button" class="nlr-ak-btn" data-act="read">${t('ak.read')}</button></div>` : ''}</section>
         <section class="nlr-ak-card sk nlr-ak-chart"><div class="head"><span data-k="chartHead">—</span><span data-k="chartFacts">—</span></div>
           <canvas aria-label="${t('ak.canvas')}"></canvas>
@@ -374,6 +451,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
         for (const k of ['backgroundColor', 'border', 'boxShadow']) c.style[k] = cs[k]
       })
     }
+    placeHero()
     hud()
     draw()
     ungesture()
@@ -394,6 +472,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     if (!b || b.disabled) return
     const act = b.dataset.act
     const v = b.dataset.v
+    if (act === 'hero') return playHero()
     if (act === 'pick') return pick(Number(v))
     if (act === 'read') {
       earn(`l${lesson}_read`)
@@ -420,6 +499,13 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
     else if (act === 'squeeze') return markSqueeze()
     else if (act === 'readm') return readMarket()
     else if (act === 'ans') return answer(v)
+    else if (act === 'quiz') {
+      quizPick[b.dataset.q] = v
+      const passed = quizComplete(quizPick, lesson)
+      build()
+      if (passed) playHero()
+      return
+    }
     else if (act === 'play') playing = !playing
     else if (act === 'tempoDown') tempo = Math.max(1, tempo - 1)
     else if (act === 'tempoUp') tempo = Math.min(4, tempo + 1)
@@ -706,6 +792,10 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
       visible = true
       root.classList.add('on')
       build()
+      if (!introPlayed) {
+        introPlayed = true
+        playHero()
+      }
       last = performance.now()
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(frame)

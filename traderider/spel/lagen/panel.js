@@ -3,9 +3,9 @@
  *  1. RSI(14)-panel under grafen, på exakt samma riktiga kursdata som spelet visar (motorns quote.candles),
  *     följer vald period och tågets position. Saknas data visas «saknas».
  *  2. Växel «NVDA Line | Raket». Raket är en ny, egen vy (se raket.js) på samma data och samma Bollinger-räls.
- *  4. Akademin (akademin.js): KS Akademins lektioner i NVDA Line-stil, med utmärkelser.
+ *  4. Trade Rider Academy (akademin.js): lektioner, kontrollfrågor och utmärkelser. Hash #tra. #academy är alias.
  *  3. Tillval «1P | 2P»: delad skärm i både NVDA Line (duo.js, två instanser av NVDA Lines egen motor) och Raket.
- *  5. KS /traderider/spel/: växelns första knapp heter «Trade Rider», hash #trade-rider (äldre #nvda-rider)/#racex/#academy,
+ *  5. KS /traderider/spel/: växelns första knapp heter «Trade Rider», hash #trade-rider (äldre #nvda-rider)/#racex/#tra,
  *     plus en liten skalrad med «← Traderider» (dator) och helskärmsknapp (Fullscreen API, CSS-reserv där API:t saknas).
  * Inget i NVDA Lines design, styrning eller mekanik ändras. Motorn läses via window.__trEngine (satt i exposeQa).
  */
@@ -14,7 +14,6 @@ import { createRaket } from './raket.js'
 import { createRabbit } from './rabbit.js'
 import { createDuo } from './duo.js'
 import { createAkademin } from './akademin.js'
-import { createTradeRiderAcademy } from './tra.js'
 import { isTypingTarget } from './keys.js'
 import { t, onLang, mountSwitcher, setPriceKey, STRINGS } from './i18n.js'
 import { readSide, cycleIndex, stepSide, ENTRY_SIDE } from './styrmotor.js'
@@ -452,9 +451,8 @@ async function main() {
   const bRaket = el('button', '', t(MODES.raket.nameKey))
   const bAcademy = el('button', '', t(MODES.akademin.nameKey))
   const bRabbit = el('button', '', t(MODES.rabbitHole.nameKey))
-  const bTra = el('button', '', t(MODES.tra.nameKey))
-  bLine.type = bRaket.type = bAcademy.type = bRabbit.type = bTra.type = 'button'
-  toggle.append(bLine, bRaket, bAcademy, bRabbit, bTra)
+  bLine.type = bRaket.type = bAcademy.type = bRabbit.type = 'button'
+  toggle.append(bLine, bRaket, bAcademy, bRabbit)
   copySkin(periodPill, toggle)
   toggle.style.zIndex = '60'
   document.body.appendChild(toggle)
@@ -480,7 +478,6 @@ async function main() {
   const raket = createRaket({ engine: eng, skinFrom: periodPill })
   const duo = createDuo({ engine: eng, skinFrom: periodPill })
   const akademin = createAkademin({ engine: eng, skinFrom: periodPill })
-  const tra = createTradeRiderAcademy()
   const rabbit = createRabbit()
   let view = 'line'
   let mode = '1p'
@@ -493,7 +490,7 @@ async function main() {
   }
   const instr = mountInstruction(document.body, {
     getOrientation: () => orientationFor(),
-    isActive: () => view !== 'tra',
+    isActive: () => true,
   })
   const fas = mountFas(document.body, {
     getOrientation: () => orientationFor(),
@@ -596,9 +593,8 @@ async function main() {
     bRaket.setAttribute('aria-pressed', String(view === 'raket'))
     bAcademy.setAttribute('aria-pressed', String(view === 'akademin'))
     bRabbit.setAttribute('aria-pressed', String(view === 'rabbit'))
-    bTra.setAttribute('aria-pressed', String(view === 'tra'))
     document.title = viewTitle()
-    modeToggle.style.display = view === 'akademin' || view === 'rabbit' || view === 'tra' ? 'none' : ''
+    modeToggle.style.display = view === 'akademin' || view === 'rabbit' ? 'none' : ''
     b1.setAttribute('aria-pressed', String(mode === '1p'))
     b2.setAttribute('aria-pressed', String(mode === '2p'))
     if (!lineSolo) {
@@ -608,40 +604,28 @@ async function main() {
       }
       panel.style.display = 'none'
     }
-    if (view === 'tra') {
-      instr.hide()
-      akademin.hide()
-      duo.hide()
-      raket.hide()
-      rabbit.hide()
-      tra.show()
-    } else if (view === 'akademin') {
-      tra.hide()
+    if (view === 'akademin') {
       duo.hide()
       raket.hide()
       rabbit.hide()
       akademin.show()
     } else if (view === 'rabbit') {
-      tra.hide()
       akademin.hide()
       duo.hide()
       raket.hide()
       rabbit.show()
     } else if (view === 'raket') {
-      tra.hide()
       akademin.hide()
       rabbit.hide()
       duo.hide()
       raket.setMode(mode)
       raket.show()
     } else if (mode === '2p') {
-      tra.hide()
       akademin.hide()
       rabbit.hide()
       raket.hide()
       duo.visible() || duo.show()
     } else {
-      tra.hide()
       akademin.hide()
       rabbit.hide()
       raket.hide()
@@ -659,7 +643,7 @@ async function main() {
     syncSnap()
     if (push) {
       const slug = hashForView(view)
-      const h = slug + (mode === '2p' && view !== 'akademin' && view !== 'rabbit' && view !== 'tra' ? '-2p' : '')
+      const h = slug + (mode === '2p' && view !== 'akademin' && view !== 'rabbit' ? '-2p' : '')
       try {
         history.replaceState(history.state, '', `#${h}`)
       } catch {
@@ -670,7 +654,6 @@ async function main() {
   function viewTitle() {
     if (view === 'raket') return t(MODES.raket.nameKey)
     if (view === 'akademin') return t(MODES.akademin.nameKey)
-    if (view === 'tra') return t(MODES.tra.nameKey)
     if (view === 'rabbit') return t(MODES.rabbitHole.nameKey)
     return t(MODES.trendRider.nameKey)
   }
@@ -688,14 +671,12 @@ async function main() {
   bRaket.setAttribute('aria-pressed', 'false')
   bAcademy.setAttribute('aria-pressed', 'false')
   bRabbit.setAttribute('aria-pressed', 'false')
-  bTra.setAttribute('aria-pressed', 'false')
   b1.setAttribute('aria-pressed', 'true')
   b2.setAttribute('aria-pressed', 'false')
   bLine.onclick = () => setView(selectMode({ via: 'click', value: 1 }))
   bRaket.onclick = () => setView(selectMode({ via: 'click', value: 2 }))
   bAcademy.onclick = () => setView(selectMode({ via: 'click', value: 3 }))
   bRabbit.onclick = () => setView(selectMode({ via: 'click', value: 4 }))
-  bTra.onclick = () => setView('tra')
   b1.onclick = () => setMode('1p')
   b2.onclick = () => setMode('2p')
   let hashBooted = false
@@ -703,7 +684,7 @@ async function main() {
     const h = source == null ? location.hash : source
     view = modeFromHash(h)
     mode = String(h).includes('2p') ? '2p' : '1p'
-    const slug = hashForView(view) + (mode === '2p' && view !== 'akademin' && view !== 'rabbit' && view !== 'tra' ? '-2p' : '')
+    const slug = hashForView(view) + (mode === '2p' && view !== 'akademin' && view !== 'rabbit' ? '-2p' : '')
     apply(location.hash !== `#${slug}`)
   }
   addEventListener('hashchange', () => fromHash(location.hash))
@@ -725,7 +706,6 @@ async function main() {
     bRaket.textContent = t(MODES.raket.nameKey)
     bAcademy.textContent = t(MODES.akademin.nameKey)
     bRabbit.textContent = t(MODES.rabbitHole.nameKey)
-    bTra.textContent = t(MODES.tra.nameKey)
     modeToggle.setAttribute('aria-label', t('players.aria'))
     b1.textContent = t('players.1')
     b2.textContent = t('players.2')
@@ -793,7 +773,7 @@ async function main() {
     const narrow = innerWidth <= 520
     if (narrow) {
       toggle.style.maxWidth = 'calc(100vw - 16px)'
-      if (mode === '2p' || view === 'akademin' || view === 'rabbit' || view === 'tra') {
+      if (mode === '2p' || view === 'akademin' || view === 'rabbit') {
         toggle.style.left = '8px'
         toggle.style.top = '8px'
         toggle.style.height = '36px'
@@ -809,12 +789,11 @@ async function main() {
       return
     }
     toggle.style.maxWidth = ''
-    if (mode === '2p' || view === 'akademin' || view === 'tra') {
-      // delad skärm / Akademin / Trade Rider Academy: växeln centrerad överst
+    if (mode === '2p' || view === 'akademin') {
       const h = innerWidth <= 640 ? 36 : 40
       toggle.style.height = `${h}px`
       const tw = toggle.getBoundingClientRect().width
-      const mw = view === 'akademin' || view === 'tra' ? -8 : modeToggle.getBoundingClientRect().width
+      const mw = view === 'akademin' ? -8 : modeToggle.getBoundingClientRect().width
       const sw = skal.getBoundingClientRect().width
       const left = Math.max(4, Math.round((innerWidth - tw - 8 - mw - 8 - sw) / 2))
       toggle.style.left = `${left}px`
