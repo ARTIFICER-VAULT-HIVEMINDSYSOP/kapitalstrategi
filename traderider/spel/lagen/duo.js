@@ -37,6 +37,10 @@ const css = `
 .nlr-duo-duel{position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:3;max-width:min(520px,calc(100% - 24px));padding:8px 12px;border-radius:14px;background:rgba(246,242,234,.96);border:1px solid rgba(28,25,21,.14);font:500 12px/1.4 "IBM Plex Sans",sans-serif;text-align:center}
 .nlr-duo.narrow .nlr-duo-row button{height:40px}
 .nlr-duo.narrow .nlr-duo-card b{font-size:14px}
+.nlr-duo.short .tr-plan-award,.nlr-duo.short .tr-plan-warn{display:none}
+.nlr-duo.short .tr-plan{padding:2px 4px}
+.nlr-duo.short .nlr-duo-ctl{gap:4px;margin-bottom:4px}
+.nlr-duo.short .nlr-duo-ctl button{height:36px;min-height:0}
 `
 const ICON_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>'
 const ICON_DOWN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>'
@@ -91,6 +95,7 @@ export function createDuo({ engine: main, skinFrom }) {
     const W = root.clientWidth || innerWidth
     const H = root.clientHeight || innerHeight
     root.classList.toggle('narrow', W <= 700)
+    root.classList.toggle('short', H <= 460)
     if (W > 700) {
       const w = Math.floor(W / 2)
       return [{ x: 0, y: 0, w, h: H }, { x: w, y: 0, w: W - w, h: H }]
@@ -263,7 +268,7 @@ export function createDuo({ engine: main, skinFrom }) {
     if (d.winner === 'tie') verdict = t('plan.duelTie', { r: fmtR(d.r) })
     else if (d.winner === 'a' || d.winner === 'b') {
       const who = t('duo.player', { n: d.winner === 'a' ? 1 : 2 })
-      verdict = d.reason === 'only' ? t('plan.duelOnly', { who, r: fmtR(d.r) }) : t('plan.duelHigher', { who, r: fmtR(d.r), other: fmtR(d.other) })
+      verdict = d.reason === 'only' ? t('plan.duelSolo', { who, r: fmtR(d.r) }) : t('plan.duelHigher', { who, r: fmtR(d.r), other: fmtR(d.other) })
     }
     duel.hidden = false
     duel.textContent = verdict

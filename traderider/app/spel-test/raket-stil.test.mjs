@@ -123,4 +123,6 @@ test('ingenting från den spärrade varianten i raket.js', () => {
   const src = readFileSync(new URL('../../spel/lagen/raket.js', import.meta.url), 'utf8')
   for (const w of ['Övningskapital', '100,000', '100_000', 'Köp', 'Sälj', 'Platt', 'Hävstång –', 'Paus · mellanslag', 'Alla lägen', 'candles/s', 'konduktör', 'Konduktör', '20-SMA', 'Övre', 'Undre', 'pixeltåg', 'pixel-tåg', 'drawTrain'])
     assert.ok(!src.includes(w), w)
+  for (const w of ['SpaceX', 'Starship', 'Grok', 'xAI', 'Elon', 'Musk'])
+    assert.equal(src.toLowerCase().includes(w.toLowerCase()), false, w)
 })
