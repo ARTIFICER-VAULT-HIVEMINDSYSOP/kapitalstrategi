@@ -1,6 +1,30 @@
 {
-  "today": "2026-09-28",
+  "today": "2026-10-05",
   "editions": [
+    {
+      "date": "2026-10-05",
+      "title": "Nyhetsbrev",
+      "kind": "text",
+      "hasPdf": false,
+      "hasWeb": true,
+      "updatedAt": "2026-10-05T04:55:00.000Z"
+    },
+    {
+      "date": "2026-10-01",
+      "title": "Nyhetsbrev",
+      "kind": "text",
+      "hasPdf": false,
+      "hasWeb": true,
+      "updatedAt": "2026-10-01T10:30:00.000Z"
+    },
+    {
+      "date": "2026-09-29",
+      "title": "Nyhetsbrev",
+      "kind": "text",
+      "hasPdf": false,
+      "hasWeb": true,
+      "updatedAt": "2026-09-29T12:28:00.000Z"
+    },
     {
       "date": "2026-09-28",
       "title": "Nyhetsbrev",

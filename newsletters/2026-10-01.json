@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-01",
+  "title": "Nyhetsbrev",
+  "dateLabel": "1 oktober 2026",
+  "subtitle": "NordAmps första dag | Oljan kring 100 dollar | Guld inför jobbrapporten",
+  "closingNote": "Utgåvan finns också som modulartiklar. Varje kort slutar med sökvägen till sin modul.",
+  "sections": [
+    {
+      "category": "IPO",
+      "cards": [
+        {
+          "title": "IPO / nytt på börsen",
+          "body": "NordAmps (NRDAMP) — första handelsdag 30 sep (First North). Teckningskurs 15,50 kr. Premiärdagen stängde på 12,00 kr. I dag kl 12:05: 10,72 kr (−10,67 %). Foremont Group (FOMO) har teckningsperiod till 2 okt, kurs 10 kr. Avioneros notering på Spotlight, planerad till 13 okt, är avbruten. Linjemontage 48,25 kr, Dormy 70,70 kr, Svevik 52,60 kr och Axvik 61,70 kr i förmiddagens avläsning. Airtel Money i London: 1,96 pund per aktie, handel väntas 9 okt.\nHela modulen: /nyheter/2026-10-01/ipo/",
+          "stats": [
+            {
+              "label": "NordAmps",
+              "value": "10,72 kr"
+            },
+            {
+              "label": "Foremont",
+              "value": "teckning till 2 okt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "OLJA",
+      "cards": [
+        {
+          "title": "Vad som rör olja",
+          "body": "Morgonen började nedåt. Under förmiddagen vände det, sedan kinesiska raffinaderier tills vidare stoppat exporten av oljeprodukter utanför Hongkong och Macao. DI spot kl 12:23: Brent 100,03 USD/fat (+2,24 %); WTI 91,72 (+1,58 %). Iran har tagit emot USA:s svar via qatarisk medling. Enligt AP-källor beordrade USA:s utrikesminister Irans FN-delegation att lämna USA i förtid.\nHela modulen: /nyheter/2026-10-01/olja/",
+          "stats": [
+            {
+              "label": "Brent",
+              "value": "100,03 USD/fat"
+            },
+            {
+              "label": "WTI",
+              "value": "91,72"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "GULD",
+      "cards": [
+        {
+          "title": "Guld",
+          "body": "DI spot (1 okt, visad tid 12:23): 4 162,47 dollar/uns (+0,13 %; −2,60 % på en vecka). Reuters: spot 4 175,19 dollar/uns på morgonen efter ett fall på över 6 % i september. Nästa hållpunkt är USA:s jobbrapport för september på fredag.\nHela modulen: /nyheter/2026-10-01/guld/",
+          "stats": [
+            {
+              "label": "Spot",
+              "value": "4 162,47 dollar/uns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "RÅVAROR",
+      "cards": [
+        {
+          "title": "Övriga råvaror",
+          "body": "DI (1 okt): silver spot 60,58 dollar/uns (+0,30 %, 12:23); platina spot 1 712,16 dollar/uns (−0,22 %, 12:23); koppar 14 455 dollar/ton (−0,13 %, 3 mån termin, 18:00).\nHela modulen: /nyheter/2026-10-01/ovriga-ravaror/",
+          "stats": [
+            {
+              "label": "Silver",
+              "value": "60,58 dollar/uns"
+            },
+            {
+              "label": "Koppar",
+              "value": "14 455 dollar/ton"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "SKOLAN",
+      "cards": [
+        {
+          "title": "Prova först · skolan",
+          "body": "Säkerhet först, sedan fart. En ny aktie kan stiga över teckningskursen och samma vecka falla långt under den.\nSKOLA — Tradingskolan: /tradingskolan\nHela modulen: /nyheter/2026-10-01/skolan/",
+          "stats": [
+            {
+              "label": "Skolan",
+              "value": "/tradingskolan"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

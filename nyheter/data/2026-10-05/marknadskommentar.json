@@ -1,0 +1,21 @@
+{
+  "edition": "2026-10-05",
+  "date": "2026-10-05",
+  "dateLabel": {
+    "sv": "5 oktober 2026"
+  },
+  "slug": "marknadskommentar",
+  "order": 6,
+  "translations": {
+    "sv": {
+      "title": "Om kommentaren",
+      "ingress": "Utbildande marknadskommentar. Ingen personlig rekommendation. Inga kända positioner.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Den här texten är en utbildande marknadskommentar. Den är ingen personlig rekommendation och innehåller inga köp- eller säljsignaler. Intressekonflikter: inga kända positioner. Framställd 5 oktober 2026 kl. 06:55."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "edition": "2026-10-05",
+  "date": "2026-10-05",
+  "dateLabel": {
+    "sv": "5 oktober 2026"
+  },
+  "slug": "olja",
+  "order": 2,
+  "translations": {
+    "sv": {
+      "title": "Vad som rör olja",
+      "ingress": "Utbudet ökar när G7 öppnar beredskapslager, samtidigt som nya attacker i Gulfen håller oron vid liv.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Två krafter drar åt olika håll i morse. Utbudet ökar: G7-länderna enades i fredags om att släppa **100 miljoner fat** diesel och råolja ur beredskapslagren och att avstå från exportbegränsningar för energi, och fartygsdata visar att exporten från Mellanöstern låg över nivån före kriget fyra av sju dagar sista veckan i september. Saudiarabiska Aramco har dessutom sänkt novemberpriset för Asien till den lägsta nivån på sex år. Risken finns kvar: Huthirebellerna i Jemen säger att de skjutit robotar och drönare mot Aramco-anläggningar i Riyadh och Khurais (uppgiften väntar på bekräftelse från Saudiarabien), och enligt SVT/UKMTO träffades ytterligare ett tankfartyg i Hormuzsundet under söndagen, med skador i maskinrummet och besättningen oskadd. OPEC+ har skjutit upp översynen av kvoterna för 2027."
+        },
+        {
+          "type": "p",
+          "text": "Natten i siffror (Reuters via CNBC): Brent steg först till **103,06 dollar** kring midnatt, och låg sedan på **101,90** (**−0,34 %**) kl **03:15**; WTI **90,49** (**−0,68 %**)."
+        },
+        {
+          "type": "p",
+          "text": "DI spot (5 okt, visad tid **06:53**): Brent **101,70 USD/fat** (**−0,94 %**); WTI **90,27** (**−0,99 %**)."
+        },
+        {
+          "type": "p",
+          "text": "Den här texten är en utbildande marknadskommentar. Den är ingen personlig rekommendation och innehåller inga köp- eller säljsignaler. Intressekonflikter: inga kända positioner. Framställd 5 oktober 2026 kl. 06:55."
+        }
+      ]
+    }
+  },
+  "hiddenSources": [
+    {
+      "label": "Reuters/CNBC 5 okt: oljan backar när exporten ökar och G7 släpper lager",
+      "href": "https://www.cnbc.com/2026/10/05/oil-slips-as-middle-east-crude-exports-rise-g7-to-release-stocks.html"
+    },
+    {
+      "label": "WAM 5 okt: Brent över 103",
+      "href": "https://www.wam.ae/en/article/17gix0n-oil-prices-rise-brent-above-103"
+    },
+    {
+      "label": "SVT live Iran/USA",
+      "href": "https://www.svt.se/nyheter/utrikes/senaste-nytt-om-iran-och-konflikten-med-usa-och-israel"
+    },
+    {
+      "label": "DI råvaror 5 okt",
+      "href": "https://www.di.se/ravaror/"
+    }
+  ]
+}

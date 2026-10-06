@@ -1,0 +1,31 @@
+{
+  "edition": "2026-10-05",
+  "date": "2026-10-05",
+  "dateLabel": {
+    "sv": "5 oktober 2026"
+  },
+  "slug": "ovriga-ravaror",
+  "order": 4,
+  "translations": {
+    "sv": {
+      "title": "Övriga råvaror",
+      "ingress": "DI (5 okt): silver spot 60,91 dollar/uns (+0,89 %, 06:53); platina spot 1 708,96 dollar/uns (+0,48 %, 06:53); koppar 14 320 dollar/ton (−0,10 %, 3 mån termin, 18:00).",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "DI (5 okt): **silver** spot **60,91 dollar/uns** (**+0,89 %**, **06:53**); **platina** spot **1 708,96 dollar/uns** (**+0,48 %**, **06:53**); **koppar** **14 320 dollar/ton** (**−0,10 %**, 3 mån termin, **18:00**)."
+        },
+        {
+          "type": "p",
+          "text": "Den här texten är en utbildande marknadskommentar. Den är ingen personlig rekommendation och innehåller inga köp- eller säljsignaler. Intressekonflikter: inga kända positioner. Framställd 5 oktober 2026 kl. 06:55."
+        }
+      ]
+    }
+  },
+  "hiddenSources": [
+    {
+      "label": "DI råvaror 5 okt",
+      "href": "https://www.di.se/ravaror/"
+    }
+  ]
+}
