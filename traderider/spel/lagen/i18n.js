@@ -300,7 +300,7 @@ const sv = {
   'lesson.4.text': 'RSI (14) jämför styrkan i de senaste uppgångarna med nedgångarna på en skala 0–100. Över 70 kallas överköpt, under 30 översålt. RSI ensamt är inget köp- eller säljbesked — det blir användbart tillsammans med banden: kurs vid rälsen ovanför och RSI över 70 är ett sträckt läge där nästa steg ofta är vila eller återgång mot mittlinjen.',
   'lesson.4.task': 'Vänta tills RSI går över 70 eller under 30, tryck Läs läget och välj tolkningen som stämmer med både band och RSI.',
 
-  'hero.alt': 'Robot med stav i Trade Rider Academy',
+  'hero.alt': 'Trade Rider Academy-robot',
   'ak.quizTitle': 'Kontrollfrågor',
   'ak.quizOk': 'Det stämmer med lektionstexten.',
   'ak.quizNo': 'Läs lektionstexten igen och välj på nytt.',
@@ -748,7 +748,7 @@ const en = {
   'lesson.4.text': 'RSI (14) compares the strength of recent rises with the falls on a scale of 0–100. Above 70 is called overbought, below 30 oversold. RSI alone is not a buy or sell instruction — it becomes useful together with the bands: price at the upper rail and RSI above 70 is a stretched state where the next step is often a rest or a return toward the centre line.',
   'lesson.4.task': 'Wait until RSI goes above 70 or below 30, press Read the situation and choose the reading that matches both the bands and RSI.',
 
-  'hero.alt': 'Robot with a staff in Trade Rider Academy',
+  'hero.alt': 'Trade Rider Academy-robot',
   'ak.quizTitle': 'Check questions',
   'ak.quizOk': 'That matches the lesson text.',
   'ak.quizNo': 'Read the lesson text again and choose once more.',
@@ -1196,7 +1196,7 @@ const uk = {
   'lesson.4.text': 'RSI (14) порівнює силу останніх зростань і спадів за шкалою 0–100. Понад 70 називають перекупленим, нижче 30 – перепроданим. Сам RSI не є вказівкою купити чи продати — він корисний разом зі смугами: ціна біля верхньої рейки і RSI понад 70 – розтягнутий стан, де наступний крок часто спокій або повернення до середньої лінії.',
   'lesson.4.task': 'Зачекайте, доки RSI піде понад 70 або нижче 30, натисніть Прочитати ситуацію і оберіть тлумачення, що збігається і зі смугами, і з RSI.',
 
-  'hero.alt': 'Робот із посохом у Trade Rider Academy',
+  'hero.alt': 'Робот Trade Rider Academy',
   'ak.quizTitle': 'Перевірка',
   'ak.quizOk': 'Це збігається з текстом уроку.',
   'ak.quizNo': 'Прочитайте текст уроку ще раз і оберіть знову.',

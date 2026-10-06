@@ -58,8 +58,8 @@ test('kontrollfrågor och figurens alt finns på sv, en och uk', () => {
   for (const lang of ['sv', 'en', 'uk']) {
     for (const key of keys) assert.equal(typeof STRINGS[lang][key], 'string', `${lang} ${key}`)
   }
-  assert.match(STRINGS.sv['hero.alt'], /Robot/)
-  assert.match(STRINGS.en['hero.alt'], /Robot/)
+  assert.equal(STRINGS.sv['hero.alt'], 'Trade Rider Academy-robot')
+  assert.equal(STRINGS.en['hero.alt'], 'Trade Rider Academy-robot')
   assert.match(STRINGS.uk['hero.alt'], /Робот/)
 })
 
@@ -69,10 +69,11 @@ test('stillbild och sprite är de angivna filerna, och cykeln är steps(8)', () 
   assert.equal(ACADEMY_HERO_FRAMES, 8)
   const css = read('../../spel/lagen/akademin.js')
   assert.match(css, /object-fit:contain/)
+  assert.match(css, /background:#000/)
+  assert.match(css, /border-radius:22px/)
   assert.match(css, /steps\(8\)/)
   assert.match(css, /academy-robot-attack \.9s steps\(8\) 1/)
   assert.match(css, /prefers-reduced-motion:reduce/)
-  assert.equal(css.includes('background:#0'), false)
 })
 
 test('cykeln spelas vid öppning och rätt quiz, och vilar vid reduced motion', async () => {

@@ -82,16 +82,15 @@ const css = `
 .nlr-ak-quiz button[data-quiz-hit="ok"]{border-color:${GREEN_D};background:rgba(118,185,0,.18)}
 .nlr-ak-quiz button[data-quiz-hit="no"]{border-color:${RED}}
 .nlr-ak-hero-slot{display:flex}
-.nlr-ak-hero{--frame:168px;width:168px;height:320px;padding:0;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;justify-self:start;position:relative}
+.nlr-ak-hero{--frame:168px;width:168px;height:320px;padding:0;border:0;background:#000;border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px rgba(180,120,255,.28);display:grid;place-items:center;cursor:pointer;justify-self:start;position:relative}
 .nlr-ak-hero:focus-visible{outline:3px solid #22d3ee;outline-offset:3px}
-.nlr-ak-hero-still{width:168px;height:320px;object-fit:contain;object-position:center;display:block;pointer-events:none}
+.nlr-ak-hero-still{width:100%;height:100%;object-fit:contain;object-position:center;display:block;pointer-events:none;background:#000}
 .nlr-ak-hero-sprite{position:absolute;left:50%;top:50%;width:var(--frame);height:var(--frame);transform:translate(-50%,-50%);background-repeat:no-repeat;background-position:0 50%;opacity:0;pointer-events:none}
 .nlr-ak-hero.is-attack .nlr-ak-hero-still{opacity:0}
 .nlr-ak-hero.is-attack .nlr-ak-hero-sprite{opacity:1;background-size:calc(var(--frame) * 8) var(--frame);animation:academy-robot-attack .9s steps(8) 1}
 @keyframes academy-robot-attack{from{background-position-x:0}to{background-position-x:calc(var(--frame) * -8)}}
 @media (max-width:720px){
-  .nlr-ak-hero{--frame:112px;width:112px;height:220px}
-  .nlr-ak-hero-still{width:112px;height:220px}
+  .nlr-ak-hero{--frame:112px;width:112px;height:220px;border-radius:16px}
 }
 @media (prefers-reduced-motion:reduce){
   .nlr-ak-hero.is-attack .nlr-ak-hero-sprite{animation:none;opacity:0;background-image:none}
