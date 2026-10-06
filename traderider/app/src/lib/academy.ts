@@ -12,7 +12,14 @@ export const PRACTICE_BALANCE = STARTING_CASH
 export const MAX_RISK_PCT = 2
 export const RISK_CHOICES = [0.5, 1, 2, 5] as const
 export const STOP_SIGMAS = [1, 1.5, 2] as const
-export const TP_R_MULTIPLES = [1, 2, 3] as const
+/** Target as a multiple of the stop distance. Floor is 1.5R; the lesson preset is 2R. */
+export const TP_R_MULTIPLES = [1.5, 2, 3] as const
+export const DEFAULT_TP_R = 2
+/** Hit rate for a flat result when the gain is R times the loss: 1 / (1 + R). */
+export function breakEvenWinRate(rewardOverRisk: number): number {
+  if (!(rewardOverRisk > 0)) return 1
+  return 1 / (1 + rewardOverRisk)
+}
 
 export type LessonId = 1 | 2 | 3 | 4
 export type XpKey =

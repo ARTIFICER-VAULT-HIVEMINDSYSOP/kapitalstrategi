@@ -200,6 +200,15 @@ test('planen följer senaste steget och stänger vid mål eller stopp, utan att 
   close(openMove(open, 103), 3)
 })
 
+test('ett mål på 4 % stänger referensen senare än ett mål på 3 %', () => {
+  const up = series([100, 101, 102, 103, 104, 105, 106])
+  const closeAt = (plan) => referenceRun(up, plan).sides.findIndex((side, i) => i > 1 && side === 'flat')
+  const at3 = closeAt({ tp: 3, sl: 2 })
+  const at4 = closeAt({ tp: 4, sl: 2 })
+  assert.ok(at3 > 1)
+  assert.ok(at4 > at3)
+})
+
 test('referensen är deterministisk på samma kursserie och tittar inte framåt', () => {
   const up = series([100, 101, 102, 103, 104, 105, 106])
   const run = referenceRun(up)
