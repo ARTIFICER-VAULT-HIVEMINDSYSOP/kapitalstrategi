@@ -22,8 +22,28 @@ test('kanoniskt exempel är 100 / 98 / 104, alltså 1:2', () => {
 })
 
 test('quizzen räknar 1:2 som rätt svar på samma exempel', () => {
-  assert.match(bundle, /Entry 100, S\/L 98, T\/P 104\. Vad är R:R\?`,options:\[xs\(`a`,`1:1`,!1\),xs\(`b`,`1:2`,!0\)/)
-  assert.match(bundle, /Köp 100, SL 98, TP 104\. Vad är R:R\?`,options:\[ks\(`a`,`1:1`,!1\),ks\(`b`,`1:2`,!0\)/)
+  const fields = "(?:,promptEn:`[^`]*`,promptUk:`[^`]*`)?"
+  const translated = "(?:,`[^`]*`,`[^`]*`)?"
+  assert.match(
+    bundle,
+    new RegExp(
+      "Entry 100, S\\/L 98, T\\/P 104\\. Vad är R:R\\?`" +
+        fields +
+        ",options:\\[xs\\(`a`,`1:1`,!1" +
+        translated +
+        "\\),xs\\(`b`,`1:2`,!0",
+    ),
+  )
+  assert.match(
+    bundle,
+    new RegExp(
+      "Köp 100, SL 98, TP 104\\. Vad är R:R\\?`" +
+        fields +
+        ",options:\\[ks\\(`a`,`1:1`,!1" +
+        translated +
+        "\\),ks\\(`b`,`1:2`,!0",
+    ),
+  )
   assert.match(bundle, /stop-loss på 98/)
 })
 
