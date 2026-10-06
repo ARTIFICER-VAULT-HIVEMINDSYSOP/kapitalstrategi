@@ -9,9 +9,12 @@
  *
  * Stil (bara Raket-läget): cyber-HUD – djupt marinblå/lila bakgrund (inte svart), neon i cyan och magenta,
  * tunna ramlinjer med hörnmarkeringar, monospace-siffror, diskreta scanlines, neonhorisont i perspektiv,
- * stjärnor i tre lager med parallax, partiklar, asteroider med splitter och glitch vid förlust ≥ GLITCH_AT %.
- * Raketen själv är i metall (guldgradient med högdager, färger från KS guldknappar).
- * prefers-reduced-motion: ingen parallax, inga partiklar, statiska stjärnor och scanlines, ingen glitch.
+ * stjärnor i tre lager med parallax, svaga stjärnbilder, en mjuk omloppsbana med satellit,
+ * partiklar, asteroider med splitter och glitch vid förlust ≥ GLITCH_AT %.
+ * Farkosten är en egen borstad stålraket: rundad nos, små fenor fram och bak, en undre stegraket med gallerfenor
+ * och motorglöd. Spelare 2 har samma form med en annan accentfärg.
+ * prefers-reduced-motion: ingen parallax, inga partiklar, stilla stjärnor, stjärnbilder och satellit, ingen glitch,
+ * ingen skjuts-skakning.
  */
 import { keyAction, PREVENT_DEFAULT } from './keys.js'
 import { MODES, controlHints } from './orientation.js'
@@ -39,10 +42,6 @@ const PTS_PER_SEC = 5
 const LEV_MIN = 1
 const LEV_MAX = 4
 const MONO = '"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
-// Metall från KS guldknappar (PR #24: --gold-metal-base/-specular/-bevel)
-const GOLD = ['#f4e3b0', '#e3c47c', '#d0ab5c', '#b8923f', '#8a6628']
-const GOLD_EDGE = 'rgba(66,44,10,0.95)'
-const GOLD_INK = '#0a1628'
 export const HUD = { BG_TOP, BG_BOT, BG_PANEL, TEXT, TEXT2, MUTED, CYAN, MAGENTA, BUY, SELL, ON_DARK }
 
 const corners = (c, a = 10, t = 1.5) =>
@@ -326,6 +325,192 @@ export function makeStars(seed = 7) {
   return STAR_LAYERS.map((L) => Array.from({ length: L.n }, () => ({ x: rnd(), y: rnd(), tw: rnd() * 6.28, hue: rnd() })))
 }
 
+/** Accent på fenor och kantljus. Spelare 1 kall, spelare 2 varm. Kroppen är samma stål. */
+export const PLAYER_ACCENT = ['#7ee7ff', '#ffb15a']
+/** Visuellt dödläge i procent så en puls inte fladdrar kring noll. Påverkar inte poäng eller kurs. */
+export const VISUAL_PULSE_BAND = 0.4
+
+/**
+ * Engångspuls ur den rörelse effectLevels redan räknar.
+ * Öppen position som lämnar dödläget uppåt → 'tp' (skjuts). Nedåt → 'sl' (wobble).
+ * Flat, första bildrutan eller oförändrad sida → null. Muterar inte argumenten.
+ */
+export function tradePulse(prev, next) {
+  if (!next?.open || !prev?.open) return null
+  const a = prev.move
+  const b = next.move
+  if (!(Number.isFinite(a) && Number.isFinite(b))) return null
+  if (a <= VISUAL_PULSE_BAND && b > VISUAL_PULSE_BAND) return 'tp'
+  if (a >= -VISUAL_PULSE_BAND && b < -VISUAL_PULSE_BAND) return 'sl'
+  return null
+}
+
+/** Kort skakning i sidled. Stilla vid reducerad rörelse. */
+export function wobbleOffset(now, amount, calm = false) {
+  const a = Math.max(0, Math.min(1, Number(amount) || 0))
+  if (calm || a <= 0) return { x: 0, rot: 0 }
+  const t = Number.isFinite(now) ? now : 0
+  const swing = Math.sin(t * 31) >= 0 ? 1 : -1
+  return {
+    x: (Math.sin(t * 46) * 6.5 + swing * 3.5) * a,
+    rot: (0.16 * swing + Math.sin(t * 38) * 0.08) * a,
+  }
+}
+
+/** Kort lyft uppåt under skjuts. Stilla vid reducerad rörelse. */
+export function burstLift(amount, calm = false) {
+  const a = Math.max(0, Math.min(1, Number(amount) || 0))
+  if (calm || a <= 0) return 0
+  return 18 * a
+}
+
+/** Satellitvinkel. Fast vinkel vid reducerad rörelse. */
+export const ORBIT_FROZEN = -0.85
+export function satelliteAngle(now, calm = false) {
+  if (calm) return ORBIT_FROZEN
+  return ORBIT_FROZEN + (Number.isFinite(now) ? now : 0) * 0.28
+}
+
+export function orbitPoint(angle, rx, ry) {
+  return { x: Math.cos(angle) * rx, y: Math.sin(angle) * ry }
+}
+
+/** Svaga stjärnbilder i normaliserade koordinater. Prydnad, inte en stjärnkatalog. */
+export const CONSTELLATIONS = [
+  {
+    id: 'dipper',
+    stars: [
+      [0.07, 0.15],
+      [0.15, 0.13],
+      [0.18, 0.23],
+      [0.09, 0.25],
+      [0.24, 0.17],
+      [0.31, 0.19],
+      [0.38, 0.14],
+    ],
+    lines: [
+      [0, 1],
+      [1, 2],
+      [2, 3],
+      [3, 0],
+      [1, 4],
+      [4, 5],
+      [5, 6],
+    ],
+  },
+  {
+    id: 'cassiopeia',
+    stars: [
+      [0.58, 0.12],
+      [0.65, 0.06],
+      [0.72, 0.13],
+      [0.79, 0.05],
+      [0.86, 0.11],
+    ],
+    lines: [
+      [0, 1],
+      [1, 2],
+      [2, 3],
+      [3, 4],
+    ],
+  },
+  {
+    id: 'orion',
+    stars: [
+      [0.68, 0.34],
+      [0.84, 0.32],
+      [0.73, 0.43],
+      [0.78, 0.44],
+      [0.83, 0.43],
+      [0.72, 0.55],
+      [0.85, 0.54],
+    ],
+    lines: [
+      [0, 1],
+      [0, 2],
+      [1, 4],
+      [2, 3],
+      [3, 4],
+      [2, 5],
+      [4, 6],
+    ],
+  },
+]
+
+export function starTwinkle(now, phase, calm = false) {
+  if (calm) return 0.85
+  const t = Number.isFinite(now) ? now : 0
+  return 0.62 + 0.38 * Math.sin(t * 1.35 + phase)
+}
+
+/** Omloppsbana, satellit och stjärnbilder bakom banan. Billigt: några streck per bildruta. */
+export function drawSkyHomage(c, W, H, now, calm, drift = 0) {
+  if (!c || !(W > 0) || !(H > 0)) return
+  c.save()
+  c.translate((drift || 0) * 0.35, (drift || 0) * 0.06)
+  c.lineWidth = 1
+  c.strokeStyle = 'rgba(186, 214, 232, 0.18)'
+  c.beginPath()
+  for (const fig of CONSTELLATIONS) {
+    for (const [a, b] of fig.lines) {
+      const [x1, y1] = fig.stars[a]
+      const [x2, y2] = fig.stars[b]
+      c.moveTo(x1 * W, y1 * H)
+      c.lineTo(x2 * W, y2 * H)
+    }
+  }
+  c.stroke()
+  for (const fig of CONSTELLATIONS) {
+    fig.stars.forEach(([nx, ny], i) => {
+      const tw = starTwinkle(now, i * 1.7 + nx * 5, calm)
+      c.fillStyle = `rgba(236, 246, 255, ${(0.22 + 0.28 * tw).toFixed(3)})`
+      c.beginPath()
+      c.arc(nx * W, ny * H, i % 3 === 0 ? 1.8 : 1.15, 0, Math.PI * 2)
+      c.fill()
+    })
+  }
+  c.restore()
+
+  const cx = W * 0.06 + (drift || 0) * 0.45
+  const cy = H * 0.78
+  const R = Math.min(W, H) * 0.42
+  c.save()
+  const limb = c.createRadialGradient(cx - R * 0.25, cy - R * 0.2, R * 0.15, cx, cy, R)
+  limb.addColorStop(0, 'rgba(46, 92, 104, 0.22)')
+  limb.addColorStop(0.78, 'rgba(12, 28, 48, 0.16)')
+  limb.addColorStop(1, 'rgba(6, 10, 24, 0)')
+  c.fillStyle = limb
+  c.beginPath()
+  c.arc(cx, cy, R, 0, Math.PI * 2)
+  c.fill()
+  c.strokeStyle = 'rgba(126, 214, 196, 0.28)'
+  c.lineWidth = 1.6
+  c.stroke()
+
+  const rx = R * 1.45
+  const ry = R * 0.46
+  c.translate(cx, cy)
+  c.rotate(-0.42)
+  c.beginPath()
+  c.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2)
+  c.strokeStyle = 'rgba(140, 230, 214, 0.1)'
+  c.lineWidth = 5
+  c.stroke()
+  c.strokeStyle = 'rgba(170, 236, 224, 0.28)'
+  c.lineWidth = 1.15
+  c.stroke()
+  const ang = satelliteAngle(now, calm)
+  const p = orbitPoint(ang, rx, ry)
+  c.translate(p.x, p.y)
+  c.rotate(ang)
+  c.fillStyle = 'rgba(214, 226, 234, 0.82)'
+  c.fillRect(-5.5, -2, 11, 4)
+  c.fillStyle = 'rgba(126, 231, 255, 0.7)'
+  c.fillRect(-12, -1.1, 6, 2.2)
+  c.fillRect(6.2, -1.1, 6, 2.2)
+  c.restore()
+}
+
 /* ---------- vy ---------- */
 
 let monoLinked = false
@@ -486,6 +671,10 @@ export function createRaket({ engine }) {
         gl: 0,
         gNext: 0.4,
         gUntil: 0,
+        burst: 0,
+        wobble: 0,
+        prevMove: { open: false, move: 0 },
+        holdPose: false,
         fx: effectLevels(null),
         dom: buildPlayerDom(i),
       })
@@ -741,6 +930,8 @@ export function createRaket({ engine }) {
       }
     })
     c.globalAlpha = 1
+    const skyDrift = calm ? 0 : (pl.scroll[0] / Math.max(H, 1) - 0.5) * 16
+    drawSkyHomage(c, W, H, now, calm, skyDrift)
   }
 
   function hudFrame(c, W, H, compact) {
@@ -800,7 +991,21 @@ export function createRaket({ engine }) {
     const pxPer = twoP && H < 500 ? 20 : compact ? 26 : 30
     const fx = effectLevels(st, priceAt(clock.p), priceAt(Math.max(0, clock.p - 1)))
     pl.fx = fx
-    const speed = parallaxSpeed(clock.playing && !clock.ended, calm, PTS_PER_SEC * pxPer, fx.boost)
+    const openNow = !isFlat(st)
+    const pulse = tradePulse(pl.prevMove, { open: openNow, move: fx.move })
+    pl.prevMove = { open: openNow, move: fx.move }
+    if (dt > 0 && !pl.holdPose) {
+      pl.burst = Math.max(0, pl.burst - dt / 0.72)
+      pl.wobble = Math.max(0, pl.wobble - dt / 0.55)
+    }
+    if (!calm && !pl.holdPose) {
+      if (pulse === 'tp') pl.burst = 1
+      if (pulse === 'sl') pl.wobble = 1
+    }
+    const visualBoost = Math.min(1, fx.boost + (calm ? 0 : pl.burst * 0.85))
+    const lift = burstLift(pl.burst, calm)
+    const wob = wobbleOffset(now, pl.wobble, calm)
+    const speed = parallaxSpeed(clock.playing && !clock.ended, calm, PTS_PER_SEC * pxPer, visualBoost)
     backdrop(c, pl, W, H, dt, calm, now, speed, compact)
     if (!pts.length) {
       c.fillStyle = TEXT2
@@ -952,11 +1157,13 @@ export function createRaket({ engine }) {
     if (priceX < 4) priceX = x + 28
     if (priceX + priceOuter > W - 4) priceX = x - priceOuter - 28
     const fixedLabels = []
+    const anchorX = x + wob.x
+    const anchorY = rocketY - lift
     if (tagTxt) {
       c.font = `600 11px ${MONO}`
-      fixedLabels.push(labelBox(x, rocketY + 56, c.measureText(tagTxt).width, { size: 11, align: 'center', W }))
+      fixedLabels.push(labelBox(anchorX, anchorY + 64, c.measureText(tagTxt).width, { size: 11, align: 'center', W }))
     }
-    fixedLabels.push(labelBox(priceX, rocketY, priceMeasure, { size: 13, align: 'left', W }))
+    fixedLabels.push(labelBox(priceX + wob.x, anchorY, priceMeasure, { size: 13, align: 'left', W }))
     const alert = fx.move <= -GLITCH_AT
     const alertY = Math.max(twoP ? 110 : 86, rocketY - (compact ? 120 : 150))
     const alertSize = compact ? 10 : 12
@@ -1017,10 +1224,10 @@ export function createRaket({ engine }) {
       c.restore()
     }
 
-    // (3) boost: fartlinjer i cyan
-    if (fx.boost > 0.01 && !calm) {
-      const n = Math.round(4 + 12 * fx.boost)
-      c.strokeStyle = `rgba(46,230,255,${(0.12 + 0.22 * fx.boost).toFixed(3)})`
+    // (3) boost: fartlinjer i cyan. Visuell skjuts läggs på den befintliga plus-rörelsen.
+    if (visualBoost > 0.01 && !calm) {
+      const n = Math.round(4 + 12 * visualBoost)
+      c.strokeStyle = `rgba(46,230,255,${(0.12 + 0.22 * visualBoost).toFixed(3)})`
       c.lineWidth = 1.2
       c.beginPath()
       const ax = Math.sin(tilt)
@@ -1029,10 +1236,10 @@ export function createRaket({ engine }) {
       const py = -Math.sin(tilt)
       for (let k = 0; k < n; k++) {
         const ox = ((k * 53) % 150) - 75
-        const len = 18 + 44 * fx.boost
-        const along = ((now * (260 + 380 * fx.boost) + k * 97) % 280) - 70
-        const sx = x + px * ox + ax * along
-        const sy = rocketY + py * ox + ay * along
+        const len = 18 + 44 * visualBoost
+        const along = ((now * (260 + 380 * visualBoost) + k * 97) % 280) - 70
+        const sx = anchorX + px * ox + ax * along
+        const sy = anchorY + py * ox + ay * along
         c.moveTo(sx, sy)
         c.lineTo(sx + ax * len, sy + ay * len)
       }
@@ -1040,19 +1247,18 @@ export function createRaket({ engine }) {
     }
 
     // partiklar: partiklar ur munstycket (bak), följer boost; ingen vid reducerad rörelse
-    const S = 1.15
-    const nozzle = 29 * S
-    const nx = x - Math.sin(tilt) * nozzle
-    const ny = rocketY + Math.cos(tilt) * nozzle
+    const nozzle = ENGINE_Y
+    const nx = anchorX - Math.sin(tilt) * nozzle
+    const ny = anchorY + Math.cos(tilt) * nozzle
     const cap = (twoP ? 150 : 240) >> (quality > 0 ? 1 : 0)
     if (dt > 0) {
-      pl.emit += exhaustRate(fx, clock.playing, calm) * dt
+      pl.emit += exhaustRate({ boost: visualBoost }, clock.playing, calm) * dt
       const worldV = speed * 0.6
       while (pl.emit >= 1 && pl.puffs.length < cap) {
         pl.emit -= 1
-        const back = 110 + 230 * fx.boost + Math.random() * 60
-        const side = (Math.random() - 0.5) * (40 + 40 * fx.boost)
-        const spark = fx.boost > 0.25 && Math.random() < 0.3
+        const back = 110 + 230 * visualBoost + Math.random() * 60
+        const side = (Math.random() - 0.5) * (40 + 40 * visualBoost)
+        const spark = visualBoost > 0.25 && Math.random() < 0.3
         pl.puffs.push({
           x: nx + (Math.random() - 0.5) * 4,
           y: ny,
@@ -1061,7 +1267,7 @@ export function createRaket({ engine }) {
           life: 0,
           max: spark ? 0.3 + Math.random() * 0.2 : 0.45 + Math.random() * 0.45,
           r0: spark ? 1 : 1.4 + Math.random(),
-          r1: spark ? 1 : 4 + 4 * fx.boost,
+          r1: spark ? 1 : 4 + 4 * visualBoost,
           spark,
         })
       }
@@ -1185,7 +1391,8 @@ export function createRaket({ engine }) {
     }
 
     const jolt = pl.hit > 0 && !calm ? Math.sin(now * 90) * 4 * pl.hit : 0
-    drawRocket(c, x + jolt, rocketY, tilt + jolt * 0.02, flat ? 'flat' : st.side, clock.playing, fx, calm, now, getSprite(flat ? 'flat' : st.side))
+    const sideKey = flat ? 'flat' : st.side
+    drawRocket(c, anchorX + jolt, anchorY, tilt + jolt * 0.02 + wob.rot, sideKey, clock.playing, fx, calm, now, getSprite(sideKey, i), calm ? 0 : pl.burst)
     if (pl.hit > 0) {
       c.fillStyle = `rgba(255,90,106,${(0.12 * pl.hit).toFixed(3)})`
       c.fillRect(0, 0, W, H)
@@ -1195,11 +1402,11 @@ export function createRaket({ engine }) {
     if (tagTxt) {
       const plus = fx.boost > 0.01
       const minus = fx.loss > 0.01
-      hudLabel(c, tagTxt, x, rocketY + 56, { size: 11, align: 'center', W, color: plus || minus ? ON_DARK : TEXT, bg: plus ? BUY : minus ? SELL : 'rgba(10,15,46,0.92)', border: plus ? BUY : minus ? SELL : CYAN })
+      hudLabel(c, tagTxt, anchorX, anchorY + 64, { size: 11, align: 'center', W, color: plus || minus ? ON_DARK : TEXT, bg: plus ? BUY : minus ? SELL : 'rgba(10,15,46,0.92)', border: plus ? BUY : minus ? SELL : CYAN })
     }
     if (alert) hudLabel(c, t('rk.warn', { pct: fmtPct(fx.move) }), W / 2, alertY, { size: alertSize, align: 'center', W, color: TEXT, border: SELL, bg: 'rgba(40,8,28,0.92)' })
 
-    hudLabel(c, priceText, priceX, rocketY, { size: 13, W, color: TEXT, border: 'rgba(46,230,255,0.8)' })
+    hudLabel(c, priceText, priceX + wob.x, anchorY, { size: 13, W, color: TEXT, border: 'rgba(46,230,255,0.8)' })
 
     // glitch vid stor förlust (inte vid reducerad rörelse)
     const gl = glitchLevel(fx, calm)
@@ -1283,9 +1490,10 @@ export function createRaket({ engine }) {
     c.restore()
   }
 
-  function getSprite(side) {
-    const k = `${side}@${dpr}`
-    if (!sprites.has(k)) sprites.set(k, rocketSprite(side, dpr))
+  function getSprite(side, player) {
+    const accent = player === 1 ? 1 : 0
+    const k = `${side}@${accent}@${dpr}`
+    if (!sprites.has(k)) sprites.set(k, rocketSprite(side, accent, dpr))
     return sprites.get(k)
   }
 
@@ -1373,6 +1581,16 @@ export function createRaket({ engine }) {
       if (pl && pl.gl > 0) pl.gUntil = performance.now() / 1000 + sec
       return pl?.gl ?? 0
     },
+    /** Skärmdumpar: frys en visuell skjuts eller wobble. Påverkar inte klocka, kurs eller poäng. */
+    pose(i = 0, opts = {}) {
+      const pl = players[i]
+      if (!pl) return null
+      if (opts.burst != null) pl.burst = opts.burst
+      if (opts.wobble != null) pl.wobble = opts.wobble
+      pl.holdPose = opts.hold !== false
+      render(0)
+      return { burst: pl.burst, wobble: pl.wobble, accent: PLAYER_ACCENT[i === 1 ? 1 : 0] }
+    },
     step(sec) {
       clock.p = Math.min(pts.length - 1, clock.p + PTS_PER_SEC * sec)
       render()
@@ -1383,9 +1601,10 @@ export function createRaket({ engine }) {
 
 /* ---------- ritning (egen grafik) ---------- */
 
-const SPR_W = 72
-const SPR_H = 96
-const SPR_CY = 42 // raketens mitt i spriten
+const SPR_W = 88
+const SPR_H = 108
+const SPR_CY = 52 // raketens mitt i spriten
+const ENGINE_Y = 40 // munstyckenas utlopp, lokal +y
 const newCanvas = (w, h) => {
   const cv = document.createElement('canvas')
   cv.width = w
@@ -1393,205 +1612,213 @@ const newCanvas = (w, h) => {
   return cv
 }
 
-/** Raketkropp i metall (guldgradient + högdager enligt KS guldknappar). Nosen mot −y, munstycket bak (+y). */
-function rocketSprite(side, dpr) {
+function steelGradient(g, x0, x1) {
+  const bg = g.createLinearGradient(x0, 0, x1, 0)
+  bg.addColorStop(0, '#5c656e')
+  bg.addColorStop(0.15, '#b4bec8')
+  bg.addColorStop(0.32, '#f5f8fb')
+  bg.addColorStop(0.46, '#d3dce4')
+  bg.addColorStop(0.64, '#8d97a2')
+  bg.addColorStop(0.8, '#e6edf3')
+  bg.addColorStop(1, '#4c555e')
+  return bg
+}
+
+function paintSteel(g, trace, x0, x1, y0, y1) {
+  trace()
+  g.fillStyle = steelGradient(g, x0, x1)
+  g.fill()
+  g.save()
+  trace()
+  g.clip()
+  g.strokeStyle = 'rgba(255,255,255,0.14)'
+  g.lineWidth = 0.55
+  for (let y = y0; y < y1; y += 3.5) {
+    g.beginPath()
+    g.moveTo(x0, y)
+    g.lineTo(x1, y)
+    g.stroke()
+  }
+  const hi = g.createLinearGradient(x0 + 1, 0, x0 + 8, 0)
+  hi.addColorStop(0, 'rgba(255,255,255,0)')
+  hi.addColorStop(0.55, 'rgba(255,255,255,0.5)')
+  hi.addColorStop(1, 'rgba(255,255,255,0)')
+  g.fillStyle = hi
+  g.fillRect(x0 + 1, y0, 7, y1 - y0)
+  g.restore()
+  trace()
+  g.strokeStyle = 'rgba(24, 30, 38, 0.88)'
+  g.lineWidth = 1.05
+  g.stroke()
+}
+
+function shipPath(g) {
+  g.beginPath()
+  g.moveTo(0, -46)
+  g.bezierCurveTo(9, -40, 12, -30, 12, -18)
+  g.lineTo(12, -1)
+  g.lineTo(-12, -1)
+  g.lineTo(-12, -18)
+  g.bezierCurveTo(-12, -30, -9, -40, 0, -46)
+  g.closePath()
+}
+
+function boosterPath(g) {
+  g.beginPath()
+  g.moveTo(-13, 5)
+  g.lineTo(-14.5, 33)
+  g.quadraticCurveTo(0, 35.5, 14.5, 33)
+  g.lineTo(13, 5)
+  g.closePath()
+}
+
+function flap(g, s, y, len, h, accent) {
+  g.beginPath()
+  g.moveTo(s * 11, y)
+  g.lineTo(s * (11 + len), y + h * 0.2)
+  g.lineTo(s * (11 + len * 0.62), y + h)
+  g.lineTo(s * 9.5, y + h * 0.62)
+  g.closePath()
+  g.fillStyle = steelGradient(g, s * 9, s * (11 + len))
+  g.fill()
+  g.strokeStyle = accent
+  g.lineWidth = 1
+  g.stroke()
+}
+
+function gridFin(g, s, accent) {
+  g.save()
+  g.translate(s * 14, 12)
+  g.beginPath()
+  g.moveTo(0, -7)
+  g.lineTo(s * 13, -3)
+  g.lineTo(s * 13, 9)
+  g.lineTo(0, 6)
+  g.closePath()
+  g.fillStyle = 'rgba(198, 208, 216, 0.72)'
+  g.fill()
+  g.strokeStyle = accent
+  g.lineWidth = 0.9
+  g.stroke()
+  g.beginPath()
+  for (let i = 1; i <= 3; i++) {
+    const t = i / 4
+    g.moveTo(s * 13 * t, -7 + 4 * t)
+    g.lineTo(s * 13 * t, 6 + 3 * t)
+  }
+  g.moveTo(0, -1)
+  g.lineTo(s * 13, 2)
+  g.moveTo(0, 3)
+  g.lineTo(s * 13, 6)
+  g.stroke()
+  g.restore()
+}
+
+function bell(g, x, y, w) {
+  const ng = g.createLinearGradient(x - w, 0, x + w, 0)
+  ng.addColorStop(0, '#3c4450')
+  ng.addColorStop(0.48, '#d7e0e8')
+  ng.addColorStop(1, '#3c4450')
+  g.fillStyle = ng
+  g.beginPath()
+  g.moveTo(x - w * 0.45, y)
+  g.lineTo(x + w * 0.45, y)
+  g.lineTo(x + w, y + 7)
+  g.lineTo(x - w, y + 7)
+  g.closePath()
+  g.fill()
+  g.strokeStyle = 'rgba(20, 24, 30, 0.9)'
+  g.lineWidth = 0.8
+  g.stroke()
+}
+
+/** Borstad stålraket. Nosen mot −y, motorerna mot +y. accent 0/1 byter kantfärg, inte formen. */
+function rocketSprite(side, accent, dpr) {
   const cv = newCanvas(Math.ceil(SPR_W * dpr), Math.ceil(SPR_H * dpr))
   const g = cv.getContext('2d')
   g.scale(dpr, dpr)
   g.translate(SPR_W / 2, SPR_CY)
-  g.scale(1.15, 1.15)
-  const acc = side === 'buy' ? [BUY, '#3f8a0e'] : side === 'sell' ? [SELL, '#8e1f2e'] : ['#b9c9ea', '#4c5d86'] // flat = stål
-  // fenor (bakom kroppen), färgad efter sida
-  for (const s of [-1, 1]) {
-    const fg = g.createLinearGradient(s * 8, 6, s * 18, 22)
-    fg.addColorStop(0, acc[0])
-    fg.addColorStop(1, acc[1])
-    g.fillStyle = fg
-    g.strokeStyle = GOLD_EDGE
-    g.lineWidth = 1.1
-    g.beginPath()
-    g.moveTo(s * 9, 5)
-    g.lineTo(s * 18.5, 22)
-    g.lineTo(s * 8, 19.5)
-    g.closePath()
-    g.fill()
-    g.stroke()
-    g.strokeStyle = 'rgba(255,255,255,0.55)'
-    g.lineWidth = 0.8
-    g.beginPath()
-    g.moveTo(s * 9.6, 7)
-    g.lineTo(s * 17.2, 20.6)
-    g.stroke()
-  }
-  // munstycke
-  const ng = g.createLinearGradient(-7, 0, 7, 0)
-  ng.addColorStop(0, '#1d2440')
-  ng.addColorStop(0.45, '#8190b8')
-  ng.addColorStop(1, '#1d2440')
-  g.fillStyle = ng
-  g.strokeStyle = 'rgba(5,8,20,0.9)'
+  const edge = PLAYER_ACCENT[accent === 1 ? 1 : 0]
+  const lamp = side === 'buy' ? BUY : side === 'sell' ? SELL : edge
+  gridFin(g, -1, edge)
+  gridFin(g, 1, edge)
+  flap(g, -1, -28, 7, 8, edge)
+  flap(g, 1, -28, 7, 8, edge)
+  flap(g, -1, -6, 10, 11, edge)
+  flap(g, 1, -6, 10, 11, edge)
+  paintSteel(g, () => boosterPath(g), -15, 15, 5, 34)
+  paintSteel(g, () => shipPath(g), -12, 12, -46, 0)
+  g.fillStyle = 'rgba(32, 38, 46, 0.9)'
+  g.fillRect(-13, 1, 26, 4)
+  g.strokeStyle = edge
   g.lineWidth = 1
+  g.strokeRect(-13.5, 0.5, 27, 5)
+  g.strokeStyle = 'rgba(24, 30, 38, 0.55)'
+  g.lineWidth = 0.8
   g.beginPath()
-  g.moveTo(-6, 19)
-  g.lineTo(6, 19)
-  g.lineTo(7.6, 25.5)
-  g.lineTo(-7.6, 25.5)
-  g.closePath()
-  g.fill()
+  g.moveTo(-11, -14)
+  g.lineTo(11, -14)
+  g.moveTo(-12, -8)
+  g.lineTo(12, -8)
   g.stroke()
-  // kropp
-  const body = () => {
-    g.beginPath()
-    g.moveTo(0, -30)
-    g.bezierCurveTo(12, -18, 11, 6, 9, 20)
-    g.lineTo(-9, 20)
-    g.bezierCurveTo(-11, 6, -12, -18, 0, -30)
-    g.closePath()
-  }
-  const bg = g.createLinearGradient(-11, 0, 11, 0)
-  bg.addColorStop(0, '#5c4216')
-  bg.addColorStop(0.12, GOLD[4])
-  bg.addColorStop(0.3, GOLD[2])
-  bg.addColorStop(0.44, GOLD[0])
-  bg.addColorStop(0.58, GOLD[1])
-  bg.addColorStop(0.8, GOLD[3])
-  bg.addColorStop(1, '#4e3812')
-  body()
-  g.fillStyle = bg
-  g.fill()
-  g.save()
-  body()
-  g.clip()
-  // specular-strimma (--gold-metal-specular) och topphögdager (--gold-metal-highlight)
-  const sp = g.createLinearGradient(-9, 0, 3, 0)
-  sp.addColorStop(0, 'rgba(255,255,255,0)')
-  sp.addColorStop(0.35, 'rgba(255,253,244,0.8)')
-  sp.addColorStop(0.55, 'rgba(255,250,232,0.28)')
-  sp.addColorStop(1, 'rgba(255,250,232,0)')
-  g.fillStyle = sp
-  g.fillRect(-9, -30, 12, 50)
-  const hl = g.createRadialGradient(0, -26, 0, 0, -26, 18)
-  hl.addColorStop(0, 'rgba(255,244,212,0.65)')
-  hl.addColorStop(1, 'rgba(255,244,212,0)')
-  g.fillStyle = hl
-  g.fillRect(-12, -32, 24, 30)
-  // ring
-  g.strokeStyle = 'rgba(66,44,10,0.7)'
-  g.lineWidth = 1
+  const nose = g.createRadialGradient(-2, -40, 1, 0, -36, 16)
+  nose.addColorStop(0, 'rgba(255, 236, 220, 0.35)')
+  nose.addColorStop(1, 'rgba(255, 236, 220, 0)')
+  g.fillStyle = nose
   g.beginPath()
-  g.moveTo(-11, 10)
-  g.lineTo(11, 10)
-  g.stroke()
-  g.strokeStyle = 'rgba(255,244,214,0.55)'
-  g.beginPath()
-  g.moveTo(-11, 11.2)
-  g.lineTo(11, 11.2)
-  g.stroke()
-  g.restore()
-  body()
-  g.strokeStyle = GOLD_EDGE
-  g.lineWidth = 1.3
-  g.stroke()
-  // nos i mörk metall med cyan kantljus
-  const nose = () => {
-    g.beginPath()
-    g.moveTo(0, -30)
-    g.bezierCurveTo(5, -25, 7, -21, 7.6, -18)
-    g.lineTo(-7.6, -18)
-    g.bezierCurveTo(-7, -21, -5, -25, 0, -30)
-    g.closePath()
-  }
-  const nz = g.createLinearGradient(-8, 0, 8, 0)
-  nz.addColorStop(0, '#040a18')
-  nz.addColorStop(0.4, '#34487a')
-  nz.addColorStop(1, GOLD_INK)
-  nose()
-  g.fillStyle = nz
+  g.arc(0, -38, 10, 0, Math.PI * 2)
   g.fill()
-  g.strokeStyle = GOLD_EDGE
+  g.fillStyle = '#121820'
+  g.beginPath()
+  g.arc(0, -16, 2.3, 0, Math.PI * 2)
+  g.fill()
+  g.strokeStyle = lamp
   g.lineWidth = 1.1
   g.stroke()
-  g.strokeStyle = 'rgba(46,230,255,0.75)'
-  g.lineWidth = 0.9
-  g.beginPath()
-  g.moveTo(-1.2, -28.2)
-  g.bezierCurveTo(-4.2, -25, -5.8, -22, -6.2, -19)
-  g.stroke()
-  // fönster: guldring + cyan glas
-  const rg = g.createLinearGradient(-6, -11, 6, 1)
-  rg.addColorStop(0, GOLD[0])
-  rg.addColorStop(1, GOLD[4])
-  g.fillStyle = rg
-  g.beginPath()
-  g.arc(0, -5, 5.8, 0, Math.PI * 2)
-  g.fill()
-  g.strokeStyle = GOLD_EDGE
-  g.lineWidth = 1
-  g.stroke()
-  const gl = g.createRadialGradient(-1.4, -6.6, 0.4, 0, -5, 4.4)
-  gl.addColorStop(0, '#d6fbff')
-  gl.addColorStop(0.4, CYAN)
-  gl.addColorStop(1, '#0a3550')
-  g.fillStyle = gl
-  g.beginPath()
-  g.arc(0, -5, 4.3, 0, Math.PI * 2)
-  g.fill()
-  g.fillStyle = 'rgba(255,255,255,0.9)'
-  g.beginPath()
-  g.arc(-1.6, -6.8, 1, 0, Math.PI * 2)
-  g.fill()
-  // mittfena
-  const mf = g.createLinearGradient(-1.5, 0, 1.5, 0)
-  mf.addColorStop(0, acc[1])
-  mf.addColorStop(0.5, acc[0])
-  mf.addColorStop(1, acc[1])
-  g.fillStyle = mf
-  g.fillRect(-1.3, 9, 2.6, 13)
+  bell(g, -7, 32, 4.2)
+  bell(g, 7, 32, 4.2)
+  bell(g, 0, 31, 5.4)
   return cv
 }
 
-let HALO = null
-/** Mjukt ljus runt raketen (cyan kärna, magenta kant) – ritas en gång. */
-function haloSprite() {
-  if (HALO) return HALO
-  HALO = newCanvas(128, 128)
-  const g = HALO.getContext('2d')
-  const h = g.createRadialGradient(64, 64, 2, 64, 64, 64)
-  h.addColorStop(0, 'rgba(46,230,255,0.24)')
-  h.addColorStop(0.5, 'rgba(255,79,192,0.10)')
-  h.addColorStop(1, 'rgba(46,230,255,0)')
-  g.fillStyle = h
-  g.fillRect(0, 0, 128, 128)
-  return HALO
-}
-
-/** Raket med mjukt ljus runt, flamma bak (+y) och metallkropp ur spriten. Lokalt origo = raketens mitt, nosen mot −y. */
-function drawRocket(c, x, y, tilt, side, burning, fx, calm, now, sprite) {
+/** Motorglöd under raketen. burst är den korta skjuts-pulsen, utöver den vanliga plus-lågan. */
+function drawRocket(c, x, y, tilt, side, burning, fx, calm, now, sprite, burst = 0) {
   c.save()
   c.translate(x, y)
-  // mjukt ljus runt raketen
-  c.globalCompositeOperation = 'lighter'
-  const rr = 58 + 30 * fx.boost
-  c.globalAlpha = Math.min(1, 0.7 + 0.3 * Math.max(fx.glow, fx.boost))
-  c.drawImage(haloSprite(), -rr, 4 - rr, rr * 2, rr * 2)
-  c.globalAlpha = 1
   c.rotate(tilt)
-  // flamma bak (efter munstycket)
-  const flick = burning && !calm ? 0.16 * Math.sin(now * 17) + 0.08 * Math.sin(now * 41) : 0
-  const fl = (burning ? 1 + flick : 0.5) * (1 + 1.5 * fx.boost)
-  c.scale(1.15, 1.15)
-  const y0 = 25
-  for (const [w, len, col] of [[8, 30, 'rgba(255,79,192,0.55)'], [5.8, 22, 'rgba(255,192,90,0.85)'], [3.2, 12, 'rgba(255,248,230,0.95)']]) {
-    c.fillStyle = col
-    c.beginPath()
-    c.moveTo(-w, y0)
-    c.quadraticCurveTo(-w * 0.6, y0 + len * fl * 0.6, 0, y0 + len * fl)
-    c.quadraticCurveTo(w * 0.6, y0 + len * fl * 0.6, w, y0)
-    c.closePath()
-    c.fill()
+  const boost = Math.max(0, Math.min(1, fx?.boost || 0))
+  const kick = calm ? 0 : Math.max(0, Math.min(1, burst || 0))
+  const flick = burning && !calm ? 0.12 * Math.sin(now * 23) + 0.06 * Math.sin(now * 51) : 0
+  const fl = (burning ? 1 : 0.62) * (1 + flick) * (1 + 1.05 * boost + 1.9 * kick)
+  c.globalCompositeOperation = 'lighter'
+  const glowR = 28 + 22 * boost + 36 * kick
+  const halo = c.createRadialGradient(0, ENGINE_Y, 2, 0, ENGINE_Y + 10, glowR)
+  halo.addColorStop(0, `rgba(255, 220, 160, ${(0.28 + 0.45 * kick).toFixed(3)})`)
+  halo.addColorStop(0.4, `rgba(255, 122, 36, ${(0.16 + 0.28 * Math.max(boost, kick)).toFixed(3)})`)
+  halo.addColorStop(1, 'rgba(255, 80, 20, 0)')
+  c.fillStyle = halo
+  c.beginPath()
+  c.arc(0, ENGINE_Y + 8, glowR, 0, Math.PI * 2)
+  c.fill()
+  const y0 = ENGINE_Y - 1
+  for (const ox of [-7, 0, 7]) {
+    const w = ox === 0 ? 5.4 : 3.3
+    const len = (ox === 0 ? 26 : 16) * fl
+    for (const [fw, flen, col] of [
+      [w * 1.8, len * 1.2, `rgba(255, 86, 18, ${(0.28 + 0.4 * kick).toFixed(3)})`],
+      [w, len * 0.82, 'rgba(255, 164, 54, 0.82)'],
+      [w * 0.42, len * 0.42, 'rgba(255, 248, 230, 0.95)'],
+    ]) {
+      c.fillStyle = col
+      c.beginPath()
+      c.moveTo(ox - fw, y0)
+      c.quadraticCurveTo(ox, y0 + flen * 0.62, ox, y0 + flen)
+      c.quadraticCurveTo(ox, y0 + flen * 0.62, ox + fw, y0)
+      c.closePath()
+      c.fill()
+    }
   }
   c.globalCompositeOperation = 'source-over'
-  c.scale(1 / 1.15, 1 / 1.15)
   c.drawImage(sprite, -SPR_W / 2, -SPR_CY, SPR_W, SPR_H)
   c.restore()
 }

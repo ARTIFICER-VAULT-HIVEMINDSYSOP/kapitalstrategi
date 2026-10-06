@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { effectLevels, pnlPct, switchSide, FX_FULL, labelBox, boxesOverlap, dodgeEntryY } from '../../spel/lagen/raket.js'
+import { effectLevels, pnlPct, switchSide, FX_FULL, labelBox, boxesOverlap, dodgeEntryY, tradePulse, wobbleOffset, burstLift, satelliteAngle, ORBIT_FROZEN, orbitPoint, CONSTELLATIONS, starTwinkle, PLAYER_ACCENT, VISUAL_PULSE_BAND } from '../../spel/lagen/raket.js'
 
 const close = (a, b, e = 1e-9) => assert.ok(Math.abs(a - b) < e, `${a} ≈ ${b}`)
 
@@ -131,6 +131,48 @@ test('ENTRY ligger kvar när rutan redan är fri', () => {
   const price = labelBox(40, 100, 64, { size: 13, align: 'left', W: 390 })
   const boxAt = (yy) => labelBox(300, yy, 70, { size: 11, align: 'center', W: 390 })
   assert.equal(dodgeEntryY(boxAt, [tag, price], { minY: 80, maxY: 240, startY: 200 }), 200)
+})
+
+test('plus-korsning ger en visuell tp-puls och minus-korsning en sl-puls, utan att ändra talen', () => {
+  const prev = { open: true, move: 0 }
+  const up = { open: true, move: VISUAL_PULSE_BAND + 0.2 }
+  const down = { open: true, move: -(VISUAL_PULSE_BAND + 0.2) }
+  assert.equal(tradePulse(prev, up), 'tp')
+  assert.equal(tradePulse(prev, down), 'sl')
+  assert.equal(tradePulse(up, { open: true, move: up.move + 1 }), null)
+  assert.equal(tradePulse({ open: false, move: 0 }, up), null)
+  assert.equal(tradePulse(prev, { open: false, move: 4 }), null)
+  assert.deepEqual(prev, { open: true, move: 0 })
+})
+
+test('wobble och lyft är stilla vid reducerad rörelse', () => {
+  assert.deepEqual(wobbleOffset(1.2, 1, true), { x: 0, rot: 0 })
+  assert.equal(burstLift(1, true), 0)
+  const live = wobbleOffset(0.4, 1, false)
+  assert.ok(Math.abs(live.x) > 0)
+  assert.ok(burstLift(1, false) > burstLift(0.5, false))
+  assert.equal(satelliteAngle(3, true), ORBIT_FROZEN)
+  assert.notEqual(satelliteAngle(3, false), satelliteAngle(4, false))
+  const p = orbitPoint(0, 10, 4)
+  assert.equal(p.x, 10)
+  assert.equal(p.y, 0)
+})
+
+test('stjärnbilderna är svaga figurer: Karlavagnen, ett W och ett bälte', () => {
+  const ids = CONSTELLATIONS.map((f) => f.id)
+  assert.deepEqual(ids, ['dipper', 'cassiopeia', 'orion'])
+  const dipper = CONSTELLATIONS[0]
+  assert.equal(dipper.stars.length, 7)
+  assert.equal(dipper.lines.length, 7)
+  for (const fig of CONSTELLATIONS) {
+    for (const [a, b] of fig.lines) {
+      assert.ok(fig.stars[a] && fig.stars[b])
+      assert.ok(fig.stars[a][0] >= 0 && fig.stars[a][0] <= 1)
+      assert.ok(fig.stars[a][1] >= 0 && fig.stars[a][1] <= 1)
+    }
+  }
+  assert.equal(starTwinkle(1, 0, true), starTwinkle(9, 2, true))
+  assert.notEqual(PLAYER_ACCENT[0], PLAYER_ACCENT[1])
 })
 
 test('2P delar skärmen: vänster/höger på bred, över/under på smal; 1P = hela', () => {
