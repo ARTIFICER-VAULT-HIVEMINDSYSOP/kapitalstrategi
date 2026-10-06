@@ -71,6 +71,13 @@ test('referensen följer valt förhållande: 2 % stopp och 4 % eller 3 % mål', 
   assert.ok(Math.abs(loose.exit.r - 1.5) < 1e-9)
 })
 
+test('en träffad stop-loss får kosta högst 2 % av insatsen, inklusive hävstång', () => {
+  assert.equal(assessPlan({ unit: 'pct', sl: 2, tp: 4 }, { minRatio: 2, leverage: 1 }).ok, true)
+  assert.equal(assessPlan({ unit: 'pct', sl: 2, tp: 4 }, { minRatio: 2, leverage: 2 }).errors.includes('loss-cap'), true)
+  assert.equal(assessPlan({ unit: 'pct', sl: 1, tp: 2 }, { minRatio: 2, leverage: 2 }).ok, true)
+  assert.equal(assessPlan({ unit: 'price', sl: 3, tp: 6 }, { minRatio: 2, leverage: 1, price: 100 }).errors.includes('loss-cap'), true)
+})
+
 test('egen plan vinner mot referens eller motståndare när R är högre och stoppen hölls', () => {
   const own = planOutcome({ entry: 100, stop: 98, exit: 104, side: 'buy', reason: 'target', overridden: false })
   const wider = planOutcome({ entry: 100, stop: 90, exit: 106, side: 'buy', reason: 'target', overridden: false })

@@ -22,6 +22,8 @@ export const PCT_SL_MIN = 0.1
 export const PCT_SL_MAX = 20
 export const PCT_TP_MIN = 0.1
 export const PCT_TP_MAX = 80
+/** En träffad stop-loss får kosta högst så här många procent av övningsinsatsen, inklusive hävstång. */
+export const MAX_LOSS_PCT = 2
 
 export function defaultPlan() {
   return { v: 1, unit: 'pct', sl: DEFAULT_SL, tp: DEFAULT_TP }
@@ -101,16 +103,22 @@ export function assessPlan(plan, opts = {}) {
   const sl = plan?.sl === '' || plan?.sl == null ? NaN : Number(plan.sl)
   const tp = plan?.tp === '' || plan?.tp == null ? NaN : Number(plan.tp)
   const minRatio = opts.minRatio == null ? 2 : Number(opts.minRatio)
+  const leverage = Number(opts.leverage) > 0 ? Number(opts.leverage) : 1
+  const price = Number(opts.price)
   if (!(sl > 0)) errors.push('sl-missing')
   else if (unit === 'pct' && (sl < PCT_SL_MIN || sl > PCT_SL_MAX)) errors.push('sl-bounds')
   else if (unit === 'price' && !(sl < 1e6)) errors.push('sl-bounds')
+  if (sl > 0) {
+    const lossPct = unit === 'price' && price > 0 ? (sl / price) * 100 * leverage : unit === 'pct' ? sl * leverage : null
+    if (lossPct != null && lossPct > MAX_LOSS_PCT + 1e-9) errors.push('loss-cap')
+  }
   if (!(tp > 0)) errors.push('tp-missing')
   else if (unit === 'pct' && (tp < PCT_TP_MIN || tp > PCT_TP_MAX)) errors.push('tp-bounds')
   else if (unit === 'price' && !(tp < 1e6)) errors.push('tp-bounds')
   const ratio = sl > 0 && tp > 0 ? tp / sl : null
   if (ratio != null && ratio + 1e-9 < 1) warnings.push('rr-below-1')
   if (ratio != null && ratio + 1e-9 < minRatio) errors.push('rr-min')
-  return { ok: errors.length === 0, errors, warnings, ratio, breakEven: breakEvenWinRate(ratio), unit, minRatio }
+  return { ok: errors.length === 0, errors, warnings, ratio, breakEven: breakEvenWinRate(ratio), unit, minRatio, leverage }
 }
 
 export function loadPlan(storage, slot = 'shared') {
@@ -235,8 +243,12 @@ const css = `
 .tr-plan input{width:4.8rem;border:1px solid color-mix(in srgb, currentColor 35%, transparent);background:transparent;color:inherit;border-radius:6px;padding:4px 6px;font:600 13px ui-monospace,monospace}
 .tr-plan button{border:1px solid color-mix(in srgb, currentColor 35%, transparent);background:transparent;color:inherit;border-radius:999px;padding:3px 8px;cursor:pointer;font:600 11px inherit}
 .tr-plan button.on{border-color:currentColor}
+.tr-plan button:disabled{opacity:.4;cursor:default}
 .tr-plan .tr-plan-live{font-variant-numeric:tabular-nums}
 .tr-plan .tr-plan-warn{flex:1 0 100%}
+.tr-plan-award{flex:1 0 100%;font-weight:600}
+.tr-plan[data-state="locked"] .tr-plan-award{opacity:.9}
+.tr-plan[data-state="unlocked"] .tr-plan-award{color:#3f8a0e}
 .tr-plan-card{position:fixed;z-index:32;left:12px;top:calc(var(--tr-chrome-b, 88px) + 8px);width:min(440px,calc(100vw - 24px));background:rgba(246,242,234,.96);color:#1c1915;border:1px solid rgba(28,25,21,.14);border-radius:14px;box-shadow:0 8px 24px rgba(28,25,21,.12)}
 `
 let styled = false
@@ -252,7 +264,7 @@ function ensureStyle() {
  * Fält för SL och TP. slot «p2» har egen nyckel, övriga delar «tr.riskplan».
  * onEdit(plan) körs när användaren ändrar. getPrice() används när enheten växlar.
  */
-export function mountPlanControl(parent, { slot = 'shared', storage, onEdit, getPrice, t, comma } = {}) {
+export function mountPlanControl(parent, { slot = 'shared', storage, onEdit, getPrice, getLeverage, t, comma } = {}) {
   ensureStyle()
   const say = typeof t === 'function' ? t : (k) => k
   const root = document.createElement('div')
@@ -266,6 +278,7 @@ export function mountPlanControl(parent, { slot = 'shared', storage, onEdit, get
     <button type="button" data-k="p2"></button>
     <button type="button" data-k="p3"></button>
     <span class="tr-plan-live" data-k="live"></span>
+    <span class="tr-plan-award" data-k="award"></span>
     <span class="tr-plan-warn" data-k="status"></span>
     <span class="tr-plan-warn" data-k="warn"></span>`
   parent.appendChild(root)
@@ -274,9 +287,13 @@ export function mountPlanControl(parent, { slot = 'shared', storage, onEdit, get
   const store = () => storage ?? (typeof localStorage !== 'undefined' ? localStorage : null)
   const useComma = () => (typeof comma === 'function' ? comma() : !!comma)
 
+  function options() {
+    return { minRatio: floorFor(store()), leverage: Number(getLeverage?.()) || 1, price: Number(getPrice?.()) }
+  }
   function paint() {
     const unlocked = ratioChoiceUnlocked(store())
-    const check = assessPlan(plan, { minRatio: floorFor(store()) })
+    root.dataset.state = unlocked ? 'unlocked' : 'locked'
+    const check = assessPlan(plan, options())
     q('name').textContent = say('plan.name')
     q('unit').textContent = plan.unit === 'price' ? say('plan.unitPrice') : say('plan.unitPct')
     q('slLbl').textContent = say('plan.sl')
@@ -300,17 +317,17 @@ export function mountPlanControl(parent, { slot = 'shared', storage, onEdit, get
     if (check.errors.includes('sl-missing')) warn.push(say('plan.errSl'))
     else if (check.errors.includes('sl-bounds') || check.errors.includes('tp-bounds')) warn.push(say('plan.errBounds'))
     if (check.errors.includes('tp-missing')) warn.push(say('plan.errTp'))
-    if (check.errors.includes('rr-min')) {
-      const min = check.minRatio === 1.5 ? (useComma() ? '1:1,5' : '1:1.5') : '1:2'
-      warn.push(say('plan.errMin', { min }))
-    } else if (check.warnings.includes('rr-below-1')) warn.push(say('plan.warnRr'))
+    if (check.errors.includes('rr-min')) warn.push(say('plan.errMin', { min: say(check.minRatio === 1.5 ? 'plan.rr15' : 'plan.rr2') }))
+    else if (check.warnings.includes('rr-below-1')) warn.push(say('plan.warnRr'))
+    if (check.errors.includes('loss-cap')) warn.push(say('plan.errLoss'))
+    q('award').textContent = say(unlocked ? 'plan.awardOn' : 'plan.awardOff')
     q('status').textContent = unlocked ? say('plan.unlocked') : say('plan.locked')
     q('warn').textContent = warn.join(' ')
   }
 
   function commit(next) {
     plan = next
-    const check = assessPlan(plan, { minRatio: floorFor(store()) })
+    const check = assessPlan(plan, options())
     if (check.ratio != null && check.ok) {
       if (Math.abs(check.ratio - 1.5) < 0.05) setChosenRatio(store(), 1.5)
       else if (Math.abs(check.ratio - 2) < 0.05) setChosenRatio(store(), 2)

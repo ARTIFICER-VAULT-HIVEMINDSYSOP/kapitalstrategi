@@ -465,6 +465,7 @@ export function createRaket({ engine }) {
         if (pl?.book && !pl.book.exit) pl.book = { ...pl.book, overridden: true, plan: next }
       },
       getPrice: () => priceAt(clock.p),
+      getLeverage: () => players[i]?.st?.lev ?? 1,
       t,
       comma: () => getLang() !== 'en',
     })
@@ -542,12 +543,12 @@ export function createRaket({ engine }) {
       if (next === 'flat') {
         pl.book = closeBook(pl.book, price, 'manual')
         pl.st = closePosition(pl.st, price)
-      } else if (!assessPlan(pl.dom.planCtl.getPlan(), { minRatio: floorFor() }).ok) {
+      } else if (!assessPlan(pl.dom.planCtl.getPlan(), { minRatio: floorFor(), leverage: pl.st.lev, price }).ok) {
         pl.dom.planCtl.paint()
       } else {
         pl.book = closeBook(pl.book, price, 'manual')
         pl.st = { ...switchSide(pl.st, next, price), traded: true }
-        const levels = levelsFor(pl.dom.planCtl.getPlan(), price, next, { minRatio: floorFor() })
+        const levels = levelsFor(pl.dom.planCtl.getPlan(), price, next, { minRatio: floorFor(), leverage: pl.st.lev, price })
         pl.book = levels
           ? { entry: price, side: next, stop: levels.stop, target: levels.target, overridden: false, exit: null }
           : null
@@ -1320,8 +1321,8 @@ export function createRaket({ engine }) {
   }
   function refLine() {
     const ref = referenceOutcome(pts.map((p) => p.price), chosenRatio())
-    const rr = ref.ratio === 1.5 ? (getLang() === 'en' ? '1:1.5' : '1:1,5') : '1:2'
-    return { ref, text: t('plan.refLine', { tp: String(ref.tpPct), rr }) }
+    const rr = t(ref.ratio === 1.5 ? 'plan.rr15' : 'plan.rr2')
+    return { ref, text: `${t('plan.vsRef')} ${t('plan.refLine', { tp: String(ref.tpPct), rr })}` }
   }
   function endCopy() {
     const { ref, text } = refLine()
@@ -1346,6 +1347,21 @@ export function createRaket({ engine }) {
       verdict = d.reason === 'only' ? t('plan.duelOnly', { who, r: fmtR(d.r) }) : t('plan.duelHigher', { who, r: fmtR(d.r), other: fmtR(d.other) })
     }
     return `${text} ${verdict}`
+  }
+
+  function finishPeriod(price) {
+    if (clock.ended) return
+    clock.ended = true
+    clock.playing = false
+    const px = Number.isFinite(price) ? price : priceAt(clock.p)
+    for (const pl of players) {
+      if (pl.book && !pl.book.exit && !isFlat(pl.st)) {
+        pl.st = closePosition(pl.st, px)
+        pl.book = closeBook(pl.book, px, 'period')
+      }
+    }
+    root.querySelector('[data-k="endTxt"]').textContent = endCopy()
+    endCard.classList.add('on')
   }
 
   function frame(now) {
@@ -1373,18 +1389,7 @@ export function createRaket({ engine }) {
           pl.st = closePosition(pl.st, price)
         }
       }
-      if (clock.p >= pts.length - 1) {
-        clock.ended = true
-        clock.playing = false
-        for (const pl of players) {
-          if (pl.book && !pl.book.exit && !isFlat(pl.st)) {
-            pl.st = closePosition(pl.st, price)
-            pl.book = closeBook(pl.book, price, 'period')
-          }
-        }
-        root.querySelector('[data-k="endTxt"]').textContent = endCopy()
-        endCard.classList.add('on')
-      }
+      if (clock.p >= pts.length - 1) finishPeriod(price)
     }
     render(dt)
     if (visible) raf = requestAnimationFrame(frame)
@@ -1448,6 +1453,7 @@ export function createRaket({ engine }) {
     },
     step(sec) {
       clock.p = Math.min(pts.length - 1, clock.p + PTS_PER_SEC * sec)
+      if (clock.p >= pts.length - 1) finishPeriod(priceAt(clock.p))
       render()
     },
     act,

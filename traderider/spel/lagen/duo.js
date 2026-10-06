@@ -165,6 +165,7 @@ export function createDuo({ engine: main, skinFrom }) {
         if (hv?.book && !hv.book.exit) hv.book = { ...hv.book, overridden: true }
       },
       getPrice: () => halves[i]?.hud?.price,
+      getLeverage: () => halves[i]?.hud?.leverage ?? 1,
       t,
       comma: () => getLang() !== 'en',
     })
@@ -226,7 +227,7 @@ export function createDuo({ engine: main, skinFrom }) {
       if (hv.book && !hv.book.exit) hv.book = closeBook(hv.book, price, h.finished ? 'period' : 'manual')
       return
     }
-    const opts = { minRatio: floorFor() }
+    const opts = { minRatio: floorFor(), leverage: h.leverage, price: h.price }
     if (!hv.book || hv.book.exit || hv.book.side !== side) {
       const plan = hv.planCtl.getPlan()
       if (!assessPlan(plan, opts).ok) {
