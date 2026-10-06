@@ -139,8 +139,8 @@ function progressMeter() {
 function practiceCard() {
   const header = document.querySelector('header.pointer-events-none')
   if (!header || getComputedStyle(header).display === 'none') return null
-  const notes = new Set([STRINGS.sv['hud.resultNote'], STRINGS.en['hud.resultNote'], STRINGS.uk['hud.resultNote']])
-  const names = [STRINGS.sv['hud.result'], STRINGS.en['hud.result'], STRINGS.uk['hud.result']]
+  const notes = new Set([STRINGS.sv['hud.resultNote'], STRINGS.no['hud.resultNote'], STRINGS.en['hud.resultNote'], STRINGS.uk['hud.resultNote']])
+  const names = [STRINGS.sv['hud.result'], STRINGS.no['hud.result'], STRINGS.en['hud.result'], STRINGS.uk['hud.result']]
   for (const node of header.querySelectorAll('div')) {
     if (node.children.length !== 2) continue
     const head = (node.children[0].textContent || '').trim()
@@ -822,8 +822,8 @@ async function main() {
 
   function linePriceTile() {
     const captions = new Set([
-      STRINGS.sv['sim.price'], STRINGS.en['sim.price'], STRINGS.uk['sim.price'],
-      STRINGS.sv['hist.price'], STRINGS.en['hist.price'], STRINGS.uk['hist.price'],
+      STRINGS.sv['sim.price'], STRINGS.no['sim.price'], STRINGS.en['sim.price'], STRINGS.uk['sim.price'],
+      STRINGS.sv['hist.price'], STRINGS.no['hist.price'], STRINGS.en['hist.price'], STRINGS.uk['hist.price'],
     ])
     for (const node of document.querySelectorAll('header div')) {
       if (node.children.length) continue
@@ -837,7 +837,7 @@ async function main() {
   function syncPriceCaption() {
     const historia = fas.isCovering() && fas.phases.phase() === 'historia'
     setPriceKey(historia ? 'hist.price' : null)
-    const simLabels = new Set([STRINGS.sv['sim.price'], STRINGS.en['sim.price'], STRINGS.uk['sim.price']])
+    const simLabels = new Set([STRINGS.sv['sim.price'], STRINGS.no['sim.price'], STRINGS.en['sim.price'], STRINGS.uk['sim.price']])
     if (!historia) {
       for (const node of document.querySelectorAll('[data-tr-price-swap]')) {
         node.textContent = t('sim.price')
@@ -911,7 +911,7 @@ async function main() {
       left = Math.round(anchorRight + 10)
       top = Math.round(title ? title.getBoundingClientRect().top : 12)
       let limitLeft = tile ? tile.getBoundingClientRect().left : innerWidth - 8
-      const resultNames = new Set([STRINGS.sv['hud.result'], STRINGS.en['hud.result'], STRINGS.uk['hud.result']])
+      const resultNames = new Set([STRINGS.sv['hud.result'], STRINGS.no['hud.result'], STRINGS.en['hud.result'], STRINGS.uk['hud.result']])
       const headerEl = headerShown ? header : null
       if (headerEl) {
         for (const node of headerEl.querySelectorAll('div')) {
