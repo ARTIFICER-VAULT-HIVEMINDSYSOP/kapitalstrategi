@@ -5,7 +5,9 @@
  * röd SELL-räls till vänster (undre bandet), streckad mittlinje. Raketen åker på vald sidas räls, nosen framåt;
  * flat (ingen position) = lugnt längs mittlinjen.
  * 1P eller 2P (delad skärm, samma data, samma period och samma klocka; egen position, hävstång, resultat,
- * asteroider och boost per spelare). Resultat visas bara i procent av den egna positionen. Övning – vinst och förlust är lika möjliga.
+ * asteroider och boost per spelare). I 1P kan man också tävla mot en referens på samma kursserie:
+ * referensen följer senaste steget och stänger vid planens mål eller stopp. Slutkortet jämför disciplin,
+ * inte tur. Resultat visas bara i procent av den egna positionen. Övning – vinst och förlust är lika möjliga.
  *
  * Stil (bara Raket-läget): cyber-HUD – djupt marinblå/lila bakgrund (inte svart), neon i cyan och magenta,
  * tunna ramlinjer med hörnmarkeringar, monospace-siffror, diskreta scanlines, neonhorisont i perspektiv,
@@ -96,6 +98,9 @@ const css = `
 .nlr-rk-bar button{border:0;background:transparent;cursor:pointer;color:${TEXT};font:600 13px ${MONO};height:32px;min-width:32px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;gap:4px}
 .nlr-rk-bar button:disabled{opacity:.4;cursor:default}
 .nlr-rk-bar .play{background:${CYAN};color:${ON_DARK};width:40px;height:40px;border-radius:4px;box-shadow:0 0 14px rgba(46,230,255,.5)}
+.nlr-rk-ref{padding:0 8px;letter-spacing:.04em;color:#ffb15a;border:1px solid rgba(255,177,90,.8);white-space:nowrap}
+.nlr-rk-ref.on{background:#ffb15a;color:${ON_DARK}}
+.nlr-rk-2p .nlr-rk-ref{display:none}
 .nlr-rk-lev{display:flex;align-items:center;gap:4px;background:rgba(46,230,255,.07);border:1px solid rgba(46,230,255,.2);border-radius:3px;padding:2px 6px}
 .nlr-rk-lev span{display:flex;flex-direction:column;align-items:center;min-width:34px;line-height:1.1}
 .nlr-rk-lev b{display:block;font:600 15px ${MONO};color:${MAGENTA};text-shadow:0 0 8px rgba(255,79,192,.5)}
@@ -105,8 +110,19 @@ const css = `
 .nlr-rk-note{margin:0;text-align:center;font:500 11px ${MONO};color:${MUTED};text-shadow:0 0 4px ${BG_TOP},0 0 2px ${BG_TOP}}
 .nlr-rk-prog{height:3px;background:rgba(147,168,212,.18);overflow:hidden}
 .nlr-rk-prog i{display:block;height:100%;background:linear-gradient(90deg,${CYAN},${MAGENTA});box-shadow:0 0 8px ${CYAN};width:0}
-.nlr-rk-end{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);text-align:center;padding:18px 22px;display:none;max-width:calc(100% - 32px);z-index:2}
+.nlr-rk-end{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);text-align:center;padding:18px 22px;display:none;max-width:calc(100% - 32px);z-index:6}
 .nlr-rk-end.on{display:block}
+.nlr-rk-end.has-cmp{top:12px;transform:translate(-50%,0);width:min(640px,calc(100% - 24px));max-width:min(640px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;text-align:left}
+.nlr-rk-end.has-cmp h3{text-align:center}
+.nlr-rk-cmp{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.nlr-rk-cmp h4{margin:0;font:600 12px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${CYAN}}
+.nlr-rk-cmp .verdict{color:${TEXT};font:600 14px ${MONO}}
+.nlr-rk-cmp .row{padding:6px 8px;border:1px solid rgba(46,230,255,.35);background:rgba(6,16,34,.45)}
+.nlr-rk-cmp .row.win{border-color:${CYAN};box-shadow:0 0 12px rgba(46,230,255,.28)}
+.nlr-rk-cmp .row.alt{border-color:rgba(255,177,90,.8)}
+.nlr-rk-cmp .row b{display:block;font:600 13px ${MONO};color:${TEXT};text-shadow:none}
+.nlr-rk-cmp .row span{display:block;font:500 11px ${MONO};color:${TEXT2}}
+.nlr-rk-cmp .rule{font-size:11px;color:${MUTED}}
 .nlr-rk-end h3,.nlr-rk-start h3{margin:0 0 6px;font:600 20px ${MONO};letter-spacing:.24em;text-transform:uppercase;color:${CYAN};text-shadow:0 0 12px rgba(46,230,255,.6)}
 .nlr-rk-end p{margin:4px 0;font:500 13px ${MONO};color:${TEXT2}}
 .nlr-rk-end button{margin-top:8px;border:0;border-radius:4px;background:${CYAN};color:${ON_DARK};font:600 14px ${MONO};letter-spacing:.08em;padding:10px 18px;cursor:pointer;box-shadow:0 0 14px rgba(46,230,255,.5)}
@@ -167,6 +183,10 @@ function fmtPrice(v) {
 function fmtPct(v) {
   if (!Number.isFinite(v)) return '—'
   return `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)} %`
+}
+function fmtDip(v) {
+  if (!Number.isFinite(v)) return '—'
+  return `${Math.abs(v).toFixed(1)} %`
 }
 function fmtDate(t, key) {
   if (!Number.isFinite(t)) return '—'
@@ -357,6 +377,160 @@ export function wobbleOffset(now, amount, calm = false) {
   }
 }
 
+/**
+ * Referenslopp. Planen ser bara senaste steget: med rörelsen om man är utan position,
+ * hem vid PLAN_TP procent, stopp vid PLAN_SL procent mot positionen. Ingen framåtblick och ingen hävstång.
+ * Båda får samma punkter. Disciplinen väger planen tyngst, sedan stopp, sedan största fall.
+ * Övningsindexet visas, men det avgör inte vem som vann.
+ */
+export const PLAN_TP = 3
+export const PLAN_SL = 2
+export const PRACTICE_INDEX = 100
+
+export function openMove(state, price) {
+  if (!state || state.entry == null || !(state.entry > 0) || !(price > 0)) return 0
+  const sgn = state.side === 'buy' ? 1 : state.side === 'sell' ? -1 : 0
+  if (!sgn) return 0
+  return sgn * (price / state.entry - 1) * 100
+}
+
+export function planAction(state, price, prevPrice) {
+  const held = state?.side === 'buy' || state?.side === 'sell' ? state.side : 'flat'
+  const open = state?.entry != null
+  if (!(price > 0) || !(prevPrice > 0)) return open ? held : 'flat'
+  if (!open) {
+    if (price > prevPrice) return 'buy'
+    if (price < prevPrice) return 'sell'
+    return 'flat'
+  }
+  const move = openMove(state, price)
+  if (move >= PLAN_TP || move <= -PLAN_SL) return 'flat'
+  return held
+}
+
+function clamp01(v) {
+  const n = Number(v)
+  if (!Number.isFinite(n)) return 0
+  return Math.max(0, Math.min(1, n))
+}
+
+function asSide(side) {
+  return side === 'buy' || side === 'sell' ? side : 'flat'
+}
+
+function applyPlanSide(state, want, price) {
+  const side = asSide(want)
+  if (side === 'flat') return state.entry == null ? state : closePosition(state, price)
+  if (state.entry != null && state.side === side) return state
+  return { ...switchSide(state, side, price), lev: 1 }
+}
+
+/** Sidor efter planen, ett steg i taget, från index 1. Samma punkter ger samma lopp. */
+export function referenceRun(points) {
+  const pts = Array.isArray(points) ? points : []
+  const sides = new Array(pts.length).fill('flat')
+  let st = { side: 'flat', entry: null, realized: 0, lev: 1 }
+  for (let i = 1; i < pts.length; i++) {
+    const price = Number(pts[i]?.price)
+    const prev = Number(pts[i - 1]?.price)
+    st = applyPlanSide(st, planAction(st, price, prev), price)
+    sides[i] = st.entry == null ? 'flat' : st.side
+  }
+  return { sides }
+}
+
+/** Fyller luckor: senaste kända sidan gäller tills nästa stämpel. */
+export function sidesFromLog(n, log) {
+  const count = Math.max(0, n | 0)
+  const sides = new Array(count).fill('flat')
+  if (!log?.length || !count) return sides
+  const ordered = [...log].sort((a, b) => (a.i || 0) - (b.i || 0))
+  let k = 0
+  let side = 'flat'
+  for (let i = 0; i < count; i++) {
+    while (k < ordered.length && (ordered[k].i || 0) <= i) {
+      side = asSide(ordered[k].side)
+      k++
+    }
+    sides[i] = side
+  }
+  return sides
+}
+
+export function balanceIndex(state, price) {
+  if (!state || !Number.isFinite(price)) return PRACTICE_INDEX
+  return PRACTICE_INDEX * (1 + pnlPct(state, price) / 100)
+}
+
+export function disciplineScore({ planMatch = 0, slScore = 0, maxDd = 0 } = {}) {
+  const dd = 1 - Math.min(1, Math.max(0, Number(maxDd) || 0) / 20)
+  return Math.round((0.5 * clamp01(planMatch) + 0.3 * clamp01(slScore) + 0.2 * dd) * 100)
+}
+
+/**
+ * Omräkning längs sidorna med hävstång 1. planMatch mot referensen på samma punkter.
+ * tpAt är första index där öppen rörelse når PLAN_TP, även om sidan stängs där.
+ * Ett stopp som stängs på samma stapel räknas inte som brott.
+ */
+export function assess(points, sides) {
+  const pts = Array.isArray(points) ? points : []
+  const plan = referenceRun(pts).sides
+  let st = { side: 'flat', entry: null, realized: 0, lev: 1 }
+  let compared = 0
+  let matched = 0
+  let badSteps = 0
+  let tpAt = null
+  let equity = PRACTICE_INDEX
+  let peak = equity
+  let maxDd = 0
+  for (let i = 0; i < pts.length; i++) {
+    const price = Number(pts[i]?.price)
+    if (!(price > 0)) continue
+    const want = asSide(sides?.[i])
+    if (i > 0) {
+      compared++
+      if (want === asSide(plan[i])) matched++
+      const carried = openMove(st, price)
+      if (st.entry != null && tpAt == null && carried >= PLAN_TP) tpAt = i
+      if (st.entry != null && (want === 'buy' || want === 'sell') && carried <= -PLAN_SL) badSteps++
+    }
+    st = { ...applyPlanSide(st, want, price), lev: 1 }
+    equity = PRACTICE_INDEX * (1 + pnlPct(st, price) / 100)
+    if (equity > peak) peak = equity
+    if (peak > 0) {
+      const dd = ((peak - equity) / peak) * 100
+      if (dd > maxDd) maxDd = dd
+    }
+  }
+  const planMatch = compared ? matched / compared : 1
+  const slScore = badSteps === 0 ? 1 : Math.max(0, 1 - badSteps / compared)
+  return {
+    planMatch,
+    slScore,
+    maxDd,
+    tpAt,
+    discipline: disciplineScore({ planMatch, slScore, maxDd }),
+    balance: equity,
+  }
+}
+
+/** Högre disciplin vinner. Sedan tidigare mål. Sedan mindre fall. Indexet påverkar inte ordningen. */
+export function compareRuns(runs) {
+  const ranked = [...(runs || [])].sort((a, b) => {
+    const d = (b.discipline || 0) - (a.discipline || 0)
+    if (d) return d
+    const ta = a.tpAt == null ? Infinity : a.tpAt
+    const tb = b.tpAt == null ? Infinity : b.tpAt
+    if (ta !== tb) return ta - tb
+    return (a.maxDd || 0) - (b.maxDd || 0)
+  })
+  if (!ranked.length) return { ranked, winnerId: null, tie: true }
+  const top = ranked[0]
+  const second = ranked[1]
+  const tie = !!second && second.discipline === top.discipline && (second.tpAt ?? null) === (top.tpAt ?? null) && second.maxDd === top.maxDd
+  return { ranked, winnerId: tie ? null : top.id, tie }
+}
+
 /** Kort lyft uppåt under skjuts. Stilla vid reducerad rörelse. */
 export function burstLift(amount, calm = false) {
   const a = Math.max(0, Math.min(1, Number(amount) || 0))
@@ -536,7 +710,7 @@ export function createRaket({ engine }) {
     <div class="nlr-rk-scan" aria-hidden="true"></div>
     <div class="nlr-rk-div"></div>
     <div class="nlr-rk-card nlr-rk-start"><h3></h3><p data-k="startClaim" data-tr-claim="1"></p><p data-k="startBody"></p><p data-k="keys"></p></div>
-    <div class="nlr-rk-card nlr-rk-end"><h3 data-k="endTitle"></h3><p data-k="endTxt"></p><button type="button" data-k="again"></button></div>`
+    <div class="nlr-rk-card nlr-rk-end"><h3 data-k="endTitle"></h3><p data-k="endTxt"></p><div data-k="compare" hidden></div><button type="button" data-k="again"></button></div>`
   document.body.appendChild(root)
   const canvas = root.querySelector('canvas')
   const divider = root.querySelector('.nlr-rk-div')
@@ -555,9 +729,18 @@ export function createRaket({ engine }) {
     if (keys) keys.textContent = ''
     endCard.querySelector('[data-k="endTitle"]').textContent = t('rk.endTitle')
     endCard.querySelector('[data-k="again"]').textContent = t('rk.again')
-    if (endCard.classList.contains('on')) endCard.querySelector('[data-k="endTxt"]').textContent = t('end.body')
+    if (endCard.classList.contains('on')) paintEnd()
     for (const pl of players) {
       const q = pl.dom.q
+      const refBtn = q('ref')
+      if (refBtn) {
+        const showRef = mode !== '2p' && players.indexOf(pl) === 0
+        refBtn.hidden = !showRef
+        refBtn.textContent = t('rk.ref')
+        refBtn.title = t('rk.refTitle')
+        refBtn.setAttribute('aria-pressed', String(showRef && versusRef))
+        refBtn.classList.toggle('on', showRef && versusRef)
+      }
       q('buyLbl').textContent = t('btn.buy')
       q('sellLbl').textContent = t('btn.sell')
       q('flatLbl').textContent = t('btn.flat')
@@ -573,6 +756,8 @@ export function createRaket({ engine }) {
   }
 
   let mode = '1p'
+  let versusRef = false
+  let refSides = []
   let pts = []
   let log = false
   let key = '1y'
@@ -615,6 +800,7 @@ export function createRaket({ engine }) {
         <div class="nlr-rk-card nlr-rk-bar">
           <button type="button" class="play" data-k="play">▶</button>
           <button type="button" data-k="reset">↺</button>
+          <button type="button" data-k="ref" class="nlr-rk-ref" hidden></button>
           <div class="nlr-rk-lev"><button type="button" data-k="levDown"><kbd class="nlr-rk-kbd">${h.levDown}</kbd>−</button><span><small data-k="levName"></small><b data-k="lev">1×</b></span><button type="button" data-k="levUp"><kbd class="nlr-rk-kbd">${h.levUp}</kbd>+</button></div>
           <span class="nlr-rk-info" data-k="info">—</span>
         </div>
@@ -640,6 +826,7 @@ export function createRaket({ engine }) {
     bindBtn('levUp', () => act(i, 'levUp'))
     bindBtn('play', () => act(0, 'pause'))
     bindBtn('reset', () => act(0, 'reset'))
+    bindBtn('ref', () => toggleRef())
     return { el, q }
   }
 
@@ -675,15 +862,107 @@ export function createRaket({ engine }) {
         wobble: 0,
         prevMove: { open: false, move: 0 },
         holdPose: false,
+        log: [],
+        refX: null,
         fx: effectLevels(null),
         dom: buildPlayerDom(i),
       })
     }
     root.classList.toggle('nlr-rk-2p', mode === '2p')
+    refSides = versusRef && mode !== '2p' ? referenceRun(pts).sides : []
     endCard.classList.remove('on')
+    endCard.classList.remove('has-cmp')
     startCard.style.display = ''
     if (entrySnap) entrySnap.root.style.display = mode === '2p' ? 'none' : ''
     relabel()
+  }
+
+  function notePath(pl) {
+    if (!pl || !pts.length) return
+    const idx = Math.max(0, Math.min(pts.length - 1, Math.floor(clock.p)))
+    const side = isFlat(pl.st) ? 'flat' : pl.st.side
+    const last = pl.log[pl.log.length - 1]
+    if (last && last.i === idx && last.side === side && last.entry === pl.st.entry && last.lev === pl.st.lev && last.realized === pl.st.realized) return
+    pl.log.push({ i: idx, side, entry: pl.st.entry, realized: pl.st.realized, lev: pl.st.lev })
+  }
+
+  function toggleRef() {
+    if (mode === '2p') return
+    versusRef = !versusRef
+    refSides = versusRef ? referenceRun(pts).sides : []
+    if (players[0]) players[0].refX = null
+    relabel()
+    render()
+  }
+
+  function playerRun(pl, id, name) {
+    notePath(pl)
+    const report = assess(pts, sidesFromLog(pts.length, pl.log))
+    return { ...report, id, name, balance: balanceIndex(pl.st, priceAt(clock.p)) }
+  }
+
+  function buildCompare(cmp) {
+    const wrap = document.createElement('div')
+    wrap.className = 'nlr-rk-cmp'
+    const title = document.createElement('h4')
+    title.textContent = t('rk.compareTitle')
+    const verdict = document.createElement('p')
+    verdict.className = 'verdict'
+    if (cmp.tie || cmp.winnerId == null) verdict.textContent = t('rk.tie')
+    else verdict.textContent = t('rk.winner', { name: cmp.ranked.find((r) => r.id === cmp.winnerId)?.name ?? '' })
+    const tpLine = document.createElement('p')
+    const hitters = cmp.ranked.filter((r) => r.tpAt != null).sort((a, b) => a.tpAt - b.tpAt)
+    tpLine.textContent = hitters.length ? t('rk.tpFirst', { name: hitters[0].name }) : t('rk.noTp')
+    wrap.append(title, verdict, tpLine)
+    for (const run of cmp.ranked) {
+      const row = document.createElement('div')
+      row.className = 'row' + (cmp.winnerId === run.id ? ' win' : '') + (run.id === 'ref' || run.id === 'p1' ? ' alt' : '')
+      const name = document.createElement('b')
+      name.textContent = run.name
+      const stats = document.createElement('span')
+      const tp = run.tpAt == null ? t('rk.tpNone') : t('rk.tpAt', { n: run.tpAt })
+      stats.textContent = t('rk.statLine', {
+        plan: Math.round(run.planMatch * 100),
+        sl: Math.round(run.slScore * 100),
+        dd: fmtDip(run.maxDd),
+        bal: Math.round(run.balance),
+        tp,
+      })
+      row.append(name, stats)
+      wrap.appendChild(row)
+    }
+    const rule = document.createElement('p')
+    rule.className = 'rule'
+    rule.textContent = t('rk.planRule')
+    wrap.appendChild(rule)
+    return wrap
+  }
+
+  function paintEnd() {
+    const box = endCard.querySelector('[data-k="compare"]')
+    endCard.querySelector('[data-k="endTxt"]').textContent = t('end.body')
+    const show = (mode === '2p' || versusRef) && pts.length > 1 && players.length > 0
+    endCard.classList.toggle('has-cmp', show)
+    box.replaceChildren()
+    if (!show) {
+      box.hidden = true
+      return null
+    }
+    const runs = mode === '2p'
+      ? players.map((pl, i) => playerRun(pl, `p${i}`, t('rk.player', { n: i + 1 })))
+      : [playerRun(players[0], 'you', t('rk.you')), { ...assess(pts, referenceRun(pts).sides), id: 'ref', name: t('rk.refName') }]
+    const cmp = compareRuns(runs)
+    box.hidden = false
+    box.appendChild(buildCompare(cmp))
+    return cmp
+  }
+
+  function closePeriod() {
+    if (clock.ended || !pts.length || clock.p < pts.length - 1) return
+    clock.ended = true
+    clock.playing = false
+    paintEnd()
+    endCard.classList.add('on')
   }
 
   const priceAt = (p, f = 'price') => {
@@ -985,6 +1264,7 @@ export function createRaket({ engine }) {
     const W = vp.w
     const H = vp.h
     const st = pl.st
+    notePath(pl)
     const q = pl.dom.q
     const twoP = mode === '2p'
     const compact = W <= 640 || twoP
@@ -1392,6 +1672,21 @@ export function createRaket({ engine }) {
 
     const jolt = pl.hit > 0 && !calm ? Math.sin(now * 90) * 4 * pl.hit : 0
     const sideKey = flat ? 'flat' : st.side
+    if (versusRef && mode !== '2p' && i === 0 && refSides.length) {
+      const ri = Math.max(0, Math.min(refSides.length - 1, Math.floor(p)))
+      const rs = refSides[ri] === 'buy' || refSides[ri] === 'sell' ? refSides[ri] : 'flat'
+      pl.refX = smoothTo(pl.refX, positionFor(rs, buyX, sellX), step, calm ? 14 : 11)
+      const gy = rocketY + (compact ? 28 : 36)
+      c.save()
+      c.globalAlpha = 0.82
+      drawRocket(c, pl.refX, gy, 0, rs, clock.playing, { boost: rs === 'flat' ? 0 : 0.22 }, calm, now, getSprite(rs, 1), 0)
+      c.restore()
+      let labelX = pl.refX
+      if (Math.abs(labelX - anchorX) < 72) labelX += anchorX < W * 0.55 ? 84 : -84
+      const refLabel = t('rk.refName')
+      c.font = `600 11px ${MONO}`
+      hudLabel(c, refLabel, labelX, gy + 58, { size: 11, align: 'center', W, color: ON_DARK, bg: PLAYER_ACCENT[1], border: PLAYER_ACCENT[1] })
+    }
     drawRocket(c, anchorX + jolt, anchorY, tilt + jolt * 0.02 + wob.rot, sideKey, clock.playing, fx, calm, now, getSprite(sideKey, i), calm ? 0 : pl.burst)
     if (pl.hit > 0) {
       c.fillStyle = `rgba(255,90,106,${(0.12 * pl.hit).toFixed(3)})`
@@ -1513,13 +1808,7 @@ export function createRaket({ engine }) {
     }
     if (clock.playing && !clock.ended) {
       clock.p = Math.min(pts.length - 1, clock.p + PTS_PER_SEC * dt)
-      if (clock.p >= pts.length - 1) {
-        clock.ended = true
-        clock.playing = false
-        const price = priceAt(clock.p)
-        root.querySelector('[data-k="endTxt"]').textContent = t('end.body')
-        endCard.classList.add('on')
-      }
+      if (clock.p >= pts.length - 1) closePeriod()
     }
     render(dt)
     if (visible) raf = requestAnimationFrame(frame)
@@ -1592,8 +1881,19 @@ export function createRaket({ engine }) {
       return { burst: pl.burst, wobble: pl.wobble, accent: PLAYER_ACCENT[i === 1 ? 1 : 0] }
     },
     step(sec) {
-      clock.p = Math.min(pts.length - 1, clock.p + PTS_PER_SEC * sec)
+      const jump = Math.max(0, Number(sec) || 0)
+      clock.p = Math.min(pts.length - 1, clock.p + PTS_PER_SEC * jump)
+      if (pts.length && clock.p >= pts.length - 1) closePeriod()
+      render(jump)
+    },
+    versus(on) {
+      if (mode === '2p') return false
+      versusRef = !!on
+      refSides = versusRef ? referenceRun(pts).sides : []
+      if (players[0]) players[0].refX = null
+      relabel()
       render()
+      return versusRef
     },
     act,
   }
