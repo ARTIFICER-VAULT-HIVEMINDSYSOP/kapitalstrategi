@@ -31,6 +31,10 @@ import {
   setTargets,
   sigmaPct,
   stepGame,
+  accountRiskPct,
+  breakEvenWinRate,
+  DEFAULT_TARGETS,
+  MAX_ACCOUNT_RISK_PCT,
   togglePauseGame,
   validateTargets,
   type Game,
@@ -49,15 +53,6 @@ const SOUND_KEY = 'traderider.raket.ljud.v1'
 const MODE_KEY = 'traderider.raket.lage.v1'
 
 type Tab = RaketMode | 'klassisk'
-
-const DEFAULT_TARGETS: Record<RaketMode, Targets> = {
-  niva: { tpPct: 2, slPct: 1 },
-  tid: { tpPct: 1.5, slPct: 1 },
-  budget: { tpPct: 1.5, slPct: 1 },
-  stopp: { tpPct: 3, slPct: 1.5 },
-  chock: { tpPct: 3, slPct: 2 },
-  spoke: { tpPct: 2, slPct: 1 },
-}
 
 function store(key: string): string | null {
   try {
@@ -99,7 +94,7 @@ function newGame(candles: Candle[], mode: RaketMode, prev?: Game | null): Game {
   const g = createGame(candles, mode, {
     targets: DEFAULT_TARGETS[mode],
     gas: prev?.gas ?? 0.35,
-    leverage: prev?.desk.leverage ?? 2,
+    leverage: prev?.desk.leverage ?? 1,
     ghost: mode === 'spoke' ? loadGhost() : null,
   })
   return { ...g, targets: fitTargets(g, g.targets) }
@@ -193,7 +188,7 @@ function Setup({ g, apply }: { g: Game; apply: (fn: (g: Game) => Game) => void }
         </label>
         {rules.slRequired ? null : (
           <label className="rs-check">
-            <input type="checkbox" checked={!slOn} onChange={(e) => setSl(e.target.checked ? null : 1)} /> Ingen SL (då kan bara TP eller margin call stänga)
+            <input type="checkbox" checked={!slOn} onChange={(e) => setSl(e.target.checked ? null : 1)} /> Utan SL (extremt): bara TP eller margin call kan stänga. Förvalet är SL på.
           </label>
         )}
       </div>
@@ -215,13 +210,14 @@ function Setup({ g, apply }: { g: Game; apply: (fn: (g: Game) => Game) => void }
           </tr>
           <tr>
             <th>R (TP ÷ SL)</th>
-            <td colSpan={2}>{ratio == null ? 'ingen SL = ingen R' : `${ratio.toFixed(2)} R · krav ${rules.minRatio} R`}</td>
+            <td colSpan={2}>{ratio == null ? 'ingen SL = ingen R' : `${ratio.toFixed(2)} R · krav ${rules.minRatio} R · jämnt utfall över ${Math.round(breakEvenWinRate(ratio) * 100)} % träffar`}</td>
           </tr>
         </tbody>
       </table>
       <p className="rs-rulenote">
         Minsta TP-avstånd nu {minTpPct(g).toFixed(1)} % (större av 0,8 % och 1 band-σ = {sigmaPct(g).toFixed(2)} %). Priserna räknas från
-        fyllnadskursen när du öppnar.
+        fyllnadskursen när du öppnar. Förvalet är 1:2.
+        {slOn ? ` Om SL träffas blir förlusten ungefär ${accountRiskPct(t.slPct as number, g.desk.leverage).toFixed(1)} % av övningsinsatsen vid ${g.desk.leverage}× (tak ${MAX_ACCOUNT_RISK_PCT} %).` : ''}
       </p>
       {errs.length ? (
         <ul className="rs-errs" role="status">

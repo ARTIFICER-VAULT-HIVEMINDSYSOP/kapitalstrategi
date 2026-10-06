@@ -35,8 +35,8 @@ export const MODE_RULES: Record<RaketMode, ModeRules> = {
   niva: {
     title: 'Nå din TP',
     short: 'Grundläget',
-    goal: 'Öppna en position och nå din egen take profit.',
-    rules: ['TP krävs, SL rekommenderas.', 'SL = kontrollerad stängning, nivån inte klarad.', 'Margin call = tvångsstängning, nivån misslyckad.'],
+    goal: 'Öppna en position med stop-loss och nå din take profit. Förvalet är 1:2.',
+    rules: ['Förval: TP 2 % och SL 1 % (1:2).', 'SL på: träff stänger kontrollerat, nivån inte klarad.', 'Utan SL är den extrema varianten: bara TP eller margin call kan stänga.', 'Hävstång × SL-avstånd ska stanna på högst 2 % av övningsinsatsen.'],
     slRequired: false,
     minRatio: 1.5,
     minSlSigma: 0,
@@ -117,6 +117,30 @@ export const MARGIN_COUNTDOWN_MS = 5000
 export const TP_MIN_PCT = 0.8
 export const TP_MIN_FROM_MARK_PCT = 0.5
 export const SL_MIN_PCT = 0.2
+/** Tak för förlust om stop-loss träffas, i procent av övningsinsatsen: hävstång × SL-avstånd. */
+export const MAX_ACCOUNT_RISK_PCT = 2
+
+/** Förval per läge. Alla har SL satt och TP dubbelt så långt bort (1:2). */
+export const DEFAULT_TARGETS: Record<RaketMode, Targets> = {
+  niva: { tpPct: 2, slPct: 1 },
+  tid: { tpPct: 2, slPct: 1 },
+  budget: { tpPct: 2, slPct: 1 },
+  stopp: { tpPct: 3, slPct: 1.5 },
+  chock: { tpPct: 4, slPct: 2 },
+  spoke: { tpPct: 2, slPct: 1 },
+}
+
+/** Andel träffar för jämnt utfall när vinsten är R gånger förlusten: 1 / (1 + R). */
+export function breakEvenWinRate(rewardOverRisk: number): number {
+  if (!(rewardOverRisk > 0)) return 1
+  return 1 / (1 + rewardOverRisk)
+}
+
+/** Ungefärlig förlust av övningsinsatsen om SL träffas och positionen fyller hela hävstången. */
+export function accountRiskPct(slPct: number, leverage: number): number {
+  const lev = Number.isFinite(leverage) && leverage > 0 ? leverage : 1
+  return slPct * lev
+}
 export const CHOCK_WINDOW = 12
 export const CHOCK_LEAD = 8
 
@@ -215,6 +239,10 @@ export function validateTargets(g: Game, t: Targets = g.targets): string[] {
     if (!(t.slPct >= SL_MIN_PCT)) errs.push(`SL måste ligga minst ${SL_MIN_PCT.toFixed(1)} % från ingången.`)
     const ratio = t.tpPct / t.slPct
     if (ratio + 1e-9 < rules.minRatio) errs.push(`TP måste vara minst ${rules.minRatio} R (TP-avstånd ÷ SL-avstånd), nu ${ratio.toFixed(2)} R.`)
+    const acct = accountRiskPct(t.slPct, g.desk.leverage)
+    if (acct > MAX_ACCOUNT_RISK_PCT + 1e-9) {
+      errs.push(`SL ${t.slPct.toFixed(1)} % vid hävstång ${g.desk.leverage}× blir ungefär ${acct.toFixed(1)} % av övningsinsatsen. Håll det på högst ${MAX_ACCOUNT_RISK_PCT} % — sänk hävstången eller dra SL närmare.`)
+    }
     if (rules.minSlSigma > 0) {
       const s = sigmaPct(g) * rules.minSlSigma
       if (t.slPct + 1e-9 < s) errs.push(`SL är innanför bruset: minst ${s.toFixed(2)} % (1 band-σ) krävs i stoppträning.`)
@@ -239,7 +267,7 @@ export function createGame(candles: Candle[], mode: RaketMode, opts: Partial<{ t
   desk = { ...desk, progress: startProgress }
   if (opts.leverage) desk = setDeskLeverage(desk, opts.leverage)
   const rules = MODE_RULES[mode]
-  const targets = opts.targets ?? { tpPct: 2, slPct: rules.slRequired ? 1 : 1 }
+  const targets = opts.targets ?? DEFAULT_TARGETS[mode]
   return {
     mode,
     desk,

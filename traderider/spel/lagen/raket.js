@@ -21,7 +21,8 @@
 import { keyAction, PREVENT_DEFAULT } from './keys.js'
 import { MODES, controlHints } from './orientation.js'
 import { simTid } from './simtid.js'
-import { t, onLang } from './i18n.js'
+import { t, onLang, getLang } from './i18n.js'
+import { assessPlan, levelsFor, tickBook, closeBook, compareDuel, mountPlanControl, floorFor, chosenRatio, referenceDistances } from './riskplan.js'
 import { stepSide, readSide } from './styrmotor.js'
 import { positionFor } from './spar.js'
 import { mountEntrySnap, bindStepGestures } from './snapp.js'
@@ -159,7 +160,10 @@ html[data-nlr-view="raket"] .nlr-toggle button:focus-visible{outline:2px solid $
 .nlr-raket.short .nlr-rk-boost,.nlr-raket.short .nlr-rk-note,.nlr-raket.short .nlr-rk-pnl span{display:none}
 .nlr-raket.short.nlr-rk-2p.narrow .nlr-rk-note{display:block}
 .nlr-raket.short .nlr-rk-start [data-k="startBody"]{display:none}
-.nlr-raket.short:not(.nlr-rk-2p) .nlr-rk-quote{top:8px;max-width:148px}
+.nlr-raket.short:not(.nlr-rk-2p) .nlr-rk-quote{top:8px;bottom:auto;max-width:148px}
+.nlr-raket.short .tr-plan-award,.nlr-raket.short .tr-plan-warn,.nlr-raket.narrow .tr-plan-award,.nlr-raket.narrow .tr-plan-warn{display:none}
+.nlr-raket.short .tr-plan,.nlr-raket.narrow .tr-plan{padding:2px 4px;gap:4px}
+@media (max-width:640px){.nlr-raket .tr-plan-award,.nlr-raket .tr-plan-warn{display:none}.nlr-raket .tr-plan{padding:2px 4px;gap:4px}.nlr-raket:not(.nlr-rk-2p) .nlr-rk-quote,.nlr-raket:not(.nlr-rk-2p) .nlr-rk-pnl{bottom:248px}}
 .nlr-raket.short:not(.nlr-rk-2p) .nlr-rk-pnl{display:none}
 .nlr-raket.short.live:not(.nlr-rk-2p) .nlr-rk-pnl{display:block;top:8px;right:auto;bottom:auto;left:12px;text-align:left;min-width:0;max-width:min(220px,46%);padding:4px 8px}
 .nlr-raket.short.live:not(.nlr-rk-2p) .nlr-rk-pnl b,.nlr-raket.short.live:not(.nlr-rk-2p) .nlr-rk-pnl .nlr-rk-boost{display:none}
@@ -167,7 +171,8 @@ html[data-nlr-view="raket"] .nlr-toggle button:focus-visible{outline:2px solid $
 .nlr-raket.short .nlr-rk-start{top:12px;left:12px;transform:none;text-align:left;max-width:min(340px,calc(100% - 200px))}
 .nlr-raket.short.nlr-rk-2p .nlr-rk-pnl{max-width:min(148px,34%);max-height:44px;overflow:hidden}
 .nlr-raket.short.nlr-rk-2p .nlr-rk-who{max-height:32px;overflow:hidden}
-.nlr-raket.short.nlr-rk-2p .nlr-rk-start{left:50%;transform:translateX(-50%);text-align:center;top:52px;max-width:min(220px,34%)}
+.nlr-raket.short.nlr-rk-2p .nlr-rk-start{left:50%;transform:translateX(-50%);text-align:center;top:52px;max-width:min(220px,34%);padding:2px 8px}
+.nlr-raket.short.nlr-rk-2p .nlr-rk-start h3{display:none}
 `
 
 const ICON_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>'
@@ -394,7 +399,9 @@ export function openMove(state, price) {
   return sgn * (price / state.entry - 1) * 100
 }
 
-export function planAction(state, price, prevPrice) {
+export function planAction(state, price, prevPrice, plan) {
+  const tp = Number(plan?.tp) > 0 ? Number(plan.tp) : PLAN_TP
+  const sl = Number(plan?.sl) > 0 ? Number(plan.sl) : PLAN_SL
   const held = state?.side === 'buy' || state?.side === 'sell' ? state.side : 'flat'
   const open = state?.entry != null
   if (!(price > 0) || !(prevPrice > 0)) return open ? held : 'flat'
@@ -404,7 +411,7 @@ export function planAction(state, price, prevPrice) {
     return 'flat'
   }
   const move = openMove(state, price)
-  if (move >= PLAN_TP || move <= -PLAN_SL) return 'flat'
+  if (move >= tp || move <= -sl) return 'flat'
   return held
 }
 
@@ -426,14 +433,14 @@ function applyPlanSide(state, want, price) {
 }
 
 /** Sidor efter planen, ett steg i taget, från index 1. Samma punkter ger samma lopp. */
-export function referenceRun(points) {
+export function referenceRun(points, plan) {
   const pts = Array.isArray(points) ? points : []
   const sides = new Array(pts.length).fill('flat')
   let st = { side: 'flat', entry: null, realized: 0, lev: 1 }
   for (let i = 1; i < pts.length; i++) {
     const price = Number(pts[i]?.price)
     const prev = Number(pts[i - 1]?.price)
-    st = applyPlanSide(st, planAction(st, price, prev), price)
+    st = applyPlanSide(st, planAction(st, price, prev, plan), price)
     sides[i] = st.entry == null ? 'flat' : st.side
   }
   return { sides }
@@ -472,9 +479,10 @@ export function disciplineScore({ planMatch = 0, slScore = 0, maxDd = 0 } = {}) 
  * tpAt är första index där öppen rörelse når PLAN_TP, även om sidan stängs där.
  * Ett stopp som stängs på samma stapel räknas inte som brott.
  */
-export function assess(points, sides) {
+export function assess(points, sides, plan) {
   const pts = Array.isArray(points) ? points : []
-  const plan = referenceRun(pts).sides
+  const spec = { tp: Number(plan?.tp) > 0 ? Number(plan.tp) : PLAN_TP, sl: Number(plan?.sl) > 0 ? Number(plan.sl) : PLAN_SL }
+  const planSides = referenceRun(pts, spec).sides
   let st = { side: 'flat', entry: null, realized: 0, lev: 1 }
   let compared = 0
   let matched = 0
@@ -489,10 +497,10 @@ export function assess(points, sides) {
     const want = asSide(sides?.[i])
     if (i > 0) {
       compared++
-      if (want === asSide(plan[i])) matched++
+      if (want === asSide(planSides[i])) matched++
       const carried = openMove(st, price)
-      if (st.entry != null && tpAt == null && carried >= PLAN_TP) tpAt = i
-      if (st.entry != null && (want === 'buy' || want === 'sell') && carried <= -PLAN_SL) badSteps++
+      if (st.entry != null && tpAt == null && carried >= spec.tp) tpAt = i
+      if (st.entry != null && (want === 'buy' || want === 'sell') && carried <= -spec.sl) badSteps++
     }
     st = { ...applyPlanSide(st, want, price), lev: 1 }
     equity = PRACTICE_INDEX * (1 + pnlPct(st, price) / 100)
@@ -730,6 +738,7 @@ export function createRaket({ engine }) {
     endCard.querySelector('[data-k="endTitle"]').textContent = t('rk.endTitle')
     endCard.querySelector('[data-k="again"]').textContent = t('rk.again')
     if (endCard.classList.contains('on')) paintEnd()
+    for (const pl of players) pl.dom.planCtl?.paint()
     for (const pl of players) {
       const q = pl.dom.q
       const refBtn = q('ref')
@@ -792,6 +801,7 @@ export function createRaket({ engine }) {
       <div class="nlr-rk-card nlr-rk-pnl" data-k="pnlCard"><small data-k="pnlLabel"></small><b data-k="pnl">—</b><span data-k="pnlSub"></span>
         <div class="nlr-rk-boost"><span data-k="boostLbl"></span><i><u data-k="boost"></u></i><span data-k="boostVal">0</span></div></div>
       <div class="nlr-rk-ctl">
+        <div data-k="planHost"></div>
         <div class="nlr-rk-row">
           <button type="button" class="nlr-rk-side buy" data-k="buy">${ICON_UP}<span data-k="buyLbl"></span><kbd class="nlr-rk-kbd">${h.buy}</kbd></button>
           <button type="button" class="nlr-rk-side sell" data-k="sell">${ICON_DOWN}<span data-k="sellLbl"></span><kbd class="nlr-rk-kbd">${h.sell}</kbd></button>
@@ -827,7 +837,22 @@ export function createRaket({ engine }) {
     bindBtn('play', () => act(0, 'pause'))
     bindBtn('reset', () => act(0, 'reset'))
     bindBtn('ref', () => toggleRef())
-    return { el, q }
+    const planCtl = mountPlanControl(q('planHost'), {
+      slot: mode === '2p' ? (i === 0 ? 'p1' : 'p2') : 'shared',
+      onEdit: (next) => {
+        const pl = players[i]
+        if (pl?.book && !pl.book.exit) pl.book = { ...pl.book, overridden: true, plan: next }
+        if (versusRef && mode !== '2p') {
+          refSides = referenceRun(pts, livePlan()).sides
+          if (players[0]) players[0].refX = null
+        }
+      },
+      getPrice: () => priceAt(clock.p),
+      getLeverage: () => players[i]?.st?.lev ?? 1,
+      t,
+      comma: () => getLang() !== 'en',
+    })
+    return { el, q, planCtl }
   }
 
   function fresh() {
@@ -869,12 +894,17 @@ export function createRaket({ engine }) {
       })
     }
     root.classList.toggle('nlr-rk-2p', mode === '2p')
-    refSides = versusRef && mode !== '2p' ? referenceRun(pts).sides : []
+    refSides = versusRef && mode !== '2p' ? referenceRun(pts, livePlan()).sides : []
     endCard.classList.remove('on')
     endCard.classList.remove('has-cmp')
     startCard.style.display = ''
     if (entrySnap) entrySnap.root.style.display = mode === '2p' ? 'none' : ''
     relabel()
+  }
+
+  function livePlan() {
+    const d = referenceDistances(chosenRatio())
+    return { tp: d.tpPct, sl: d.slPct }
   }
 
   function notePath(pl) {
@@ -889,7 +919,7 @@ export function createRaket({ engine }) {
   function toggleRef() {
     if (mode === '2p') return
     versusRef = !versusRef
-    refSides = versusRef ? referenceRun(pts).sides : []
+    refSides = versusRef ? referenceRun(pts, livePlan()).sides : []
     if (players[0]) players[0].refX = null
     relabel()
     render()
@@ -897,7 +927,7 @@ export function createRaket({ engine }) {
 
   function playerRun(pl, id, name) {
     notePath(pl)
-    const report = assess(pts, sidesFromLog(pts.length, pl.log))
+    const report = assess(pts, sidesFromLog(pts.length, pl.log), livePlan())
     return { ...report, id, name, balance: balanceIndex(pl.st, priceAt(clock.p)) }
   }
 
@@ -933,14 +963,15 @@ export function createRaket({ engine }) {
     }
     const rule = document.createElement('p')
     rule.className = 'rule'
-    rule.textContent = t('rk.planRule')
+    const plan = livePlan()
+    rule.textContent = t('rk.planRule', { tp: String(plan.tp), sl: String(plan.sl) })
     wrap.appendChild(rule)
     return wrap
   }
 
   function paintEnd() {
     const box = endCard.querySelector('[data-k="compare"]')
-    endCard.querySelector('[data-k="endTxt"]').textContent = t('end.body')
+    endCard.querySelector('[data-k="endTxt"]').textContent = endCopy()
     const show = (mode === '2p' || versusRef) && pts.length > 1 && players.length > 0
     endCard.classList.toggle('has-cmp', show)
     box.replaceChildren()
@@ -948,9 +979,10 @@ export function createRaket({ engine }) {
       box.hidden = true
       return null
     }
+    const plan = livePlan()
     const runs = mode === '2p'
       ? players.map((pl, i) => playerRun(pl, `p${i}`, t('rk.player', { n: i + 1 })))
-      : [playerRun(players[0], 'you', t('rk.you')), { ...assess(pts, referenceRun(pts).sides), id: 'ref', name: t('rk.refName') }]
+      : [playerRun(players[0], 'you', t('rk.you')), { ...assess(pts, referenceRun(pts, plan).sides, plan), id: 'ref', name: t('rk.refName') }]
     const cmp = compareRuns(runs)
     box.hidden = false
     box.appendChild(buildCompare(cmp))
@@ -994,14 +1026,25 @@ export function createRaket({ engine }) {
       if (clock.ended) return
       const next = stepSide(readSide(pl.st), kind === 'buy' ? 1 : -1)
       if (next === readSide(pl.st)) return
-      pl.st = next === 'flat' ? closePosition(pl.st, price) : { ...switchSide(pl.st, next, price), traded: true }
-      if (next !== 'flat') {
+      if (next === 'flat') {
+        pl.book = closeBook(pl.book, price, 'manual')
+        pl.st = closePosition(pl.st, price)
+      } else if (!assessPlan(pl.dom.planCtl.getPlan(), { minRatio: floorFor(), leverage: pl.st.lev, price }).ok) {
+        pl.dom.planCtl.paint()
+      } else {
+        pl.book = closeBook(pl.book, price, 'manual')
+        pl.st = { ...switchSide(pl.st, next, price), traded: true }
+        const levels = levelsFor(pl.dom.planCtl.getPlan(), price, next, { minRatio: floorFor(), leverage: pl.st.lev, price })
+        pl.book = levels
+          ? { entry: price, side: next, stop: levels.stop, target: levels.target, overridden: false, exit: null }
+          : null
         clock.playing = true
         clock.started = true
         startCard.style.display = 'none'
         if (entrySnap) entrySnap.root.style.display = 'none'
       }
     } else if (kind === 'flat') {
+      pl.book = closeBook(pl.book, price, 'manual')
       pl.st = closePosition(pl.st, price)
     } else if (kind === 'levDown' || kind === 'levUp') {
       pl.st = setLev(pl.st, pl.st.lev + (kind === 'levUp' ? 1 : -1), price)
@@ -1061,7 +1104,7 @@ export function createRaket({ engine }) {
     startCard.style.transform = 'none'
     startCard.style.width = `${Math.max(120, Math.round(rootBox.width - 24))}px`
     startCard.style.maxWidth = `${Math.max(120, Math.round(rootBox.width - 24))}px`
-    if (gap >= 44) {
+    if (gap >= 24) {
       startCard.style.top = `${Math.max(8, Math.round(floor - rootBox.top))}px`
       startCard.style.maxHeight = `${Math.floor(gap)}px`
       startCard.style.overflow = 'hidden'
@@ -1792,6 +1835,51 @@ export function createRaket({ engine }) {
     return sprites.get(k)
   }
 
+  function fmtR(r) {
+    if (!Number.isFinite(r)) return '—'
+    const n = (Math.round(r * 10) / 10).toFixed(1)
+    return getLang() === 'en' ? n : n.replace('.', ',')
+  }
+  function refLine() {
+    const plan = livePlan()
+    const rr = t(Math.abs(plan.tp / plan.sl - 1.5) < 0.05 ? 'plan.rr15' : 'plan.rr2')
+    return `${t('plan.vsRef')} ${t('plan.refLine', { tp: String(plan.tp), rr })}`
+  }
+  function endCopy() {
+    const text = refLine()
+    const outcomeOf = (pl) => pl?.book?.exit || null
+    if (mode !== '2p') {
+      const ex = outcomeOf(players[0])
+      const verdict = ex && Number.isFinite(ex.r)
+        ? t('plan.endOwn', { r: fmtR(ex.r), disc: t(ex.disciplined ? 'plan.discYes' : 'plan.discNo') })
+        : t('end.body')
+      return `${text} ${verdict}`
+    }
+    const d = compareDuel(outcomeOf(players[0]), outcomeOf(players[1]))
+    let verdict = t('plan.duelNone')
+    if (d.winner === 'tie') verdict = t('plan.duelTie', { r: fmtR(d.r) })
+    else if (d.winner === 'a' || d.winner === 'b') {
+      const who = t('rk.player', { n: d.winner === 'a' ? 1 : 2 })
+      verdict = d.reason === 'only' ? t('plan.duelSolo', { who, r: fmtR(d.r) }) : t('plan.duelHigher', { who, r: fmtR(d.r), other: fmtR(d.other) })
+    }
+    return `${text} ${verdict}`
+  }
+
+  function settleBooks(price) {
+    const px = Number.isFinite(price) ? price : priceAt(clock.p)
+    for (const pl of players) {
+      if (!pl.book || pl.book.exit || isFlat(pl.st)) continue
+      const next = tickBook(pl.book, px)
+      if (next !== pl.book && next?.exit) {
+        pl.book = next
+        pl.st = closePosition(pl.st, px)
+      } else if (clock.p >= pts.length - 1) {
+        pl.st = closePosition(pl.st, px)
+        pl.book = closeBook(pl.book, px, 'period')
+      }
+    }
+  }
+
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000 || 0)
     last = now
@@ -1808,6 +1896,8 @@ export function createRaket({ engine }) {
     }
     if (clock.playing && !clock.ended) {
       clock.p = Math.min(pts.length - 1, clock.p + PTS_PER_SEC * dt)
+      const price = priceAt(clock.p)
+      settleBooks(price)
       if (clock.p >= pts.length - 1) closePeriod()
     }
     render(dt)
@@ -1883,13 +1973,14 @@ export function createRaket({ engine }) {
     step(sec) {
       const jump = Math.max(0, Number(sec) || 0)
       clock.p = Math.min(pts.length - 1, clock.p + PTS_PER_SEC * jump)
+      settleBooks(priceAt(clock.p))
       if (pts.length && clock.p >= pts.length - 1) closePeriod()
       render(jump)
     },
     versus(on) {
       if (mode === '2p') return false
       versusRef = !!on
-      refSides = versusRef ? referenceRun(pts).sides : []
+      refSides = versusRef ? referenceRun(pts, livePlan()).sides : []
       if (players[0]) players[0].refX = null
       relabel()
       render()

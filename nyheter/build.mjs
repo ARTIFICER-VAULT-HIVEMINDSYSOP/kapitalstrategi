@@ -87,12 +87,22 @@ function articleHtml(edition, module, modules) {
   const href = `/nyheter/${edition.date}/${module.slug}/`;
   const category = pick(module.category, lang);
   const kicker = category ? `${category} · ${dateLabel}` : `Nyhetsbrev · ${dateLabel}`;
+  const sourceBlocks = copy.blocks.filter((block) => /^(Källa|Källor):/.test(block.text));
+  const hiddenSources = Array.isArray(module.hiddenSources) ? module.hiddenSources : [];
+  const sourceLines = [
+    ...sourceBlocks.map((block) => block.text),
+    ...hiddenSources.map((src) => `${src.label} ${src.href}`.trim()),
+  ];
+  const sourceComment = sourceLines.length
+    ? `\n        <!-- Källor: ${sourceLines.join(" · ").replace(/--/g, "%2D%2D")} -->`
+    : "";
   const paragraphs = copy.blocks
-    .map((block) => {
-      const source = /^(Källa|Källor):/.test(block.text);
-      return `<p${source ? ' class="ks-source"' : ""}>${renderInline(block.text)}</p>`;
-    })
+    .filter((block) => !/^(Källa|Källor):/.test(block.text))
+    .map((block) => `<p>${renderInline(block.text)}</p>`)
     .join("\n        ");
+  const disclaimerHtml = disclaimer
+    ? `\n      <p class="ks-disclaimer">${escapeHtml(disclaimer)}</p>`
+    : "";
   const siblings = modules
     .map((item) => {
       const itemTitle = item.translations[lang].title;
@@ -145,10 +155,9 @@ function articleHtml(edition, module, modules) {
     </header>
     <main id="innehall" class="ks-wrap">
       <p class="ks-kicker">${escapeHtml(kicker)}</p>
-      <h1>${escapeHtml(title)}</h1>
-      <p class="ks-disclaimer">${escapeHtml(disclaimer)}</p>
+      <h1>${escapeHtml(title)}</h1>${disclaimerHtml}
       <article class="ks-article">
-        ${paragraphs}
+        ${paragraphs}${sourceComment}
       </article>
       <nav class="ks-siblings" aria-label="Moduler i utgåvan">
         <h2>I samma utgåva</h2>
