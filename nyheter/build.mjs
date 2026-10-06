@@ -65,15 +65,23 @@ function editionDirs() {
     .sort((a, b) => (a < b ? 1 : a > b ? -1 : 0));
 }
 
+function loadQuiz(dir) {
+  const file = path.join(dir, "quiz.json");
+  if (!fs.existsSync(file)) return null;
+  const quiz = readJson(file);
+  if (!quiz || !Array.isArray(quiz.questions)) return null;
+  return quiz;
+}
+
 function loadEdition(date) {
   const dir = path.join(dataDir, date);
   const edition = readJson(path.join(dir, "edition.json"));
   const modules = fs
     .readdirSync(dir)
-    .filter((name) => name.endsWith(".json") && name !== "edition.json")
+    .filter((name) => name.endsWith(".json") && name !== "edition.json" && name !== "quiz.json")
     .map((name) => readJson(path.join(dir, name)))
     .sort((a, b) => a.order - b.order);
-  return { edition, modules };
+  return { edition, modules, quiz: loadQuiz(dir) };
 }
 
 function articleHtml(edition, module, modules) {
@@ -194,7 +202,7 @@ function ensureShell() {
 function main() {
   const editions = [];
   for (const date of editionDirs()) {
-    const { edition, modules } = loadEdition(date);
+    const { edition, modules, quiz } = loadEdition(date);
     if (edition.date !== date) throw new Error(`Datum stämmer inte i ${date}`);
     for (const module of modules) {
       const dir = path.join(here, date, module.slug);
@@ -219,6 +227,7 @@ function main() {
         ),
         ...(module.category ? { category: module.category } : {}),
       })),
+      ...(quiz ? { quiz } : {}),
     });
   }
   const first = loadEdition(editionDirs()[0]).edition;

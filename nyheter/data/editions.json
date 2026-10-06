@@ -88,7 +88,287 @@
             "sv": "Skolan"
           }
         }
-      ]
+      ],
+      "quiz": {
+        "date": "2026-09-28",
+        "dateLabel": {
+          "sv": "28 september 2026",
+          "en": "28 September 2026",
+          "uk": "28 вересня 2026"
+        },
+        "title": {
+          "sv": "Nyhetsquiz",
+          "en": "News quiz",
+          "uk": "Новинна вікторина"
+        },
+        "lead": {
+          "sv": "Svaren finns i korten ovan. Läs först, svara sen.",
+          "en": "The answers are in the cards above. Read first, then answer.",
+          "uk": "Відповіді є в картках вище. Спочатку прочитай, потім відповідай."
+        },
+        "teaser": {
+          "sv": "I morgon kan frågan gälla en råvarusiffra — en avläsning, inte ett beslut.",
+          "en": "Tomorrow the question may be about a commodity figure — a reading, not a decision.",
+          "uk": "Завтра питання може стосуватися цифри сировини — це зчитування, не рішення."
+        },
+        "questions": [
+          {
+            "id": "nq-2026-09-28-1",
+            "prompt": {
+              "sv": "Enligt IPO-kortet: vad består Linjemontages erbjudande av?",
+              "en": "According to the IPO card: what does Linjemontage's offer consist of?",
+              "uk": "Згідно з карткою IPO: з чого складається пропозиція Linjemontage?"
+            },
+            "explanation": {
+              "sv": "Kortet säger att erbjudandet är befintliga aktier och att bolaget inte tillförs likvid. En uppgift om affären, inte ett beslut att delta.",
+              "en": "The card says the offer is existing shares and that the company receives no proceeds. A fact about the offer, not a decision to take part.",
+              "uk": "Картка каже, що пропозиція — це вже існуючі акції і що компанія не отримує коштів. Факт про угоду, не рішення брати участь."
+            },
+            "options": [
+              {
+                "id": "a",
+                "correct": true,
+                "text": {
+                  "sv": "Befintliga aktier. Bolaget tillförs ingen likvid.",
+                  "en": "Existing shares. The company receives no proceeds.",
+                  "uk": "Існуючі акції. Компанія не отримує коштів."
+                }
+              },
+              {
+                "id": "b",
+                "correct": false,
+                "text": {
+                  "sv": "Enbart nyemitterade aktier som fyller på bolagets kassa",
+                  "en": "Only newly issued shares that fill the company's cash",
+                  "uk": "Лише нововипущені акції, що поповнюють касу компанії"
+                }
+              },
+              {
+                "id": "c",
+                "correct": false,
+                "text": {
+                  "sv": "En obligation med fast ränta",
+                  "en": "A bond with a fixed rate",
+                  "uk": "Облігація з фіксованою ставкою"
+                }
+              },
+              {
+                "id": "d",
+                "correct": false,
+                "text": {
+                  "sv": "Ett råvarukontrakt i Brent",
+                  "en": "A Brent commodity contract",
+                  "uk": "Сировинний контракт на Brent"
+                }
+              }
+            ]
+          },
+          {
+            "id": "nq-2026-09-28-2",
+            "prompt": {
+              "sv": "Enligt oljekortet: vad visade DI:s spot för Brent klockan 06:50?",
+              "en": "According to the oil card: what did the DI spot show for Brent at 06:50?",
+              "uk": "Згідно з карткою нафти: що показав спот DI для Brent о 06:50?"
+            },
+            "explanation": {
+              "sv": "Kortet visar en avläsning klockan 06:50. Brent och WTI är olika siffror. En ögonblicksbild, inte ett omdöme.",
+              "en": "The card shows a reading at 06:50. Brent and WTI are different figures. A snapshot, not a verdict.",
+              "uk": "Картка показує зчитування о 06:50. Brent і WTI — різні цифри. Знімок, не вирок."
+            },
+            "options": [
+              {
+                "id": "a",
+                "correct": false,
+                "text": {
+                  "sv": "94,05 och +1,81 procent — det är WTI på samma rad",
+                  "en": "94.05 and +1.81 percent — that is WTI on the same line",
+                  "uk": "94,05 і +1,81 відсотка — це WTI в тому самому рядку"
+                }
+              },
+              {
+                "id": "b",
+                "correct": true,
+                "text": {
+                  "sv": "99,09 USD/fat och −5,01 procent",
+                  "en": "99.09 USD per barrel and −5.01 percent",
+                  "uk": "99,09 USD за барель і −5,01 відсотка"
+                }
+              },
+              {
+                "id": "c",
+                "correct": false,
+                "text": {
+                  "sv": "4 197,36 dollar/uns — det står i guldkortet",
+                  "en": "4,197.36 dollars per ounce — that is on the gold card",
+                  "uk": "4 197,36 долара за унцію — це на картці золота"
+                }
+              },
+              {
+                "id": "d",
+                "correct": false,
+                "text": {
+                  "sv": "Olja handlas inte längre",
+                  "en": "Oil is no longer traded",
+                  "uk": "Нафтою більше не торгують"
+                }
+              }
+            ]
+          },
+          {
+            "id": "nq-2026-09-28-3",
+            "prompt": {
+              "sv": "Vad betyder when-issued för Linjemontage i IPO-kortet?",
+              "en": "What does when-issued mean for Linjemontage on the IPO card?",
+              "uk": "Що означає when-issued для Linjemontage на картці IPO?"
+            },
+            "explanation": {
+              "sv": "Kortet anger when-issued 25–28 september och förväntad likviddag 29 september. Ett datum i kalendern, inte ett köp.",
+              "en": "The card states when-issued 25–28 September and an expected settlement day of 29 September. A date in the calendar, not a buy.",
+              "uk": "Картка називає when-issued 25–28 вересня і очікуваний день розрахунків 29 вересня. Дата в календарі, не купівля."
+            },
+            "options": [
+              {
+                "id": "a",
+                "correct": false,
+                "text": {
+                  "sv": "Att priset är garanterat",
+                  "en": "That the price is guaranteed",
+                  "uk": "Що ціна гарантована"
+                }
+              },
+              {
+                "id": "b",
+                "correct": false,
+                "text": {
+                  "sv": "Att bolaget har stängt",
+                  "en": "That the company has closed",
+                  "uk": "Що компанію закрито"
+                }
+              },
+              {
+                "id": "c",
+                "correct": true,
+                "text": {
+                  "sv": "Perioden 25–28 september, sista dagen i utgåvan, och förväntad likviddag 29 september — ett datum, inte ett köp",
+                  "en": "The period 25–28 September, the last day in this edition, and expected settlement on 29 September — a date, not a buy",
+                  "uk": "Період 25–28 вересня, останній день у випуску, і очікуваний розрахунок 29 вересня — дата, не купівля"
+                }
+              },
+              {
+                "id": "d",
+                "correct": false,
+                "text": {
+                  "sv": "Att man måste vara med samma dag",
+                  "en": "That one must take part the same day",
+                  "uk": "Що треба брати участь того самого дня"
+                }
+              }
+            ]
+          },
+          {
+            "id": "nq-2026-09-28-4",
+            "prompt": {
+              "sv": "Enligt guldkortet: vad är 4 197,36 dollar/uns?",
+              "en": "According to the gold card: what is 4,197.36 dollars per ounce?",
+              "uk": "Згідно з карткою золота: що таке 4 197,36 долара за унцію?"
+            },
+            "explanation": {
+              "sv": "Guldkortet visar spot vid 06:50, minus 2,04 procent. En ögonblicksbild, inte ett omdöme. Silvret står i ett annat kort.",
+              "en": "The gold card shows the spot at 06:50, down 2.04 percent. A snapshot, not a verdict. Silver is on another card.",
+              "uk": "Картка золота показує спот о 06:50, мінус 2,04 відсотка. Знімок, не вирок. Срібло стоїть на іншій картці."
+            },
+            "options": [
+              {
+                "id": "a",
+                "correct": false,
+                "text": {
+                  "sv": "Ett löfte om nästa veckas pris",
+                  "en": "A promise of next week's price",
+                  "uk": "Обіцянка ціни наступного тижня"
+                }
+              },
+              {
+                "id": "b",
+                "correct": false,
+                "text": {
+                  "sv": "Silverpriset klockan 18:00",
+                  "en": "The silver price at 18:00",
+                  "uk": "Ціна срібла о 18:00"
+                }
+              },
+              {
+                "id": "c",
+                "correct": false,
+                "text": {
+                  "sv": "En order i skolan",
+                  "en": "An order in the school card",
+                  "uk": "Наказ у шкільній картці"
+                }
+              },
+              {
+                "id": "d",
+                "correct": true,
+                "text": {
+                  "sv": "En DI-spot visad klockan 06:50, minus 2,04 procent — en ögonblicksbild, inte ett omdöme",
+                  "en": "A DI spot shown at 06:50, down 2.04 percent — a snapshot, not a verdict",
+                  "uk": "Спот DI, показаний о 06:50, мінус 2,04 відсотка — знімок, не вирок"
+                }
+              }
+            ]
+          },
+          {
+            "id": "nq-2026-09-28-5",
+            "prompt": {
+              "sv": "Vad är pausen i kortet Tyst tid till för, enligt texten?",
+              "en": "What is the pause on the Quiet time card for, according to the text?",
+              "uk": "Для чого пауза в картці Тиша, згідно з текстом?"
+            },
+            "explanation": {
+              "sv": "Kortet skiljer pausen från beslutet. Prova först, i stillhet. Det är en vana i läsningen, inte ett utfall.",
+              "en": "The card separates the pause from the decision. Practise first, in stillness. It is a habit of reading, not an outcome.",
+              "uk": "Картка відділяє паузу від рішення. Спочатку вправа, в тиші. Це звичка читання, не результат."
+            },
+            "options": [
+              {
+                "id": "a",
+                "correct": false,
+                "text": {
+                  "sv": "Att hoppa över lektionen",
+                  "en": "To skip the lesson",
+                  "uk": "Щоб пропустити урок"
+                }
+              },
+              {
+                "id": "b",
+                "correct": true,
+                "text": {
+                  "sv": "En tyst stund före ett övningsbeslut, så att bakgrundsljud inte styr steget",
+                  "en": "A quiet moment before a practice decision, so background sound does not steer the step",
+                  "uk": "Тиха хвилина перед навчальним рішенням, щоб фоновий звук не керував кроком"
+                }
+              },
+              {
+                "id": "c",
+                "correct": false,
+                "text": {
+                  "sv": "En garanti för ett bättre pris",
+                  "en": "A guarantee of a better price",
+                  "uk": "Гарантія кращої ціни"
+                }
+              },
+              {
+                "id": "d",
+                "correct": false,
+                "text": {
+                  "sv": "Ett krav att öva varje dag",
+                  "en": "A requirement to practise every day",
+                  "uk": "Вимога практикуватися щодня"
+                }
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }
