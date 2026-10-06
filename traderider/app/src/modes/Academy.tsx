@@ -33,7 +33,7 @@ const LESSONS: Record<LessonId, { title: string; text: string; task: string }> =
   2: {
     title: 'Stop-loss och take-profit',
     text:
-      'En stop-loss är kursen där du i förväg bestämt att affären var fel och ska stängas. En take-profit är kursen där du tar hem. Båda sätts innan du öppnar — inte när känslorna tagit över. Förhållandet mellan mål och risk (R) visar om upplägget är rimligt: 2R betyder att målet ligger dubbelt så långt bort som stoppet.',
+      'En stop-loss är kursen där du i förväg bestämt att affären var fel och ska stängas. En take-profit är kursen där du tar hem. Båda sätts innan du öppnar — inte när känslorna tagit över. Förhållandet mellan mål och risk (R) visar om upplägget är rimligt: 2R betyder att målet ligger dubbelt så långt bort som stoppet. Förvalet är 2R, och listan börjar på 1,5R. Vid 2R behövs fler träffar än en av tre (över 33 %) för jämnt utfall om vinst och förlust följer planen. Vid 1,5R behövs över 40 %, vid 3R över 25 %.',
     task: 'Välj riktning, sätt både stop-loss och take-profit, öppna övningsaffären och låt simuleringen köra tills en av dem träffas.',
   },
   3: {
@@ -340,7 +340,7 @@ export function Academy({ candles }: { candles: Candle[] }) {
               <div className="ac-row">
                 <Choice label="Riktning" options={['long', 'short'] as const} value={side} onPick={(v) => { if (!trade || trade.closed) { setSide(v); } }} fmt={(v) => (v === 'long' ? 'Köp (long)' : 'Sälj (short)')} />
                 <Choice label="Stopp (band-σ)" options={STOP_SIGMAS} value={sigma as (typeof STOP_SIGMAS)[number]} onPick={setSigma} fmt={(v) => `${v}σ`} />
-                <Choice label="Mål (R)" options={TP_R_MULTIPLES} value={rMult as (typeof TP_R_MULTIPLES)[number]} onPick={setRMult} fmt={(v) => `${v}R`} />
+                <Choice label="Mål (R)" options={TP_R_MULTIPLES} value={rMult as (typeof TP_R_MULTIPLES)[number]} onPick={setRMult} fmt={(v) => `${String(v).replace('.', ',')}R`} />
                 <div className="ac-toggles">
                   <button type="button" className={`ac-chip ${slSet ? 'on-red' : ''}`} onClick={() => { setSlSet(true); if (tpSet) earn('l2_bracket') }}>{slSet ? `Stop-loss ${px(trade && !trade.closed ? trade.stop : l2Stop)}` : 'Sätt stop-loss'}</button>
                   <button type="button" className={`ac-chip ${tpSet ? 'on-cyan' : ''}`} onClick={() => { setTpSet(true); if (slSet) earn('l2_bracket') }} disabled={!slSet}>{tpSet ? `Take-profit ${px(trade && !trade.closed ? trade.target : l2Target)}` : 'Sätt take-profit'}</button>

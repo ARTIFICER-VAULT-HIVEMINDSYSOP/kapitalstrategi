@@ -13,7 +13,14 @@ export const STORE_KEY = 'nvda-line-akademin-v1'
 export const MAX_RISK_PCT = 2
 export const RISK_CHOICES = [0.5, 1, 2, 5]
 export const STOP_SIGMAS = [1, 1.5, 2]
-export const TP_R_MULTIPLES = [1, 2, 3]
+/** Mål som multiplar av stoppavståndet. Golvet är 1,5R; förvalet i lektionen är 2R. */
+export const TP_R_MULTIPLES = [1.5, 2, 3]
+export const DEFAULT_TP_R = 2
+/** Andel träffar som krävs för jämnt utfall när vinsten är R gånger förlusten: 1 / (1 + R). */
+export function breakEvenWinRate(rewardOverRisk) {
+  if (!(rewardOverRisk > 0)) return 1
+  return 1 / (1 + rewardOverRisk)
+}
 
 export const RSI_HIGH = 70
 export const RSI_LOW = 30

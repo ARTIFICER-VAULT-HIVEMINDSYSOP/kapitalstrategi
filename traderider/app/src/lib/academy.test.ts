@@ -1,12 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import {
-  advancePractice, correctRead, levelFor, lessonUnlocked, openPractice, positionSize, riskAllowed,
-  squeezeThreshold, xpTotal, XP_MAX, type XpKey,
+  advancePractice, breakEvenWinRate, correctRead, DEFAULT_TP_R, levelFor, lessonUnlocked, openPractice, positionSize, riskAllowed,
+  squeezeThreshold, TP_R_MULTIPLES, xpTotal, XP_MAX, type XpKey,
 } from './academy'
 
 const band = { sma: 100, upper: 104, lower: 96, stdev: 2 }
 
 describe('academy', () => {
+  it('presets a target at least 1.5R, usually 2R', () => {
+    expect(TP_R_MULTIPLES.every((r) => r >= 1.5)).toBe(true)
+    expect(DEFAULT_TP_R).toBe(2)
+    expect(TP_R_MULTIPLES).toContain(DEFAULT_TP_R)
+    expect(breakEvenWinRate(2)).toBeCloseTo(1 / 3, 6)
+    expect(breakEvenWinRate(1.5)).toBeCloseTo(0.4, 6)
+  })
   it('sizes so a stop-out risks at most the chosen %', () => {
     const s = positionSize(100_000, 1, 100, 98)
     expect(s.qty).toBe(500)
