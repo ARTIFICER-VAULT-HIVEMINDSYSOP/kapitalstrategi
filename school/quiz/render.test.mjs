@@ -150,7 +150,10 @@ async function waitFor(client, expression, timeout = 20000) {
   }
   let body = last;
   try {
-    body = await evaluate(client, "document.body ? location.href + '\\n' + document.body.innerText.slice(0, 500) : ''");
+    body = await evaluate(
+      client,
+      "(() => { const radios=[...document.querySelectorAll('.ts-quiz input')]; const quiz=document.querySelector('.ts-quiz'); return location.href + '\\nradios ' + radios.length + ' disabled ' + radios.filter(r=>r.disabled).length + '\\n' + (quiz?quiz.innerText.slice(0,300):'no quiz') + '\\n' + (document.querySelector('.banner.error')?.innerText||'') })()",
+    );
   } catch {}
   throw new Error(`timeout: ${expression}\n${body}`);
 }
@@ -172,7 +175,57 @@ async function setSize(client, width) {
   });
 }
 
-test("lesson quiz, news quiz and streak render in Swedish and English", { timeout: 120000 }, async () => {
+function lessonAnswers() {
+  const bundle = fs.readFileSync(path.join(repo, "assets/index-CBayL6Go.js"), "utf8");
+  const start = bundle.indexOf("moduleId:`basics-01-samma-sprak`");
+  const end = bundle.indexOf("moduleId:`basics-03-ranta-pa-ranta`", start);
+  const slice = bundle.slice(start, end);
+  const answers = {};
+  for (const block of slice.matchAll(/\{id:`(bas1-[a-z0-9-]+)`,[\s\S]*?options:\[([\s\S]*?)\]/g)) {
+    const correct = [...block[2].matchAll(/xs\(`([a-d])`,`(?:\\`|[^`])*`,(!0|!1)/g)].find((item) => item[2] === "!0");
+    if (!correct) throw new Error(`missing correct option for ${block[1]}`);
+    answers[block[1]] = correct[1];
+  }
+  if (!answers["bas1-ratio"]) throw new Error("bas1-ratio missing from lesson 1");
+  return answers;
+}
+
+async function planState(client, width) {
+  await setSize(client, width);
+  const raw = await waitFor(
+    client,
+    `(() => {
+      const sl = document.querySelector('.tr-plan [data-k="sl"]');
+      const tp = document.querySelector('.tr-plan [data-k="tp"]');
+      const p15 = document.querySelector('.tr-plan [data-k="p15"]');
+      const status = document.querySelector('.tr-plan [data-k="status"]');
+      if (!sl || !tp || !p15 || !status) return '';
+      return JSON.stringify({
+        sl: sl.value,
+        tp: tp.value,
+        disabled: p15.disabled,
+        status: status.textContent,
+        state: sl.closest('.tr-plan').dataset.state
+      });
+    })()`,
+  );
+  return JSON.parse(raw);
+}
+
+async function shotPlan(client, file) {
+  const box = await evaluate(
+    client,
+    `(() => {
+      const el = document.querySelector('.tr-plan');
+      el.scrollIntoView({ block: 'center' });
+      const rect = el.getBoundingClientRect();
+      return { x: Math.max(0, rect.left + window.scrollX - 8), y: Math.max(0, rect.top + window.scrollY - 8), width: Math.min(window.innerWidth, rect.width + 16), height: rect.height + 16 };
+    })()`,
+  );
+  await shot(client, file, box);
+}
+
+test("lesson quiz, news quiz, streak and RaceX ratio lock render", { timeout: 180000 }, async () => {
   assert.equal(fs.existsSync(chromeBin), true);
   const { server, port } = await startServer();
   const chrome = startChrome();
@@ -186,10 +239,42 @@ test("lesson quiz, news quiz and streak render in Swedish and English", { timeou
     const today = calendarDate(new Date());
     const yesterday = addCalendarDays(today, -1);
     const earlier = addCalendarDays(today, -2);
+    const answers = lessonAnswers();
+    const lessonUrl = `${origin}/tradingskolan?course=basics-sprak&lesson=basics-01-samma-sprak`;
+
+    await client.send("Page.navigate", { url: `${origin}/` });
+    await waitFor(client, "document.querySelector('#root') && document.querySelector('#root').childElementCount > 0");
+    await evaluate(
+      client,
+      `(() => {
+        localStorage.setItem('ig.auth.session', JSON.stringify({ userId: 'quiz-local', name: 'Quiz', email: 'quiz@example.com', loggedInAt: '2026-10-06T00:00:00.000Z' }));
+        localStorage.setItem('ig.ks.localApi.v1', JSON.stringify({ portfolios: [{ id: 'p-quiz', userId: 'quiz-local', holdings: [] }], progress: [], utr: [] }));
+        localStorage.removeItem('tr.riskplan.unlock');
+        localStorage.removeItem('tr.riskplan');
+        localStorage.removeItem('tr.riskplan.choice');
+        localStorage.removeItem('tr.riskplan.p2');
+        localStorage.setItem('app.language', 'sv');
+        localStorage.setItem('ig.app.language', JSON.stringify('sv'));
+      })()`,
+    );
+    await client.send("Page.navigate", { url: `${origin}/traderider/spel/#racex` });
+    const lockedWide = await planState(client, 1280);
+    assert.equal(lockedWide.sl, "2");
+    assert.equal(lockedWide.tp, "4");
+    assert.equal(lockedWide.disabled, true);
+    assert.equal(lockedWide.state, "locked");
+    assert.match(lockedWide.status, /Förvalet är 1:2/);
+    await shotPlan(client, "racex-locked-1280.png");
+    const lockedNarrow = await planState(client, 390);
+    assert.equal(lockedNarrow.sl, "2");
+    assert.equal(lockedNarrow.tp, "4");
+    assert.equal(lockedNarrow.disabled, true);
+    assert.match(lockedNarrow.status, /1:2/);
+    await shotPlan(client, "racex-locked-390.png");
 
     for (const lang of ["sv", "en"]) {
       await setSize(client, 1280);
-      await client.send("Page.navigate", { url: `${origin}/tradingskolan?course=basics-sprak&lesson=basics-01-samma-sprak` });
+      await client.send("Page.navigate", { url: lessonUrl });
       await waitFor(client, "document.querySelector('#root') && document.querySelector('#root').childElementCount > 0");
       await evaluate(client, `localStorage.setItem('ig.app.language', JSON.stringify(${JSON.stringify(lang)}))`);
       await client.send("Page.reload", { ignoreCache: true });
@@ -299,6 +384,69 @@ test("lesson quiz, news quiz and streak render in Swedish and English", { timeou
       assert.match(retried, lang === "en" ? /Streak: 3 days/ : /Svit: 3 dagar/);
       assert.match(retried, /1\//);
     }
+
+    await setSize(client, 1280);
+    await evaluate(client, `localStorage.setItem('ig.app.language', JSON.stringify('sv'))`);
+    await client.send("Page.navigate", { url: lessonUrl });
+    await waitFor(client, "document.querySelector('.ts-quiz input[type=radio]:not(:disabled)') ? 'ready' : ''");
+    const passed = await evaluate(
+      client,
+      `(() => {
+        const answers = ${JSON.stringify(answers)};
+        const root = document.querySelector('.ts-quiz');
+        return new Promise((resolve) => {
+          let guard = 0;
+          const step = () => {
+            if (root.querySelector('.ts-quiz-result-block') || guard++ > 40) {
+              const radioNow = root.querySelector('input[type=radio]');
+              const name = radioNow ? radioNow.name : '';
+              const expected = answers[name] || '';
+              const pickNow = name ? root.querySelector('input[name="' + name + '"][value="' + expected + '"]') : null;
+              const buttonNow = root.querySelector('button.btn.primary');
+              resolve({
+                done: !!root.querySelector('.ts-quiz-result-block'),
+                unlock: localStorage.getItem('tr.riskplan.unlock'),
+                name,
+                expected,
+                checked: !!(pickNow && pickNow.checked),
+                buttonDisabled: !buttonNow || buttonNow.disabled,
+                values: [...root.querySelectorAll('input[type=radio]')].map((item) => item.value + (item.checked ? '*' : '')).join(','),
+                text: root.innerText.slice(0, 180)
+              });
+              return;
+            }
+            const radio = root.querySelector('input[type=radio]');
+            if (!radio) { resolve({ done: false, text: 'no radio' }); return; }
+            const pick = root.querySelector('input[name="' + radio.name + '"][value="' + (answers[radio.name] || '') + '"]');
+            if (!pick || pick.disabled) { resolve({ done: false, text: 'disabled ' + radio.name }); return; }
+            if (!pick.checked) pick.click();
+            const button = root.querySelector('button.btn.primary');
+            if (!button || button.disabled) { setTimeout(step, 40); return; }
+            button.click();
+            setTimeout(step, 40);
+          };
+          step();
+        });
+      })()`,
+    );
+    assert.equal(passed.done, true, JSON.stringify(passed));
+    assert.equal(passed.unlock, JSON.stringify({ unlocked: true, quizId: "bas1-ratio" }));
+
+    await client.send("Page.navigate", { url: `${origin}/traderider/spel/#racex` });
+    const openWide = await planState(client, 1280);
+    assert.equal(openWide.sl, "2");
+    assert.equal(openWide.tp, "4");
+    assert.equal(openWide.disabled, false);
+    assert.equal(openWide.state, "unlocked");
+    assert.match(openWide.status, /1:1,5/);
+    assert.match(openWide.status, /1:2/);
+    await shotPlan(client, "racex-unlocked-1280.png");
+    const openNarrow = await planState(client, 390);
+    assert.equal(openNarrow.disabled, false);
+    assert.equal(openNarrow.sl, "2");
+    assert.equal(openNarrow.tp, "4");
+    assert.match(openNarrow.status, /1:1,5/);
+    await shotPlan(client, "racex-unlocked-390.png");
   } finally {
     client?.close();
     chrome.kill();

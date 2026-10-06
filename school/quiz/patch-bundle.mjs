@@ -9,7 +9,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { appended, paragraphs } from "./extras.mjs";
+import { appended } from "./extras.mjs";
 import { translations } from "./i18n/index.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -198,72 +198,18 @@ function appendExtras(source) {
   return next;
 }
 
-function insertParagraphs(source) {
-  let next = source;
-  if (!next.includes(paragraphs.svMarker)) {
-    const count = next.split(paragraphs.svAnchor).length - 1;
-    if (count !== 1) throw new Error(`sv ratio anchor: ${count}`);
-    next = next.replace(paragraphs.svAnchor, paragraphs.svAnchor + paragraphs.svInsert);
-  }
-  if (!next.includes(paragraphs.enMarker)) {
-    const count = next.split(paragraphs.enAnchor).length - 1;
-    if (count !== 1) throw new Error(`en ratio anchor: ${count}`);
-    next = next.replace(paragraphs.enAnchor, paragraphs.enAnchor + paragraphs.enInsert);
-  }
-  return next;
-}
-
 function localizeCalls(source) {
   let next = source;
-  const helper = `function quizPick(e,t,n,r){return r===\`uk\`?n||t||e||\`\`:r===\`en\`?t||e||\`\`:e||\`\`}function localizeLessonQuiz(e,t){return Array.isArray(e)?e.map(n=>({...n,prompt:quizPick(n.prompt,n.promptEn,n.promptUk,t),explanation:quizPick(n.explanation,n.explanationEn,n.explanationUk,t),options:Array.isArray(n.options)?n.options.map(e=>({...e,text:quizPick(e.text,e.textEn,e.textUk,t)})):n.options})):e}`;
-  if (!next.includes("function localizeLessonQuiz(")) {
+  const helper = `function quizPick(e,t,n,r){return r===\`uk\`?n||t||e||\`\`:r===\`en\`?t||e||\`\`:e||\`\`}function localizeLessonQuiz(e,t){if(!Array.isArray(e))return e;let n=localizeLessonQuiz.cache||(localizeLessonQuiz.cache=new WeakMap),r=n.get(e);r||(r=new Map,n.set(e,r));if(r.has(t))return r.get(t);let i=e.map(n=>({...n,prompt:quizPick(n.prompt,n.promptEn,n.promptUk,t),explanation:quizPick(n.explanation,n.explanationEn,n.explanationUk,t),options:Array.isArray(n.options)?n.options.map(e=>({...e,text:quizPick(e.text,e.textEn,e.textUk,t)})):n.options}));return r.set(t,i),i}`;
+  const previous = `function quizPick(e,t,n,r){return r===\`uk\`?n||t||e||\`\`:r===\`en\`?t||e||\`\`:e||\`\`}function localizeLessonQuiz(e,t){return Array.isArray(e)?e.map(n=>({...n,prompt:quizPick(n.prompt,n.promptEn,n.promptUk,t),explanation:quizPick(n.explanation,n.explanationEn,n.explanationUk,t),options:Array.isArray(n.options)?n.options.map(e=>({...e,text:quizPick(e.text,e.textEn,e.textUk,t)})):n.options})):e}`;
+  if (next.includes(previous)) next = next.replace(previous, helper);
+  else if (!next.includes("localizeLessonQuiz.cache")) {
     const at = next.indexOf("function n8(");
     if (at < 0) throw new Error("n8 missing");
     next = next.slice(0, at) + helper + next.slice(at);
   }
   next = replaceOnce(next, "questions:ue.module.quiz", "questions:localizeLessonQuiz(ue.module.quiz,a)", "school quiz");
   next = replaceOnce(next, "questions:n.quiz", "questions:localizeLessonQuiz(n.quiz,t)", "fs quiz");
-  return next;
-}
-
-function patchProgress(source) {
-  let next = source;
-  next = replaceOnce(
-    next,
-    "n.set(r.moduleId,{userId:r.userId,moduleId:r.moduleId,moduleTitle:r.moduleTitle||``,status:o?`completed`:r.status||`in_progress`,progressPercent:o?Math.max(a,100):a})",
-    "n.set(r.moduleId,{userId:r.userId,moduleId:r.moduleId,moduleTitle:r.moduleTitle||``,status:o?`completed`:r.status||`in_progress`,progressPercent:o?Math.max(a,100):a,...(r.ratioQuizPassed||i?.ratioQuizPassed?{ratioQuizPassed:!0}:{})})",
-    "merge ratio",
-  );
-  next = replaceOnce(
-    next,
-    "if(Array.isArray(t))return t.filter(t=>t&&t.moduleId).map(t=>({userId:t.userId||e,moduleId:t.moduleId,moduleTitle:t.moduleTitle||``,status:t.status||`in_progress`,progressPercent:Number(t.progressPercent)||0}))",
-    "if(Array.isArray(t))return t.filter(t=>t&&t.moduleId).map(t=>({userId:t.userId||e,moduleId:t.moduleId,moduleTitle:t.moduleTitle||``,status:t.status||`in_progress`,progressPercent:Number(t.progressPercent)||0,...(t.ratioQuizPassed?{ratioQuizPassed:!0}:{})}))",
-    "read school ratio",
-  );
-  next = replaceOnce(
-    next,
-    "if(Array.isArray(n?.steps))return n.steps.filter(t=>t&&t.moduleId).map(t=>({userId:e,moduleId:t.moduleId,moduleTitle:t.moduleTitle||``,status:t.status||`in_progress`,progressPercent:Number(t.progressPercent)||0}))",
-    "if(Array.isArray(n?.steps))return n.steps.filter(t=>t&&t.moduleId).map(t=>({userId:e,moduleId:t.moduleId,moduleTitle:t.moduleTitle||``,status:t.status||`in_progress`,progressPercent:Number(t.progressPercent)||0,...(t.ratioQuizPassed?{ratioQuizPassed:!0}:{})}))",
-    "read steps ratio",
-  );
-  next = replaceOnce(
-    next,
-    "n.steps=t.map(e=>({moduleId:e.moduleId,moduleTitle:e.moduleTitle||``,status:e.status,progressPercent:e.progressPercent??0}))",
-    "n.steps=t.map(e=>({moduleId:e.moduleId,moduleTitle:e.moduleTitle||``,status:e.status,progressPercent:e.progressPercent??0,...(e.ratioQuizPassed?{ratioQuizPassed:!0}:{})}))",
-    "save steps ratio",
-  );
-  next = replaceOnce(
-    next,
-    "async function de(e,t,n,o){if(!K?.userId){I($a(a,`Logga in för att spara ditt kursframsteg.`,`Log in to save your course progress.`));return}P(!0),I(null),R(null);let s={userId:K.userId,moduleId:e,moduleTitle:t,status:n,progressPercent:o};",
-    "async function de(e,t,n,o,c){if(!K?.userId){I($a(a,`Logga in för att spara ditt kursframsteg.`,`Log in to save your course progress.`));return}P(!0),I(null),R(null);let u=C.some(t=>t.moduleId===e&&t.ratioQuizPassed),s={userId:K.userId,moduleId:e,moduleTitle:t,status:n,progressPercent:o,...(c||u?{ratioQuizPassed:!0}:{})};",
-    "save de ratio",
-  );
-  next = replaceOnce(
-    next,
-    "let r=e>=70?`completed`:`in_progress`,i=e>=70?100:Math.max(ue.progressPercent,Math.min(90,e));de(ue.module.moduleId,ue.module.moduleTitle,r,i)",
-    "let r=e>=70?`completed`:`in_progress`,i=e>=70?100:Math.max(ue.progressPercent,Math.min(90,e)),q=ue.module.moduleId===`hist-04-risk-sl-tp`&&Array.isArray(n)&&[`hist4-ratio-q1`,`hist4-ratio-q2`].every(t=>n.some(e=>e.id===t&&e.correct));de(ue.module.moduleId,ue.module.moduleTitle,r,i,q)",
-    "pe ratio",
-  );
   return next;
 }
 
@@ -304,9 +250,7 @@ function main() {
   patchQuestions(files, translations);
   bundle.text = upgradeHelpers(bundle.text);
   bundle.text = appendExtras(bundle.text);
-  bundle.text = insertParagraphs(bundle.text);
   bundle.text = localizeCalls(bundle.text);
-  bundle.text = patchProgress(bundle.text);
   bundle.text = retireOldQuiz(bundle.text);
   assertCourseStrings(bundle.text, course.text);
   for (const file of files) fs.writeFileSync(file.path, file.text);

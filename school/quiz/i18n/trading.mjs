@@ -95,8 +95,8 @@ export const trading = {
     },
   ),
   "final-q4": r(
-    "You buy at 100 and set a stop-loss at 95. What happens if the price reaches 95?",
-    "Ти купуєш по 100 і ставиш stop-loss на 95. Що відбувається, якщо ціна досягає 95?",
+    "You buy at 100 and set a stop-loss at 98. What happens if the price reaches 98?",
+    "Ти купуєш по 100 і ставиш stop-loss на 98. Що відбувається, якщо ціна досягає 98?",
     "S/L is an order that tries to close when the level is reached. In a fast market the fill can be at a worse price (slippage).",
     "S/L — це ордер, який намагається закрити позицію, коли рівень досягнуто. На швидкому ринку виконання може бути за гіршою ціною (прослизання).",
     {
@@ -109,8 +109,8 @@ export const trading = {
   "final-q5": r(
     "What does risk/reward (R:R) measure?",
     "Що вимірює ризик/винагорода (R:R)?",
-    "R:R is the helmet: compare the distance to T/P with the distance to S/L. 1:3 means three times more reward than risk.",
-    "R:R — це шолом: порівняй відстань до T/P з відстанню до S/L. 1:3 означає втричі більшу винагороду, ніж ризик.",
+    "R:R is the helmet: compare the distance to T/P with the distance to S/L. 1:2 means twice the reward of the risk. Break-even then needs more than one hit in three (over 33 percent).",
+    "R:R — це шолом: порівняй відстань до T/P з відстанню до S/L. 1:2 означає вдвічі більшу винагороду, ніж ризик. Для беззбитковості тоді потрібно більше ніж одна влучна угода з трьох (понад 33 відсотки).",
     {
       a: o("The relationship between planned gain and planned risk", "Співвідношення між запланованим прибутком і запланованим ризиком"),
       b: o("How fast a trade is", "Наскільки швидка угода"),
@@ -119,10 +119,10 @@ export const trading = {
     },
   ),
   "final-q6": r(
-    "Buy at 100, S/L at 98, T/P at 106. What is R:R, roughly?",
-    "Купівля по 100, S/L на 98, T/P на 106. Яке приблизно R:R?",
-    "Risk is 2, gain is 6, 6/2 = 3, so R:R is 1:3. The trip is worth the risk if the plan holds.",
-    "Ризик 2, прибуток 6, 6/2 = 3, отже R:R дорівнює 1:3. Шлях вартий ризику, якщо план тримається.",
+    "Buy at 100, S/L at 98, T/P at 104. What is R:R?",
+    "Купівля по 100, S/L на 98, T/P на 104. Яке R:R?",
+    "Risk is 2, gain is 4, 4/2 = 2, so R:R is 1:2. More than one hit in three (over 33 percent) breaks even if the plan holds.",
+    "Ризик 2, прибуток 4, 4/2 = 2, отже R:R дорівнює 1:2. Більше ніж одна влучна угода з трьох (понад 33 відсотки) дає беззбитковість, якщо план тримається.",
     {
       a: o("1:1", "1:1"),
       b: o("1:2", "1:2"),

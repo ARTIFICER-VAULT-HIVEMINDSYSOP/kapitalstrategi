@@ -18,18 +18,6 @@ function opt(id, correct, text, textEn, textUk) {
   return { id, correct, text, textEn, textUk };
 }
 
-export const paragraphs = {
-  svAnchor:
-    "Förlustgränser är gamla. **S/L, T/P och R:R** är dagens namn på samma disciplin: planera risk innan du öppnar.",
-  svInsert:
-    ",`# Förhållandet i siffror`,`Ett simulerat exempel: ingång 100 och S/L 98 ger risk 2. T/P 104 ger belöning 4, alltså 1:2. T/P 103 ger belöning 3, alltså 1:1.5. Nollpunkten är 1/(1+R): vid 1:2 är den 33,3 procent, vid 1:1.5 är den 40 procent. Siffrorna beskriver planen, inte ett utfall.`",
-  svMarker: "33,3 procent",
-  enAnchor: "S/L, T/P, R:R, leverage, small size. Same job: protect capital when luck ends.",
-  enInsert:
-    ",`# The ratio in numbers`,`A simulated example: entry 100 and S/L 98 means risk 2. T/P 104 means reward 4, so 1:2. T/P 103 means reward 3, so 1:1.5. Break-even hit rate is 1/(1+R): 1:2 gives 33.3 percent, and 1:1.5 gives 40 percent. The numbers describe the plan, not an outcome.`",
-  enMarker: "33.3 percent",
-};
-
 export const appended = [
   {
     kind: "needle",
@@ -100,14 +88,14 @@ export const appended = [
       q(
         "tp-extra-q1",
         "ks",
-        "Ingången är 100 och T/P är 109. Vad säger lektionen om den nivån?",
-        "Entry is 100 and T/P is 109. What does the lesson say about that level?",
-        "Вхід 100, а T/P 109. Що урок каже про цей рівень?",
-        "Exemplet är ingång 100 och T/P 109. Lektionen säger att T/P inte garanterar att priset når dit.",
-        "The example is entry 100 and T/P 109. The lesson says T/P does not guarantee that the price gets there.",
-        "Приклад — вхід 100 і T/P 109. Урок каже, що T/P не гарантує, що ціна туди дійде.",
+        "Ingången är 100 och T/P är 104. Vad säger lektionen om den nivån?",
+        "Entry is 100 and T/P is 104. What does the lesson say about that level?",
+        "Вхід 100, а T/P 104. Що урок каже про цей рівень?",
+        "Exemplet är ingång 100 och T/P 104. Lektionen säger att T/P inte garanterar att priset når dit.",
+        "The example is entry 100 and T/P 104. The lesson says T/P does not guarantee that the price gets there.",
+        "Приклад — вхід 100 і T/P 104. Урок каже, що T/P не гарантує, що ціна туди дійде.",
         [
-          opt("a", false, "Priset når alltid 109", "The price always reaches 109", "Ціна завжди доходить до 109"),
+          opt("a", false, "Priset når alltid 104", "The price always reaches 104", "Ціна завжди доходить до 104"),
           opt("b", false, "T/P betyder att risken är noll", "T/P means the risk is zero", "T/P означає, що ризик нульовий"),
           opt("c", false, "R:R blir automatiskt 1:1", "R:R automatically becomes 1:1", "R:R автоматично стає 1:1"),
           opt(
@@ -267,56 +255,6 @@ export const appended = [
             "That the equity index rises the same day",
             "Що індекс акцій зростає того самого дня",
           ),
-        ],
-      ),
-    ],
-  },
-  {
-    kind: "module",
-    moduleId: "hist-04-risk-sl-tp",
-    questions: [
-      q(
-        "hist4-ratio-q1",
-        "Ts",
-        "I det simulerade exemplet med ingång 100 och S/L 98, vilket förhållande ger T/P 104?",
-        "In the simulated example with entry 100 and S/L 98, which ratio does T/P 104 give?",
-        "У симульованому прикладі з входом 100 і S/L 98 яке співвідношення дає T/P 104?",
-        "Risken är 2. Belöningen till 104 är 4. 4 delat med 2 är 2, alltså 1:2.",
-        "The risk is 2. The reward to 104 is 4. 4 divided by 2 is 2, so 1:2.",
-        "Ризик 2. Винагорода до 104 дорівнює 4. 4 поділити на 2 — це 2, отже 1:2.",
-        [
-          opt("a", false, "1:1", "1:1", "1:1"),
-          opt("b", true, "1:2", "1:2", "1:2"),
-          opt("c", false, "1:1.5", "1:1.5", "1:1.5"),
-          opt("d", false, "1:3", "1:3", "1:3"),
-        ],
-      ),
-      q(
-        "hist4-ratio-q2",
-        "Ts",
-        "Vad är nollpunkten 1/(1+R) för 1:2 och för 1:1.5?",
-        "What is the break-even hit rate 1/(1+R) for 1:2 and for 1:1.5?",
-        "Яка точка беззбитковості 1/(1+R) для 1:2 і для 1:1.5?",
-        "1/(1+2) är 1/3, alltså 33,3 procent. 1/(1+1.5) är 1/2.5, alltså 40 procent.",
-        "1/(1+2) is 1/3, so 33.3 percent. 1/(1+1.5) is 1/2.5, so 40 percent.",
-        "1/(1+2) — це 1/3, отже 33,3 відсотка. 1/(1+1.5) — це 1/2.5, отже 40 відсотків.",
-        [
-          opt("a", false, "50 procent och 50 procent", "50 percent and 50 percent", "50 відсотків і 50 відсотків"),
-          opt(
-            "b",
-            false,
-            "40 procent för 1:2 och 33,3 procent för 1:1.5",
-            "40 percent for 1:2 and 33.3 percent for 1:1.5",
-            "40 відсотків для 1:2 і 33,3 відсотка для 1:1.5",
-          ),
-          opt(
-            "c",
-            true,
-            "33,3 procent för 1:2 och 40 procent för 1:1.5",
-            "33.3 percent for 1:2 and 40 percent for 1:1.5",
-            "33,3 відсотка для 1:2 і 40 відсотків для 1:1.5",
-          ),
-          opt("d", false, "25 procent för båda", "25 percent for both", "25 відсотків для обох"),
         ],
       ),
     ],

@@ -52,6 +52,21 @@ export const core = {
       d: o("That the price can never fall", "Що ціна ніколи не може впасти"),
     },
   ),
+  "bas1-ratio": r(
+    "The target sits twice as far away as the stop (1:2). What does a break-even result need, roughly, and how does 1:1.5 differ?",
+    "Ціль лежить удвічі далі за стоп (1:2). Що приблизно потрібно для беззбиткового результату, і чим відрізняється 1:1.5?",
+    "R = 2 gives 1/(1+2) = 1/3. R = 1.5 gives 1/2.5 = 40 percent. The preset stays 1:2 until this question in the first lesson is correct and the quiz is passed.",
+    "R = 2 дає 1/(1+2) = 1/3. R = 1,5 дає 1/2,5 = 40 відсотків. Типове значення лишається 1:2, доки це питання в першому уроці не буде правильним і тест не складено.",
+    {
+      a: o("More hits than half, and 1:1.5 needs fewer", "Більше ніж половина влучань, а 1:1.5 потребує менше"),
+      b: o(
+        "More hits than one in three (over 33 percent), because break-even is 1/(1+R). 1:1.5 needs over 40 percent",
+        "Більше ніж одна влучна угода з трьох (понад 33 відсотки), бо беззбитковість — це 1/(1+R). 1:1.5 потребує понад 40 відсотків",
+      ),
+      c: o("Every fifth trade is always enough", "Кожна п’ята угода завжди достатня"),
+      d: o("1:2 needs more hits than 1:1.5", "1:2 потребує більше влучань, ніж 1:1.5"),
+    },
+  ),
   "bas3-q1": r(
     "What does compound interest mean in practice?",
     "Що на практиці означає відсоток на відсоток?",
@@ -125,10 +140,10 @@ export const core = {
     },
   ),
   "bas2-q3": r(
-    "Entry 100, S/L 98, T/P 106. What is R:R, roughly?",
-    "Вхід 100, S/L 98, T/P 106. Яке приблизно R:R?",
-    "Risk = 2, gain = 6, so 6/2 = 3, R:R about 1:3.",
-    "Ризик = 2, прибуток = 6, отже 6/2 = 3, R:R близько 1:3.",
+    "Entry 100, S/L 98, T/P 104. What is R:R?",
+    "Вхід 100, S/L 98, T/P 104. Яке R:R?",
+    "Risk = 2, gain = 4, so 4/2 = 2, R:R 1:2. More than one hit in three (over 33 percent) breaks even if the plan holds.",
+    "Ризик = 2, прибуток = 4, отже 4/2 = 2, R:R 1:2. Більше ніж одна влучна угода з трьох (понад 33 відсотки) дає беззбитковість, якщо план тримається.",
     {
       a: o("1:1", "1:1"),
       b: o("1:2", "1:2"),

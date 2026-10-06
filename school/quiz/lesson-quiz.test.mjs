@@ -63,7 +63,6 @@ const added = {
   kalender: 1,
   "eu-syd-01-bors": 1,
   "eu-syd-02-bostad": 1,
-  "hist-04-risk-sl-tp": 2,
 };
 
 const extraCorrect = {
@@ -76,8 +75,6 @@ const extraCorrect = {
   "kal-extra-q1": "b",
   "eus1-extra-q1": "d",
   "eus2-extra-q1": "c",
-  "hist4-ratio-q1": "b",
-  "hist4-ratio-q2": "c",
 };
 
 function lessons() {
@@ -128,45 +125,30 @@ test("every available lesson quiz has the expected count, four options and one c
   assert.equal(As.length, 11);
 });
 
-test("the ratio lesson states the break-even math and the ratio questions", () => {
+test("lesson 1 owns the 1:2 ratio question and the RaceX unlock store", () => {
   assert.equal(Math.round((1 / (1 + 2)) * 1000) / 10, 33.3);
   assert.equal(Math.round((1 / (1 + 1.5)) * 1000) / 10, 40);
-  const lesson = Es.find((module) => module.moduleId === "hist-04-risk-sl-tp");
-  assert.equal(lesson.quiz.length, 5);
-  const ratio = lesson.quiz.filter((question) => question.id.startsWith("hist4-ratio-"));
-  assert.deepEqual(ratio.map((question) => question.id), ["hist4-ratio-q1", "hist4-ratio-q2"]);
-  assert.match(bundle, /33,3 procent/);
-  assert.match(bundle, /40 procent/);
-  assert.match(bundle, /33\.3 percent/);
-  assert.match(bundle, /40 percent/);
-  const second = ratio[1].options.find((option) => option.correct);
-  assert.match(second.text, /33,3 procent för 1:2/);
-  assert.match(second.text, /40 procent för 1:1\.5/);
+  const lesson = Ss.find((module) => module.moduleId === "basics-01-samma-sprak");
+  const ratio = lesson.quiz.find((question) => question.id === "bas1-ratio");
+  assert.ok(ratio, "bas1-ratio");
+  assert.equal(ratio.options.find((option) => option.correct).id, "b");
+  assert.match(ratio.explanation, /1\/\(1\+2\)/);
+  assert.match(ratio.explanation, /40 %/);
+  assert.match(bundle, /localStorage\.setItem\(`tr\.riskplan\.unlock`/);
+  assert.match(bundle, /quizId:`bas1-ratio`/);
+  assert.match(
+    bundle,
+    /ue\.module\.moduleId===`basics-01-samma-sprak`&&e>=70&&Array\.isArray\(n\)&&n\.some\(e=>e\.id===`bas1-ratio`&&e\.correct\)/,
+  );
+  assert.equal(bundle.includes("hist4-ratio-q1"), false);
+  assert.equal(bundle.includes("hist4-ratio-q2"), false);
+  assert.equal(bundle.includes("ratioQuizPassed"), false);
+  const hist = Es.find((module) => module.moduleId === "hist-04-risk-sl-tp");
+  assert.equal(hist.quiz.some((question) => String(question.id).startsWith("hist4-ratio")), false);
+  assert.equal(hist.quiz.length, baseline.counts["hist-04-risk-sl-tp"]);
 });
 
-test("school progress keeps ratioQuizPassed and the old daily quiz is not mounted", () => {
-  const mergeStart = bundle.indexOf("function mergeSchoolProgress");
-  const readStart = bundle.indexOf("function readSchoolProgress");
-  const mergeSchoolProgress = new Function(`${bundle.slice(mergeStart, readStart)} return mergeSchoolProgress;`)();
-  const readSchoolProgress = new Function(
-    "ca",
-    `${bundle.slice(readStart, bundle.indexOf("function dpe", readStart))} return readSchoolProgress;`,
-  );
-  const saved = mergeSchoolProgress(
-    [{ userId: "u", moduleId: "hist-04-risk-sl-tp", status: "in_progress", progressPercent: 40, ratioQuizPassed: true }],
-    [{ userId: "u", moduleId: "hist-04-risk-sl-tp", status: "completed", progressPercent: 100 }],
-  );
-  assert.equal(saved[0].ratioQuizPassed, true);
-  assert.equal(saved[0].status, "completed");
-  const storage = {
-    "school.progress.u": [
-      { userId: "u", moduleId: "hist-04-risk-sl-tp", status: "completed", progressPercent: 100, ratioQuizPassed: true },
-    ],
-  };
-  const loaded = readSchoolProgress((key) => storage[key])("u");
-  assert.equal(loaded[0].ratioQuizPassed, true);
-  assert.match(bundle, /hist4-ratio-q1/);
-  assert.match(bundle, /hist4-ratio-q2/);
+test("the old daily quiz is not mounted and the quiz patch stays idempotent", () => {
   assert.equal(bundle.includes("(0,X.jsx)(Yce,{date:te})"), false);
   assert.match(bundle, /function localizeLessonQuiz\(/);
   assert.equal(execSync("node school/quiz/patch-bundle.mjs", { encoding: "utf8" }).includes("quiz patch wrote"), true);
