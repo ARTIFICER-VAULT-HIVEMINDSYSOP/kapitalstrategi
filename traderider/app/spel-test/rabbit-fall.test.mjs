@@ -187,6 +187,8 @@ test('start, hopp och indikatorer: hemma, sedan fall med sidläge', async () => 
     'rh.wallUpper', 'rh.wallLower', 'rh.touchUpper', 'rh.touchLower',
     'rh.nearUpper', 'rh.nearLower', 'rh.rsi', 'rh.rsiHigh', 'rh.rsiLow',
     'rh.macd', 'rh.macdUp', 'rh.macdDown',
+    'rh.pressStart', 'rh.pause', 'rh.resume', 'rh.soundOn', 'rh.soundOff',
+    'rh.qualityHigh', 'rh.qualityLow',
   ]
   for (const lang of ['sv', 'en', 'uk']) {
     for (const key of keys) assert.equal(typeof STRINGS[lang][key], 'string', `${lang} ${key}`)

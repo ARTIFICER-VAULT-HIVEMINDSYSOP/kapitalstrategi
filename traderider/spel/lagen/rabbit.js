@@ -13,16 +13,14 @@ import { createGestureLock } from './styrmotor.js'
 import { positionFor, steerLanes } from './spar.js'
 import { rsi, rsiZone } from './rsi.js'
 import {
-  createStage,
-  createChiptune,
-  renderScene,
+  createWorld,
+  createScore,
   fixedStep,
   coyoteLeft,
   rememberInput,
   readBuffered,
-  animFrame,
   STEP_SEC,
-} from './pixel-stage.js'
+} from './world-stage.js'
 
 const O = MODES.rabbitHole.orientation
 const steering = createSteering(O)
@@ -37,57 +35,57 @@ const FRAME_RED = '#e10600'
 const FRAME_BLACK = '#161616'
 
 const css = `
-.nlr-rh{display:none;position:fixed;inset:0;z-index:55;background:#100810;color:#f8f0d8;--rh-pic-w:512px;--rh-pic-h:448px}
+.nlr-rh{display:none;position:fixed;inset:0;z-index:55;background:#07040c;color:#f4efe6;font-family:"IBM Plex Sans",system-ui,sans-serif}
 .nlr-rh.on{display:block}
-.nlr-rh canvas{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:block;image-rendering:pixelated;image-rendering:crisp-edges;background:#100810}
-.nlr-rh-hud{position:absolute;left:50%;top:calc(50% - var(--rh-pic-h) / 2 + 4px);transform:translateX(-50%);width:min(var(--rh-pic-w),calc(100% - 8px));display:flex;justify-content:space-between;gap:8px;pointer-events:none;font:700 11px/1.2 ui-monospace,monospace;color:#f8f0d8;text-shadow:2px 2px 0 #181018}
-.nlr-rh-hud b{color:#f8d048}
-.nlr-rh-note{position:absolute;left:50%;bottom:calc(50% - var(--rh-pic-h) / 2 + 4px);transform:translateX(-50%);width:min(var(--rh-pic-w),calc(100% - 8px));font:600 11px/1.3 ui-monospace,monospace;color:#f8f0d8;text-shadow:2px 2px 0 #181018;pointer-events:none}
-.nlr-rh[data-phase="home"] .nlr-rh-note,.nlr-rh[data-phase="jump"] .nlr-rh-note{bottom:auto;top:8px}
-.nlr-rh[data-phase="race"] .nlr-rh-note{bottom:auto;top:calc(50% - var(--rh-pic-h) / 2 + 18px)}
-.nlr-rh-home{position:absolute;left:50%;top:calc(50% - var(--rh-pic-h) / 2 + 36px);transform:translateX(-50%);width:min(340px,calc(var(--rh-pic-w) - 12px));pointer-events:none;z-index:2}
-.nlr-rh-card{pointer-events:auto;background:#f8e8c0;color:#281810;border:4px solid #181018;border-radius:0;padding:8px 10px 10px;box-shadow:inset -4px -4px 0 #a08050,inset 4px 4px 0 #fff8e0}
-.nlr-rh-claim{margin:0 0 4px;font:700 10px/1.3 ui-monospace,monospace;letter-spacing:.04em;color:#784818}
-.nlr-rh-card h2{margin:0 0 4px;font:700 16px/1.1 ui-monospace,monospace}
-.nlr-rh-card p{margin:0 0 6px;font:500 12px/1.35 ui-monospace,monospace}
-.nlr-rh-press{margin:0 0 6px;font:700 13px/1 ui-monospace,monospace;letter-spacing:.08em;color:#d02030;animation:nlr-rh-blink 1s steps(2,end) infinite}
-.nlr-rh-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.nlr-rh-start,.nlr-rh-two,.nlr-rh-mute,.nlr-rh-resume{border:3px solid #181018;border-radius:0;font:700 12px/1 ui-monospace,monospace;padding:8px 10px;cursor:pointer;box-shadow:inset -3px -3px 0 rgba(0,0,0,.25)}
-.nlr-rh-start,.nlr-rh-resume{background:#f8d048;color:#281810}
-.nlr-rh-two,.nlr-rh-mute{background:#281810;color:#f8f0d8}
-.nlr-rh-start:focus-visible,.nlr-rh-two:focus-visible,.nlr-rh-mute:focus-visible,.nlr-rh-resume:focus-visible{outline:3px solid #40d0c8;outline-offset:2px}
-.nlr-rh-keys{margin:6px 0 0;font:500 11px/1.35 ui-monospace,monospace;color:#584838}
-.nlr-rh-indicators{position:absolute;left:50%;bottom:calc(50% - var(--rh-pic-h) / 2 + 22px);transform:translateX(-50%);width:min(var(--rh-pic-w),calc(100% - 8px));display:grid;gap:6px;pointer-events:none;z-index:2}
+.nlr-rh canvas{position:absolute;inset:0;width:100%;height:100%;display:block;background:#07040c}
+.nlr-rh-hud{position:absolute;left:16px;right:16px;top:14px;display:flex;justify-content:space-between;gap:12px;pointer-events:none;font:600 13px/1.3 "IBM Plex Sans",system-ui,sans-serif;color:#f4efe6;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.nlr-rh-hud b{color:#f0c14a;font-weight:650}
+.nlr-rh-note{position:absolute;left:16px;right:16px;bottom:14px;font:500 12px/1.35 "IBM Plex Sans",system-ui,sans-serif;color:rgba(244,239,230,.88);pointer-events:none}
+.nlr-rh[data-phase="home"] .nlr-rh-note,.nlr-rh[data-phase="jump"] .nlr-rh-note{bottom:auto;top:12px}
+.nlr-rh[data-phase="race"] .nlr-rh-note{bottom:auto;top:40px}
+.nlr-rh-home{position:absolute;left:50%;top:48px;transform:translateX(-50%);width:min(380px,calc(100% - 24px));pointer-events:none;z-index:2}
+.nlr-rh-card{pointer-events:auto;background:rgba(14,10,20,.72);color:#f4efe6;border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:16px 16px 14px;box-shadow:0 18px 50px rgba(0,0,0,.35);backdrop-filter:blur(12px)}
+.nlr-rh-claim{margin:0 0 6px;font:600 11px/1.35 "IBM Plex Sans",system-ui,sans-serif;letter-spacing:.03em;color:#e7c27a}
+.nlr-rh-card h2{margin:0 0 6px;font:650 22px/1.15 Fraunces,"IBM Plex Sans",serif}
+.nlr-rh-card p{margin:0 0 8px;font:500 14px/1.4 "IBM Plex Sans",system-ui,sans-serif}
+.nlr-rh-press{margin:0 0 8px;font:700 13px/1 "IBM Plex Sans",system-ui,sans-serif;letter-spacing:.14em;color:#ffd56a;animation:nlr-rh-blink 1.1s steps(2,end) infinite}
+.nlr-rh-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.nlr-rh-start,.nlr-rh-two,.nlr-rh-mute,.nlr-rh-resume,.nlr-rh-quality{border:0;border-radius:999px;font:650 13px/1 "IBM Plex Sans",system-ui,sans-serif;padding:10px 14px;cursor:pointer}
+.nlr-rh-start,.nlr-rh-resume{background:#f0c14a;color:#24180c}
+.nlr-rh-two,.nlr-rh-mute,.nlr-rh-quality{background:rgba(255,255,255,.08);color:#f4efe6;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}
+.nlr-rh-start:focus-visible,.nlr-rh-two:focus-visible,.nlr-rh-mute:focus-visible,.nlr-rh-resume:focus-visible,.nlr-rh-quality:focus-visible{outline:2px solid #2ee6d6;outline-offset:2px}
+.nlr-rh-keys{margin:8px 0 0;font:500 12px/1.4 "IBM Plex Sans",system-ui,sans-serif;color:rgba(244,239,230,.72)}
+.nlr-rh-indicators{position:absolute;left:16px;right:16px;bottom:16px;display:grid;gap:8px;pointer-events:none;z-index:2}
 .nlr-rh-indicators[data-players="1"]{grid-template-columns:minmax(0,1fr)}
 .nlr-rh-indicators[data-players="2"]{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-.nlr-rh-player{background:#201018;border:4px solid #f8d048;border-radius:0;padding:4px 6px 6px;display:grid;gap:2px;color:#f8f0d8}
-.nlr-rh-who{margin:0;font:700 10px/1.2 ui-monospace,monospace;letter-spacing:.06em;color:#f8d048}
-.nlr-rh-fall{margin:0;font:600 12px/1.3 ui-monospace,monospace}
-.nlr-rh-meter{height:8px;border-radius:0;background:#181018;border:2px solid #f8f0d8;overflow:hidden}
-.nlr-rh-meter > span{display:block;height:100%;width:0;background:#40d0c8}
-.nlr-rh-lane-labels{display:flex;justify-content:space-between;gap:6px;font:700 11px/1.2 ui-monospace,monospace}
-.nlr-rh-lane-labels [data-on="sell"]{color:#f04090}
-.nlr-rh-lane-labels [data-on="flat"]{color:#f8d048}
-.nlr-rh-lane-labels [data-on="buy"]{color:#40d0c8}
-.nlr-rh-track{position:relative;height:10px;border-radius:0;background:linear-gradient(90deg,#f04090 0%,#f8f0d8 50%,#40d0c8 100%);border:2px solid #181018}
-.nlr-rh-marker{position:absolute;top:-4px;width:6px;height:18px;margin-left:-3px;border-radius:0;background:#f8f0d8;box-shadow:0 0 0 2px #181018}
-.nlr-rh-decision{margin:2px 0 0;font:700 18px/1 ui-monospace,monospace}
-.nlr-rh-decision[data-side="sell"]{color:#f04090}
-.nlr-rh-decision[data-side="flat"]{color:#f8d048}
-.nlr-rh-decision[data-side="buy"]{color:#40d0c8}
-.nlr-rh-cue,.nlr-rh-risk{margin:0;font:500 11px/1.3 ui-monospace,monospace;color:#f8f0d8}
-.nlr-rh-market{position:absolute;left:calc(50% - var(--rh-pic-w) / 2 + 6px);top:calc(50% - var(--rh-pic-h) / 2 + 16px);max-width:min(220px,46%);display:grid;gap:2px;pointer-events:none;z-index:2;font:700 11px/1.3 ui-monospace,monospace;color:#f8f0d8;text-shadow:2px 2px 0 #181018;background:#201018cc;border:3px solid #f8d048;padding:4px 6px}
+.nlr-rh-player{background:rgba(10,8,16,.72);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:8px 10px 10px;display:grid;gap:3px;color:#f4efe6;backdrop-filter:blur(10px)}
+.nlr-rh-who{margin:0;font:650 11px/1.2 "IBM Plex Sans",system-ui,sans-serif;letter-spacing:.08em;color:#f0c14a}
+.nlr-rh-fall{margin:0;font:600 13px/1.3 "IBM Plex Sans",system-ui,sans-serif}
+.nlr-rh-meter{height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.nlr-rh-meter > span{display:block;height:100%;width:0;background:linear-gradient(90deg,#2ee6d6,#f0c14a)}
+.nlr-rh-lane-labels{display:flex;justify-content:space-between;gap:6px;font:650 12px/1.2 "IBM Plex Sans",system-ui,sans-serif}
+.nlr-rh-lane-labels [data-on="sell"]{color:#ff4f9a}
+.nlr-rh-lane-labels [data-on="flat"]{color:#f0c14a}
+.nlr-rh-lane-labels [data-on="buy"]{color:#2ee6d6}
+.nlr-rh-track{position:relative;height:8px;border-radius:99px;background:linear-gradient(90deg,#ff4f9a 0%,#f4efe6 50%,#2ee6d6 100%)}
+.nlr-rh-marker{position:absolute;top:-4px;width:4px;height:16px;margin-left:-2px;border-radius:99px;background:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.45)}
+.nlr-rh-decision{margin:4px 0 0;font:700 22px/1 "IBM Plex Sans",system-ui,sans-serif}
+.nlr-rh-decision[data-side="sell"]{color:#ff4f9a}
+.nlr-rh-decision[data-side="flat"]{color:#f0c14a}
+.nlr-rh-decision[data-side="buy"]{color:#2ee6d6}
+.nlr-rh-cue,.nlr-rh-risk{margin:0;font:500 12px/1.35 "IBM Plex Sans",system-ui,sans-serif;color:rgba(244,239,230,.86)}
+.nlr-rh-market{position:absolute;left:16px;top:64px;max-width:min(240px,46%);display:grid;gap:3px;pointer-events:none;z-index:2;font:600 13px/1.35 "IBM Plex Sans",system-ui,sans-serif;color:#f4efe6;background:rgba(10,8,16,.66);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:8px 10px;backdrop-filter:blur(10px)}
 .nlr-rh-market p{margin:0}
 .nlr-rh-market[hidden]{display:none}
-.nlr-rh-signal{color:#f8d048}
-.nlr-rh-pause{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;display:grid;gap:8px;background:#201018;border:4px solid #f8d048;padding:12px;min-width:160px}
+.nlr-rh-signal{color:#f0c14a}
+.nlr-rh-pause{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;display:grid;gap:8px;background:rgba(12,9,18,.88);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:16px;min-width:200px;backdrop-filter:blur(14px)}
 .nlr-rh-pause[hidden]{display:none}
-.nlr-rh-pause p{margin:0;font:700 14px/1 ui-monospace,monospace;color:#f8f0d8;text-align:center}
+.nlr-rh-pause p{margin:0;font:650 18px/1 Fraunces,"IBM Plex Sans",serif;color:#f4efe6;text-align:center}
 .nlr-rh-pad{display:none}
-@keyframes nlr-rh-blink{50%{opacity:0}}
+@keyframes nlr-rh-blink{50%{opacity:.35}}
 @media (pointer:coarse){
-  .nlr-rh-pad{display:grid;position:absolute;right:8px;bottom:8px;z-index:5;grid-template-columns:44px 44px 44px;grid-template-rows:44px 44px 44px;gap:4px}
-  .nlr-rh-pad button{border:3px solid #181018;background:#f8e8c0;color:#281810;font:700 16px/1 ui-monospace,monospace;border-radius:0}
+  .nlr-rh-pad{display:grid;position:absolute;right:12px;bottom:12px;z-index:5;grid-template-columns:52px 52px 52px;grid-template-rows:52px 52px 52px;gap:6px}
+  .nlr-rh-pad button{border:0;border-radius:14px;background:rgba(244,239,230,.92);color:#24180c;font:700 16px/1 "IBM Plex Sans",system-ui,sans-serif}
   .nlr-rh-pad [data-rh-pad="FORWARD"]{grid-column:2;grid-row:1}
   .nlr-rh-pad [data-rh-pad="STEER_TOWARD_LOW"]{grid-column:1;grid-row:2}
   .nlr-rh-pad [data-rh-pad="FLAT"]{grid-column:2;grid-row:2}
@@ -96,20 +94,20 @@ const css = `
 }
 @media (max-width:640px){
   .nlr-rh-indicators[data-players="2"]{grid-template-columns:minmax(0,1fr)}
-  .nlr-rh-card{padding:8px}
-  .nlr-rh-card h2{font-size:14px}
-  .nlr-rh-card p{font-size:11px}
-  .nlr-rh-decision{font-size:16px}
+  .nlr-rh-card{padding:12px}
+  .nlr-rh-card h2{font-size:18px}
+  .nlr-rh-card p{font-size:13px}
+  .nlr-rh-decision{font-size:18px}
 }
 @media (max-height:520px){
-  .nlr-rh-home{top:4px;transform:translateX(-50%);max-height:calc(100% - 8px)}
-  .nlr-rh-card{padding:6px 8px}
-  .nlr-rh-card p{font-size:11px}
+  .nlr-rh-home{top:8px;max-height:calc(100% - 16px);overflow:auto}
+  .nlr-rh-card{padding:8px 10px}
+  .nlr-rh-card p{font-size:12px}
   .nlr-rh-card [data-rh-home-body],.nlr-rh-keys{display:none}
-  .nlr-rh-actions{flex-wrap:wrap}
-  .nlr-rh-start,.nlr-rh-two,.nlr-rh-mute,.nlr-rh-resume{padding:6px 8px}
+  .nlr-rh-start,.nlr-rh-two,.nlr-rh-mute,.nlr-rh-resume,.nlr-rh-quality{padding:8px 10px}
   .nlr-rh-indicators{bottom:8px}
   .nlr-rh-risk{display:none}
+  .nlr-rh-market{top:36px}
 }
 @media (prefers-reduced-motion: reduce){
   .nlr-rh,.nlr-rh canvas,.nlr-rh-marker,.nlr-rh-press{animation:none;transition:none;scroll-behavior:auto}
@@ -616,7 +614,7 @@ export function rabbitSprite({ eating = false } = {}) {
   }
 }
 
-/* Äldre vektorritning. Den synliga bilden ritas av pixel-stage. */
+/* Äldre vektorritning. Den synliga bilden ritas av world-stage. */
 function part(sprite, id) {
   return sprite.parts.find((p) => p.id === id)
 }
@@ -1378,7 +1376,11 @@ export function createRabbit() {
   muteBtn.type = 'button'
   muteBtn.className = 'nlr-rh-mute'
   muteBtn.dataset.rhMute = '1'
-  actions.append(startBtn, twoBtn, muteBtn)
+  const qualityBtn = document.createElement('button')
+  qualityBtn.type = 'button'
+  qualityBtn.className = 'nlr-rh-quality'
+  qualityBtn.dataset.rhQuality = '1'
+  actions.append(startBtn, twoBtn, muteBtn, qualityBtn)
   card.append(claim, title, press, body, actions, keys)
   home.append(card)
   const pauseBox = document.createElement('div')
@@ -1395,7 +1397,11 @@ export function createRabbit() {
   pauseMute.type = 'button'
   pauseMute.className = 'nlr-rh-mute'
   pauseMute.dataset.rhMute = '1'
-  pauseBox.append(pauseTitle, resumeBtn, pauseMute)
+  const pauseQuality = document.createElement('button')
+  pauseQuality.type = 'button'
+  pauseQuality.className = 'nlr-rh-quality'
+  pauseQuality.dataset.rhQuality = '1'
+  pauseBox.append(pauseTitle, resumeBtn, pauseMute, pauseQuality)
   const pad = document.createElement('div')
   pad.className = 'nlr-rh-pad'
   pad.dataset.rhPad = '1'
@@ -1455,8 +1461,8 @@ export function createRabbit() {
   let prevHist = null
   const padLock = [createGestureLock(480), createGestureLock(480)]
   let riders = [freshRider(), freshRider()]
-  const stage = createStage()
-  const audio = createChiptune()
+  const world = createWorld(canvas)
+  const audio = createScore()
   let acc = 0
   let clock = 0
   let frameCount = 0
@@ -1573,6 +1579,11 @@ export function createRabbit() {
     const soundLabel = audio.muted() ? t('rh.soundOff') : t('rh.soundOn')
     muteBtn.textContent = soundLabel
     pauseMute.textContent = soundLabel
+    const qualityLabel = t(world.quality() === 'low' ? 'rh.qualityLow' : 'rh.qualityHigh')
+    qualityBtn.textContent = qualityLabel
+    pauseQuality.textContent = qualityLabel
+    root.dataset.view = world.mode()
+    root.dataset.quality = world.quality()
     note.textContent = t('sim.claim')
     for (const el of indicators.querySelectorAll('[data-rh-who]')) {
       el.textContent = t(el.dataset.rhWho === '2' ? 'rh.p2' : 'rh.p1')
@@ -1909,13 +1920,12 @@ export function createRabbit() {
       ? activeRiders().map((rider) => syncRider(rider, span, h, reduced))
       : []
     if (phase === 'race') lastSprite = rabbitSprite({ eating: riders[0].eatLeft > 0 })
-    renderScene(stage.buffer, {
+    world.render({
       phase: phase === 'race' ? 'race' : phase,
       players,
       reduced,
       paused,
       time: clock,
-      frame: animFrame(clock, 8, 4, reduced),
       shake: reduced ? 0 : shake,
       logicW: w,
       logicH: h,
@@ -1924,32 +1934,15 @@ export function createRabbit() {
       lanes,
       side: riders[0].side,
       stand: pose || standPoint(riders[0].side, layout),
-      showRabbit: true,
       rabbitPose,
       juice,
       eating: riders[0].eatLeft > 0,
       jump: jumpP,
       hud: hudLine,
-      labels: {
-        title: t('mode.rabbitHole.name'),
-        press: t('rh.pressStart'),
-        sell: t('btn.sell'),
-        flat: t('btn.flat'),
-        buy: t('btn.buy'),
-        tunnel: t('rh.tunnel'),
-        hole: t('rh.hole'),
-        upper: t('rh.wallUpper'),
-        lower: t('rh.wallLower'),
-        hp: '+HP',
-        pause: t('rh.pause'),
-        resume: t('rh.resume'),
-        sound: audio.muted() ? t('rh.soundOff') : t('rh.soundOn'),
-      },
       riders: sceneRiders,
-    })
-    const fit = stage.flush(canvas, w, h, reduced)
-    root.style.setProperty('--rh-pic-w', `${fit.w}px`)
-    root.style.setProperty('--rh-pic-h', `${fit.h}px`)
+    }, w, h)
+    root.dataset.view = world.mode()
+    root.dataset.quality = world.quality()
   }
 
   function applyTo(index, intent) {
@@ -2057,6 +2050,14 @@ export function createRabbit() {
     }
     if (e.target.closest?.('[data-rh-mute]')) {
       setMuted(!audio.muted())
+      return
+    }
+    if (e.target.closest?.('[data-rh-quality]')) {
+      world.setQuality(world.quality() === 'high' ? 'low' : 'high')
+      armAudio()
+      audio.sfx('menu')
+      copyChrome()
+      paint()
       return
     }
     const padBtn = e.target.closest?.('[data-rh-pad]')
