@@ -16,7 +16,7 @@
       "blocks": [
         {
           "type": "p",
-          "text": "En vaken hjärna är inte tom bara för att den inte löser en uppgift. Raichle och kollegor beskrev 2001 ett grundläge, ett default mode: ett organiserat viloläge när uppmärksamheten inte är låst vid något yttre. I de mätningar av genomblödning som deras artikel i PNAS redovisar var läget tydligare i vila än när personen fick en riktad uppgift. När uppgiften tog över försköts grundläget. Den texten är grundkällan för vilonätverket, det som på engelska kallas default mode network."
+          "text": "En vaken hjärna är inte tom bara för att den inte löser en uppgift. En forskargrupp beskrev 2001 ett grundläge, ett default mode: ett organiserat viloläge när uppmärksamheten inte är låst vid något yttre. I de mätningar av genomblödning som artikeln i PNAS redovisar var läget tydligare i vila än när personen fick en riktad uppgift. När uppgiften tog över försköts grundläget. Den texten är grundkällan för vilonätverket, det som på engelska kallas default mode network."
         },
         {
           "type": "p",
@@ -37,12 +37,18 @@
         {
           "type": "p",
           "text": "Prova först, i stillhet. Sedan kan övningen fortsätta."
-        },
-        {
-          "type": "p",
-          "text": "Källor: [Dagens.se via MSN, 27 sep 2026](https://www.msn.com/sv-se/vetenskap/allmänt/slopa-hörlurarna-vad-som-verkligen-händer-med-din-hjärna-utan-tysta-stunder/ar-AA2d3RyU) · [Raichle m.fl. 2001, A default mode of brain function, PNAS](https://doi.org/10.1073/pnas.98.2.676)"
         }
       ]
     }
-  }
+  },
+  "hiddenSources": [
+    {
+      "label": "Dagens.se via MSN, 27 sep 2026",
+      "href": "https://www.msn.com/sv-se/vetenskap/allmänt/slopa-hörlurarna-vad-som-verkligen-händer-med-din-hjärna-utan-tysta-stunder/ar-AA2d3RyU"
+    },
+    {
+      "label": "PNAS 2001, A default mode of brain function, PNAS",
+      "href": "https://doi.org/10.1073/pnas.98.2.676"
+    }
+  ]
 }
