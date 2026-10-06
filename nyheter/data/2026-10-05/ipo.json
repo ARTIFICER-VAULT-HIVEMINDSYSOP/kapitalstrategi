@@ -1,0 +1,79 @@
+{
+  "edition": "2026-10-05",
+  "date": "2026-10-05",
+  "dateLabel": {
+    "sv": "5 oktober 2026"
+  },
+  "slug": "ipo",
+  "order": 1,
+  "translations": {
+    "sv": {
+      "title": "IPO / nytt på börsen",
+      "ingress": "Foremont Group (FOMO) — utfallet väntas offentliggöras i dag 5 okt (NGM Growth Market).",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "**Foremont Group (FOMO)** — **utfallet väntas offentliggöras i dag 5 okt** (NGM Growth Market). Teckningskurs **10 kr**; full teckning ger **54,6 MSEK** (upp till ca **66,6 MSEK** med utökning), varav ca **40,8 MSEK** var säkrat genom teckningsåtaganden. Likviddag **8 okt**, preliminär första handelsdag **14 okt**. En liten nynoterad aktie kan röra sig kraftigt åt båda hållen redan första dagen. Bolagets eget pressmeddelande är underlaget för utfallet. Utfallet var inte publicerat när texten ställdes samman, omkring kl. **06:55**."
+        },
+        {
+          "type": "p",
+          "text": "**Höstens nykomlingar, stängning fredag 2 okt.** **Linjemontage (LMGAB)**, Nasdaq Stockholm Mid Cap — **47,15 kr** (**−1,57 %**), intervall **46,40–48,85 kr**; erbjudandepris **46 kr**. **Dormy (DORMY)**, First North Premier — **70,20 kr** (**−0,14 %**), intervall **70,00–70,70 kr**; erbjudandepris **70 kr**. **Axvik Group (AXVIK)**, First North — **58,90 kr**; teckningskurs **55 kr**, spann sedan debuten **51,00–77,80 kr**. **Svevik Industri (SVEVIK)**, First North Premier — **52,70 kr**; teckningskurs **55 kr**. **NordAmps (NRDAMP)**, First North — **10,80 kr**; teckningskurs **15,50 kr**, spann sedan debuten **8,22–13,95 kr**."
+        },
+        {
+          "type": "p",
+          "text": "Flera av nykomlingarna handlas över sitt erbjudandepris och andra under. Spannen visar hur fort en nykomling kan både stiga och falla. Dagens kurser (5 okt): **saknas** före börsöppning."
+        },
+        {
+          "type": "p",
+          "text": "**Globalt: Airtel Money (London)** — fast pris **1,96 pund** per aktie, värdering ca **5,3 mdr pund** (ca **7 mdr dollar**); befintliga ägare bjuder ut **270 miljoner** aktier. Boken för institutioner stänger **8 okt kl 15:00**, villkorad handel väntas starta senast **9 okt** och ordinarie handel på Londonbörsen **14 okt kl 09:00**."
+        },
+        {
+          "type": "p",
+          "text": "IPO-översikt: [IPO-kalender](/nyheter#ipo-cal-heading)"
+        },
+        {
+          "type": "p",
+          "text": "Den här texten är en utbildande marknadskommentar. Den är ingen personlig rekommendation och innehåller inga köp- eller säljsignaler. Intressekonflikter: inga kända positioner. Framställd 5 oktober 2026 kl. 06:55."
+        }
+      ]
+    }
+  },
+  "hiddenSources": [
+    {
+      "label": "MFN Foremont 22 sep, teckningsperioden inleds",
+      "href": "https://mfn.se/all/a/foremont/idag-inleds-teckningsperioden-i-foremont-group-infor-planerad-notering-pa-ngm-growth-market"
+    },
+    {
+      "label": "MFN Foremont, informationsmemorandum",
+      "href": "https://mfn.se/all/a/foremont/foremont-group-avser-att-notera-bolagets-aktier-pa-ngm-growth-market-och-offentliggor-informationsmemorandum"
+    },
+    {
+      "label": "DI Linjemontage",
+      "href": "https://www.di.se/bors/aktier/linjemontage-i-grastorp-8837447/"
+    },
+    {
+      "label": "DI Dormy",
+      "href": "https://www.di.se/bors/aktier/dormy-8836011/"
+    },
+    {
+      "label": "CNBC AXVIK",
+      "href": "https://www.cnbc.com/quotes/AXVIK-SE"
+    },
+    {
+      "label": "CNBC SVEVIK",
+      "href": "https://www.cnbc.com/quotes/SVEVIK-SE"
+    },
+    {
+      "label": "CNBC NRDAMP",
+      "href": "https://www.cnbc.com/quotes/NRDAMP-SE"
+    },
+    {
+      "label": "Airtel Money, erbjudandepris 1 okt",
+      "href": "https://www.lse.co.uk/rns/airtel-money-announcement-of-offer-price-ofm827i6nacxfkn.html"
+    },
+    {
+      "label": "Börsmeddelande 1 okt",
+      "href": "https://markets.ft.com/data/announce/full?dockey=1323-17814909-5EKI24RB38A20PCV9GU6EHTCMT"
+    }
+  ]
+}

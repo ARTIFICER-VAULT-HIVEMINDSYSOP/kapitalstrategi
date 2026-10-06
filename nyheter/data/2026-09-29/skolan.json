@@ -1,0 +1,25 @@
+{
+  "edition": "2026-09-29",
+  "date": "2026-09-29",
+  "dateLabel": {
+    "sv": "29 september 2026"
+  },
+  "slug": "skolan",
+  "order": 4,
+  "translations": {
+    "sv": {
+      "title": "Prova först · skolan",
+      "ingress": "Först säkerhetsutrustning. Sedan fart.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Först säkerhetsutrustning. Sedan fart."
+        },
+        {
+          "type": "p",
+          "text": "**SKOLA** — Tradingskolan: [Tradingskolan](/tradingskolan)"
+        }
+      ]
+    }
+  }
+}

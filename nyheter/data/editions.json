@@ -4,6 +4,225 @@
   },
   "editions": [
     {
+      "id": "2026-10-05",
+      "date": "2026-10-05",
+      "dateLabel": {
+        "sv": "5 oktober 2026"
+      },
+      "lead": {
+        "sv": "Marknadsföring. Måndag 5 oktober — Foremont väntas meddela utfallet i sin notering i dag. Oljan backar en aning efter helgen när G7 öppnar sina beredskapslager och exporten från Mellanöstern ökar, samtidigt som nya attacker i Gulfen håller oron vid liv. Guldet fick stöd av fredagens svaga amerikanska jobbsiffror. DI:s morgonsiffror för Brent, guld, silver, koppar och platina ligger klara."
+      },
+      "signoff": {
+        "sv": "Kapital och Strategi · utbildning och verktyg"
+      },
+      "modules": [
+        {
+          "slug": "ipo",
+          "order": 1,
+          "href": "/nyheter/2026-10-05/ipo/",
+          "title": {
+            "sv": "IPO / nytt på börsen"
+          },
+          "ingress": {
+            "sv": "Foremont Group (FOMO) — utfallet väntas offentliggöras i dag 5 okt (NGM Growth Market)."
+          }
+        },
+        {
+          "slug": "olja",
+          "order": 2,
+          "href": "/nyheter/2026-10-05/olja/",
+          "title": {
+            "sv": "Vad som rör olja"
+          },
+          "ingress": {
+            "sv": "Utbudet ökar när G7 öppnar beredskapslager, samtidigt som nya attacker i Gulfen håller oron vid liv."
+          }
+        },
+        {
+          "slug": "guld",
+          "order": 3,
+          "href": "/nyheter/2026-10-05/guld/",
+          "title": {
+            "sv": "Guld"
+          },
+          "ingress": {
+            "sv": "DI spot (5 okt, visad tid 06:53): 4 132,49 dollar/uns (−0,19 %). Fredagens svaga jobbrapport gav guldet stöd."
+          }
+        },
+        {
+          "slug": "ovriga-ravaror",
+          "order": 4,
+          "href": "/nyheter/2026-10-05/ovriga-ravaror/",
+          "title": {
+            "sv": "Övriga råvaror"
+          },
+          "ingress": {
+            "sv": "DI (5 okt): silver spot 60,91 dollar/uns (+0,89 %, 06:53); platina spot 1 708,96 dollar/uns (+0,48 %, 06:53); koppar 14 320 dollar/ton (−0,10 %, 3 mån termin, 18:00)."
+          }
+        },
+        {
+          "slug": "skolan",
+          "order": 5,
+          "href": "/nyheter/2026-10-05/skolan/",
+          "title": {
+            "sv": "Prova först · skolan"
+          },
+          "ingress": {
+            "sv": "Säkerhet först, sedan fart."
+          }
+        },
+        {
+          "slug": "marknadskommentar",
+          "order": 6,
+          "href": "/nyheter/2026-10-05/marknadskommentar/",
+          "title": {
+            "sv": "Om kommentaren"
+          },
+          "ingress": {
+            "sv": "Utbildande marknadskommentar. Ingen personlig rekommendation. Inga kända positioner."
+          }
+        }
+      ]
+    },
+    {
+      "id": "2026-10-01",
+      "date": "2026-10-01",
+      "dateLabel": {
+        "sv": "1 oktober 2026"
+      },
+      "lead": {
+        "sv": "Torsdag 1 oktober — oljan vände upp under förmiddagen och Brent står åter kring 100 dollar fatet, sedan Kina stoppat exporten av raffinerade oljeprodukter. NordAmps fick en tung första dag på First North i går och fortsätter nedåt i dag. Guldet rör sig lite inför fredagens amerikanska jobbrapport. DI:s siffror för Brent, guld, silver, koppar och platina ligger klara."
+      },
+      "signoff": {
+        "sv": "Kapital och Strategi · utbildning och verktyg"
+      },
+      "modules": [
+        {
+          "slug": "ipo",
+          "order": 1,
+          "href": "/nyheter/2026-10-01/ipo/",
+          "title": {
+            "sv": "IPO / nytt på börsen"
+          },
+          "ingress": {
+            "sv": "NordAmps (NRDAMP) — första handelsdag 30 sep (First North)."
+          }
+        },
+        {
+          "slug": "olja",
+          "order": 2,
+          "href": "/nyheter/2026-10-01/olja/",
+          "title": {
+            "sv": "Vad som rör olja"
+          },
+          "ingress": {
+            "sv": "Morgonen började nedåt: DI/Direkt (kl 07:55) skrev att ökade oljeflöden från Mellanöstern dämpade utbudsoron."
+          }
+        },
+        {
+          "slug": "guld",
+          "order": 3,
+          "href": "/nyheter/2026-10-01/guld/",
+          "title": {
+            "sv": "Guld"
+          },
+          "ingress": {
+            "sv": "DI spot (1 okt, visad tid 12:23): 4 162,47 dollar/uns (+0,13 %; −2,60 % på en vecka)."
+          }
+        },
+        {
+          "slug": "ovriga-ravaror",
+          "order": 4,
+          "href": "/nyheter/2026-10-01/ovriga-ravaror/",
+          "title": {
+            "sv": "Övriga råvaror"
+          },
+          "ingress": {
+            "sv": "DI (1 okt): silver spot 60,58 dollar/uns (+0,30 %, 12:23); platina spot 1 712,16 dollar/uns (−0,22 %, 12:23); koppar 14 455 dollar/ton (−0,13 %, 3 mån termin, 18:00)."
+          }
+        },
+        {
+          "slug": "skolan",
+          "order": 5,
+          "href": "/nyheter/2026-10-01/skolan/",
+          "title": {
+            "sv": "Prova först · skolan"
+          },
+          "ingress": {
+            "sv": "Säkerhet först, sedan fart."
+          }
+        }
+      ]
+    },
+    {
+      "id": "2026-09-29",
+      "date": "2026-09-29",
+      "dateLabel": {
+        "sv": "29 september 2026"
+      },
+      "lead": {
+        "sv": "Tisdag 29 september — ett juridiskt krav om åtal mot USA:s president, med hänvisning till en FN-rapport om en skolattack i Iran. En rapport om hur ryska statsmedier utbildar journalister i AI. Och ett exempel på hur nya arbetssätt kan korta riskfyllt arbete på hög höjd."
+      },
+      "signoff": {
+        "sv": "Kapital och Strategi · utbildning och verktyg"
+      },
+      "modules": [
+        {
+          "slug": "iran-icc",
+          "order": 1,
+          "href": "/nyheter/2026-09-29/iran-icc/",
+          "title": {
+            "sv": "Juridikprofessor vill att ICC prövar USA:s president"
+          },
+          "ingress": {
+            "sv": "Dagens.se rapporterar att en juridikprofessor vid ett amerikanskt universitet vill att Internationella brottmålsdomstolen åtalar USA:s president, med hänvisning till en FN-rapport om en skolattack i Iran."
+          },
+          "category": {
+            "sv": "Geopolitik"
+          }
+        },
+        {
+          "slug": "isw-ai",
+          "order": 2,
+          "href": "/nyheter/2026-09-29/isw-ai/",
+          "title": {
+            "sv": "ISW: ryska statsmedier bygger ett nätverk av AI-utbildade journalister"
+          },
+          "ingress": {
+            "sv": "Institute for the Study of War beskriver i en rapport från 12 augusti 2026 hur ryska statliga program utbildar journalister och studenter i att använda AI."
+          },
+          "category": {
+            "sv": "Källkritik"
+          }
+        },
+        {
+          "slug": "fasadtvatt",
+          "order": 3,
+          "href": "/nyheter/2026-09-29/fasadtvatt/",
+          "title": {
+            "sv": "Två tonåringar kortade fasadtvätten från en månad till fyra dagar"
+          },
+          "ingress": {
+            "sv": "Ett videoinslag från SVT Nyheter beskriver hur två tonåringar minskat tiden för fasadtvätt på ett flerfamiljshus, och att arbetet samtidigt blivit säkrare."
+          },
+          "category": {
+            "sv": "Arbetsmiljö"
+          }
+        },
+        {
+          "slug": "skolan",
+          "order": 4,
+          "href": "/nyheter/2026-09-29/skolan/",
+          "title": {
+            "sv": "Prova först · skolan"
+          },
+          "ingress": {
+            "sv": "Först säkerhetsutrustning. Sedan fart."
+          }
+        }
+      ]
+    },
+    {
       "id": "2026-09-28",
       "date": "2026-09-28",
       "dateLabel": {

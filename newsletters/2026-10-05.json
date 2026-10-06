@@ -1,0 +1,119 @@
+{
+  "date": "2026-10-05",
+  "title": "Nyhetsbrev",
+  "dateLabel": "5 oktober 2026",
+  "subtitle": "Marknadsföring | Foremonts utfall | G7 och oljelager | Guld efter jobbsiffrorna",
+  "closingNote": "Utgåvan finns också som modulartiklar. Varje kort slutar med sökvägen till sin modul.",
+  "sections": [
+    {
+      "category": "IPO",
+      "cards": [
+        {
+          "title": "IPO / nytt på börsen",
+          "body": "Foremont Group (FOMO) väntas meddela utfallet i dag 5 okt. Teckningskurs 10 kr; full teckning ger 54,6 MSEK. Likviddag 8 okt, preliminär första handelsdag 14 okt. Utfallet var inte publicerat när texten ställdes samman, omkring kl. 06:55. Fredagens stängning: Linjemontage 47,15 kr, Dormy 70,20 kr, Axvik 58,90 kr, Svevik 52,70 kr, NordAmps 10,80 kr. Dagens kurser saknas före börsöppning. Airtel Money i London: 1,96 pund per aktie, ordinarie handel 14 okt.\nHela modulen: /nyheter/2026-10-05/ipo/",
+          "stats": [
+            {
+              "label": "Foremont",
+              "value": "utfall väntas i dag"
+            },
+            {
+              "label": "Kurs 5 okt",
+              "value": "saknas före öppning"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "OLJA",
+      "cards": [
+        {
+          "title": "Vad som rör olja",
+          "body": "G7 enades i fredags om att släppa 100 miljoner fat diesel och råolja ur beredskapslagren. Exporten från Mellanöstern låg över nivån före kriget fyra av sju dagar sista veckan i september. Huthirebellerna säger att de angripit anläggningar i Riyadh och Khurais; uppgiften väntar på bekräftelse. DI spot kl 06:53: Brent 101,70 USD/fat (−0,94 %); WTI 90,27 (−0,99 %).\nHela modulen: /nyheter/2026-10-05/olja/",
+          "stats": [
+            {
+              "label": "Brent",
+              "value": "101,70 USD/fat"
+            },
+            {
+              "label": "WTI",
+              "value": "90,27"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "GULD",
+      "cards": [
+        {
+          "title": "Guld",
+          "body": "DI spot (5 okt, visad tid 06:53): 4 132,49 dollar/uns (−0,19 %). Fredagens jobbrapport: 29 000 nya jobb mot väntade cirka 90 000. Marknaden prisar ungefär 20 % chans för en räntehöjning från Fed i oktober, ned från omkring 70 % en vecka tidigare. Samma besked kan ge guldet både medvind och motvind.\nHela modulen: /nyheter/2026-10-05/guld/",
+          "stats": [
+            {
+              "label": "Spot",
+              "value": "4 132,49 dollar/uns"
+            },
+            {
+              "label": "Jobb, september",
+              "value": "29 000"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "RÅVAROR",
+      "cards": [
+        {
+          "title": "Övriga råvaror",
+          "body": "DI (5 okt): silver spot 60,91 dollar/uns (+0,89 %, 06:53); platina spot 1 708,96 dollar/uns (+0,48 %, 06:53); koppar 14 320 dollar/ton (−0,10 %, 3 mån termin, 18:00).\nHela modulen: /nyheter/2026-10-05/ovriga-ravaror/",
+          "stats": [
+            {
+              "label": "Silver",
+              "value": "60,91 dollar/uns"
+            },
+            {
+              "label": "Koppar",
+              "value": "14 320 dollar/ton"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "SKOLAN",
+      "cards": [
+        {
+          "title": "Prova först · skolan",
+          "body": "Säkerhet först, sedan fart. En vecka med jobbsiffror, oljelager och nya noteringar visar hur snabbt en marknad kan vända åt båda hållen.\nSKOLA — Tradingskolan: /tradingskolan\nHela modulen: /nyheter/2026-10-05/skolan/",
+          "stats": [
+            {
+              "label": "Skolan",
+              "value": "/tradingskolan"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "KOMMENTAR",
+      "cards": [
+        {
+          "title": "Om kommentaren",
+          "body": "Den här texten är en utbildande marknadskommentar. Den är ingen personlig rekommendation och innehåller inga köp- eller säljsignaler. Intressekonflikter: inga kända positioner. Framställd 5 oktober 2026 kl. 06:55.\nHela modulen: /nyheter/2026-10-05/marknadskommentar/",
+          "stats": [
+            {
+              "label": "Framställd",
+              "value": "5 okt 2026 kl. 06:55"
+            },
+            {
+              "label": "Positioner",
+              "value": "inga kända"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

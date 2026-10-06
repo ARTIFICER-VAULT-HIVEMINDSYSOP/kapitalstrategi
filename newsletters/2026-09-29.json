@@ -1,0 +1,81 @@
+{
+  "date": "2026-09-29",
+  "title": "Nyhetsbrev",
+  "dateLabel": "29 september 2026",
+  "subtitle": "ICC-krav och FN-rapport | AI och källkritik | Fasadtvätt som exempel",
+  "closingNote": "Utgåvan finns också som modulartiklar. Varje kort slutar med sökvägen till sin modul.",
+  "sections": [
+    {
+      "category": "GEOPOLITIK",
+      "cards": [
+        {
+          "title": "Juridikprofessor vill att ICC prövar USA:s president",
+          "body": "En juridikprofessor vid ett amerikanskt universitet vill att Internationella brottmålsdomstolen åtalar USA:s president för krigsbrott, rapporterar Dagens.se. Professorn hänvisar till en FN-rapport om en attack den 28 februari mot en flickskola i Minab. Enligt artikeln dödades 157 personer, varav 123 barn, och utredarna uteslöt en oavsiktlig träff. Det är ett krav från en enskild expert, inte ett beslut från domstolen. Artikeln innehåller inga marknadsuppgifter.\nHela modulen: /nyheter/2026-09-29/iran-icc/",
+          "stats": [
+            {
+              "label": "Enligt artikeln",
+              "value": "157 döda, varav 123 barn"
+            },
+            {
+              "label": "Status",
+              "value": "krav, inte domstolsbeslut"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "INFORMATION",
+      "cards": [
+        {
+          "title": "ISW: ryska statsmedier bygger ett nätverk av AI-utbildade journalister",
+          "body": "Institute for the Study of War beskriver i en rapport från 12 augusti 2026 hur programmen SputnikPro och RT Academy utbildar journalister och studenter, bland annat i AI. Minst 50 tillfällen på ett år, och ungefär hälften med AI-moduler. Deltagarsiffrorna, över 15 000 respektive över 7 000, är programmens egna uppgifter. Inget nordiskt land finns med i den ofullständiga listan. Rapporten är bakgrund, inte en dagsnyhet, och innehåller inga marknadsuppgifter.\nHela modulen: /nyheter/2026-09-29/isw-ai/",
+          "stats": [
+            {
+              "label": "Tillfällen",
+              "value": "minst 50"
+            },
+            {
+              "label": "Rapport",
+              "value": "12 augusti 2026"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "ARBETSMILJÖ",
+      "cards": [
+        {
+          "title": "Två tonåringar kortade fasadtvätten från en månad till fyra dagar",
+          "body": "Ett videoinslag från SVT Nyheter, publicerat 26 december 2025, beskriver hur två tonåringar minskat tiden för fasadtvätt på ett flerfamiljshus från cirka en månad till fyra dagar, och att arbetet samtidigt blivit säkrare. Sidtexten beskriver inte metoden. Det är ett exempel, inte en dagsnyhet, och det saknas uppgifter om bolag eller marknader.\nHela modulen: /nyheter/2026-09-29/fasadtvatt/",
+          "stats": [
+            {
+              "label": "Exempel",
+              "value": "en månad till fyra dagar"
+            },
+            {
+              "label": "Inslag",
+              "value": "26 december 2025"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "SKOLAN",
+      "cards": [
+        {
+          "title": "Prova först · skolan",
+          "body": "Först säkerhetsutrustning. Sedan fart.\nSKOLA — Tradingskolan: /tradingskolan\nHela modulen: /nyheter/2026-09-29/skolan/",
+          "stats": [
+            {
+              "label": "Skolan",
+              "value": "/tradingskolan"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

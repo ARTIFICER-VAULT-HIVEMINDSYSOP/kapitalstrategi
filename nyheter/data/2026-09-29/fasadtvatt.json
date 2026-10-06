@@ -1,0 +1,34 @@
+{
+  "edition": "2026-09-29",
+  "date": "2026-09-29",
+  "dateLabel": {
+    "sv": "29 september 2026"
+  },
+  "slug": "fasadtvatt",
+  "order": 3,
+  "category": {
+    "sv": "Arbetsmiljö"
+  },
+  "translations": {
+    "sv": {
+      "title": "Två tonåringar kortade fasadtvätten från en månad till fyra dagar",
+      "ingress": "Ett videoinslag från SVT Nyheter beskriver hur två tonåringar minskat tiden för fasadtvätt på ett flerfamiljshus, och att arbetet samtidigt blivit säkrare.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Två tonåringar har kraftigt minskat tiden det tar att tvätta fasaden på ett stort flerfamiljshus, från cirka en månad till fyra dagar, enligt ett videoinslag från SVT Nyheter. Enligt SVT har arbetet samtidigt blivit säkrare. Inslaget publicerades 26 december 2025. Sidtexten beskriver inte hur de gick till väga."
+        },
+        {
+          "type": "p",
+          "text": "Inslaget är ett konkret exempel på hur nya arbetssätt och teknik kan göra riskfyllt arbete på hög höjd både snabbare och säkrare. Det passar som tema om produktivitet och automation i vardagsnära tjänster. Det är ett enskilt, lokalt exempel från december 2025, inte en dagsnyhet, och det saknas uppgifter om bolag eller marknader. Sidtexten är kort, så metoden framgår inte där."
+        }
+      ]
+    }
+  },
+  "hiddenSources": [
+    {
+      "label": "SVT Nyheter, videoinslag 26 december 2025",
+      "href": "https://www.svt.se/nyheter/"
+    }
+  ]
+}

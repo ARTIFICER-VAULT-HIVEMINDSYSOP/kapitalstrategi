@@ -1,0 +1,38 @@
+{
+  "edition": "2026-09-29",
+  "date": "2026-09-29",
+  "dateLabel": {
+    "sv": "29 september 2026"
+  },
+  "slug": "iran-icc",
+  "order": 1,
+  "category": {
+    "sv": "Geopolitik"
+  },
+  "translations": {
+    "sv": {
+      "title": "Juridikprofessor vill att ICC prövar USA:s president",
+      "ingress": "Dagens.se rapporterar att en juridikprofessor vid ett amerikanskt universitet vill att Internationella brottmålsdomstolen åtalar USA:s president, med hänvisning till en FN-rapport om en skolattack i Iran.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "En juridikprofessor vid ett amerikanskt universitet vill att Internationella brottmålsdomstolen (ICC) åtalar USA:s president för krigsbrott, rapporterar Dagens.se. Professorn hänvisar till en rapport från FN:s råd för mänskliga rättigheter om en attack den 28 februari mot en flickskola i den sydiranska staden Minab, som enligt artikeln tillskrivs amerikanska styrkor. Enligt de fynd som artikeln återger dödades **157** personer, varav **123** barn i åldern 13 år eller yngre, och utredarna uteslöt en oavsiktlig träff. Amerikanska företrädare har enligt artikeln inte tagit på sig ansvaret, och USA:s president har antytt att Teheran kan vara skyldigt. Professorn kopplar kravet till fler amerikanska militära insatser, bland annat attacker mot båtar i Karibien."
+        },
+        {
+          "type": "p",
+          "text": "Irankonflikten präglar nyhetsläget som nyhetsbrevet följer, bland annat i oljebevakningen. Artikeln beskriver ett krav från en enskild expert och ett underlag från FN, inte ett beslut från domstolen. Den skillnaden är viktig att hålla isär när ett laddat ämne sprids snabbt."
+        },
+        {
+          "type": "p",
+          "text": "Artikeln innehåller inga marknadsuppgifter. Uppgifterna är andrahand: Dagens.se refererar en annan nyhetssajt och en FN-rapport som inte länkas i artikeln, så offersiffrorna är inte avstämda mot FN:s egen rapport här. Artikelns ordval är starkt värdeladdat; den här texten återger sakuppgifterna."
+        }
+      ]
+    }
+  },
+  "hiddenSources": [
+    {
+      "label": "Dagens.se 29 september 2026, återgivet via MSN kl. 13:50",
+      "href": "https://www.dagens.se/"
+    }
+  ]
+}

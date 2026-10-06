@@ -1,0 +1,47 @@
+{
+  "edition": "2026-10-05",
+  "date": "2026-10-05",
+  "dateLabel": {
+    "sv": "5 oktober 2026"
+  },
+  "slug": "guld",
+  "order": 3,
+  "translations": {
+    "sv": {
+      "title": "Guld",
+      "ingress": "DI spot (5 okt, visad tid 06:53): 4 132,49 dollar/uns (−0,19 %). Fredagens svaga jobbrapport gav guldet stöd.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "DI spot (5 okt, visad tid **06:53**): **4 132,49 dollar/uns** (**−0,19 %**)."
+        },
+        {
+          "type": "p",
+          "text": "Fredagens jobbrapport från USA blev svag: **29 000** nya jobb i september mot väntade cirka **90 000**, augusti reviderad ner till **133 000** och arbetslösheten på **4,2 %**. Marknaden prisar nu ungefär **20 %** chans för en räntehöjning från Fed i oktober, ned från omkring **70 %** en vecka tidigare, och det gav guldet stöd i den asiatiska morgonhandeln. Höga obligationsräntor och oljedriven inflation håller emot. Veckans hållpunkt är protokollet från Feds septembermöte mitt i veckan. Samma besked kan ge guldet både medvind och motvind."
+        },
+        {
+          "type": "p",
+          "text": "Den här texten är en utbildande marknadskommentar. Den är ingen personlig rekommendation och innehåller inga köp- eller säljsignaler. Intressekonflikter: inga kända positioner. Framställd 5 oktober 2026 kl. 06:55."
+        }
+      ]
+    }
+  },
+  "hiddenSources": [
+    {
+      "label": "DI råvaror 5 okt",
+      "href": "https://www.di.se/ravaror/"
+    },
+    {
+      "label": "Jobbrapport för september 2026",
+      "href": "https://finance.yahoo.com/economy/articles/september-2026-jobs-report-payrolls-123334753.html"
+    },
+    {
+      "label": "Guld efter jobbsiffrorna, 5 okt",
+      "href": "https://uk.investing.com/news/commodities-news/gold-edges-higher-after-weekly-slide-as-weak-jobs-data-ease-fed-hike-bets-4894401"
+    },
+    {
+      "label": "Guld och ränteförväntningar, 5 okt",
+      "href": "https://www.fxstreet.com/news/gold-holds-gains-above-4-150-as-traders-trim-bets-on-fed-rate-hikes-202610050213"
+    }
+  ]
+}

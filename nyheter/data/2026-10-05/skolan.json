@@ -1,0 +1,25 @@
+{
+  "edition": "2026-10-05",
+  "date": "2026-10-05",
+  "dateLabel": {
+    "sv": "5 oktober 2026"
+  },
+  "slug": "skolan",
+  "order": 5,
+  "translations": {
+    "sv": {
+      "title": "Prova först · skolan",
+      "ingress": "Säkerhet först, sedan fart.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Säkerhet först, sedan fart. En vecka med jobbsiffror, oljelager och nya noteringar visar hur snabbt en marknad kan vända åt båda hållen. Öva på att läsa erbjudanden, kurser och nyhetsflöden i lugn takt innan riktiga pengar står på spel."
+        },
+        {
+          "type": "p",
+          "text": "**SKOLA** — Tradingskolan, prova först: [Tradingskolan](/tradingskolan)"
+        }
+      ]
+    }
+  }
+}

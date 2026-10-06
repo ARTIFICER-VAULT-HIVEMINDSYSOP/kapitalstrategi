@@ -1,0 +1,42 @@
+{
+  "edition": "2026-09-29",
+  "date": "2026-09-29",
+  "dateLabel": {
+    "sv": "29 september 2026"
+  },
+  "slug": "isw-ai",
+  "order": 2,
+  "category": {
+    "sv": "Källkritik"
+  },
+  "translations": {
+    "sv": {
+      "title": "ISW: ryska statsmedier bygger ett nätverk av AI-utbildade journalister",
+      "ingress": "Institute for the Study of War beskriver i en rapport från 12 augusti 2026 hur ryska statliga program utbildar journalister och studenter i att använda AI.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Den amerikanska tankesmedjan Institute for the Study of War (ISW) beskriver i en rapport från 12 augusti 2026 hur ryska statliga program, främst SputnikPro och RT Academy, utbildar journalister och studenter i bland annat Afrika, Asien, Latinamerika och före detta sovjetstater. Enligt ISW hölls minst **50** utbildningstillfällen mellan juli 2025 och juli 2026, och ungefär hälften innehöll moduler om att använda AI för att ta fram innehåll och effektivisera redaktionellt arbete. Deltagarsiffrorna, över **15 000** för SputnikPro och över **7 000** för RT Academy, är programmens egna uppgifter som ISW återger. ISW bedömer att de utbildade verkar utanför ryska statliga strukturer och att inflytandet därför kan bestå även när ryska medier begränsas. Rapportens lista över mottagande universitet och medier är uttryckligen ofullständig, och inget nordiskt land finns med i den."
+        },
+        {
+          "type": "p",
+          "text": "Källkritik är en del av hushållets beredskap. Enligt rapporten verkar de utbildade utanför ryska statliga strukturer, vilket kan göra det svårare att se vem som står bakom en uppgift. Det lönar sig att i förväg bestämma vilka källor man vänder sig till och att kontrollera vem som står bakom en uppgift innan man agerar på den eller delar den vidare."
+        },
+        {
+          "type": "p",
+          "text": "Rapporten beskriver långsiktig informationspåverkan och innehåller inga marknadsuppgifter. ISW är en amerikansk tankesmedja med ett uttalat säkerhetspolitiskt perspektiv, och rapporten avslutas med förslag riktade till USA och dess partner. Underlaget bygger till stor del på ryska statsmediers egna publiceringar, och deltagarsiffrorna är programmens egna uppgifter. Rapporten är från augusti och är bakgrund, inte en dagsnyhet."
+        }
+      ]
+    }
+  },
+  "hiddenSources": [
+    {
+      "label": "ISW, specialrapport 12 augusti 2026",
+      "href": "https://understandingwar.org/research/cognitive-warfare/the-kremlin-is-cultivating-an-ai-trained-global-media-cadre-for-lasting-influence/"
+    },
+    {
+      "label": "Wayback Machine, kopia 15 september 2026",
+      "href": "https://web.archive.org/web/20260915154244/https://understandingwar.org/research/cognitive-warfare/the-kremlin-is-cultivating-an-ai-trained-global-media-cadre-for-lasting-influence/"
+    }
+  ]
+}

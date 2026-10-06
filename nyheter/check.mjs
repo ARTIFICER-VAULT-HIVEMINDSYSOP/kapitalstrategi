@@ -67,6 +67,12 @@ const banned = [
   "Fraunces",
   "Trade Rider",
   "trade-rider",
+  "Paus · mellanslag",
+  "Alla lägen",
+  "Hävstång",
+  "Storsjö",
+  "internt underlag",
+  "2 till 4 av 36",
 ];
 
 function walk(dir, acc = []) {
@@ -116,8 +122,11 @@ const olja = fs.readFileSync(path.join(here, "2026-09-28/olja/index.html"), "utf
 if ((olja.split("saknas").length - 1) !== 1) fail("Oljeartikeln ska behålla Baha.com saknas");
 
 const editions = JSON.parse(fs.readFileSync(path.join(here, "data/editions.json"), "utf8"));
-if (editions.editions[0].modules.length !== 6) fail("utgåvan ska ha 6 moduler");
-const hrefs = editions.editions[0].modules.map((mod) => mod.href);
+const sep28Edition = editions.editions.find((item) => item.date === "2026-09-28");
+if (!sep28Edition) fail("saknar utgåvan 2026-09-28");
+if (sep28Edition.modules.length !== 6) fail("utgåvan 2026-09-28 ska ha 6 moduler");
+if (editions.editions[0]?.date !== "2026-10-05") fail("senaste modulutgåvan ska vara 2026-10-05");
+const hrefs = sep28Edition.modules.map((mod) => mod.href);
 const expectedHrefs = [
   "/nyheter/2026-09-28/ipo/",
   "/nyheter/2026-09-28/olja/",
@@ -126,7 +135,7 @@ const expectedHrefs = [
   "/nyheter/2026-09-28/skolan/",
   "/nyheter/2026-09-28/tyst-tid/",
 ];
-const tyst = editions.editions[0].modules.find((mod) => mod.slug === "tyst-tid");
+const tyst = sep28Edition.modules.find((mod) => mod.slug === "tyst-tid");
 if (tyst?.category?.sv !== "Skolan") fail("tyst-tid ska ligga i kategorin Skolan");
 const tystHtml = fs.readFileSync(path.join(here, "2026-09-28/tyst-tid/index.html"), "utf8");
 if (!tystHtml.includes("https://doi.org/10.1073/pnas.98.2.676")) fail("saknar PNAS-källan");
@@ -170,13 +179,23 @@ for (const file of files) {
 }
 
 const nlIndex = JSON.parse(fs.readFileSync(path.join(here, "../newsletters/index.json"), "utf8"));
-if (nlIndex.today !== "2026-09-28") fail(`newsletters today är ${nlIndex.today}`);
-if (nlIndex.editions?.[0]?.date !== "2026-09-28") fail("senaste arkivutgåvan ska vara 2026-09-28");
-const sep28 = JSON.parse(fs.readFileSync(path.join(here, "../newsletters/2026-09-28.json"), "utf8"));
-if (!sep28.sections?.length) fail("2026-09-28.json saknar sections");
-if (!JSON.stringify(sep28).includes("/nyheter/2026-09-28/")) fail("2026-09-28.json pekar inte på modulartiklar");
-for (const date of ["2026-08-28", "2026-09-08", "2026-09-28"]) {
+if (nlIndex.today !== "2026-10-05") fail(`newsletters today är ${nlIndex.today}`);
+if (nlIndex.editions?.[0]?.date !== "2026-10-05") fail("senaste arkivutgåvan ska vara 2026-10-05");
+const archiveOrder = (nlIndex.editions || []).slice(0, 4).map((item) => item.date);
+if (JSON.stringify(archiveOrder) !== JSON.stringify(["2026-10-05", "2026-10-01", "2026-09-29", "2026-09-28"])) {
+  fail(`arkivordning ${archiveOrder.join(", ")}`);
+}
+for (const date of ["2026-10-05", "2026-10-01", "2026-09-29", "2026-09-28"]) {
   const edition = JSON.parse(fs.readFileSync(path.join(here, `../newsletters/${date}.json`), "utf8"));
+  if (!edition.sections?.length) fail(`${date}.json saknar sections`);
+  if (!JSON.stringify(edition).includes(`/nyheter/${date}/`)) fail(`${date}.json pekar inte på modulartiklar`);
+}
+for (const date of ["2026-08-28", "2026-09-08", "2026-09-28", "2026-09-29", "2026-10-01", "2026-10-05"]) {
+  const raw = fs.readFileSync(path.join(here, `../newsletters/${date}.json`), "utf8");
+  const edition = JSON.parse(raw);
+  if (raw.includes("live.kapitalstrategi.com")) fail(`${date} har död live-länk`);
+  if (raw.includes("investeringsråd")) fail(`${date} har investeringsråd-rad`);
+  if (raw.includes("Källor:") || raw.includes("Källa:")) fail(`${date} har synlig källrad`);
   for (const section of edition.sections || []) {
     for (const card of section.cards || []) {
       if (card.source) fail(`${date} har synligt source-fält`);
