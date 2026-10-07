@@ -1,0 +1,31 @@
+{
+  "edition": "2026-10-07",
+  "date": "2026-10-07",
+  "dateLabel": {
+    "sv": "7 oktober 2026"
+  },
+  "slug": "hormuz",
+  "order": 4,
+  "translations": {
+    "sv": {
+      "title": "Hormuz fortfarande begränsat",
+      "ingress": "USA:s blockad ligger kvar. Varningarna om bordning gick ut när blockaden infördes i april.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Sundet är fortfarande kraftigt begränsat, och USA:s blockad ligger kvar. Varningar om bordning och våld om fartygen inte följer anvisningarna gick ut när blockaden infördes i april, enligt Wall Street Journal."
+        },
+        {
+          "type": "p",
+          "text": "Iran hävdar egen kontroll och kräver tillstånd. Det är ett läge, inte en order."
+        }
+      ]
+    }
+  },
+  "hiddenSources": [
+    {
+      "label": "DN",
+      "href": "https://www.dn.se/varlden/anropet-till-fartyget-tvingar-oss-att-anvanda-vald/"
+    }
+  ]
+}

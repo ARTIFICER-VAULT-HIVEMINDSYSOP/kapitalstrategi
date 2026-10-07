@@ -2,7 +2,377 @@
   "brand": {
     "sv": "Kapital och Strategi"
   },
+  "disclaimer": {
+    "sv": "Ett läge, inte en order. Skolan först. Ingen avkastning utlovas."
+  },
   "editions": [
+    {
+      "id": "2026-10-07",
+      "date": "2026-10-07",
+      "dateLabel": {
+        "sv": "7 oktober 2026"
+      },
+      "lead": {
+        "sv": "Onsdag 7 oktober — chefer på Svenska kraftnät slår larm om tystnadskultur. Det är ett ledningsärende, inte ett driftlarm. KPIF steg preliminärt till 1,5 procent. Hormuz är fortfarande begränsat. Bulgarien har avslutat sökningen efter det sjunkna fartyget."
+      },
+      "signoff": {
+        "sv": "Kapital och Strategi · utbildning och verktyg"
+      },
+      "modules": [
+        {
+          "slug": "balans",
+          "order": 1,
+          "href": "/nyheter/2026-10-07/balans/",
+          "title": {
+            "sv": "Stark rädsla på Svenska kraftnät — inte ett driftlarm"
+          },
+          "ingress": {
+            "sv": "DN: åtta anonyma chefer beskriver en tystnadskultur sedan Maja Lundbäck tillträdde."
+          },
+          "category": {
+            "sv": "Balans"
+          }
+        },
+        {
+          "slug": "inflation",
+          "order": 2,
+          "href": "/nyheter/2026-10-07/inflation/",
+          "title": {
+            "sv": "Inflationen lyfts av energin"
+          },
+          "ingress": {
+            "sv": "Preliminär KPIF 1,5 procent i september, från 0,7 i augusti. Utan energi stilla på 0,5."
+          }
+        },
+        {
+          "slug": "hyllie",
+          "order": 3,
+          "href": "/nyheter/2026-10-07/hyllie/",
+          "title": {
+            "sv": "Polisinsats i Hyllie"
+          },
+          "ingress": {
+            "sv": "Grovt brott vid en matbutik i Hyllie. En person skadad, en misstänkt frihetsberövad."
+          }
+        },
+        {
+          "slug": "hormuz",
+          "order": 4,
+          "href": "/nyheter/2026-10-07/hormuz/",
+          "title": {
+            "sv": "Hormuz fortfarande begränsat"
+          },
+          "ingress": {
+            "sv": "USA:s blockad ligger kvar. Varningarna om bordning gick ut när blockaden infördes i april."
+          }
+        },
+        {
+          "slug": "svarta-havet",
+          "order": 5,
+          "href": "/nyheter/2026-10-07/svarta-havet/",
+          "title": {
+            "sv": "Inga överlevande utanför Bulgarien"
+          },
+          "ingress": {
+            "sv": "Sökningen avslutad. Besättningen på det sjunkna fartyget antas omkommen. 18 räddades från det andra."
+          }
+        },
+        {
+          "slug": "skolan",
+          "order": 6,
+          "href": "/nyheter/2026-10-07/skolan/",
+          "title": {
+            "sv": "Prova först · skolan"
+          },
+          "ingress": {
+            "sv": "Först kartan. Sedan ett övningsbeslut. Ingen avkastning utlovas."
+          },
+          "category": {
+            "sv": "Skolan"
+          }
+        }
+      ],
+      "quiz": {
+        "date": "2026-10-07",
+        "dateLabel": {
+          "sv": "7 oktober 2026",
+          "en": "7 October 2026",
+          "uk": "7 жовтня 2026"
+        },
+        "title": {
+          "sv": "Nyhetsquiz",
+          "en": "News quiz",
+          "uk": "Новинна вікторина"
+        },
+        "lead": {
+          "sv": "Svaren finns i korten ovan. Läs först, svara sen.",
+          "en": "The answers are in the cards above. Read first, then answer.",
+          "uk": "Відповіді є в картках вище. Спочатку прочитай, потім відповідай."
+        },
+        "teaser": {
+          "sv": "I morgon kan frågan gälla en siffra i kortet — en avläsning, inte ett beslut.",
+          "en": "Tomorrow the question may be a figure on the card — a reading, not a decision.",
+          "uk": "Завтра питання може стосуватися цифри на картці — це зчитування, не рішення."
+        },
+        "questions": [
+          {
+            "id": "nq-2026-10-07-1",
+            "prompt": {
+              "sv": "Enligt balanskortet: vad är larmet på Svenska kraftnät?",
+              "en": "According to the balancing card: what is the alarm at Svenska kraftnät?",
+              "uk": "Згідно з карткою балансу: що це за тривога на Svenska kraftnät?"
+            },
+            "explanation": {
+              "sv": "Kortet skiljer ledningslarm från drift. Åtta anonyma chefer, inte ett bevis för att reserverna uteblir.",
+              "en": "The card separates a leadership alarm from operations. Eight anonymous managers, not proof that reserves fail.",
+              "uk": "Картка відділяє керівну тривогу від роботи мережі. Вісім анонімних керівників, не доказ що резерви зникли."
+            },
+            "options": [
+              {
+                "id": "a",
+                "correct": true,
+                "text": {
+                  "sv": "Ett ledningslarm om tystnadskultur, inte ett driftlarm.",
+                  "en": "A leadership alarm about a culture of silence, not an operational alarm.",
+                  "uk": "Керівна тривога про культуру мовчання, не операційна."
+                }
+              },
+              {
+                "id": "b",
+                "correct": false,
+                "text": {
+                  "sv": "Ett besked att elen stängs av i morgon.",
+                  "en": "A notice that power is cut tomorrow.",
+                  "uk": "Повідомлення, що світло вимкнуть завтра."
+                }
+              },
+              {
+                "id": "c",
+                "correct": false,
+                "text": {
+                  "sv": "Ett bud från oss i FCR.",
+                  "en": "A bid from us in FCR.",
+                  "uk": "Наша заявка на FCR."
+                }
+              },
+              {
+                "id": "d",
+                "correct": false,
+                "text": {
+                  "sv": "Att förkvalificering inte längre behövs.",
+                  "en": "That prequalification is no longer needed.",
+                  "uk": "Що прекваліфікація більше не потрібна."
+                }
+              }
+            ]
+          },
+          {
+            "id": "nq-2026-10-07-2",
+            "prompt": {
+              "sv": "Enligt balanskortet: hur kommer ett virtuellt kraftverk in?",
+              "en": "According to the balancing card: how does a virtual power plant enter?",
+              "uk": "Згідно з карткою балансу: як входить віртуальна електростанція?"
+            },
+            "explanation": {
+              "sv": "Kortet säger BSP och förkvalificering. Rubriken är inte vägen in.",
+              "en": "The card says BSP and prequalification. The headline is not the way in.",
+              "uk": "Картка каже BSP і прекваліфікація. Заголовок — не вхід."
+            },
+            "options": [
+              {
+                "id": "a",
+                "correct": false,
+                "text": {
+                  "sv": "Genom nyhetsrubriken.",
+                  "en": "Through the news headline.",
+                  "uk": "Через заголовок новини."
+                }
+              },
+              {
+                "id": "b",
+                "correct": true,
+                "text": {
+                  "sv": "Via en BSP, efter förkvalificering.",
+                  "en": "Via a BSP, after prequalification.",
+                  "uk": "Через BSP, після прекваліфікації."
+                }
+              },
+              {
+                "id": "c",
+                "correct": false,
+                "text": {
+                  "sv": "Genom att lova avkastning.",
+                  "en": "By promising a return.",
+                  "uk": "Обіцяючи дохідність."
+                }
+              },
+              {
+                "id": "d",
+                "correct": false,
+                "text": {
+                  "sv": "Det behövs ingen motpart.",
+                  "en": "No counterparty is needed.",
+                  "uk": "Контрагент не потрібен."
+                }
+              }
+            ]
+          },
+          {
+            "id": "nq-2026-10-07-3",
+            "prompt": {
+              "sv": "Enligt inflationskortet: vad blev preliminär KPIF i september?",
+              "en": "According to the inflation card: what was preliminary KPIF in September?",
+              "uk": "Згідно з карткою інфляції: яким був попередній KPIF у вересні?"
+            },
+            "explanation": {
+              "sv": "Kortet visar 1,5 procent, från 0,7. Utan energi stod den på 0,5. Preliminärt.",
+              "en": "The card shows 1.5 percent, from 0.7. Excluding energy it stayed at 0.5. Preliminary.",
+              "uk": "Картка показує 1,5 відсотка, з 0,7. Без енергії лишилося 0,5. Попередньо."
+            },
+            "options": [
+              {
+                "id": "a",
+                "correct": false,
+                "text": {
+                  "sv": "0,5 procent, det är siffran utan energi.",
+                  "en": "0.5 percent, that is the figure excluding energy.",
+                  "uk": "0,5 відсотка — це цифра без енергії."
+                }
+              },
+              {
+                "id": "b",
+                "correct": false,
+                "text": {
+                  "sv": "2 procent, det är målet.",
+                  "en": "2 percent, that is the target.",
+                  "uk": "2 відсотки — це ціль."
+                }
+              },
+              {
+                "id": "c",
+                "correct": true,
+                "text": {
+                  "sv": "1,5 procent, från 0,7 i augusti. Preliminärt.",
+                  "en": "1.5 percent, from 0.7 in August. Preliminary.",
+                  "uk": "1,5 відсотка, з 0,7 у серпні. Попередньо."
+                }
+              },
+              {
+                "id": "d",
+                "correct": false,
+                "text": {
+                  "sv": "1,1 procent, det är KPI.",
+                  "en": "1.1 percent, that is CPI.",
+                  "uk": "1,1 відсотка — це KPI."
+                }
+              }
+            ]
+          },
+          {
+            "id": "nq-2026-10-07-4",
+            "prompt": {
+              "sv": "Enligt kortet om Svarta havet: vad hände med det andra fartyget?",
+              "en": "According to the Black Sea card: what happened to the second ship?",
+              "uk": "Згідно з карткою Чорного моря: що сталося з другим судном?"
+            },
+            "explanation": {
+              "sv": "Kortet skiljer fartygen. Det sjunkna antas ha förlorat besättningen. 18 räddades från det andra.",
+              "en": "The card separates the ships. The sunk ship's crew is presumed dead. 18 were saved from the other.",
+              "uk": "Картка розділяє судна. Екіпаж затонулого вважають загиблим. 18 врятовано з іншого."
+            },
+            "options": [
+              {
+                "id": "a",
+                "correct": false,
+                "text": {
+                  "sv": "Alla ombord antas omkomna.",
+                  "en": "Everyone on board is presumed dead.",
+                  "uk": "Усі на борту вважаються загиблими."
+                }
+              },
+              {
+                "id": "b",
+                "correct": true,
+                "text": {
+                  "sv": "18 överlevde, två allvarligt skadade.",
+                  "en": "18 survived, two seriously injured.",
+                  "uk": "18 вижили, двоє тяжко поранені."
+                }
+              },
+              {
+                "id": "c",
+                "correct": false,
+                "text": {
+                  "sv": "Ursprunget är fastställt till Ryssland.",
+                  "en": "The origin has been established as Russia.",
+                  "uk": "Походження встановлено: Росія."
+                }
+              },
+              {
+                "id": "d",
+                "correct": false,
+                "text": {
+                  "sv": "Sökningen pågår fortfarande.",
+                  "en": "The search is still under way.",
+                  "uk": "Пошук ще триває."
+                }
+              }
+            ]
+          },
+          {
+            "id": "nq-2026-10-07-5",
+            "prompt": {
+              "sv": "Vad är pausen i skolkortet till för, enligt texten?",
+              "en": "What is the school card's pause for, according to the text?",
+              "uk": "Для чого пауза в шкільній картці, згідно з текстом?"
+            },
+            "explanation": {
+              "sv": "Kortet skiljer kartan från budet. Först säkerhetsutrustning, sedan fart. Ingen avkastning utlovas.",
+              "en": "The card separates the map from the bid. Safety gear first, then speed. No return is promised.",
+              "uk": "Картка відділяє карту від заявки. Спочатку захист, потім швидкість. Дохідність не обіцяється."
+            },
+            "options": [
+              {
+                "id": "a",
+                "correct": false,
+                "text": {
+                  "sv": "Att lägga ett bud i mFRR samma dag.",
+                  "en": "To place an mFRR bid the same day.",
+                  "uk": "Подати заявку mFRR того ж дня."
+                }
+              },
+              {
+                "id": "b",
+                "correct": false,
+                "text": {
+                  "sv": "En garanti för nästa elpris.",
+                  "en": "A guarantee of the next power price.",
+                  "uk": "Гарантія наступної ціни електроенергії."
+                }
+              },
+              {
+                "id": "c",
+                "correct": true,
+                "text": {
+                  "sv": "Först kartan och säkerheten, sedan ett övningsbeslut. Inte ett bud.",
+                  "en": "First the map and the safety gear, then a practice decision. Not a bid.",
+                  "uk": "Спочатку карта і захист, потім навчальне рішення. Не заявка."
+                }
+              },
+              {
+                "id": "d",
+                "correct": false,
+                "text": {
+                  "sv": "Att hoppa över lektionen.",
+                  "en": "To skip the lesson.",
+                  "uk": "Пропустити урок."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
     {
       "id": "2026-09-28",
       "date": "2026-09-28",

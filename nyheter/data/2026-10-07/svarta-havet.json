@@ -1,0 +1,31 @@
+{
+  "edition": "2026-10-07",
+  "date": "2026-10-07",
+  "dateLabel": {
+    "sv": "7 oktober 2026"
+  },
+  "slug": "svarta-havet",
+  "order": 5,
+  "translations": {
+    "sv": {
+      "title": "Inga överlevande utanför Bulgarien",
+      "ingress": "Sökningen avslutad. Besättningen på det sjunkna fartyget antas omkommen. 18 räddades från det andra.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Bulgarien har avslutat sök- och räddningsinsatsen efter tisdagens drönaranfall mot två handelsfartyg i landets ekonomiska zon. Det sjunkna fartyget hade ett tiotal ombord; de antas omkomna."
+        },
+        {
+          "type": "p",
+          "text": "De **18** på det andra fartyget överlevde, två allvarligt skadade. Ursprunget är inte fastställt."
+        }
+      ]
+    }
+  },
+  "hiddenSources": [
+    {
+      "label": "Göteborgs-Posten",
+      "href": "https://www.gp.se/nyheter/varlden/inga-overlevare-i-fartygsattack-utanfor-bulgarien.b4e0a702-c1ac-585d-bbfe-5cd39881c37f"
+    }
+  ]
+}

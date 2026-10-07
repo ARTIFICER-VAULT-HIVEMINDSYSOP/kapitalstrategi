@@ -1,0 +1,46 @@
+{
+  "edition": "2026-10-07",
+  "date": "2026-10-07",
+  "dateLabel": {
+    "sv": "7 oktober 2026"
+  },
+  "slug": "balans",
+  "order": 1,
+  "translations": {
+    "sv": {
+      "title": "Stark rädsla på Svenska kraftnät — inte ett driftlarm",
+      "ingress": "DN: åtta anonyma chefer beskriver en tystnadskultur sedan Maja Lundbäck tillträdde.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "DN: åtta anonyma chefer beskriver en tystnadskultur sedan Maja Lundbäck tillträdde som generaldirektör för ungefär två månader sedan. En källa: stark rädsla för att göra fel, bli utskälld, vara ärlig, och en känsla av att vara övervakad. Larmen ska ha nått styrelse och fack. En hög chef slutar, fler uppges överväga att gå. Lundbäck tar anklagelserna på allvar men kommenterar inte anonyma uppgifter."
+        },
+        {
+          "type": "p",
+          "text": "Kopplingen hit är köparen, inte bråket. Svenska kraftnät handlar upp **FCR**, **aFRR** och **mFRR**. Ett virtuellt kraftverk samlar batteri, last och små produktioner så att de kan bjudas in via en **BSP**. Förkvalificering krävs."
+        },
+        {
+          "type": "p",
+          "text": "Från 22 juni kan budväljaren lämna upp till **70 MW** mFRR oaktiverat per kvart om priset är för högt. I fjärde kvartalet skärs nedreglering dagtid från **325** till **275 MW**. Larmet visar inte att reserverna uteblir, och det är inget bud från oss."
+        }
+      ]
+    }
+  },
+  "hiddenSources": [
+    {
+      "label": "DN: Interna larm",
+      "href": "https://www.dn.se/sverige/interna-larm-om-missforhallanden-pa-svenska-kraftnat/"
+    },
+    {
+      "label": "Omni",
+      "href": "https://omni.se/anstallda-pa-svenska-kraftnat-slar-larm-stark-radsla/a/Pgpk7e"
+    },
+    {
+      "label": "Svenska kraftnät: FCR, aFRR, mFRR",
+      "href": "https://www.svk.se/en/stakeholders-portal/electricity-market/provision-of-ancillary-services/become-a-provider-of-ancillary-services/provide-fcr-afrr-or-mfrr/"
+    }
+  ],
+  "category": {
+    "sv": "Balans"
+  }
+}

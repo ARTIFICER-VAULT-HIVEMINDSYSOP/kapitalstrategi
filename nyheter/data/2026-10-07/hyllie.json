@@ -1,0 +1,31 @@
+{
+  "edition": "2026-10-07",
+  "date": "2026-10-07",
+  "dateLabel": {
+    "sv": "7 oktober 2026"
+  },
+  "slug": "hyllie",
+  "order": 3,
+  "translations": {
+    "sv": {
+      "title": "Polisinsats i Hyllie",
+      "ingress": "Grovt brott vid en matbutik i Hyllie. En person skadad, en misstänkt frihetsberövad.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Flera patruller är vid en matbutik i **Hyllie** i Malmö efter ett grovt brott. En person är förd till sjukhus, skadeläget är oklart. En misstänkt är frihetsberövad."
+        },
+        {
+          "type": "p",
+          "text": "TV4 uppger att en kvinna knivhuggits; polisen bekräftar inte det. Ingen fara för allmänheten, enligt polisen. Knivmannen vid slottet är ett annat ärende, i Stockholm, och redan anhållen."
+        }
+      ]
+    }
+  },
+  "hiddenSources": [
+    {
+      "label": "Aftonbladet",
+      "href": "https://www.aftonbladet.se/nyheter/a/jvQjnA/grovt-brott-i-malmo-en-gripen"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "edition": "2026-10-07",
+  "date": "2026-10-07",
+  "dateLabel": {
+    "sv": "7 oktober 2026"
+  },
+  "slug": "inflation",
+  "order": 2,
+  "translations": {
+    "sv": {
+      "title": "Inflationen lyfts av energin",
+      "ingress": "Preliminär KPIF 1,5 procent i september, från 0,7 i augusti. Utan energi stilla på 0,5.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "SCB:s preliminära snabb-KPI visar att **KPIF** steg till **1,5 procent** i september, från 0,7 i augusti. **KPI** gick från 0,3 till **1,1 procent**. Rensat för energi stod KPIF still på **0,5 procent**."
+        },
+        {
+          "type": "p",
+          "text": "Målet är 2 procent. Siffrorna är preliminära; det definitiva utfallet kommer den **14 oktober**. En novemberhöjning är bankernas huvudspår, inte ett beslut."
+        }
+      ]
+    }
+  },
+  "hiddenSources": [
+    {
+      "label": "SCB snabb-KPI september 2026",
+      "href": "https://www.scb.se/hitta-statistik/statistik-efter-amne/priser-och-ekonomiska-tendenser/priser/konsumentprisindex-kpi/pong/statistiknyhet/snabb-kpi-september-2026/"
+    }
+  ]
+}

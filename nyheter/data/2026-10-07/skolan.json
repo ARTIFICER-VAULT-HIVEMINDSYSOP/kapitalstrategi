@@ -1,0 +1,32 @@
+{
+  "edition": "2026-10-07",
+  "date": "2026-10-07",
+  "dateLabel": {
+    "sv": "7 oktober 2026"
+  },
+  "slug": "skolan",
+  "order": 6,
+  "translations": {
+    "sv": {
+      "title": "Prova först · skolan",
+      "ingress": "Först kartan. Sedan ett övningsbeslut. Ingen avkastning utlovas.",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Robban: först säkerhetsutrustning. Sedan fart."
+        },
+        {
+          "type": "p",
+          "text": "**SKOLA** — Tradingskolan: [Tradingskolan](/tradingskolan)"
+        },
+        {
+          "type": "p",
+          "text": "Kraftnätskortet är en karta över köparen, FCR, aFRR och mFRR. Det är inte ett bud. Escrow sköts av tredjepart."
+        }
+      ]
+    }
+  },
+  "category": {
+    "sv": "Skolan"
+  }
+}
