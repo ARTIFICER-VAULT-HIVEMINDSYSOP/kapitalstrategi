@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-07",
+  "title": "Nyhetsbrev",
+  "dateLabel": "7 oktober 2026",
+  "subtitle": "Moskvas bränsle | Svarta havet | Ukrainsk export | Drönarindustri",
+  "closingNote": "Utgåvan är ett läge, inte en order. Det som inte är officiellt bekräftat står som sådant.",
+  "sections": [
+    {
+      "category": "OLJA",
+      "cards": [
+        {
+          "title": "Moskvas bränsle är målet",
+          "body": "Natten 5–6 oktober skickade Ukraina omkring 650 drönare mot Moskva och regionen, den största enskilda vågen hittills enligt borgmästare Sergej Sobjanin. Luftförsvaret uppger 185 nedskjutningar över regionen och 105 på inflygning. Två döda och nio skadade, 47 hus skadade, enligt guvernör Andrej Vorobjov. Flygplatserna stängdes tillfälligt och öppnade efter klockan 05.\nDet som spelar roll för bränsleflödet är Volodarskaja, Transnefts största oljelager i regionen, ungefär 3 miljoner ton bensin, fotogen och diesel om året, och knutpunkten som matar Vnukovo, Domodedovo och Sjeremetjevo. Branden är belagd av bilder och oberoende kanaler, inte av ett ryskt medgivande. Sexton dagar tidigare träffades Gazprom Nefts raffinaderi i Kapotnja, som täcker runt 40 procent av Moskvas bränslemarknad. RBC-Ukraina säger att raffineringen där stoppades.\nImplikation: kampanjen har flyttat från raffinaderier till logistiken som håller huvudstaden och flyget igång. Även om lagret repareras snabbt tvingar varje våg upp kostnaden för luftförsvar, stänger flygplatser och äter av jetbränslelagret. Det som inte bekräftats officiellt är skadans varaktighet, inte att anfallet skedde.",
+          "stats": [
+            {"label": "Drönarvåg", "value": "ca 650"},
+            {"label": "Volodarskaja", "value": "ca 3 mn ton/år"}
+          ]
+        }
+      ]
+    },
+    {
+      "category": "SJÖFART",
+      "cards": [
+        {
+          "title": "Drönare mot handelsfartyg i bulgarisk zon",
+          "body": "Tidigt den 6 oktober, omkring klockan 03, träffade luft- och sjödrönare två handelsfartyg ungefär 70 sjömil öster om Byala, inne i NATO-landet Bulgariens exklusiva ekonomiska zon. Första gången sjöfart där angrips.\nDet togolesiska lastfartyget Alfa Watan, turkiskägt och på väg norrut mot Sulina, sjönk. Besättningen saknas. Det palauflaggade spannmålsfartyget Able, med vete, tog eld. Alla 18 räddades av färjan Dioscuria: elva turkar och sju indier. Två skadades allvarligt. En mekaniker har brännskador på 45 procent av kroppen.\nPremiärminister Rumen Radev kallade det ett brott mot sjörätten. Ursprunget utreds. Zelenskyj lade skulden på Ryssland. Moskva har inte kommenterat. Samma dygn sade ryska transportministeriet att ukrainska sjödrönare träffat ett liberianskflaggat tankfartyg utanför Sotji.\nImplikation: kriget har gått från ukrainska hamnar till civil sjöfart i en NATO-medlems ekonomiska zon. Londonmarknaden lade området på sin högrisklista för mindre än tre veckor sedan. Premierna stiger. Ekonomisk zon är inte territorium, så artikel 5 är inte aktuell. Spannmål och olja delar nu samma riskkorridor.",
+          "stats": [
+            {"label": "Alfa Watan", "value": "sänkt, besättning saknas"},
+            {"label": "Able", "value": "18 räddade"}
+          ]
+        }
+      ]
+    },
+    {
+      "category": "FÖRSVAR",
+      "cards": [
+        {
+          "title": "Ukraina som licensgivare, inte bara mottagare",
+          "body": "Beskedet är från 8 februari, inte en invigning den här veckan. Zelenskyj sade att tio exportcenter för ukrainsk försvarsteknik ska vara igång i Europa under 2026, i Baltikum och Nordeuropa. Första säljkontoren pekades ut som Berlin och Köpenhamn. En tysk lina för ukrainska drönare skulle vara igång i mitten av februari. Linor gick redan i Storbritannien. I november 2025 licensierades interceptor-drönaren Octopus till brittiska försvarsministeriet.\nDen 1 juli antog regeringen resolution 875: registrerade tillverkare får förhandla med allierade utan det gamla förhandstillståndet. I augusti var centren fortfarande tillkännagivanden. I september sade vapentillverkarrådet att inte ett enda exporttillstånd hade utfärdats under den nya ordningens första månad.\nImplikation: skriv inte att tio center är öppna. Kyiv har bytt modell, från mottagare till licensgivare. Flaskhalsen är tillstånd och bemannade kontor, inte teknik. Den hållbara modellen är licens att bygga ukrainsk design inne i allierat land.",
+          "stats": [
+            {"label": "Center 2026", "value": "10 utlovade"},
+            {"label": "Tillstånd sep", "value": "inga utfärdade"}
+          ]
+        },
+        {
+          "title": "Volym nu, wingman sen",
+          "body": "Samel-90 i Samokov har sedan 2024 en lina för SAMJET, en Shahed-lik loitering munition med schweiziska ALIDRONE. Fabriksreportaget från oktober 2025: omkring 50 i månaden, kapacitet att tredubbla, mindre elektrisk variant runt 100 km. Buntar Aerospace i Kyiv tar in 16 miljoner dollar, totalt 30. Sedan juli kan en operatör flyga Buntar-3 över internet på hundratals kilometer. Northrops YFQ-48A Talon Blue flög autonomt 3 oktober i Mojave. Flygvapnet har produktionskontrakt med General Atomics och Anduril, inte Northrop, och siktar på minst 500 Collaborative Combat Aircraft till 2032. BAE får Lockheed-order på telekrigssviten AN/ASQ-239 till F-35 lot 20–22 plus retrofit. Värde hemligt. Över 1 500 system levererade.\nImplikation: Europa och USA svarar med två spår som inte möts. Billiga engångsdrönare kan fältas i år. Autonoma wingmen är ett 2032-mål. Den som har båda sätter tempot.",
+          "stats": [
+            {"label": "Buntar", "value": "16 mn USD, totalt 30"},
+            {"label": "Talon Blue", "value": "första flygning 3 okt"}
+          ]
+        }
+      ]
+    },
+    {
+      "category": "RISK",
+      "cards": [
+        {
+          "title": "Två olyckor som är tillgänglighet, inte taktik",
+          "body": "En MQ-4C Triton stod 3 oktober av banan vid Naval Station Mayport, bana 5, mot St. Johns River. Foto från TheIntelFrog. Marinen har inte sagt när, om det var start eller landning, eller skadeläget. Ingen ombord. En overrun är ett tillgänglighetsproblem tills marinen säger att planet är avskrivet.\nSamma vecka sköt en rysk Su-35 ner en egen Mi-8 över Voronezj när den flyttades undan ett ukrainskt drönaranfall. Tre döda. Först pekade kanalerna på markluftvärn. Det var jaktplan. The Insider räknade minst 17 egna flygplan förlorade till vådabekämpning till slutet av 2025. Igenkänning brister när egna och fientliga mål blandas i samma korridor.",
+          "stats": [
+            {"label": "Triton", "value": "av banan, orsak okänd"},
+            {"label": "Mi-8", "value": "eget mål, tre döda"}
+          ]
+        }
+      ]
+    }
+  ]
+}
