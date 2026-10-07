@@ -2,9 +2,22 @@
   "date": "2026-10-07",
   "title": "Nyhetsbrev",
   "dateLabel": "7 oktober 2026",
-  "subtitle": "Inflation | Hyllie | Hormuz | Svarta havet",
-  "closingNote": "Utgåvan är ett läge, inte en order. Det som inte är officiellt bekräftat står som sådant. Samma format i morgon, om inte ekonomi, utrikes eller politik ska väga tyngre.",
+  "subtitle": "Svenska kraftnät | Inflation | Hyllie | Hormuz",
+  "closingNote": "Utgåvan är ett läge, inte en order. Kraftnätskortet är ett ledningslarm, inte ett bud. Skolan först. Ingen avkastning utlovas.",
   "sections": [
+    {
+      "category": "BALANS",
+      "cards": [
+        {
+          "title": "Stark rädsla på Svenska kraftnät — inte ett driftlarm",
+          "body": "DN: åtta anonyma chefer beskriver en tystnadskultur sedan Maja Lundbäck tillträdde som generaldirektör för ungefär två månader sedan. En källa: stark rädsla för att göra fel, bli utskälld, vara ärlig, och en känsla av att vara övervakad. Larmen ska ha nått styrelse och fack. En hög chef slutar, fler uppges överväga att gå. Lundbäck tar anklagelserna på allvar men kommenterar inte anonyma uppgifter.\nKopplingen hit är köparen, inte bråket. Svenska kraftnät handlar upp FCR, aFRR och mFRR. Ett virtuellt kraftverk samlar batteri, last och små produktioner så att de kan bjudas in via en BSP. Förkvalificering krävs. Från 22 juni kan budväljaren lämna upp till 70 MW mFRR oaktiverat per kvart om priset är för högt. I fjärde kvartalet skärs nedreglering dagtid från 325 till 275 MW. Larmet visar inte att reserverna uteblir, och det är inget bud från oss.",
+          "stats": [
+            {"label": "Köpare", "value": "Svenska kraftnät"},
+            {"label": "Vägen in", "value": "BSP, inte rubriken"}
+          ]
+        }
+      ]
+    },
     {
       "category": "SVERIGE",
       "cards": [
