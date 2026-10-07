@@ -1,12 +1,19 @@
 /**
  * Språk för Trade Rider. Samma nyckel som sajtens språkväxlare: localStorage «app.language»
- * (sv | en | uk). Svenska är standard. All synlig text hämtas härifrån.
+ * (sv | no | en | uk). Svenska är standard. All synlig text hämtas härifrån.
+ * Norska (bokmål, html lang «nb») ligger i i18n-no.js. NO som valts på sajten
+ * («ig.app.language») gäller också här.
  */
 import { HINTS } from './keys.js'
 import { MODES, instructionText } from './orientation.js'
+import { no, NO_NAME } from './i18n-no.js'
 
 export const LANG_KEY = 'app.language'
-export const LANGS = ['sv', 'en', 'uk']
+/** Sajtens gemensamma nyckel (JSON-sträng). */
+export const SITE_LANG_KEY = 'ig.app.language'
+export const LANGS = ['sv', 'no', 'en', 'uk']
+const HTML_LANG = { sv: 'sv', no: 'nb', en: 'en', uk: 'uk' }
+const isLang = (v) => LANGS.includes(v)
 
 const sv = {
   'lang.group': 'Språk',
@@ -1448,7 +1455,11 @@ const uk = {
   'tra.canvas': 'Ракета, що летить зліва направо вздовж симульованої лінії',
 }
 
-export const STRINGS = { sv, en, uk }
+sv['lang.no'] = NO_NAME.sv
+en['lang.no'] = NO_NAME.en
+uk['lang.no'] = NO_NAME.uk
+
+export const STRINGS = { sv, no, en, uk }
 
 const listeners = new Set()
 let priceKey = null
@@ -1458,20 +1469,33 @@ export function setPriceKey(key) {
   priceKey = key || null
 }
 
-function readStored() {
+function readSite() {
   try {
-    const v = localStorage.getItem(LANG_KEY)
-    if (v === 'sv' || v === 'en' || v === 'uk') return v
+    return JSON.parse(localStorage.getItem(SITE_LANG_KEY) || 'null')
+  } catch {
+    return null
+  }
+}
+
+function readStored() {
+  let v = null
+  try {
+    v = localStorage.getItem(LANG_KEY)
   } catch {
     /* storage unavailable */
   }
-  return 'sv'
+  /* Sajtens växel kan spara NO i ig.app.language men 'sv' i app.language. Då gäller NO. */
+  if ((v === 'sv' || !isLang(v)) && readSite() === 'no') return 'no'
+  return isLang(v) ? v : 'sv'
 }
 
 function persistQuery() {
   try {
     const q = new URLSearchParams(location.search).get('lang')
-    if (q === 'sv' || q === 'en' || q === 'uk') localStorage.setItem(LANG_KEY, q)
+    if (isLang(q)) {
+      localStorage.setItem(LANG_KEY, q)
+      localStorage.setItem(SITE_LANG_KEY, JSON.stringify(q))
+    }
   } catch {
     /* ignore */
   }
@@ -1487,9 +1511,16 @@ function emit() {
 }
 
 export function setLang(lang) {
-  if (lang !== 'sv' && lang !== 'en' && lang !== 'uk') return
+  if (!isLang(lang)) return
   try {
     localStorage.setItem(LANG_KEY, lang)
+    localStorage.setItem(SITE_LANG_KEY, JSON.stringify(lang))
+  } catch {
+    /* ignore */
+  }
+  try {
+    const site = typeof window !== 'undefined' ? window.KSLang : null
+    if (site && typeof site.set === 'function' && site.get() !== lang) site.set(lang, { fromApp: true })
   } catch {
     /* ignore */
   }
@@ -1518,7 +1549,7 @@ export function helpLine(mode, orientation) {
 
 export function applyHtmlLang() {
   if (typeof document === 'undefined') return
-  document.documentElement.lang = getLang()
+  document.documentElement.lang = HTML_LANG[getLang()] || 'sv'
 }
 
 export function applyStatic(root = typeof document !== 'undefined' ? document : null) {
@@ -1555,9 +1586,9 @@ export function mountSwitcher(host) {
     b.type = 'button'
     b.className = 'lang-switcher-btn'
     b.setAttribute('data-lang', id)
-    b.setAttribute('lang', id === 'uk' ? 'uk' : id)
+    b.setAttribute('lang', HTML_LANG[id])
     b.textContent = id === 'uk' ? 'UA' : id.toUpperCase()
-    b.title = t(id === 'sv' ? 'lang.sv' : id === 'en' ? 'lang.en' : 'lang.uk')
+    b.title = t('lang.' + id)
     b.addEventListener('click', () => setLang(id))
     box.appendChild(b)
   }
@@ -1573,7 +1604,8 @@ function installWindow() {
   window.__trSubscribeLang = (cb) => onLang(cb)
   window.__trHint = (action) => HINTS['1p'][action] ?? ''
   window.__trHelp = () => helpLine('1p')
-  window.__trSetLang = setLang
+  /* Sajtens växel skickar 'sv' när NO är valt (äldre mappning). Då gäller NO. */
+  window.__trSetLang = (lang) => setLang(lang === 'sv' && readSite() === 'no' ? 'no' : lang)
 }
 
 installWindow()
@@ -1581,7 +1613,7 @@ if (typeof window !== 'undefined') {
   persistQuery()
   applyHtmlLang()
   window.addEventListener('storage', (e) => {
-    if (e.key === LANG_KEY) emit()
+    if (e.key === LANG_KEY || e.key === SITE_LANG_KEY) emit()
   })
 }
 
