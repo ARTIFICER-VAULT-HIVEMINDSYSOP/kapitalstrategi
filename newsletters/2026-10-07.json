@@ -2,65 +2,116 @@
   "date": "2026-10-07",
   "title": "Nyhetsbrev",
   "dateLabel": "7 oktober 2026",
-  "subtitle": "Moskvas bränsle | Svarta havet | Ukrainsk export | Drönarindustri",
-  "closingNote": "Utgåvan är ett läge, inte en order. Det som inte är officiellt bekräftat står som sådant.",
+  "subtitle": "Inflation | Hyllie | Hormuz | Svarta havet",
+  "closingNote": "Utgåvan är ett läge, inte en order. Det som inte är officiellt bekräftat står som sådant. Samma format i morgon, om inte ekonomi, utrikes eller politik ska väga tyngre.",
   "sections": [
     {
-      "category": "OLJA",
+      "category": "SVERIGE",
       "cards": [
         {
-          "title": "Moskvas bränsle är målet",
-          "body": "Natten 5–6 oktober skickade Ukraina omkring 650 drönare mot Moskva och regionen, den största enskilda vågen hittills enligt borgmästare Sergej Sobjanin. Luftförsvaret uppger 185 nedskjutningar över regionen och 105 på inflygning. Två döda och nio skadade, 47 hus skadade, enligt guvernör Andrej Vorobjov. Flygplatserna stängdes tillfälligt och öppnade efter klockan 05.\nDet som spelar roll för bränsleflödet är Volodarskaja, Transnefts största oljelager i regionen, ungefär 3 miljoner ton bensin, fotogen och diesel om året, och knutpunkten som matar Vnukovo, Domodedovo och Sjeremetjevo. Branden är belagd av bilder och oberoende kanaler, inte av ett ryskt medgivande. Sexton dagar tidigare träffades Gazprom Nefts raffinaderi i Kapotnja, som täcker runt 40 procent av Moskvas bränslemarknad. RBC-Ukraina säger att raffineringen där stoppades.\nImplikation: kampanjen har flyttat från raffinaderier till logistiken som håller huvudstaden och flyget igång. Även om lagret repareras snabbt tvingar varje våg upp kostnaden för luftförsvar, stänger flygplatser och äter av jetbränslelagret. Det som inte bekräftats officiellt är skadans varaktighet, inte att anfallet skedde.",
+          "title": "Inflationen lyfts av energin",
+          "body": "SCB:s preliminära snabb-KPI visar att KPIF steg till 1,5 procent i september, från 0,7 i augusti. KPI gick från 0,3 till 1,1 procent. Rensat för energi stod KPIF still på 0,5 procent. Målet är 2 procent. Siffrorna är preliminära; det definitiva utfallet kommer den 14 oktober. En novemberhöjning är bankernas huvudspår, inte ett beslut.",
           "stats": [
-            {"label": "Drönarvåg", "value": "ca 650"},
-            {"label": "Volodarskaja", "value": "ca 3 mn ton/år"}
-          ]
-        }
-      ]
-    },
-    {
-      "category": "SJÖFART",
-      "cards": [
-        {
-          "title": "Drönare mot handelsfartyg i bulgarisk zon",
-          "body": "Tidigt den 6 oktober, omkring klockan 03, träffade luft- och sjödrönare två handelsfartyg ungefär 70 sjömil öster om Byala, inne i NATO-landet Bulgariens exklusiva ekonomiska zon. Första gången sjöfart där angrips.\nDet togolesiska lastfartyget Alfa Watan, turkiskägt och på väg norrut mot Sulina, sjönk. Besättningen saknas. Det palauflaggade spannmålsfartyget Able, med vete, tog eld. Alla 18 räddades av färjan Dioscuria: elva turkar och sju indier. Två skadades allvarligt. En mekaniker har brännskador på 45 procent av kroppen.\nPremiärminister Rumen Radev kallade det ett brott mot sjörätten. Ursprunget utreds. Zelenskyj lade skulden på Ryssland. Moskva har inte kommenterat. Samma dygn sade ryska transportministeriet att ukrainska sjödrönare träffat ett liberianskflaggat tankfartyg utanför Sotji.\nImplikation: kriget har gått från ukrainska hamnar till civil sjöfart i en NATO-medlems ekonomiska zon. Londonmarknaden lade området på sin högrisklista för mindre än tre veckor sedan. Premierna stiger. Ekonomisk zon är inte territorium, så artikel 5 är inte aktuell. Spannmål och olja delar nu samma riskkorridor.",
-          "stats": [
-            {"label": "Alfa Watan", "value": "sänkt, besättning saknas"},
-            {"label": "Able", "value": "18 räddade"}
-          ]
-        }
-      ]
-    },
-    {
-      "category": "FÖRSVAR",
-      "cards": [
-        {
-          "title": "Ukraina som licensgivare, inte bara mottagare",
-          "body": "Beskedet är från 8 februari, inte en invigning den här veckan. Zelenskyj sade att tio exportcenter för ukrainsk försvarsteknik ska vara igång i Europa under 2026, i Baltikum och Nordeuropa. Första säljkontoren pekades ut som Berlin och Köpenhamn. En tysk lina för ukrainska drönare skulle vara igång i mitten av februari. Linor gick redan i Storbritannien. I november 2025 licensierades interceptor-drönaren Octopus till brittiska försvarsministeriet.\nDen 1 juli antog regeringen resolution 875: registrerade tillverkare får förhandla med allierade utan det gamla förhandstillståndet. I augusti var centren fortfarande tillkännagivanden. I september sade vapentillverkarrådet att inte ett enda exporttillstånd hade utfärdats under den nya ordningens första månad.\nImplikation: skriv inte att tio center är öppna. Kyiv har bytt modell, från mottagare till licensgivare. Flaskhalsen är tillstånd och bemannade kontor, inte teknik. Den hållbara modellen är licens att bygga ukrainsk design inne i allierat land.",
-          "stats": [
-            {"label": "Center 2026", "value": "10 utlovade"},
-            {"label": "Tillstånd sep", "value": "inga utfärdade"}
+            {"label": "KPIF", "value": "1,5 %"},
+            {"label": "Utan energi", "value": "0,5 %"}
           ]
         },
         {
-          "title": "Volym nu, wingman sen",
-          "body": "Samel-90 i Samokov har sedan 2024 en lina för SAMJET, en Shahed-lik loitering munition med schweiziska ALIDRONE. Fabriksreportaget från oktober 2025: omkring 50 i månaden, kapacitet att tredubbla, mindre elektrisk variant runt 100 km. Buntar Aerospace i Kyiv tar in 16 miljoner dollar, totalt 30. Sedan juli kan en operatör flyga Buntar-3 över internet på hundratals kilometer. Northrops YFQ-48A Talon Blue flög autonomt 3 oktober i Mojave. Flygvapnet har produktionskontrakt med General Atomics och Anduril, inte Northrop, och siktar på minst 500 Collaborative Combat Aircraft till 2032. BAE får Lockheed-order på telekrigssviten AN/ASQ-239 till F-35 lot 20–22 plus retrofit. Värde hemligt. Över 1 500 system levererade.\nImplikation: Europa och USA svarar med två spår som inte möts. Billiga engångsdrönare kan fältas i år. Autonoma wingmen är ett 2032-mål. Den som har båda sätter tempot.",
+          "title": "Polisinsats i Hyllie",
+          "body": "Flera patruller är vid en matbutik i Hyllie i Malmö efter ett grovt brott. En person är förd till sjukhus, skadeläget är oklart. En misstänkt är frihetsberövad. TV4 uppger att en kvinna knivhuggits; polisen bekräftar inte det. Ingen fara för allmänheten, enligt polisen. Knivmannen vid slottet är ett annat ärende, i Stockholm, och redan anhållen.",
           "stats": [
-            {"label": "Buntar", "value": "16 mn USD, totalt 30"},
-            {"label": "Talon Blue", "value": "första flygning 3 okt"}
+            {"label": "Plats", "value": "Hyllie"},
+            {"label": "Misstänkt", "value": "frihetsberövad"}
+          ]
+        },
+        {
+          "title": "Tre demonstrationer på treårsdagen",
+          "body": "Stockholmspolisen har en särskild resurs för kvällens tre demonstrationer, på treårsdagen av Hamas attack mot Israel 2023. Två är till stöd för Israel, på Mynttorget och vid ambassaden. Den tredje är den ordinarie onsdagsdemonstrationen för Palestina, som råkar infalla samma dag.",
+          "stats": [
+            {"label": "Resurs", "value": "dialogpoliser"},
+            {"label": "Demonstrationer", "value": "tre"}
+          ]
+        },
+        {
+          "title": "Förbifartens första etapp 6 december",
+          "body": "Trafikverket öppnar sträckan Häggvik–Hjulsta den 6 december. Hela E4 Förbifart Stockholm, mellan Häggvik och Kungens kurva, planeras till 2030.",
+          "stats": [
+            {"label": "Öppning", "value": "6 december"},
+            {"label": "Hela leden", "value": "2030"}
+          ]
+        },
+        {
+          "title": "Säpo och al-Amoudi",
+          "body": "SVT:s Uppdrag granskning uppger att Säpo, trots tidigare varningar, inte utredde tipsen om Preems tidigare ägare Mohammed al-Amoudi fullt ut. En underrättelserapport pekar ut honom för finansiering av al-Qaida. Han förnekar uppgifterna via sin pressavdelning.",
+          "stats": [
+            {"label": "Källa", "value": "Uppdrag granskning"},
+            {"label": "Svar", "value": "förnekar"}
           ]
         }
       ]
     },
     {
-      "category": "RISK",
+      "category": "VÄRLDEN",
       "cards": [
         {
-          "title": "Två olyckor som är tillgänglighet, inte taktik",
-          "body": "En MQ-4C Triton stod 3 oktober av banan vid Naval Station Mayport, bana 5, mot St. Johns River. Foto från TheIntelFrog. Marinen har inte sagt när, om det var start eller landning, eller skadeläget. Ingen ombord. En overrun är ett tillgänglighetsproblem tills marinen säger att planet är avskrivet.\nSamma vecka sköt en rysk Su-35 ner en egen Mi-8 över Voronezj när den flyttades undan ett ukrainskt drönaranfall. Tre döda. Först pekade kanalerna på markluftvärn. Det var jaktplan. The Insider räknade minst 17 egna flygplan förlorade till vådabekämpning till slutet av 2025. Igenkänning brister när egna och fientliga mål blandas i samma korridor.",
+          "title": "Hormuz fortfarande begränsat",
+          "body": "Sundet är fortfarande kraftigt begränsat, och USA:s blockad ligger kvar. Varningar om bordning och våld om fartygen inte följer anvisningarna gick ut när blockaden infördes i april, enligt Wall Street Journal. Iran hävdar egen kontroll och kräver tillstånd.",
           "stats": [
-            {"label": "Triton", "value": "av banan, orsak okänd"},
-            {"label": "Mi-8", "value": "eget mål, tre döda"}
+            {"label": "Status", "value": "begränsat"},
+            {"label": "Blockad", "value": "kvar"}
+          ]
+        },
+        {
+          "title": "Inga överlevande utanför Bulgarien",
+          "body": "Bulgarien har avslutat sök- och räddningsinsatsen efter tisdagens drönaranfall mot två handelsfartyg i landets ekonomiska zon. Det sjunkna fartyget hade ett tiotal ombord; de antas omkomna. De 18 på det andra fartyget överlevde, två allvarligt skadade. Ursprunget är inte fastställt.",
+          "stats": [
+            {"label": "Sänkt fartyg", "value": "besättning antas död"},
+            {"label": "Andra fartyget", "value": "18 räddade"}
+          ]
+        },
+        {
+          "title": "Frankrike stoppar granater",
+          "body": "Över 260 000 demonstrerade i går enligt inrikesdepartementet, 450 000 enligt arrangörerna. Distraktionsgranater stoppas vid skolprotester efter att en 15-årig pojke i Lens förlorat en hand. Polisen säger att han plockade upp granaten; eleverna säger att den träffade honom.",
+          "stats": [
+            {"label": "Myndighet", "value": "260 000+"},
+            {"label": "Arrangörer", "value": "450 000"}
+          ]
+        },
+        {
+          "title": "Kim hyllar Putins krig",
+          "body": "Kim Jong-un gratulerar Putin på 74-årsdagen och kallar kriget i Ukraina ett heligt rättvisekrig, enligt nordkoreanska statsmedier.",
+          "stats": [
+            {"label": "Putin", "value": "74 år"},
+            {"label": "Formulering", "value": "heligt krig"}
+          ]
+        }
+      ]
+    },
+    {
+      "category": "ANNAT",
+      "cards": [
+        {
+          "title": "Fisknät från Värmland",
+          "body": "Länsstyrelsen Värmland samlar in fisknät 9–23 oktober. Zaporizjzja har bett om dem som skydd mot drönare.",
+          "stats": [
+            {"label": "Insamling", "value": "9–23 okt"},
+            {"label": "Mottagare", "value": "Zaporizjzja"}
+          ]
+        },
+        {
+          "title": "Damlandslaget åtta",
+          "body": "Damlandslaget är åtta på världsrankningen, efter att ha toppat den efter VM-bronset 2023. Playoff mot Litauen inleds borta på fredag.",
+          "stats": [
+            {"label": "Rankning", "value": "8"},
+            {"label": "Playoff", "value": "Litauen, fredag"}
+          ]
+        },
+        {
+          "title": "Mot trafiken på E4",
+          "body": "En äldre kvinna körde mot trafiken på E4 mellan Torsvik och Jönköping i över en timme under natten. Polisen fick stopp. Ingen skadades. Hon misstänks för vårdslöshet i trafik.",
+          "stats": [
+            {"label": "Tid", "value": "över en timme"},
+            {"label": "Skadade", "value": "inga"}
           ]
         }
       ]
