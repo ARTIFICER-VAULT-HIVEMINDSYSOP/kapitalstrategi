@@ -21,7 +21,8 @@
             var saved = JSON.parse(raw);
             if (saved === "light" || saved === "dark") theme = saved;
           }
-        } catch (e) {}
+        } catch (e) {
+        }
         document.documentElement.setAttribute("data-theme", theme);
         var meta = document.querySelector('meta[name="theme-color"]);
         if (meta) meta.setAttribute("content", theme === "light" ? "#f4efe4" : "#0a1628");
@@ -102,12 +103,6 @@
           <p class="name">KS33 AB · Kapital och Strategi</p>
           <p><a href="mailto:finance@kapitalstrategi.com">finance@kapitalstrategi.com</a></p>
           <p>kapitalstrategi.com</p>
-        </div>
-
-        <div class="ks-signature">
-          <p>Dokumentet avser KS33 AB, organisationsnummer 559592-6352.</p>
-          <p>Datum: 8 oktober 2026</p>
-          <p>Underskrift: ______________________________</p>
         </div>
       </article>
     </main>
