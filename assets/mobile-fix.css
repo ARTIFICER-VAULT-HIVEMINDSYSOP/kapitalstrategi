@@ -1,0 +1,89 @@
+/*
+ * Mobilfix: Tradingskolans kampanjkort ("Rekommenderas" / "Skola först").
+ *
+ * Felet: mobilregeln i index-*.css riktade sig mot `.school-kampanj` men
+ * desktopregeln använder `.school-kampanj.card` (högre specificitet), så
+ * kortet behöll två kolumner även på telefon: bilden tog ~2/3 av bredden
+ * och texten trycktes ihop i en smal högerkolumn (2–3 ord per rad, långa
+ * ord klipptes).
+ *
+ * Här: under 768px staplas kortet – bilden överst i full bredd (16:9) och
+ * texten under i en egen panel. Allt ligger i en media query, så desktop
+ * (> 768px) är helt oförändrad.
+ */
+@media (max-width: 768px) {
+  .school-kampanj.card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0;
+    margin-bottom: 1.25rem;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .school-kampanj.card .school-kampanj-img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    min-height: 0;
+    max-height: none;
+    object-fit: cover;
+    object-position: center;
+    border: 1px solid var(--border);
+    border-radius: var(--radius, 12px);
+    display: block;
+  }
+
+  .school-kampanj.card .school-kampanj-copy {
+    gap: 0.65rem;
+    padding: 1.35rem 1.25rem 1.4rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius, 12px);
+  }
+
+  .school-kampanj.card .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .school-kampanj.card .school-kampanj-title {
+    font-size: 28px;
+    line-height: 1.15;
+    margin: 0 0 0.15rem;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .school-kampanj.card .school-kampanj-lead {
+    max-width: 60ch;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .school-kampanj.card .school-kampanj-actions {
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+  }
+
+  .school-kampanj.card .school-kampanj-actions .btn {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 1.15rem;
+    font-size: 15px;
+  }
+
+  .school-kampanj.card .school-kampanj-credit {
+    margin-top: 0.35rem;
+    font-size: 12px;
+  }
+}
