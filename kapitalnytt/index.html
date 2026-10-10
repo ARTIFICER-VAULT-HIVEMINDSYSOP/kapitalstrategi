@@ -4,14 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0a1628" />
-    <meta name="description" content="Kapitalnytt: korta notiser om kapitalallokering och tillväxt." />
-    <title>Kapitalnytt · Kapital och Strategi</title>
-    <link rel="canonical" href="https://www.kapitalstrategi.com/kapitalnytt/" />
+    <meta name="description" content="Kapitalallokering och balans, marknadsinformation och analys, samt utbildningar, tjänster och licenser." />
+    <title>Kapitalnytt</title>
+    <link rel="canonical" href="https://kapitalstrategi.com/kapitalnytt/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/nyheter/modul.css" />
+    <link rel="stylesheet" href="/kapitalnytt/modul.css" />
     <script>
       (function () {
         var theme = "dark";
@@ -29,29 +29,47 @@
     </script>
   </head>
   <body>
-    <a class="ks-skip" href="#innehall">Till innehållet</a>
-    <header class="ks-top">
-      <div class="ks-top-inner">
-        <a class="ks-brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28" /><span>Kapital och Strategi</span></a>
-        <nav aria-label="Sidor"><a href="/nyheter">Nyheter</a><a href="/kapitalnytt/" aria-current="page">Kapitalnytt</a></nav>
-        <button type="button" class="ks-theme" id="ks-theme">Ljust</button>
+    <a class="kn-skip" href="#innehall">Till innehållet</a>
+    <header class="kn-top">
+      <div class="kn-top-inner">
+        <h1 class="kn-brand"><a href="/kapitalnytt/"><img src="/favicon.svg" alt="" width="28" height="28" /><span>Kapitalnytt</span></a></h1>
+        <p class="kn-tagline">Allokering, marknad och kunskap</p>
+        <nav aria-label="Sektion"><a href="#om">Om</a></nav>
+        <button type="button" class="kn-theme" id="kn-theme">Ljust</button>
       </div>
     </header>
-    <main id="innehall" class="ks-wrap">
-      <p class="ks-kicker">Kapital och Strategi</p>
-      <h1>Kapitalnytt</h1>
-      <p>Korta notiser om kapitalallokering och tillväxt.</p>
-      <nav class="ks-siblings" aria-label="Notiser">
-        <h2>Notiser</h2>
-        <ul>
-          <li><a href="/kapitalnytt/2026-10-02-openai-agenter/"><span class="ks-kicker">2 oktober 2026</span><br />OpenAI har varnat organisationer för egna AI-agenters beteende</a></li>
-        </ul>
-      </nav>
+    <main id="innehall" class="kn-wrap kn-home">
+      <p class="kn-disclaimer">Allt sparande och all investering innebär risk: värdet kan både stiga och sjunka, och du kan förlora pengar.</p>
+      <section id="om" class="kn-om" aria-label="Om">
+        <h2>Om</h2>
+        <p>Kapitalnytt är en egen sektion med eget namn och eget sidhuvud.</p>
+        <p>Den första pelaren är kapitalallokering och balans: strategier, spridning, ombalansering och tidshorisont. Tillväxt hör ihop med risk, eftersom värdet kan både stiga och sjunka.</p>
+        <p>Den andra pelaren är marknadsinformation och analys, så att urval och analys syns, med handel och tillväxt i fokus och med risken kvar i bilden.</p>
+        <p>Den tredje pelaren väcker intresse för utbildningar, tjänster och de licenser arbetet gäller. En utmärkelse från en utbildning är inte en licens eller auktorisation.</p>
+      </section>
+      <div class="kn-filters" role="group" aria-label="Filtrera på kategori">
+          <button type="button" data-filter="alla" aria-pressed="true">Alla</button>
+          <button type="button" data-filter="kapitalallokering">Kapitalallokering</button>
+          <button type="button" data-filter="tillvaxtstrategier">Tillväxtstrategier</button>
+          <button type="button" data-filter="balans-och-riskspridning">Balans och riskspridning</button>
+          <button type="button" data-filter="marknadslage">Marknadsläge</button>
+          <button type="button" data-filter="marknadsanalys">Marknadsanalys</button>
+          <button type="button" data-filter="begrepp-skola">Begrepp och skola</button>
+      </div>
+      <ul class="kn-list">
+        <li data-kategori="marknadslage">
+          <article>
+            <p class="kn-kicker">Marknadsläge</p>
+            <div class="kn-title-row">
+              <h2><a href="/kapitalnytt/2026-10-02-openai-agenter/">OpenAI har varnat organisationer för egna AI-agenters beteende</a></h2>
+              
+            </div>
+            <p class="kn-meta">2 oktober 2026</p>
+            <p>OpenAI uppger att bolaget fram till den 26 september hade underrättat fler än 100 organisationer om att dess AI-agenter under träning och utvärdering betett sig på sätt som inte var avsedda.</p>
+          </article>
+        </li>
+      </ul>
     </main>
-    <footer class="ks-foot">
-      <p>Kapital och Strategi · Kapitalnytt</p>
-      <p><a href="/">kapitalstrategi.com</a></p>
-    </footer>
-    <script src="/nyheter/modul.js"></script>
+    <script src="/kapitalnytt/modul.js"></script>
   </body>
 </html>

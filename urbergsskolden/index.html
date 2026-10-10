@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="sv" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a1628" />
+    <meta name="description" content="Den fennoskandiska urbergsskölden som lång grund för historia, fornminnen, jakt, natur, råvaror, energi och resurshushållning." />
+    <title>Urbergsskölden</title>
+    <link rel="canonical" href="https://kapitalstrategi.com/urbergsskolden/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/urbergsskolden/modul.css" />
+    <script>
+      (function () {
+        var theme = "dark";
+        try {
+          var raw = localStorage.getItem("ig.app.theme");
+          if (raw != null) {
+            var saved = JSON.parse(raw);
+            if (saved === "light" || saved === "dark") theme = saved;
+          }
+        } catch (e) {}
+        document.documentElement.setAttribute("data-theme", theme);
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute("content", theme === "light" ? "#f4efe4" : "#0a1628");
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="kn-skip" href="#innehall">Till innehållet</a>
+    <header class="kn-top">
+      <div class="kn-top-inner">
+        <h1 class="kn-brand"><a href="/urbergsskolden/"><img src="/favicon.svg" alt="" width="28" height="28" /><span>Urbergsskölden</span></a></h1>
+        <p class="kn-tagline">Den fennoskandiska urbergsskölden</p>
+        <nav aria-label="Sektion"><a href="#om">Om</a></nav>
+        <button type="button" class="kn-theme" id="kn-theme">Ljust</button>
+      </div>
+    </header>
+    <main id="innehall" class="kn-wrap kn-home">
+      <section id="om" class="kn-om" aria-label="Om">
+        <h2>Om</h2>
+        <p>Urbergsskölden är en egen sektion om den fennoskandiska urbergsskölden.</p>
+        <p>Urberget är den långa grunden för historia och fornminnen, för jakt, natur och råvarornas kretslopp, och för energi och resurshushållning.</p>
+        <p>Sektionen kan också ta upp nyheter som hör ihop med historia och med värden bortom enbart fysiska tillgångar.</p>
+        <p>Fakta om berget källhänvisas, till exempel till SGU. Fornminnen skrivs utan koordinater. Jakt hålls inom laglig jakt och viltvård.</p>
+        <p>När ett inlägg rör placering av kapital sätts finans, och då syns risktexten. Historia, natur och energi utan den markeringen har ingen sådan text.</p>
+      </section>
+      <div class="kn-filters" role="group" aria-label="Filtrera på kategori">
+          <button type="button" data-filter="alla" aria-pressed="true">Alla</button>
+          <button type="button" data-filter="historia-och-fornminnen">Historia och fornminnen</button>
+          <button type="button" data-filter="jakt-och-natur">Jakt och natur</button>
+          <button type="button" data-filter="ravaror-och-kretslopp">Råvaror och kretslopp</button>
+          <button type="button" data-filter="energi-och-resurshushallning">Energi och resurshushållning</button>
+          <button type="button" data-filter="historienyheter">Historienyheter</button>
+      </div>
+      <p class="kn-empty">Inga publicerade inlägg ännu.</p>
+    </main>
+    <script src="/urbergsskolden/modul.js"></script>
+  </body>
+</html>
