@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<script>
+try{if(sessionStorage.getItem('pv.ok')!=='1')location.replace('../');}catch(e){}
+</script>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Vikingbåt iter5 — 2P</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:transparent;color:#e9eef6;font:14px/1.4 system-ui,Segoe UI,sans-serif}
+#c{display:block;width:100vw;height:100vh;outline:none;background:transparent;position:relative;z-index:3}
+header{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;justify-content:space-between;
+  padding:10px 16px;background:linear-gradient(180deg,rgba(5,10,20,.92),transparent);pointer-events:none}
+header h1{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#c9a227}
+header .hint{color:#8d99ad;font-size:12px}
+#runpanel{position:fixed;top:44px;left:12px;z-index:6;max-width:260px;padding:10px 12px;
+  border:1px solid rgba(196,60,44,.55);border-radius:8px;
+  background:linear-gradient(160deg,rgba(40,28,18,.88),rgba(12,16,24,.82));
+  color:#e8dcc8;font-size:12px;pointer-events:none}
+#runpanel .t{color:#c43c2c;font:600 11px monospace;letter-spacing:.12em;margin-bottom:6px}
+#runpanel b{color:#e8c547}
+#dbg{position:fixed;right:12px;top:44px;z-index:30;min-width:280px;max-width:380px;padding:10px 12px;
+  background:#000;border:2px solid #0ff;border-radius:8px;color:#0ff;
+  font:12px/1.45 ui-monospace,Consolas,monospace;white-space:pre-wrap;pointer-events:none}
+#dbg{display:none}
+html.vbdebug #dbg{display:block}
+#hud{position:fixed;left:12px;bottom:12px;right:12px;display:flex;gap:12px;z-index:5;pointer-events:none}
+.card{flex:1;max-width:360px;padding:10px 12px;border-radius:12px;background:rgba(8,16,28,.7);border:1px solid rgba(196,60,44,.35)}
+.card.p2{margin-left:auto;border-color:rgba(130,205,255,.45)}
+.card b{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.card.p1 b{color:#e8c547}.card.p2 b{color:#82cdff}
+.card .mode{font-weight:700;margin:2px 0}.card span{color:#8d99ad;font-size:12px}
+#face{position:fixed;bottom:110px;left:12px;right:12px;display:flex;gap:16px;z-index:5;pointer-events:none;align-items:flex-end}
+.face{width:120px;height:120px;border-radius:16px;border:2px solid #e8c547;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:28px;background:rgba(0,0,0,.25);transition:box-shadow .12s,transform .12s,border-color .12s;overflow:hidden;position:relative}
+.face.p2{margin-left:auto;border-color:#82cdff}
+.face.hit-tp{box-shadow:0 0 22px 6px rgba(80,255,140,.9);transform:scale(1.08)}
+.face.hit-sl{box-shadow:0 0 22px 6px rgba(255,60,60,.9);transform:scale(0.94) rotate(-3deg)}
+.face.mood-up{box-shadow:0 0 14px 3px rgba(80,255,160,.55);transform:scale(1.04)}
+.face.mood-ok{box-shadow:0 0 10px 2px rgba(232,197,71,.35)}
+.face.mood-risk{box-shadow:0 0 14px 3px rgba(255,160,40,.55);transform:scale(1.02)}
+.face.mood-down{box-shadow:0 0 14px 3px rgba(255,80,80,.5);transform:scale(0.97)}
+.face.mood-flat{opacity:.9}
+.face .face-label{position:absolute;bottom:2px;left:0;right:0;text-align:center;font:700 9px/1.1 system-ui;color:#ffe066;
+  text-shadow:0 1px 2px #000;pointer-events:none;padding:0 2px}
+.face.p2 .face-label{color:#9fe0ff}
+.face img{width:100%;height:100%;object-fit:contain;object-position:center 20%;display:block;background:transparent!important;
+  transition:transform .15s,filter .15s}
+.face.mood-up img{transform:translateY(-2px) scale(1.06);filter:brightness(1.12) saturate(1.15)}
+.face.mood-down img,.face.hit-sl img{filter:brightness(.85) saturate(.8)}
+.face.mood-risk img{animation:face-pulse .7s ease-in-out infinite}
+@keyframes face-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@media (prefers-reduced-motion:reduce){.face.mood-risk img{animation:none}}
+.face-flag{position:absolute;top:6px;right:6px;width:28px;height:20px;border-radius:3px;overflow:hidden;
+  box-shadow:0 1px 4px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.25);z-index:2}
+.face-flag svg{display:block;width:100%;height:100%}
+.face .face-flag-cap{position:absolute;top:6px;left:6px;font:800 9px/1 system-ui;color:#fff;
+  text-shadow:0 1px 2px #000;background:rgba(0,0,0,.45);padding:2px 5px;border-radius:4px;z-index:2}
+.face.p1 .face-flag-cap{color:#ffe066}
+.face.p2 .face-flag-cap{color:#9fe0ff}
+#start{position:fixed;inset:0;z-index:15;display:flex;align-items:center;justify-content:center;
+  background:rgba(5,10,20,.75)}
+#start .panel{text-align:center;padding:28px 32px;border:1px solid rgba(196,60,44,.45);border-radius:16px;background:rgba(10,20,36,.95);max-width:540px}
+#start h2{color:#e8c547;margin-bottom:8px}
+#start p{color:#8d99ad;font-size:13px;margin-bottom:12px}
+#start .mode-row{display:flex;gap:10px;justify-content:center;margin-bottom:14px}
+#start .mode-row button{pointer-events:auto;border:1px solid #8d99ad;background:transparent;color:#8d99ad;
+  padding:8px 18px;border-radius:999px;font:600 13px system-ui;cursor:pointer}
+#start .mode-row button.active{border-color:#e8c547;color:#e8c547;background:rgba(232,197,71,.12)}
+#start #go{pointer-events:auto;border:1px solid #e8c547;background:transparent;color:#e8c547;
+  padding:10px 22px;border-radius:999px;font:600 13px system-ui;cursor:pointer}
+#rune-ring{position:fixed;inset:0;width:100vw;height:100vh;z-index:8;pointer-events:none;overflow:visible}
+#rune-ring .rune-text{fill:#e8c547;font:700 2.4px/1 ui-monospace,"Segoe UI Historic",monospace;
+  letter-spacing:0.4px;opacity:0.95;transform-origin:50% 50%;animation:rune-spin 120s linear infinite;filter:drop-shadow(0 0 1.2px #c43c2c)}
+#rune-ring .rune-axes{opacity:0.95}
+@keyframes rune-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){#rune-ring .rune-text{animation:none}}
+#mascot{position:fixed;top:auto;bottom:210px;left:auto;right:16px;z-index:6;width:72px;height:108px;pointer-events:none;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.55));opacity:.9;transition:opacity .25s}
+#mascot.hidden{opacity:0;visibility:hidden;pointer-events:none}
+#mascot img{width:100%;height:100%;object-fit:contain;background:transparent;mix-blend-mode:normal}
+/* img background transparent sprites */
+.face img,.dragon-intro{background:transparent!important}
+#start .panel{max-width:640px}
+#start .dragon-intro{width:160px;height:240px;margin:0 auto 12px;object-fit:contain;
+  filter:drop-shadow(0 8px 18px rgba(0,0,0,.55));animation:dragon-bob 2.4s ease-in-out infinite}
+@keyframes dragon-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@media (prefers-reduced-motion:reduce){#start .dragon-intro{animation:none}}
+#start .wayfinder{margin:12px 0;padding:12px;border:1px solid rgba(232,197,71,.45);border-radius:12px;
+  background:rgba(8,16,28,.65);text-align:left}
+#start .wayfinder .wf-title{display:flex;align-items:center;gap:8px;color:#e8c547;font-weight:700;margin-bottom:8px}
+#start .wayfinder .wf-compass{font-size:22px;line-height:1}
+#start .wf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#start .wf-card{padding:8px 10px;border-radius:8px;border:1px solid rgba(232,197,71,.35);background:rgba(0,0,0,.35)}
+#start .wf-card.p2{border-color:rgba(130,205,255,.45)}
+#start .wf-card b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+#start .wf-card.p1 b{color:#e8c547}#start .wf-card.p2 b{color:#82cdff}
+#start .wf-row{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:4px 0;font-size:12px;color:#c9d2e0}
+#start .wf-row button{pointer-events:auto;border:1px solid #8d99ad;background:rgba(255,255,255,.06);color:#e9eef6;
+  width:28px;height:28px;border-radius:6px;cursor:pointer;font-weight:700}
+#start .wf-row .val{min-width:72px;text-align:center;font-variant-numeric:tabular-nums;color:#ffe066}
+#start .wf-hint{color:#8d99ad;font-size:11px;margin-top:8px}
+#start .wf-field.active{outline:1px solid #e8c547;border-radius:4px;background:rgba(232,197,71,.08)}
+</style>
+</head>
+<body>
+<header>
+  <h1>PrimeVerse · Vikingbåt iter5</h1>
+  <div class="hint">Gul: A/D · W/S · Blå: ←→ · ↑↓ · SL/TP via vägvisare före start · F flat · Esc</div>
+</header>
+<div id="runpanel">
+  <div class="t">ᚱ ᚢ ᚾ · Indikatorer</div>
+  <div><b>Bollinger</b> Tunnelhav: övre vågor→berg · mitt = hav · nedre vågor→strand</div>
+  <div><b>Faser</b> Lobbyn → Gränslandet (båda) → Tävling</div>
+  <div><b>MACD</b> Stjärnreflektioner i havet</div>
+  <div><b>Kurslinje</b> LIVE BTCUSDT (Binance) · gul · höger om panel</div>
+  <div id="livepx" style="color:#ffe066;font-weight:700;margin-top:4px">Kurs: hämtar…</div>
+  <div><b>Terräng</b> <span id="terrLabel">Flat</span> (F växlar till Vanlig)</div>
+  <div><b>Runring</b> X/Y runt kanten (kompassros)</div>
+  <div style="color:#8d99ad;margin-top:6px;font-size:11px">Övning — inte råd</div>
+</div>
+<img id="mascot" src="viking-dragon-boat-SE.png?v=alpha3" alt="Trädrake" title="Syns i lobbyn — döljs vid start"/>
+<script>if(/[?&]debug\b/.test(location.search))document.documentElement.classList.add("vbdebug");</script>
+<div id="dbg">DEBUG startar…\n(tryck valfri tangent)</div>
+<svg id="rune-ring" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+  <defs>
+    <path id="rune-circle" d="M 50,50 m -46,0 a 46,46 0 1,1 92,0 a 46,46 0 1,1 -92,0"/>
+  </defs>
+  <circle class="rune-compass-ring" cx="50" cy="50" r="46" fill="none" stroke="#c43c2c" stroke-width="0.35" opacity="0.85"/>
+  <circle cx="50" cy="50" r="43.5" fill="none" stroke="#e8c547" stroke-width="0.15" opacity="0.55" stroke-dasharray="1.2 1.8"/>
+  <line x1="50" y1="4" x2="50" y2="10" stroke="#ffe066" stroke-width="0.4"/>
+  <line x1="50" y1="90" x2="50" y2="96" stroke="#ffe066" stroke-width="0.4"/>
+  <line x1="4" y1="50" x2="10" y2="50" stroke="#ffe066" stroke-width="0.4"/>
+  <line x1="90" y1="50" x2="96" y2="50" stroke="#ffe066" stroke-width="0.4"/>
+  <text class="rune-text">
+    <textPath href="#rune-circle" startOffset="0%">
+      ᛫ ᚨᚢᛊᛏᚱ · X→ · ᛏᛁᛗᛁ · ᛫ ᚾᛟᚱᚦ · Y↑ · ᛈᚱᛁᛊ · ᛫ ᚹᛖᛊᛏ · X← · ᛫ ᛊᚢᚦ · Y↓ · ᛒᛒ · ᛫ ᛗᚨᚲᛞ · ᛫ ᚱᚢᚾᚨ · ᛫ ᚠᛃᛖᛚᛚ · ᛫ ᚺᚨᚠ · ᛫
+      ᛫ AUST X→ TIMI ᛫ NORD Y↑ PRIS ᛫ VEST X← ᛫ SUD Y↓ BB ᛫ MACD ᛫ RUNA ᛫ FJELL ᛫ HAV ᛫
+    </textPath>
+  </text>
+  <g class="rune-axes" fill="#ffe066" font-size="2.6" font-family="ui-monospace,monospace" style="filter:drop-shadow(0 0 1px #c43c2c)">
+    <text x="50" y="5.5" text-anchor="middle">ᚾ Y↑</text>
+    <text x="50" y="97.5" text-anchor="middle">ᛊ Y↓</text>
+    <text x="96.5" y="51.2" text-anchor="middle">ᚨ X→</text>
+    <text x="3.5" y="51.2" text-anchor="middle">ᚹ X←</text>
+  </g>
+</svg>
+<canvas id="c" tabindex="0"></canvas>
+<div id="face">
+  <div class="face p1 mood-flat" id="face1">
+    <span class="face-flag-cap">SE</span>
+    <span class="face-flag" title="Sverige" aria-label="Svensk flagga">
+      <svg viewBox="0 0 16 10" xmlns="http://www.w3.org/2000/svg"><rect width="16" height="10" fill="#006AA7"/><rect x="5" width="2" height="10" fill="#FECC00"/><rect y="4" width="16" height="2" fill="#FECC00"/></svg>
+    </span>
+    <img id="face1img" src="faces/face-p1-medgang.png?v=hd2" alt="P1"/>
+    <span class="face-label" id="face1lab">FLAT</span>
+  </div>
+  <div class="face p2 mood-flat" id="face2">
+    <span class="face-flag-cap">NO</span>
+    <span class="face-flag" title="Norge" aria-label="Norsk flagga">
+      <svg viewBox="0 0 22 16" xmlns="http://www.w3.org/2000/svg"><rect width="22" height="16" fill="#BA0C2F"/><rect x="6" width="4" height="16" fill="#fff"/><rect y="6" width="22" height="4" fill="#fff"/><rect x="7" width="2" height="16" fill="#00205B"/><rect y="7" width="22" height="2" fill="#00205B"/></svg>
+    </span>
+    <img id="face2img" src="faces/face-p2-medgang.png?v=hd2" alt="P2"/>
+    <span class="face-label" id="face2lab">FLAT</span>
+  </div>
+</div>
+<div id="hud">
+  <div class="card p1"><b>Gul · WASD · SE-drake</b><div class="mode" id="m1">FLAT</div><span id="s1">—</span></div>
+  <div class="card p2"><b>Blå · pilar · NO-drake</b><div class="mode" id="m2">FLAT</div><span id="s2">—</span></div>
+</div>
+<div id="start"><div class="panel">
+  <img class="dragon-intro" src="viking-dragon-boat-SE.png?v=alpha3" alt="Trädrake intro"/>
+  <h2>Trädraken · Hav möter sand</h2>
+  <p>32-bitars trädrake: Gul = SE-segel · Blå = NO-segel.<br>
+  <b>Kurslinjen</b> = strandlinjen där vatten möter sand (live BTCUSDT).<br>
+  Startar i <b>Flat</b>. <b>Gränslandet</b> = historik → live på kursen.<br>
+  Sätt <b>SL/TP</b> i vägvisaren innan start — låses under race.</p>
+  <div class="mode-row">
+    <button type="button" id="btnNormal">Vanlig</button>
+    <button type="button" id="btnFlat" class="active">Flat</button>
+  </div>
+  <div class="wayfinder" id="wayfinder">
+    <div class="wf-title"><span class="wf-compass">🧭</span> Vägvisare · Stop loss &amp; Take profit</div>
+    <div class="wf-grid">
+      <div class="wf-card p1">
+        <b>Gul P1 · W/S bläddra · A/D fält</b>
+        <div class="wf-row wf-field" data-p="0" data-f="sl"><span>SL</span>
+          <button type="button" data-act="p0-sl-">−</button>
+          <span class="val" id="wf-sl0">—</span>
+          <button type="button" data-act="p0-sl+">+</button></div>
+        <div class="wf-row wf-field" data-p="0" data-f="tp"><span>TP</span>
+          <button type="button" data-act="p0-tp-">−</button>
+          <span class="val" id="wf-tp0">—</span>
+          <button type="button" data-act="p0-tp+">+</button></div>
+      </div>
+      <div class="wf-card p2">
+        <b>Blå P2 · ↑↓ bläddra · ←→ fält</b>
+        <div class="wf-row wf-field" data-p="1" data-f="sl"><span>SL</span>
+          <button type="button" data-act="p1-sl-">−</button>
+          <span class="val" id="wf-sl1">—</span>
+          <button type="button" data-act="p1-sl+">+</button></div>
+        <div class="wf-row wf-field" data-p="1" data-f="tp"><span>TP</span>
+          <button type="button" data-act="p1-tp-">−</button>
+          <span class="val" id="wf-tp1">—</span>
+          <button type="button" data-act="p1-tp+">+</button></div>
+      </div>
+    </div>
+    <div class="wf-hint">Upp/ner justerar aktiv nivå · Enter aktiverar · nivåerna syns som markörer i sanden</div>
+  </div>
+  <button id="go" type="button">Aktivera vägvisare &amp; starta</button>
+</div></div>
+<script>
+/* ===== KEYS FIRST — before any heavy work ===== */
+window.__VBKEYS = Object.create(null);
+window.__VBDBG = { last:'—', boat:'—', n:0, buySell:'—' };
+(function bindKeysEarly(){
+  function codeOf(e){
+    if (e.code && e.code !== 'Unidentified') return e.code;
+    var k = e.key;
+    if (k === 'ArrowLeft' || k === 'Left') return 'ArrowLeft';
+    if (k === 'ArrowRight' || k === 'Right') return 'ArrowRight';
+    if (k === 'ArrowUp' || k === 'Up') return 'ArrowUp';
+    if (k === 'ArrowDown' || k === 'Down') return 'ArrowDown';
+    if (k === 'a' || k === 'A') return 'KeyA';
+    if (k === 'd' || k === 'D') return 'KeyD';
+    if (k === 'w' || k === 'W') return 'KeyW';
+    if (k === 's' || k === 'S') return 'KeyS';
+    if (k === 'q' || k === 'Q') return 'KeyQ';
+    if (k === 'e' || k === 'E') return 'KeyE';
+    if (k === 'r' || k === 'R') return 'KeyR';
+    if (k === 't' || k === 'T') return 'KeyT';
+    if (k === 'f' || k === 'F') return 'KeyF';
+    if (k === 'Escape' || k === 'Esc') return 'Escape';
+    if (k === ' ' ) return 'Space';
+    if (k === '[') return 'BracketLeft';
+    if (k === ']') return 'BracketRight';
+    if (k === ';' || k === ':') return 'Semicolon';
+    if (k === "'" || k === '"') return 'Quote';
+    return e.code || ('key:' + k);
+  }
+  function onKey(e, down){
+    var code = codeOf(e);
+    var trap = code.indexOf('Arrow') === 0 || code.indexOf('Key') === 0 || code === 'Space' || code === 'Escape'
+      || code === 'BracketLeft' || code === 'BracketRight' || code === 'Semicolon' || code === 'Quote';
+    if (trap) { e.preventDefault(); e.stopPropagation(); }
+    window.__VBKEYS[code] = down;
+    if (down) {
+      window.__VBDBG.n++;
+      window.__VBDBG.last = code + ' key=' + (e.key || '?');
+      if (code === 'KeyA' || code === 'KeyD') window.__VBDBG.boat = 'GUL hävstång/fart';
+      else if (code === 'KeyW') { window.__VBDBG.boat = 'GUL'; window.__VBDBG.buySell = 'GUL KÖP (W)'; }
+      else if (code === 'KeyS') { window.__VBDBG.boat = 'GUL'; window.__VBDBG.buySell = 'GUL SÄLJ (S)'; }
+      else if (code === 'ArrowLeft' || code === 'ArrowRight') window.__VBDBG.boat = 'BLÅ hävstång/fart';
+      else if (code === 'ArrowUp') { window.__VBDBG.boat = 'BLÅ'; window.__VBDBG.buySell = 'BLÅ KÖP (↑)'; }
+      else if (code === 'ArrowDown') { window.__VBDBG.boat = 'BLÅ'; window.__VBDBG.buySell = 'BLÅ SÄLJ (↓)'; }
+      else if (code === 'KeyQ' || code === 'KeyE') window.__VBDBG.boat = 'GUL SL';
+      else if (code === 'KeyR' || code === 'KeyT') window.__VBDBG.boat = 'GUL TP';
+      else if (code === 'BracketLeft' || code === 'BracketRight') window.__VBDBG.boat = 'BLÅ SL';
+      else if (code === 'Semicolon' || code === 'Quote') window.__VBDBG.boat = 'BLÅ TP';
+      else if (code === 'KeyF') window.__VBDBG.boat = 'FLAT toggle';
+      else window.__VBDBG.boat = 'annan';
+    }
+    var el = document.getElementById('dbg');
+    if (el) {
+      var K = window.__VBKEYS;
+      el.textContent =
+        'SENAST: ' + window.__VBDBG.last + '\n' +
+        'BÅT: ' + window.__VBDBG.boat + '\n' +
+        'KÖP/SÄLJ: ' + window.__VBDBG.buySell + '\n' +
+        'n=' + window.__VBDBG.n + '\n' +
+        'WASD: ' + !!(K.KeyW) + '/' + !!(K.KeyA) + '/' + !!(K.KeyS) + '/' + !!(K.KeyD) + '\n' +
+        'Pilar L/R/U/D: ' + !!(K.ArrowLeft) + '/' + !!(K.ArrowRight) + '/' + !!(K.ArrowUp) + '/' + !!(K.ArrowDown) + '\n' +
+        'focus: ' + ((document.activeElement && (document.activeElement.id || document.activeElement.tagName)) || '?') + '\n' +
+        'heartbeat ok';
+    }
+  }
+  window.addEventListener('keydown', function(e){ onKey(e, true); }, true);
+  window.addEventListener('keyup', function(e){ onKey(e, false); }, true);
+  document.addEventListener('keydown', function(e){ onKey(e, true); }, true);
+  document.addEventListener('keyup', function(e){ onKey(e, false); }, true);
+  setInterval(function(){
+    var el = document.getElementById('dbg');
+    if (!el) return;
+    if (el.textContent.indexOf('SENAST') === -1) {
+      el.textContent = 'DEBUG live · tryck tangent\nn=0\nheartbeat ' + new Date().toLocaleTimeString();
+    } else if (el.textContent.indexOf('heartbeat') !== -1) {
+      el.textContent = el.textContent.replace(/heartbeat.*/ , 'heartbeat ' + new Date().toLocaleTimeString());
+    }
+  }, 500);
+})();
+</script>
+<script>
+(function(){
+  function down(code){ return !!window.__VBKEYS[code]; }
+
+  var cv = document.getElementById('c');
+  var ctx = cv.getContext('2d');
+  var running = false, paused = false, t0 = 0, tick = 0;
+  var gamePhase = 'lobby'; // lobby (historik) | crossing | race (tävling)
+  var phaseFade = 0; // 1→0 visual veil during crossing
+  var GATE_X = 0.72; // fractional boat.x to reach Gränslandet
+  var worldScroll = 0; // meters-along-voyage for 3D parallax
+  function parallaxOf(depth){
+    // depth 0 = infinity (stars), 1 = foreground beach
+    return worldScroll * (0.05 + depth * 0.95);
+  }
+  function wrapX(x, w){
+    var m = ((x % w) + w) % w;
+    return m;
+  }
+  var SYMBOL = 'BTCUSDT';
+  var prices = [];
+  var candles = []; // {o,h,l,c} OHLC for sticks + vekar
+  var liveStatus = 'ansluter…';
+  var liveSource = 'Binance data-api';
+  var lastLiveAt = 0;
+  var terrainMode = 'flat'; // 'normal' | 'flat' — start flat
+  var fWasDown = false;
+  for (var i = 0; i < 60; i++) prices.push(0);
+
+  /* ---- 32-bit wood-dragon boat avatars (stable, no blink) ---- */
+  function loadCell(src){
+    var im = new Image();
+    im.decoding = 'async';
+    im.src = src;
+    return im;
+  }
+  function readyImg(im){
+    return im && im.complete && im.naturalWidth > 0;
+  }
+  var dragonSE = loadCell('viking-dragon-boat-SE.png?v=alpha3');
+  var dragonNO = loadCell('viking-dragon-boat-NO.png?v=alpha3');
+  var lastGoodGold = null;
+  var lastGoodCyan = null;
+  // Wayfinder pre-race state
+  var preRace = true;
+  var wfFocus = { p: 0, f: 'sl' }; // player 0/1, field sl/tp
+  var levelsLocked = false;
+  var _wfSeeded = false;
+
+  var boats = [
+    { x:0.28, y:0.50, vx:0, side:'FLAT', pnl:0, tint:'gold', flash:0, sl:null, tp:null, entry:null, faceFlash:0, faceHit:null, flag:'SE', lev:1, speed:1, wWas:false, sWas:false, practiced:false, histProgress:0, atGate:false },
+    { x:0.22, y:0.55, vx:0, side:'FLAT', pnl:0, tint:'cyan', flash:0, sl:null, tp:null, entry:null, faceFlash:0, faceHit:null, flag:'NO', lev:1, speed:1, upWas:false, dnWas:false, practiced:false, histProgress:0, atGate:false }
+  ];
+
+  function resize(){
+    var dpr = devicePixelRatio || 1;
+    cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
+    cv.style.width = innerWidth + 'px'; cv.style.height = innerHeight + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  addEventListener('resize', resize); resize();
+  cv.addEventListener('pointerdown', function(){ cv.focus(); });
+
+  function sma(arr, n){
+    if (arr.length < n) return null;
+    var s = 0; for (var i = arr.length - n; i < arr.length; i++) s += arr[i];
+    return s / n;
+  }
+  function stdev(arr, n, m){
+    var s = 0; for (var i = arr.length - n; i < arr.length; i++) s += Math.pow(arr[i] - m, 2);
+    return Math.sqrt(s / n);
+  }
+  function bands(){
+    var n = 20, m = sma(prices, n);
+    if (m == null) return { mid: prices[prices.length-1], up: prices[prices.length-1]+5, lo: prices[prices.length-1]-5 };
+    var sd = stdev(prices, n, m);
+    return { mid: m, up: m + 2 * sd, lo: m - 2 * sd };
+  }
+  function macdHist(){
+    var a = sma(prices, 12), b = sma(prices, 26);
+    if (a == null || b == null) return 0;
+    return a - b;
+  }
+  function priceToY(px, bb, h){
+    var span = Math.max(1e-6, bb.up - bb.lo);
+    var t = (px - bb.lo) / span;
+    // Upper ~38% = stjärnor + berg; tunnel; under ~32% = strand
+    var yTop = h * 0.38, yBot = h * 0.66;
+    return yBot - t * (yBot - yTop);
+  }
+  function yToPrice(y, bb, h){
+    var yTop = h * 0.38, yBot = h * 0.66;
+    var t = (yBot - y) / Math.max(1e-6, yBot - yTop);
+    return bb.lo + t * (bb.up - bb.lo);
+  }
+
+  function applyKlines(rows){
+    if (!rows || !rows.length) return;
+    candles = rows.map(function(k){
+      return {
+        o: parseFloat(k[1]),
+        h: parseFloat(k[2]),
+        l: parseFloat(k[3]),
+        c: parseFloat(k[4])
+      };
+    });
+    prices = candles.map(function(c){ return c.c; });
+    liveStatus = 'LIVE';
+    lastLiveAt = Date.now();
+    var el = document.getElementById('livepx');
+    var rsi = rsi14();
+    var hint = rsi == null ? '' : (rsi >= 70 ? ' · ÖVERSKÖPT' : rsi <= 30 ? ' · UNDERSKÖPT' : ' · RSI ' + rsi.toFixed(0));
+    if (el) el.textContent = SYMBOL + ' ' + prices[prices.length-1].toFixed(2) + ' · ' + liveSource + hint;
+    if (!_wfSeeded) { _wfSeeded = true; defaultLevelsFromPrice(); }
+    else if (!running) syncWayfinderUI();
+  }
+  function applyCloses(closes){
+    // fallback if only closes available
+    if (!closes || !closes.length) return;
+    prices = closes.slice();
+    candles = closes.map(function(c, i, arr){
+      var prev = i ? arr[i-1] : c;
+      var hi = Math.max(prev, c), lo = Math.min(prev, c);
+      return { o: prev, h: hi, l: lo, c: c };
+    });
+    liveStatus = 'LIVE';
+    lastLiveAt = Date.now();
+    var el = document.getElementById('livepx');
+    if (el) el.textContent = SYMBOL + ' ' + prices[prices.length-1].toFixed(2) + ' · ' + liveSource;
+    if (!_wfSeeded) { _wfSeeded = true; defaultLevelsFromPrice(); }
+    else if (!running) syncWayfinderUI();
+  }
+  function rsi14(){
+    if (prices.length < 16) return null;
+    var n = 14, gains = 0, losses = 0;
+    for (var i = prices.length - n; i < prices.length; i++) {
+      var d = prices[i] - prices[i - 1];
+      if (d >= 0) gains += d; else losses -= d;
+    }
+    if (losses < 1e-12) return 100;
+    var rs = (gains / n) / (losses / n);
+    return 100 - (100 / (1 + rs));
+  }
+  function fetchLive(){
+    var url = 'https://data-api.binance.vision/api/v3/klines?symbol=' + SYMBOL + '&interval=1m&limit=120';
+    fetch(url, { cache: 'no-store' })
+      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function(rows){ applyKlines(rows); })
+      .catch(function(err){
+        return fetch('https://api.binance.com/api/v3/klines?symbol=' + SYMBOL + '&interval=1m&limit=120', { cache: 'no-store' })
+          .then(function(r){ if (!r.ok) throw err; return r.json(); })
+          .then(function(rows){
+            applyKlines(rows);
+            liveSource = 'Binance api';
+          });
+      })
+      .catch(function(err){
+        liveStatus = 'FEL: ' + (err && err.message ? err.message : err) + ' — kontrollera nätverket';
+        var el = document.getElementById('livepx');
+        if (el) el.textContent = liveStatus;
+      });
+  }
+  fetchLive();
+  setInterval(fetchLive, 5000);
+
+  function setTerrain(mode){
+    terrainMode = mode === 'flat' ? 'flat' : 'normal';
+    var tl = document.getElementById('terrLabel');
+    if (tl) tl.textContent = terrainMode === 'flat' ? 'Flat' : 'Vanlig';
+    document.getElementById('btnNormal').classList.toggle('active', terrainMode === 'normal');
+    document.getElementById('btnFlat').classList.toggle('active', terrainMode === 'flat');
+  }
+  document.getElementById('btnNormal').onclick = function(){ setTerrain('normal'); };
+  document.getElementById('btnFlat').onclick = function(){ setTerrain('flat'); };
+
+  function defaultLevelsFromPrice(){
+    var bb = bands();
+    var price = prices[prices.length - 1] || bb.mid || 100;
+    if (!(price > 0)) price = 100;
+    var span = Math.max(20, (bb.up - bb.lo) || price * 0.01);
+    boats.forEach(function(b){
+      if (b.sl == null) b.sl = price - span * 0.45;
+      if (b.tp == null) b.tp = price + span * 0.55;
+    });
+    syncWayfinderUI();
+  }
+  function syncWayfinderUI(){
+    function fmt(v){ return v == null ? '—' : v.toFixed(0); }
+    var a;
+    a = document.getElementById('wf-sl0'); if (a) a.textContent = fmt(boats[0].sl);
+    a = document.getElementById('wf-tp0'); if (a) a.textContent = fmt(boats[0].tp);
+    a = document.getElementById('wf-sl1'); if (a) a.textContent = fmt(boats[1].sl);
+    a = document.getElementById('wf-tp1'); if (a) a.textContent = fmt(boats[1].tp);
+    document.querySelectorAll('#wayfinder .wf-field').forEach(function(el){
+      var on = +el.getAttribute('data-p') === wfFocus.p && el.getAttribute('data-f') === wfFocus.f;
+      el.classList.toggle('active', on);
+    });
+  }
+  function nudgeWayfinder(player, field, dir){
+    if (levelsLocked || running) return;
+    var price = prices[prices.length - 1] || bands().mid || 100;
+    var step = Math.max(5, Math.abs(price) * 0.00025);
+    var b = boats[player];
+    if (b[field] == null) b[field] = price;
+    b[field] += dir * step;
+    syncWayfinderUI();
+  }
+  function cycleFocus(player, dir){
+    if (levelsLocked || running) return;
+    wfFocus.p = player;
+    if (dir) wfFocus.f = wfFocus.f === 'sl' ? 'tp' : 'sl';
+    syncWayfinderUI();
+  }
+  document.getElementById('wayfinder').addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-act]');
+    if (!btn) return;
+    var act = btn.getAttribute('data-act');
+    // p0-sl+ etc
+    var m = /^p([01])-(sl|tp)([+-])$/.exec(act);
+    if (!m) return;
+    wfFocus.p = +m[1]; wfFocus.f = m[2];
+    nudgeWayfinder(+m[1], m[2], m[3] === '+' ? 1 : -1);
+  });
+  // wayfinder seeded via applyCloses
+
+  function midgard(g, w, h, now, yHoriz){
+    // Midgårdsormen — stiliserad RÖD runstensorm (Jelling/Rök), bobbar i vattnet
+    var bob = Math.sin(now * 0.0024) * (terrainMode === 'flat' ? 2 : 7);
+    var baseY = yHoriz - 10 + bob;
+    var amp = terrainMode === 'flat' ? 6 : 16;
+    g.save();
+    // body ribbon (thick red fill stroke)
+    g.beginPath();
+    for (var x = 0; x <= w; x += 4) {
+      var t = x / w;
+      var y = baseY
+        + Math.sin(t * Math.PI * 5 + now * 0.001) * amp
+        + Math.sin(t * Math.PI * 11) * (amp * 0.35);
+      if (x === 0) g.moveTo(x, y); else g.lineTo(x, y);
+    }
+    g.strokeStyle = '#8b1a1a';
+    g.lineWidth = 9; g.lineJoin = 'round'; g.lineCap = 'round'; g.stroke();
+    g.strokeStyle = '#c43c2c';
+    g.lineWidth = 5.5; g.stroke();
+    // interlace / knot dashes along body (runestone style)
+    g.setLineDash([5, 7]);
+    g.strokeStyle = 'rgba(255, 200, 160, 0.55)';
+    g.lineWidth = 1.6; g.stroke();
+    g.setLineDash([]);
+    // parallel twin strand (classic 8-shaped knot suggestion)
+    g.beginPath();
+    for (var x2 = 0; x2 <= w; x2 += 5) {
+      var t2 = x2 / w;
+      var y2 = baseY + 7
+        + Math.sin(t2 * Math.PI * 5 + now * 0.001 + 1.2) * (amp * 0.7)
+        + Math.sin(t2 * Math.PI * 9 + 0.5) * (amp * 0.25);
+      if (x2 === 0) g.moveTo(x2, y2); else g.lineTo(x2, y2);
+    }
+    g.strokeStyle = 'rgba(160, 30, 30, 0.75)';
+    g.lineWidth = 3.2; g.stroke();
+    g.setLineDash([3, 6]);
+    g.strokeStyle = 'rgba(255, 180, 140, 0.4)';
+    g.lineWidth = 1.2; g.stroke();
+    g.setLineDash([]);
+    // head (right side) — stylized beast head
+    var hx = w * 0.92, hy = baseY + Math.sin(0.92 * Math.PI * 5 + now * 0.001) * amp;
+    g.fillStyle = '#c43c2c';
+    g.beginPath();
+    g.ellipse(hx, hy, 14, 9, -0.3, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#5a1010';
+    g.beginPath(); g.arc(hx + 6, hy - 2, 2.2, 0, Math.PI * 2); g.fill(); // eye
+    g.strokeStyle = '#e8c547'; g.lineWidth = 1.2;
+    g.beginPath(); g.moveTo(hx + 10, hy); g.lineTo(hx + 18, hy - 4); g.stroke(); // snout tip
+    // tiny rune ticks on body segments
+    g.fillStyle = 'rgba(232,197,71,0.7)';
+    g.font = '9px ui-monospace,monospace';
+    for (var k = 0; k < 6; k++) {
+      var kx = w * (0.12 + k * 0.13);
+      var kt = kx / w;
+      var ky = baseY + Math.sin(kt * Math.PI * 5 + now * 0.001) * amp - 8;
+      g.fillText('ᛒ', kx, ky);
+    }
+    g.restore();
+  }
+  function starlink(g, w, h, now, hist){
+    var glow = hist >= 0 ? 'rgba(140,255,200,' : 'rgba(255,140,140,';
+    var off = parallaxOf(0.08);
+    for (var i = 0; i < 9; i++) {
+      var t = (now * 0.00004 + i * 0.08) % 1;
+      var sx = wrapX(t * w - off, w), sy = h * 0.07 + i * 3;
+      g.fillStyle = glow + (0.5 + Math.min(0.4, Math.abs(hist) * 0.05)) + ')';
+      g.fillRect(sx - 3, sy - 1, 6, 2);
+      g.fillStyle = '#dff'; g.beginPath(); g.arc(sx, sy, 1.2, 0, Math.PI * 2); g.fill();
+    }
+  }
+
+  function drawFjallFilled(g, w, yUp, now){
+    var jag = terrainMode === 'flat' ? 0.55 : 1.0;
+    var pFar = parallaxOf(0.22), pNear = parallaxOf(0.38);
+    g.save();
+    // Far mountains — tall, clearly visible behind water
+    g.beginPath();
+    g.moveTo(0, yUp + 8);
+    for (var x = 0; x <= w; x += 5) {
+      var peak = yUp - (70 + 120 * jag * Math.abs(Math.sin(x / w * 2.1 + 0.15))
+        + 55 * jag * Math.abs(Math.sin(x / w * 4.8 + 0.9))
+        + 25 * jag * Math.abs(Math.sin(x / w * 9.3)));
+      if (terrainMode === 'flat') peak = yUp - (55 + 28 * Math.abs(Math.sin(x / w * Math.PI * 1.2)));
+      g.lineTo(x, Math.max(4, peak));
+    }
+    g.lineTo(w, yUp + 8); g.lineTo(0, yUp + 8); g.closePath();
+    var grad = g.createLinearGradient(0, 0, 0, yUp);
+    grad.addColorStop(0, 'rgba(18,8,28,0.95)');
+    grad.addColorStop(0.4, 'rgba(58,28,78,0.92)');
+    grad.addColorStop(0.75, 'rgba(90,40,110,0.88)');
+    grad.addColorStop(1, 'rgba(30,20,40,0.55)');
+    g.fillStyle = grad; g.fill();
+    // Near ridge
+    g.beginPath();
+    g.moveTo(0, yUp + 4);
+    for (var x1 = 0; x1 <= w; x1 += 5) {
+      var peakN = yUp - (35 + 70 * jag * Math.abs(Math.sin(x1 / w * 3.2 + 1.0))
+        + 30 * jag * Math.abs(Math.sin(x1 / w * 7.4)));
+      if (terrainMode === 'flat') peakN = yUp - (32 + 16 * Math.abs(Math.sin(x1 / w * 2.2)));
+      g.lineTo(x1, Math.max(24, peakN));
+    }
+    g.lineTo(w, yUp + 4); g.lineTo(0, yUp + 4); g.closePath();
+    var grad2 = g.createLinearGradient(0, yUp - 100, 0, yUp + 6);
+    grad2.addColorStop(0, 'rgba(72,36,88,0.85)');
+    grad2.addColorStop(1, 'rgba(24,14,32,0.4)');
+    g.fillStyle = grad2; g.fill();
+    // Snow/highlight ridges
+    g.strokeStyle = 'rgba(220,200,255,0.35)'; g.lineWidth = 1.4; g.beginPath();
+    for (var xs = 0; xs <= w; xs += 7) {
+      var ps = yUp - (80 + 90 * jag * Math.abs(Math.sin(xs / w * 2.3)));
+      if (xs === 0) g.moveTo(xs, ps); else g.lineTo(xs, ps);
+    }
+    g.stroke();
+    // Soft mist into water
+    var mist = g.createLinearGradient(0, yUp - 40, 0, yUp + 22);
+    mist.addColorStop(0, 'rgba(8,18,32,0)');
+    mist.addColorStop(0.5, 'rgba(20,50,70,0.35)');
+    mist.addColorStop(1, 'rgba(10,55,70,0.55)');
+    g.fillStyle = mist; g.fillRect(0, yUp - 40, w, 62);
+    g.strokeStyle = 'rgba(196,60,44,0.85)'; g.lineWidth = 1.8; g.beginPath();
+    for (var x2 = 0; x2 <= w; x2 += 8) {
+      var peak2 = yUp - (50 + 70 * jag * Math.abs(Math.sin(x2 / w * 3.2)));
+      if (terrainMode === 'flat') peak2 = yUp - (40 + 12 * Math.abs(Math.sin(x2 / w * 2)));
+      if (x2 === 0) g.moveTo(x2, peak2); else g.lineTo(x2, peak2);
+    }
+    g.stroke();
+    midgard(g, w, innerHeight, now, yUp);
+  }
+
+function drawHouse(g, x, baseY, scale, accent){
+    var s = scale || 1;
+    g.fillStyle = '#2a1830';
+    g.fillRect(x, baseY - 22*s, 28*s, 22*s);
+    g.fillStyle = '#4a2060';
+    g.beginPath();
+    g.moveTo(x - 4*s, baseY - 22*s);
+    g.lineTo(x + 14*s, baseY - 38*s);
+    g.lineTo(x + 32*s, baseY - 22*s);
+    g.closePath(); g.fill();
+    g.fillStyle = accent || '#c43c2c';
+    g.fillRect(x + 10*s, baseY - 14*s, 8*s, 14*s);
+    g.fillStyle = 'rgba(232,197,71,0.55)';
+    g.fillRect(x + 4*s, baseY - 18*s, 5*s, 5*s);
+  }
+
+  function drawTroll(g, x, baseY, scale){
+    var s = scale || 1;
+    g.fillStyle = '#4a2060';
+    g.beginPath(); g.ellipse(x, baseY - 10*s, 10*s, 14*s, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = '#2a1830';
+    g.beginPath(); g.arc(x, baseY - 26*s, 9*s, 0, Math.PI*2); g.fill();
+    // horns
+    g.strokeStyle = '#c43c2c'; g.lineWidth = 2*s;
+    g.beginPath(); g.moveTo(x - 5*s, baseY - 30*s); g.lineTo(x - 10*s, baseY - 40*s); g.stroke();
+    g.beginPath(); g.moveTo(x + 5*s, baseY - 30*s); g.lineTo(x + 10*s, baseY - 40*s); g.stroke();
+    g.fillStyle = '#e8c547';
+    g.beginPath(); g.arc(x - 3*s, baseY - 27*s, 1.5*s, 0, Math.PI*2); g.fill();
+    g.beginPath(); g.arc(x + 3*s, baseY - 27*s, 1.5*s, 0, Math.PI*2); g.fill();
+  }
+
+  function drawEasterEgg(g, w, yUp, yLo, now){
+    // Tiny hard-to-spot hare in fjäll shadow — blinks in ~1/12 of the time
+    var phase = (now * 0.00015) % 1;
+    if (phase > 0.08) return; // mostly hidden
+    var ex = w * 0.705, ey = yUp - 48;
+    g.save();
+    g.globalAlpha = 0.55;
+    g.fillStyle = '#3a2840';
+    g.beginPath(); g.ellipse(ex, ey, 4.5, 3, 0, 0, Math.PI * 2); g.fill(); // body
+    g.beginPath(); g.ellipse(ex + 4, ey - 2, 2.5, 2.2, 0, 0, Math.PI * 2); g.fill(); // head
+    g.strokeStyle = '#4a2060'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(ex + 3, ey - 4); g.lineTo(ex + 2, ey - 10); g.stroke(); // ear
+    g.beginPath(); g.moveTo(ex + 5, ey - 4); g.lineTo(ex + 6, ey - 9); g.stroke();
+    // micro rune nearby on beach pebbles — always there but tiny
+    g.globalAlpha = 0.35;
+    g.fillStyle = '#c43c2c';
+    g.font = '7px ui-monospace,monospace';
+    g.fillText('ᚱ', w * 0.93, yLo + 28);
+    g.restore();
+  }
+
+  function drawDecor(g, w, yUp, yLo, now){
+    // houses & fjäll peaks sit in mountain zone ABOVE upper BB
+    drawHouse(g, w * 0.22, yUp - 8, 1.1, '#c43c2c');
+    drawHouse(g, w * 0.55, yUp - 4, 0.85, '#c43c2c');
+    drawHouse(g, w * 0.78, yUp - 10, 1.0, '#e8c547');
+    // trolls peek near slopes / beach edge
+    drawTroll(g, w * 0.12, yUp + 6, 0.9);
+    drawTroll(g, w * 0.88, yLo + 8, 1.05);
+    drawTroll(g, w * 0.35, yLo + 4, 0.7);
+    drawEasterEgg(g, w, yUp, yLo, now);
+  }
+
+  function drawFlag(g, x, y, now, kind){
+    // kind: 'SE' or 'NO' — fluttering
+    var flutter = Math.sin(now * 0.008 + x * 0.01) * 4;
+    g.strokeStyle = '#c9b896'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x, y - 36); g.stroke();
+    g.beginPath();
+    g.moveTo(x, y - 36);
+    g.quadraticCurveTo(x + 14 + flutter, y - 30, x + 22, y - 28 + flutter * 0.3);
+    g.lineTo(x + 22, y - 16 + flutter * 0.2);
+    g.quadraticCurveTo(x + 14 + flutter, y - 18, x, y - 20);
+    g.closePath();
+    if (kind === 'SE') {
+      g.fillStyle = '#006aa7'; g.fill();
+      g.fillStyle = '#fecc00';
+      g.fillRect(x + 8, y - 34, 3, 16);
+      g.fillRect(x + 2, y - 28, 18, 3);
+    } else {
+      g.fillStyle = '#ef2b2d'; g.fill();
+      g.fillStyle = '#fff';
+      g.fillRect(x + 7, y - 34, 4, 16);
+      g.fillRect(x + 2, y - 28, 18, 3);
+      g.fillStyle = '#00205b';
+      g.fillRect(x + 8, y - 34, 2, 16);
+      g.fillRect(x + 2, y - 27.5, 18, 2);
+    }
+  }
+
+  function shoreYAt(i, n, bb, h, yLo){
+    // Strandkant = under nedre BB, rör sig proportionellt mot kursen (samma kurva som havet)
+    var base = yLo + 14;
+    if (!prices.length || !(prices[prices.length - 1] > 0)) return base;
+    var idx = Math.max(0, Math.min(prices.length - 1, Math.round(i / Math.max(1, n - 1) * (prices.length - 1))));
+    var span = Math.max(1e-6, bb.up - bb.lo);
+    var rel = (prices[idx] - bb.lo) / span; // 0 at lower BB → 1 at upper
+    // soft proportional mirror of price into sand zone
+    var y = base + 8 - (rel - 0.5) * 36;
+    return Math.max(yLo + 8, Math.min(h - 36, y));
+  }
+
+  // Real facts for sand runestones (Rökstenen / Östergötland context)
+  var RUNE_FACTS = [
+    { title: 'Rökstenen', lines: ['Ödeshög, Östergötland', '~760 runor · 800-talet', 'Varin reste efter Vämod'] },
+    { title: 'Þjóðríkr', lines: ['Theodorik den store', 'nämnd på Rökstenen', 'gotisk kung · 400-tal'] },
+    { title: 'Futhark', lines: ['Yngre futharken', '16 runor · vikingatid', 'ristad i slingor'] }
+  ];
+
+  function drawRunestone(g, x, y, s, factIdx){
+    var fact = RUNE_FACTS[factIdx % RUNE_FACTS.length];
+    g.save();
+    // buried base in sand
+    g.fillStyle = 'rgba(120,100,70,0.55)';
+    g.beginPath(); g.ellipse(x, y + 4*s, 18*s, 6*s, 0, 0, Math.PI*2); g.fill();
+    // granite body — Rök-like tall slab
+    var grd = g.createLinearGradient(x - 14*s, y - 50*s, x + 14*s, y);
+    grd.addColorStop(0, '#6a6358');
+    grd.addColorStop(0.4, '#8a8274');
+    grd.addColorStop(1, '#4a453c');
+    g.fillStyle = grd;
+    g.beginPath();
+    g.moveTo(x - 14*s, y);
+    g.lineTo(x - 12*s, y - 48*s);
+    g.lineTo(x - 4*s, y - 58*s);
+    g.lineTo(x + 6*s, y - 56*s);
+    g.lineTo(x + 14*s, y - 44*s);
+    g.lineTo(x + 13*s, y);
+    g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(30,28,24,0.5)'; g.lineWidth = 1; g.stroke();
+    // Rök-style red painted serpent band (historically many stones were painted)
+    g.strokeStyle = '#9a2a1a'; g.lineWidth = 1.6*s; g.lineJoin = 'round';
+    g.beginPath();
+    for (var i = 0; i <= 20; i++) {
+      var u = i / 20;
+      var px = x + Math.sin(u * Math.PI * 3) * 7*s;
+      var py = y - 6*s - u * 46*s;
+      if (i === 0) g.moveTo(px, py); else g.lineTo(px, py);
+    }
+    g.stroke();
+    // interlace cross-bands
+    g.strokeStyle = 'rgba(154,42,26,0.7)'; g.lineWidth = 1.1*s;
+    for (var b = 0; b < 3; b++) {
+      var by = y - 14*s - b * 12*s;
+      g.beginPath();
+      g.moveTo(x - 9*s, by);
+      g.quadraticCurveTo(x, by - 4*s, x + 9*s, by);
+      g.stroke();
+    }
+    // carved runes (Younger Futhark sample)
+    g.fillStyle = '#2a2418';
+    g.font = 'bold ' + Math.max(7, (8*s)|0) + 'px ui-monospace,monospace';
+    g.fillText('ᛅᚠᛏ ᚠᛅᚦᚢᚱ', x - 11*s, y - 28*s);
+    g.fillText('ᛋᛁᚾ ᚦᛅᚾ', x - 9*s, y - 18*s);
+    // fact plaque (readable, real)
+    g.fillStyle = 'rgba(12,10,16,0.72)';
+    g.fillRect(x - 52*s, y + 8*s, 104*s, 38*s);
+    g.strokeStyle = 'rgba(232,197,71,0.55)'; g.lineWidth = 1; g.strokeRect(x - 52*s, y + 8*s, 104*s, 38*s);
+    g.fillStyle = '#e8c547';
+    g.font = 'bold ' + Math.max(9, (10*s)|0) + 'px system-ui';
+    g.fillText(fact.title, x - 48*s, y + 20*s);
+    g.fillStyle = '#d4c8b0';
+    g.font = Math.max(8, (9*s)|0) + 'px system-ui';
+    for (var li = 0; li < fact.lines.length; li++) {
+      g.fillText(fact.lines[li], x - 48*s, y + 31*s + li * 10*s);
+    }
+    g.restore();
+  }
+
+  function drawVikingSword(g, x, y){
+    // Stuck VERTICALLY in the sand — tip buried, hilt up
+    g.save();
+    // sand mound / disturbance where blade enters
+    g.fillStyle = 'rgba(140,110,70,0.7)';
+    g.beginPath(); g.ellipse(x, y + 2, 16, 7, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = 'rgba(90,70,40,0.45)';
+    g.beginPath(); g.ellipse(x, y + 1, 10, 4, 0, 0, Math.PI*2); g.fill();
+    // buried tip (darker, shorter visible stump below ground line)
+    g.fillStyle = '#6a7078';
+    g.fillRect(x - 2, y - 4, 4, 8);
+    // visible blade rising from ground
+    g.fillStyle = '#c8d0d8';
+    g.beginPath();
+    g.moveTo(x - 4, y - 6);
+    g.lineTo(x - 3, y - 52);
+    g.lineTo(x, y - 58);
+    g.lineTo(x + 3, y - 52);
+    g.lineTo(x + 4, y - 6);
+    g.closePath(); g.fill();
+    g.strokeStyle = '#8a9098'; g.lineWidth = 1; g.stroke();
+    // fuller
+    g.strokeStyle = 'rgba(255,255,255,0.45)';
+    g.beginPath(); g.moveTo(x, y - 50); g.lineTo(x, y - 10); g.stroke();
+    // guard above sand
+    g.fillStyle = '#e8c547';
+    g.fillRect(x - 14, y - 62, 28, 5);
+    // grip
+    g.fillStyle = '#3a2818';
+    g.fillRect(x - 3.5, y - 78, 7, 16);
+    // wrap lines
+    g.strokeStyle = '#6a4a28'; g.lineWidth = 1;
+    for (var wi = 0; wi < 4; wi++) {
+      g.beginPath(); g.moveTo(x - 3.5, y - 76 + wi * 4); g.lineTo(x + 3.5, y - 76 + wi * 4); g.stroke();
+    }
+    // pommel
+    g.fillStyle = '#e8c547';
+    g.beginPath(); g.arc(x, y - 80, 6, 0, Math.PI*2); g.fill();
+    g.strokeStyle = '#a08030'; g.stroke();
+    g.restore();
+  }
+
+  function drawWayfinderAtSand(g, w, h, yShore, now){
+    var cx = w * 0.52, cy = Math.min(h - 70, yShore + 55);
+    g.save();
+    g.fillStyle = 'rgba(20,14,28,0.72)';
+    g.strokeStyle = 'rgba(232,197,71,0.85)'; g.lineWidth = 2;
+    roundRect(g, cx - 120, cy - 42, 240, 78, 10); g.fill(); g.stroke();
+    // compass rose
+    g.save();
+    g.translate(cx - 78, cy);
+    g.rotate(now * 0.0004);
+    g.strokeStyle = '#e8c547'; g.lineWidth = 2;
+    g.beginPath(); g.arc(0, 0, 18, 0, Math.PI*2); g.stroke();
+    g.fillStyle = '#c43c2c';
+    g.beginPath(); g.moveTo(0, -18); g.lineTo(5, 0); g.lineTo(0, 6); g.lineTo(-5, 0); g.closePath(); g.fill();
+    g.fillStyle = '#82cdff';
+    g.beginPath(); g.moveTo(0, 18); g.lineTo(5, 0); g.lineTo(0, -6); g.lineTo(-5, 0); g.closePath(); g.fill();
+    g.restore();
+    g.font = 'bold 11px system-ui';
+    g.fillStyle = '#e8c547';
+    g.fillText('Vägvisare · SL / TP', cx - 40, cy - 22);
+    g.font = '10px system-ui';
+    g.fillStyle = '#c9b896';
+    var p1 = boats[0], p2 = boats[1];
+    g.fillText('Gul SL ' + (p1.sl != null ? p1.sl.toFixed(0) : '—') + '  TP ' + (p1.tp != null ? p1.tp.toFixed(0) : '—'), cx - 40, cy - 4);
+    g.fillStyle = '#82cdff';
+    g.fillText('Blå SL ' + (p2.sl != null ? p2.sl.toFixed(0) : '—') + '  TP ' + (p2.tp != null ? p2.tp.toFixed(0) : '—'), cx - 40, cy + 12);
+    g.fillStyle = 'rgba(200,190,170,0.85)';
+    g.fillText(running ? 'Låst under race' : 'Ställ innan start · W/S · ↑/↓', cx - 40, cy + 28);
+    g.restore();
+  }
+
+  function roundRect(g, x, y, w, h, r){
+    g.beginPath();
+    g.moveTo(x+r, y); g.arcTo(x+w, y, x+w, y+h, r); g.arcTo(x+w, y+h, x, y+h, r);
+    g.arcTo(x, y+h, x, y, r); g.arcTo(x, y, x+w, y, r); g.closePath();
+  }
+
+
+
+  function drawCandles(g, w, h, bb, yUp, yLo, now){
+    // Candlesticks + vekar längs mittenvågen — läsbara, hint om nästa rörelse via RSI
+    if (!candles.length) return;
+    var n = candles.length;
+    var show = Math.min(48, n); // last N readable
+    var start = n - show;
+    var seaOff = parallaxOf(0.55);
+    var padL = 40, padR = 40;
+    var plotW = w - padL - padR;
+    var slot = plotW / show;
+    var bodyW = Math.max(3, Math.min(10, slot * 0.55));
+    var rsi = rsi14();
+    var ob = rsi != null && rsi >= 70;
+    var os = rsi != null && rsi <= 30;
+
+    // soft zone tint: överköpt / underköpt
+    if (ob) {
+      g.fillStyle = 'rgba(255,70,70,0.10)';
+      g.fillRect(0, yUp, w, Math.max(1, (yLo - yUp) * 0.35));
+      g.fillStyle = 'rgba(255,120,100,0.85)';
+      g.font = 'bold 12px system-ui';
+      g.fillText('ÖVERSKÖPT · RSI ' + rsi.toFixed(0) + ' · hint: nedåt-risk', 300, yUp + 18);
+    } else if (os) {
+      g.fillStyle = 'rgba(70,200,120,0.10)';
+      g.fillRect(0, yLo - (yLo - yUp) * 0.35, w, (yLo - yUp) * 0.35);
+      g.fillStyle = 'rgba(100,230,150,0.9)';
+      g.font = 'bold 12px system-ui';
+      g.fillText('UNDERSKÖPT · RSI ' + rsi.toFixed(0) + ' · hint: uppåt-chans', 300, yLo - 10);
+    } else if (rsi != null) {
+      g.fillStyle = 'rgba(200,210,230,0.7)';
+      g.font = '11px system-ui';
+      g.fillText('RSI ' + rsi.toFixed(0) + ' · neutralt', 300, yUp + 16);
+    }
+
+    for (var i = 0; i < show; i++) {
+      var c = candles[start + i];
+      var x = padL + (i + 0.5) * slot - (seaOff % slot);
+      var yO = priceToY(c.o, bb, h);
+      var yH = priceToY(c.h, bb, h);
+      var yL = priceToY(c.l, bb, h);
+      var yC = priceToY(c.c, bb, h);
+      // clamp into sea
+      yO = Math.max(yUp + 4, Math.min(yLo - 4, yO));
+      yH = Math.max(yUp + 2, Math.min(yLo - 2, yH));
+      yL = Math.max(yUp + 2, Math.min(yLo - 2, yL));
+      yC = Math.max(yUp + 4, Math.min(yLo - 4, yC));
+      var up = c.c >= c.o;
+      var col = up ? 'rgba(80,220,140,0.92)' : 'rgba(230,70,70,0.92)';
+      var wick = up ? 'rgba(180,255,210,0.85)' : 'rgba(255,170,170,0.85)';
+      // veke (high-low)
+      g.strokeStyle = wick;
+      g.lineWidth = 1.4;
+      g.beginPath(); g.moveTo(x, yH); g.lineTo(x, yL); g.stroke();
+      // body
+      var top = Math.min(yO, yC), bot = Math.max(yO, yC);
+      var bh = Math.max(2, bot - top);
+      g.fillStyle = col;
+      g.fillRect(x - bodyW / 2, top, bodyW, bh);
+      // outline for readability
+      g.strokeStyle = 'rgba(0,0,0,0.45)';
+      g.lineWidth = 1;
+      g.strokeRect(x - bodyW / 2, top, bodyW, bh);
+    }
+
+    // last candle emphasis + pattern hint
+    var last = candles[candles.length - 1];
+    var prev = candles.length > 1 ? candles[candles.length - 2] : last;
+    var hint = '';
+    if (last.c > last.o && last.l <= prev.l && last.c > prev.c) hint = 'Engulfing↑';
+    else if (last.c < last.o && last.h >= prev.h && last.c < prev.c) hint = 'Engulfing↓';
+    else if ((last.h - Math.max(last.o, last.c)) > 2 * Math.abs(last.c - last.o) && Math.abs(last.c - last.o) < (last.h - last.l) * 0.3)
+      hint = 'Shooting star?';
+    else if ((Math.min(last.o, last.c) - last.l) > 2 * Math.abs(last.c - last.o) && Math.abs(last.c - last.o) < (last.h - last.l) * 0.3)
+      hint = 'Hammer?';
+    else if (ob) hint = 'Översköpt tryck';
+    else if (os) hint = 'Undersköpt studs';
+    if (hint) {
+      g.fillStyle = '#ffe066';
+      g.font = 'bold 11px system-ui';
+      g.fillText('Ljusstake · ' + hint, w - 200, (yUp + yLo) * 0.5 - 20);
+    }
+  }
+
+  function drawKursWave(g, w, h, bb, yUp, yLo, now){
+    // Speciell mittenvåg: skumytan ÄR kursgrafen — det man förhåller sig till
+    if (!prices.length || !(prices[prices.length - 1] > 0)) return;
+    var n = prices.length;
+    var seaOff = parallaxOf(0.55);
+    var pts = [];
+    for (var i = 0; i < n; i++) {
+      var x = ((i / Math.max(1, n - 1)) * w - seaOff * 0.4);
+      x = ((x % w) + w) % w;
+      // keep order by using unwrapped for path — better: draw without wrap, offset whole path
+      var xu = (i / Math.max(1, n - 1)) * (w + 40) - 20 - (seaOff % 40);
+      var py = priceToY(prices[i], bb, h);
+      // clamp into sea tunnel with soft margin
+      py = Math.max(yUp + 10, Math.min(yLo - 10, py));
+      pts.push({ x: xu, y: py, p: prices[i] });
+    }
+    // Sort by x for continuous path after offset
+    pts.sort(function(a,b){ return a.x - b.x; });
+
+    // Wave body ribbon (depth under foam)
+    g.save();
+    g.beginPath();
+    for (var a = 0; a < pts.length; a++) {
+      if (a === 0) g.moveTo(pts[a].x, pts[a].y + 14);
+      else g.lineTo(pts[a].x, pts[a].y + 14 + Math.sin(a * 0.4 + now * 0.004) * 2);
+    }
+    for (var b = pts.length - 1; b >= 0; b--) {
+      g.lineTo(pts[b].x, pts[b].y - 6);
+    }
+    g.closePath();
+    var body = g.createLinearGradient(0, yUp, 0, yLo);
+    body.addColorStop(0, 'rgba(40,140,180,0.35)');
+    body.addColorStop(0.5, 'rgba(20,90,120,0.45)');
+    body.addColorStop(1, 'rgba(10,50,70,0.3)');
+    g.fillStyle = body; g.fill();
+
+    // Primary foam crest = exact kurs shape ("yes" on the skum)
+    g.beginPath();
+    for (var c = 0; c < pts.length; c++) {
+      if (c === 0) g.moveTo(pts[c].x, pts[c].y); else g.lineTo(pts[c].x, pts[c].y);
+    }
+    g.strokeStyle = 'rgba(0,0,0,0.55)'; g.lineWidth = 10; g.lineJoin = 'round'; g.stroke();
+    g.strokeStyle = 'rgba(255,220,80,0.55)'; g.lineWidth = 7; g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.95)'; g.lineWidth = 4.2; g.stroke();
+    g.strokeStyle = '#ffe066'; g.lineWidth = 2.2; g.stroke();
+
+    // Moving foam sparkles along the crest (skum som rör sig)
+    for (var s = 0; s < pts.length; s += 2) {
+      var spark = (Math.sin(pts[s].x * 0.05 + now * 0.01) + 1) * 0.5;
+      if (spark < 0.55) continue;
+      g.fillStyle = 'rgba(255,255,255,' + (0.35 + spark * 0.55) + ')';
+      g.beginPath();
+      g.ellipse(pts[s].x, pts[s].y - 1, 3 + spark * 4, 1.2 + spark, 0, 0, Math.PI * 2);
+      g.fill();
+    }
+    // Secondary ripple lines mirroring slope of graph
+    for (var r = 1; r <= 3; r++) {
+      g.beginPath();
+      for (var d = 0; d < pts.length; d++) {
+        var yy = pts[d].y + r * 5 + Math.sin(d * 0.35 + now * 0.006 + r) * 1.5;
+        if (d === 0) g.moveTo(pts[d].x, yy); else g.lineTo(pts[d].x, yy);
+      }
+      g.strokeStyle = 'rgba(200,240,255,' + (0.35 - r * 0.08) + ')';
+      g.lineWidth = 1.4; g.stroke();
+    }
+    var last = pts[pts.length - 1];
+    g.fillStyle = '#fff8c8';
+    g.beginPath(); g.arc(last.x, last.y, 8, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#ffe066';
+    g.font = 'bold 12px system-ui';
+    g.fillText('KURSVÅG · skum = graf', last.x - 118, last.y - 14);
+    g.restore();
+  }
+
+  function drawBeach(g, w, h, yLo, now, bb){
+    var n = 120;
+    // Full-width shoreline ALWAYS under lower BB, live price shape
+    var shore = [];
+    var shOff = parallaxOf(0.75) % 30;
+    for (var i = 0; i < n; i++) {
+      var x = (i / (n - 1)) * w;
+      // soft horizontal drift + vertical from kurs (shoreYAt)
+      shore.push({ x: x, y: shoreYAt(i, n, bb, h, yLo) + Math.sin((x + shOff) * 0.02) * 1.5 });
+    }
+    var yMin = shore.reduce(function(a,p){ return Math.min(a, p.y); }, h);
+    var yAvg = shore.reduce(function(a,p){ return a + p.y; }, 0) / shore.length;
+
+    // sand fill below shoreline polygon to bottom
+    var sand = g.createLinearGradient(0, yMin, 0, h);
+    sand.addColorStop(0, 'rgba(196,165,116,0.92)');
+    sand.addColorStop(0.35, 'rgba(212,184,150,0.95)');
+    sand.addColorStop(1, 'rgba(168,144,96,0.98)');
+    g.fillStyle = sand;
+    g.beginPath();
+    g.moveTo(0, shore[0].y);
+    g.lineTo(shore[0].x, shore[0].y);
+    for (var si = 0; si < shore.length; si++) g.lineTo(shore[si].x, shore[si].y);
+    g.lineTo(w, shore[shore.length-1].y);
+    g.lineTo(w, h); g.lineTo(0, h); g.closePath(); g.fill();
+
+    // wet sand band just under shore
+    g.beginPath();
+    g.moveTo(shore[0].x, shore[0].y);
+    for (var wi0 = 0; wi0 < shore.length; wi0++) g.lineTo(shore[wi0].x, shore[wi0].y);
+    for (var wi1 = shore.length - 1; wi1 >= 0; wi1--) g.lineTo(shore[wi1].x, shore[wi1].y + 16);
+    g.closePath();
+    g.fillStyle = 'rgba(80,120,140,0.28)'; g.fill();
+
+    // THE kurslinje = water meeting sand (thick foam + gold accent)
+    g.beginPath();
+    for (var j = 0; j < shore.length; j++) {
+      if (j === 0) g.moveTo(shore[j].x, shore[j].y); else g.lineTo(shore[j].x, shore[j].y);
+    }
+    g.strokeStyle = 'rgba(0,0,0,0.9)'; g.lineWidth = 12; g.lineJoin = 'round'; g.stroke();
+    g.strokeStyle = 'rgba(255,200,40,0.35)'; g.lineWidth = 8; g.stroke();
+    g.strokeStyle = 'rgba(230,245,255,0.9)'; g.lineWidth = 5; g.stroke();
+    g.strokeStyle = '#ffe066'; g.lineWidth = 3; g.stroke();
+    g.strokeStyle = '#fff8c8'; g.lineWidth = 1.4; g.stroke();
+
+    // end marker
+    var last = shore[shore.length - 1];
+    g.fillStyle = '#ffe066'; g.beginPath(); g.arc(last.x, last.y, 6, 0, Math.PI*2); g.fill();
+    g.font = 'bold 12px system-ui';
+    g.fillStyle = '#ffe066';
+    g.fillText('Vatten ↔ sand · ' + (liveStatus==='LIVE'?'LIVE ':'') + SYMBOL, last.x - 160, last.y - 12);
+
+    // (Rökstenar / runstenar borttagna från sandscenen)
+    // Rikt landskap längs stranden — parallax foreground
+    var beachOff = parallaxOf(0.9);
+    function bx(x){ return wrapX(x - beachOff, w); }
+    // dune ridges
+    for (var d = 0; d < 4; d++) {
+      g.beginPath();
+      var base = yAvg + 28 + d * 22;
+      for (var dx = 0; dx <= w; dx += 8) {
+        var xx = dx + beachOff * (0.2 + d * 0.05);
+        var dy = base + Math.sin(xx * 0.012 + d) * (10 - d) + Math.sin(xx * 0.04) * 3;
+        if (dx === 0) g.moveTo(dx, dy); else g.lineTo(dx, dy);
+      }
+      g.strokeStyle = 'rgba(120,90,50,' + (0.35 - d * 0.05) + ')';
+      g.lineWidth = 2; g.stroke();
+    }
+    // grass tufts
+    for (var g1 = 0; g1 < 28; g1++) {
+      var gx = bx(g1 * 73 + 40);
+      var gy = yAvg + 40 + (g1 % 5) * 14 + Math.sin(g1 + now * 0.001) * 2;
+      if (gy > h - 8) continue;
+      g.strokeStyle = 'rgba(60,110,50,0.75)'; g.lineWidth = 1.3;
+      g.beginPath(); g.moveTo(gx, gy);
+      g.quadraticCurveTo(gx + 2, gy - 10, gx + Math.sin(now * 0.003 + g1) * 3, gy - 16);
+      g.stroke();
+      g.beginPath(); g.moveTo(gx, gy);
+      g.quadraticCurveTo(gx - 2, gy - 8, gx - 4, gy - 14); g.stroke();
+    }
+    // driftwood + pebbles
+    for (var p1 = 0; p1 < 18; p1++) {
+      var px1 = bx(p1 * 97 + 20);
+      var py1 = yAvg + 55 + (p1 % 4) * 18;
+      g.fillStyle = p1 % 3 === 0 ? 'rgba(90,70,45,0.8)' : 'rgba(140,130,120,0.7)';
+      g.beginPath(); g.ellipse(px1, py1, 5 + (p1 % 3), 2.5, 0.3, 0, Math.PI * 2); g.fill();
+    }
+    // small beach huts / boatsheds (perspective: larger near bottom)
+    for (var h1 = 0; h1 < 3; h1++) {
+      var hx = bx(180 + h1 * 320);
+      var hy = Math.min(h - 50, yAvg + 70 + h1 * 8);
+      var sc = 0.75 + h1 * 0.12;
+      g.fillStyle = 'rgba(70,45,30,0.85)';
+      g.fillRect(hx, hy - 18 * sc, 26 * sc, 18 * sc);
+      g.fillStyle = 'rgba(140,50,40,0.9)';
+      g.beginPath();
+      g.moveTo(hx - 3 * sc, hy - 18 * sc);
+      g.lineTo(hx + 13 * sc, hy - 30 * sc);
+      g.lineTo(hx + 29 * sc, hy - 18 * sc);
+      g.closePath(); g.fill();
+    }
+    // wayfinder SL/TP at sand
+    drawWayfinderAtSand(g, w, h, yAvg, now);
+
+    // Nedre BB: vågor slår mot stranden i förgrunden (alltid, även flat)
+    for (var wi = 0; wi < 5; wi++) {
+      var phase = now * 0.004 + wi * 1.15;
+      g.beginPath();
+      for (var k = 0; k < shore.length; k++) {
+        var foam = Math.sin(shore[k].x * 0.028 + phase) * (3.5 - wi * 0.4);
+        var y = Math.max(yLo + 2, shore[k].y - 6) + 2 + wi * 6 + foam;
+        if (k === 0) g.moveTo(shore[k].x, y); else g.lineTo(shore[k].x, y);
+      }
+      g.strokeStyle = 'rgba(230,245,255,' + (0.65 - wi * 0.1) + ')';
+      g.lineWidth = 2.4 - wi * 0.3; g.stroke();
+    }
+    // crest foam on lower BB edge
+    g.strokeStyle = 'rgba(255,255,255,0.8)'; g.lineWidth = 2.2; g.beginPath();
+    for (var k2 = 0; k2 < shore.length; k2++) {
+      var yf = yLo + Math.sin(shore[k2].x * 0.05 - now * 0.008) * 2.5;
+      if (k2 === 0) g.moveTo(shore[k2].x, yf); else g.lineTo(shore[k2].x, yf);
+    }
+    g.stroke();
+  }
+
+  function drawBoatSprite(g, b, bx, by, now){
+    // Always-visible boat: hull first, then 32-bit dragon avatar if loaded
+    var bob = Math.sin(((now != null ? now : performance.now()) * 0.004) + bx * 0.01) * (terrainMode === 'flat' ? 1.2 : 2.4);
+    var y = by + bob;
+    var col = b.tint === 'gold' ? '#e8c547' : '#82cdff';
+    var colDark = b.tint === 'gold' ? '#8a6a10' : '#1a5a80';
+    // hull (always on)
+    g.save();
+    g.fillStyle = colDark;
+    g.beginPath();
+    g.moveTo(bx - 48, y + 18);
+    g.quadraticCurveTo(bx - 52, y + 8, bx - 30, y + 4);
+    g.lineTo(bx + 36, y + 4);
+    g.quadraticCurveTo(bx + 54, y + 10, bx + 48, y + 20);
+    g.quadraticCurveTo(bx, y + 34, bx - 48, y + 18);
+    g.closePath(); g.fill();
+    g.strokeStyle = col; g.lineWidth = 3; g.stroke();
+    // deck stripe
+    g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(bx - 28, y + 10); g.lineTo(bx + 30, y + 10); g.stroke();
+    g.restore();
+
+    var bw = 100, bh = 150;
+    var src = b.tint === 'gold' ? dragonSE : dragonNO;
+    var img = null;
+    if (readyImg(src)) {
+      if (b.tint === 'gold') lastGoodGold = src; else lastGoodCyan = src;
+      img = src;
+    } else {
+      img = b.tint === 'gold' ? lastGoodGold : lastGoodCyan;
+    }
+    if (img) {
+      g.drawImage(img, bx - bw / 2, y - bh * 0.78, bw, bh);
+    } else {
+      // big visible stand-in so boats NEVER invisible
+      g.fillStyle = col;
+      g.beginPath(); g.arc(bx, y - 28, 22, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#1a1020';
+      g.font = 'bold 14px system-ui';
+      g.fillText(b.tint === 'gold' ? 'P1' : 'P2', bx - 10, y - 23);
+    }
+    drawFlag(g, bx + 40, y - 10, now != null ? now : 0, b.flag || (b.tint === 'gold' ? 'SE' : 'NO'));
+    // name tag always
+    g.fillStyle = col;
+    g.font = 'bold 12px system-ui';
+    g.fillText(b.tint === 'gold' ? 'GUL · WASD' : 'BLÅ · PILAR', bx - 36, y - 90);
+  }
+
+
+  function drawSlTp(g, w, h, bb, boat, color, labelPrefix){
+    if (boat.sl == null && boat.tp == null) return;
+    g.save();
+    g.setLineDash([8, 6]);
+    g.lineWidth = 1.8;
+    g.font = 'bold 11px system-ui';
+    if (boat.sl != null) {
+      var ys = priceToY(boat.sl, bb, h);
+      g.strokeStyle = color;
+      g.beginPath(); g.moveTo(290, ys); g.lineTo(w - 20, ys); g.stroke();
+      g.fillStyle = color;
+      g.fillText(labelPrefix + ' SL ' + boat.sl.toFixed(0), 294, ys - 4);
+    }
+    if (boat.tp != null) {
+      var yt = priceToY(boat.tp, bb, h);
+      g.strokeStyle = color;
+      g.beginPath(); g.moveTo(290, yt); g.lineTo(w - 20, yt); g.stroke();
+      g.fillStyle = color;
+      g.fillText(labelPrefix + ' TP ' + boat.tp.toFixed(0), 294, yt - 4);
+    }
+    g.setLineDash([]);
+    g.restore();
+  }
+
+
+  function drawGranslandet(g, w, h, bb, leftPad, plotW){
+    // Historical (left) → Live (right). Vertical threshold ~78% along plot.
+    var gateX = leftPad + plotW * 0.78;
+    var yTop = priceToY(bb.up, bb, h);
+    var yBot = priceToY(bb.lo, bb, h);
+    g.save();
+    // dim historical side slightly
+    g.fillStyle = 'rgba(20,12,40,0.28)';
+    g.fillRect(leftPad, yTop - 8, gateX - leftPad, (yBot - yTop) + 40);
+    // live side warm tint
+    g.fillStyle = 'rgba(255,200,60,0.08)';
+    g.fillRect(gateX, yTop - 8, leftPad + plotW - gateX + 20, (yBot - yTop) + 40);
+    // gateway pillar
+    g.strokeStyle = 'rgba(232,197,71,0.95)';
+    g.lineWidth = 3;
+    g.setLineDash([4, 4]);
+    g.beginPath(); g.moveTo(gateX, yTop - 20); g.lineTo(gateX, yBot + 36); g.stroke();
+    g.setLineDash([]);
+    // portal glow
+    var grd = g.createLinearGradient(gateX - 18, 0, gateX + 18, 0);
+    grd.addColorStop(0, 'rgba(196,60,44,0)');
+    grd.addColorStop(0.5, 'rgba(232,197,71,0.55)');
+    grd.addColorStop(1, 'rgba(130,205,255,0)');
+    g.fillStyle = grd;
+    g.fillRect(gateX - 18, yTop - 20, 36, (yBot - yTop) + 56);
+    g.font = 'bold 11px system-ui';
+    g.fillStyle = 'rgba(0,0,0,0.7)';
+    g.fillText('Gränslandet', gateX - 36, yTop - 26);
+    g.fillStyle = '#e8c547';
+    g.fillText('Gränslandet', gateX - 37, yTop - 27);
+    g.font = '10px system-ui';
+    g.fillStyle = 'rgba(200,190,220,0.9)';
+    g.fillText('Historik →', gateX - 78, yBot + 28);
+    g.fillStyle = 'rgba(255,220,80,0.95)';
+    g.fillText('→ Live', gateX + 8, yBot + 28);
+    g.restore();
+  }
+
+  function drawPriceLine(g, w, h, bb){
+    var leftPad = 290, rightPad = 20;
+    var plotW = w - leftPad - rightPad;
+    if (prices.length < 2 || !(prices[prices.length-1] > 0)) return { lastX: leftPad + plotW, lastY: priceToY(bb.mid, bb, h) };
+
+    function strokePath(width, color){
+      g.beginPath();
+      for (var i = 0; i < prices.length; i++) {
+        var px = leftPad + (i / (prices.length - 1)) * plotW;
+        var py = priceToY(prices[i], bb, h);
+        if (i === 0) g.moveTo(px, py); else g.lineTo(px, py);
+      }
+      g.strokeStyle = color; g.lineWidth = width; g.lineJoin = 'round'; g.lineCap = 'round'; g.stroke();
+    }
+    // Secondary ghost of price in sea (primary kurslinje = water↔sand shoreline)
+    strokePath(4, 'rgba(0,0,0,0.35)');
+    strokePath(2, 'rgba(255,224,102,0.45)');
+
+    var lastX = leftPad + plotW;
+    var lastY = priceToY(prices[prices.length - 1], bb, h);
+    // strong glow + end dot
+    g.save();
+    g.shadowColor = '#ffe066'; g.shadowBlur = 22;
+    g.fillStyle = '#fff8c8';
+    g.beginPath(); g.arc(lastX, lastY, 11, 0, Math.PI * 2); g.fill();
+    g.shadowBlur = 0;
+    g.fillStyle = '#ffe066';
+    g.beginPath(); g.arc(lastX, lastY, 7, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#fff';
+    g.beginPath(); g.arc(lastX, lastY, 3, 0, Math.PI * 2); g.fill();
+    g.restore();
+
+    g.font = 'bold 14px system-ui';
+    g.fillStyle = 'rgba(0,0,0,0.85)';
+    g.fillText('KURSLINJE LIVE', lastX - 132, lastY - 22);
+    g.fillStyle = '#ffe066';
+    g.fillText('KURSLINJE LIVE', lastX - 133, lastY - 23);
+    g.font = 'bold 12px system-ui';
+    g.fillStyle = '#fff3a0';
+    g.fillText((liveStatus === 'LIVE' ? 'LIVE ' : '') + SYMBOL + ' ' + prices[prices.length - 1].toFixed(2), lastX - 132, lastY - 6);
+    return { lastX: lastX, lastY: lastY, leftPad: leftPad, plotW: plotW };
+  }
+
+  function drawRuneBorder(g,w,h,now){
+    var top = '᛫ X→ ᛏᛁᛗᛁ · ᚨᚢᛊᛏᚱ · KURSLINA · ᛗᚨᚲᛞ · ᛒᛟᛚᛚᛁᛜᛖᚱ · X→ ᛫ ';
+    var bot = '᛫ X← ᚹᛖᛊᛏ · ᚺᚨᚠ · ᚠᛟᚱᛊ · ᛊᛏᚱᚨᚾᛞ · X← ᛫ ';
+    var left = 'Y↑ ᚾᛟᚱᚦ · ᚠᛃᛖᛚᛚ · ᛈᚱᛁᛊ↑ · Y↑';
+    var right = 'Y↓ ᛊᚢᚦ · ᛊᛏᚱᚨᚾᛞ · ᛈᚱᛁᛊ↓ · Y↓';
+    g.save();
+    g.fillStyle='rgba(196,60,44,0.88)';
+    g.font='11px ui-monospace,monospace';
+    var shift=(now*0.02)%(g.measureText(top).width||200);
+    g.fillText(top+top, 12-shift, 18);
+    var shift2=(now*0.015)%(g.measureText(bot).width||200);
+    g.fillText(bot+bot, 12-shift2, h-10);
+    g.save(); g.translate(14, h*0.22); g.rotate(-Math.PI/2);
+    g.fillText(left, 0, 0); g.restore();
+    g.save(); g.translate(w-10, h*0.22); g.rotate(Math.PI/2);
+    g.fillText(right, 0, 0); g.restore();
+    g.font='bold 12px ui-monospace,monospace';
+    g.fillText('ᚾ', w*0.5-6, 34);
+    g.fillText('ᛊ', w*0.5-6, h-28);
+    g.fillText('ᚨ', w-36, h*0.5);
+    g.fillText('ᚹ', 22, h*0.5);
+    g.restore();
+  }
+
+  function draw(now){
+    var w = innerWidth, h = innerHeight, g = ctx;
+    g.clearRect(0, 0, w, h);
+    var bb = bands();
+    var hist = macdHist();
+    var yUp = priceToY(bb.up, bb, h);
+    var yLo = priceToY(bb.lo, bb, h);
+    var yMid = priceToY(bb.mid, bb, h);
+
+    // 0) soft night sky (transparent page under) — stars + gentle wash
+    var sky = g.createLinearGradient(0, 0, 0, yUp);
+    sky.addColorStop(0, 'rgba(4,8,18,0.75)');
+    sky.addColorStop(0.55, 'rgba(10,16,34,0.55)');
+    sky.addColorStop(1, 'rgba(14,32,48,0.25)');
+    g.fillStyle = sky; g.fillRect(0, 0, w, Math.max(1, yUp));
+    var starPar = parallaxOf(0.06);
+    for (var i = 0; i < 110; i++) {
+      var sx0 = ((Math.sin(i * 12.9) * 43758) % 1 + 1) % 1 * w;
+      var sx = wrapX(sx0 - starPar, w);
+      var sy = ((Math.sin(i * 78.2) * 24634) % 1 + 1) % 1 * Math.max(50, yUp - 10);
+      g.fillStyle = 'rgba(255,255,230,' + (0.35 + (i % 5) * 0.1) + ')';
+      g.fillRect(sx, sy, (i % 3 === 0 ? 2 : 1), (i % 3 === 0 ? 2 : 1));
+    }
+    starlink(g, w, h, now, hist);
+
+    // 1) BERG i bakgrunden
+    drawFjallFilled(g, w, yUp, now);
+    drawDecor(g, w, yUp, yLo, now);
+    drawFlag(g, w * 0.48, yUp - 2, now, 'SE');
+    drawFlag(g, w * 0.62, yUp - 6, now, 'NO');
+
+    // 2) VATTEN (spelplan / tunnel mellan banden)
+    var seaH = Math.max(1, yLo - yUp);
+    var sea = g.createLinearGradient(0, yUp, 0, yLo);
+    sea.addColorStop(0, 'rgba(12,80,100,0.72)');
+    sea.addColorStop(0.5, 'rgba(6,50,68,0.78)');
+    sea.addColorStop(1, 'rgba(4,38,52,0.72)');
+    g.fillStyle = sea; g.fillRect(0, yUp, w, seaH);
+    // tunnel wall glow
+    g.strokeStyle = 'rgba(120,220,255,0.35)'; g.lineWidth = 10;
+    g.beginPath(); g.moveTo(0, yUp); g.lineTo(w, yUp); g.stroke();
+    g.strokeStyle = 'rgba(210,170,90,0.35)'; g.lineWidth = 10;
+    g.beginPath(); g.moveTo(0, yLo); g.lineTo(w, yLo); g.stroke();
+
+    // Övre BB = vågor som slår mot berg i horisonten
+    for (var band = 0; band < 6; band++) {
+      g.strokeStyle = 'rgba(200,240,255,' + (0.55 - band * 0.07) + ')';
+      g.lineWidth = 2.2 - band * 0.2; g.beginPath();
+      for (var x = 0; x <= w; x += 4) {
+        var y = yUp + 4 + band * 7 + Math.sin((x + parallaxOf(0.3)) * 0.035 - now * 0.007 + band * 0.9) * (4 + band * 0.6)
+              + Math.sin((x + parallaxOf(0.3)) * 0.09 + now * 0.004) * 1.5;
+        if (x === 0) g.moveTo(x, y); else g.lineTo(x, y);
+      }
+      g.stroke();
+    }
+    // foam crest right under mountains (parallax near-horizon)
+    var horOff = parallaxOf(0.32);
+    g.strokeStyle = 'rgba(255,255,255,0.75)'; g.lineWidth = 2.4; g.beginPath();
+    for (var x2 = 0; x2 <= w; x2 += 3) {
+      var y2 = yUp + Math.sin((x2 + horOff) * 0.05 - now * 0.008) * 3;
+      if (x2 === 0) g.moveTo(x2, y2); else g.lineTo(x2, y2);
+    }
+    g.stroke();
+
+    // 3a) Candlesticks + vekar (kopplade till kursvågen)
+    drawCandles(g, w, h, bb, yUp, yLo, now);
+    // 3b) KURSVÅG i mittenhavet — skumytan speglar grafen
+    drawKursWave(g, w, h, bb, yUp, yLo, now);
+
+    // 4) BB lines (tunnel edges)
+    g.strokeStyle = 'rgba(220,70,55,0.95)'; g.lineWidth = 2.4;
+    g.beginPath(); g.moveTo(0, yUp); g.lineTo(w, yUp); g.stroke();
+    g.strokeStyle = 'rgba(210,170,90,0.95)';
+    g.beginPath(); g.moveTo(0, yLo); g.lineTo(w, yLo); g.stroke();
+    g.setLineDash([6, 6]); g.strokeStyle = 'rgba(200,200,220,0.4)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(0, yMid); g.lineTo(w, yMid); g.stroke(); g.setLineDash([]);
+    g.fillStyle = 'rgba(220,70,55,0.9)'; g.font = '11px system-ui';
+    g.fillText('Övre BB · vågor → berg', 270, yUp - 8);
+    g.fillStyle = 'rgba(210,170,90,0.9)'; g.fillText('Nedre BB · vågor → strand', 270, yLo + 16);
+    g.fillStyle = 'rgba(180,230,255,0.75)'; g.fillText('HAV · spelplan / tunnel', 270, (yUp + yLo) * 0.5);
+
+    // 5) beach under lower BB + waves slamming into sand
+    drawBeach(g, w, h, yLo, now, bb);
+
+    // 6) MACD reflections in sea band
+    var leftPad = 290, rightPad = 20, plotW = w - leftPad - rightPad;
+    for (var mi = 0; mi < 24; mi++) {
+      var rx = leftPad + (mi / 23) * plotW;
+      var ry = (yUp + yLo) * 0.5 + Math.sin(mi + now * 0.002) * (terrainMode === 'flat' ? 2 : 8);
+      g.fillStyle = hist >= 0 ? 'rgba(80,255,160,0.45)' : 'rgba(255,90,90,0.45)';
+      g.beginPath(); g.ellipse(rx, ry, 3, 1.4, 0, 0, Math.PI * 2); g.fill();
+    }
+
+    // SL/TP markers (under price line)
+    drawSlTp(g, w, h, bb, boats[0], 'rgba(232,197,71,0.9)', 'Gul');
+    drawSlTp(g, w, h, bb, boats[1], 'rgba(130,205,255,0.9)', 'Blå');
+
+    // 7) Gränslandet portal + shoreline already IS the kurslinje (drawBeach)
+    drawGranslandet(g, w, h, bb, 290, w - 290 - 20);
+    // light gold echo kept via drawPriceLine accent (thin) — shoreline carries the read
+    drawPriceLine(g, w, h, bb);
+
+    // 8) boats LAST — pinned in SEA between BB (never under sand, never invisible)
+    var livePx = prices[prices.length - 1] || bb.mid;
+    var yKurs = priceToY(livePx, bb, h);
+    boats.forEach(function(b){
+      var bx = 140 + b.x * (w - 220);
+      var by;
+      if (b.side === 'KÖP') by = yUp + (yKurs - yUp) * 0.45;
+      else if (b.side === 'SÄLJ') by = yKurs + (yLo - yKurs) * 0.45;
+      else by = yKurs;
+      // hard clamp into water band ABOVE lower BB / shoreline
+      by = Math.max(yUp + 36, Math.min(yLo - 28, by));
+      try {
+        drawBoatSprite(g, b, bx, by, now);
+      } catch (err) {
+        g.fillStyle = b.tint === 'gold' ? '#e8c547' : '#82cdff';
+        g.fillRect(bx - 40, by - 20, 80, 40);
+      }
+      g.save();
+      g.strokeStyle = b.tint === 'gold' ? '#ffe066' : '#9fe0ff';
+      g.lineWidth = 5;
+      g.beginPath(); g.arc(bx, by, 56, 0, Math.PI * 2); g.stroke();
+      g.fillStyle = b.tint === 'gold' ? '#ffe066' : '#9fe0ff';
+      g.font = 'bold 13px system-ui';
+      g.fillText(b.tint === 'gold' ? 'GUL P1 · WASD' : 'BLÅ P2 · PILAR', bx - 55, by + 72);
+      g.restore();
+    });
+    // Fas-HUD: lobbyn / Gränslandet / tävling
+    g.save();
+    g.font = 'bold 13px system-ui';
+    var phaseLabel = gamePhase === 'lobby' ? 'FAS · Lobbyn (historik → Gränslandet)'
+      : gamePhase === 'crossing' ? 'FAS · Gränslandet — övergång…'
+      : 'FAS · Tävling (live trading)';
+    g.fillStyle = 'rgba(0,0,0,0.55)';
+    g.fillRect(w * 0.5 - 170, 44, 340, 28);
+    g.fillStyle = gamePhase === 'race' ? '#ffe066' : '#c9d2e0';
+    g.fillText(phaseLabel, w * 0.5 - 160, 63);
+    // progress per spelare
+    function drawProg(b, x0, col, name){
+      var ready = b.atGate;
+      var pct = Math.min(1, (b.histProgress || 0));
+      g.fillStyle = 'rgba(0,0,0,0.45)'; g.fillRect(x0, 78, 140, 10);
+      g.fillStyle = col; g.fillRect(x0, 78, 140 * pct, 10);
+      g.fillStyle = ready ? '#7dffb0' : col;
+      g.font = '10px system-ui';
+      g.fillText(name + (ready ? ' · GRÄNSLAND' : ' · ' + Math.round(pct * 100) + '%'), x0, 74);
+    }
+    drawProg(boats[0], 16, '#e8c547', 'Gul');
+    drawProg(boats[1], w - 156, '#82cdff', 'Blå');
+    if (gamePhase === 'crossing' || phaseFade > 0.01) {
+      g.fillStyle = 'rgba(8,4,20,' + (0.25 + phaseFade * 0.55) + ')';
+      g.fillRect(0, 0, w, h);
+      g.fillStyle = '#ffe066';
+      g.font = 'bold 28px system-ui';
+      g.textAlign = 'center';
+      g.fillText('Gränslandet passerat', w * 0.5, h * 0.42);
+      g.font = '16px system-ui';
+      g.fillStyle = '#e9eef6';
+      g.fillText('Tävling börjar — live trading mot varandra', w * 0.5, h * 0.42 + 34);
+      g.textAlign = 'left';
+    }
+    g.restore();
+
+    // runisk XY-kompass på canvas (SVG-ringen ligger ovanpå)
+    drawRuneBorder(g, w, h, now);
+  }
+
+  // Trädraksansikten (mode-sprites) — speglar live status
+  function faceSrcFor(tag, mood){
+    var map = {
+      uppgang: 'faces/face-' + tag + '-uppgang.png?v=hd2',
+      medgang: 'faces/face-' + tag + '-medgang.png?v=hd2',
+      motgang: 'faces/face-' + tag + '-motgang.png?v=hd2',
+      motgangAlt: 'faces/face-' + tag + '-motgang-alt.png?v=hd2',
+      broken: 'faces/face-' + tag + '-broken.png?v=hd2'
+    };
+    return map[mood] || map.medgang;
+  }
+  function distToLevel(price, level){
+    if (level == null || !(price > 0)) return 1e9;
+    return Math.abs(price - level) / Math.max(1, Math.abs(price) * 0.001);
+  }
+  function faceMood(b, price, tag){
+    var S = function(k){ return faceSrcFor(tag, k); };
+    if (b.faceHit === 'tp' && b.faceFlash > 0.15)
+      return { src: S('uppgang'), mood: 'hit-tp mood-up', label: 'TP ✓' };
+    if (b.faceHit === 'sl' && b.faceFlash > 0.15)
+      return { src: S('broken'), mood: 'hit-sl mood-down', label: 'SL ✗' };
+    if (b.side === 'FLAT')
+      return { src: S('medgang'), mood: 'mood-flat', label: 'FLAT · lobbyn' };
+    var nearSl = distToLevel(price, b.sl);
+    var nearTp = distToLevel(price, b.tp);
+    var lev = b.lev || 1;
+    if (nearSl < 8)
+      return { src: S('broken'), mood: 'mood-risk', label: 'SL-NÄRA · x' + lev.toFixed(1) };
+    if (nearTp < 8)
+      return { src: S('uppgang'), mood: 'mood-up', label: 'TP-NÄRA · x' + lev.toFixed(1) };
+    if (b.pnl > 1.5 || (b.pnl > 0.4 && nearTp < 25))
+      return { src: S('uppgang'), mood: 'mood-up', label: (b.side === 'KÖP' ? 'KÖP ↑' : 'SÄLJ ↑') + ' · ' + b.pnl.toFixed(1) };
+    if (b.pnl > 0.15)
+      return { src: S('medgang'), mood: 'mood-ok', label: b.side + ' · +' + b.pnl.toFixed(1) + ' · x' + lev.toFixed(1) };
+    if (b.pnl > -0.35)
+      return { src: S('medgang'), mood: 'mood-ok', label: b.side + ' · x' + lev.toFixed(1) };
+    if (b.pnl > -1.5 || nearSl < 20)
+      return { src: S('motgang'), mood: 'mood-risk', label: 'RISK · ' + b.pnl.toFixed(1) };
+    return { src: S('motgangAlt'), mood: 'mood-down', label: 'MOTGÅNG · ' + b.pnl.toFixed(1) };
+  }
+  function applyFaceHud(el, imgEl, labEl, b, price, tag){
+    var m = faceMood(b, price, tag || 'p1');
+    var moods = ['hit-tp','hit-sl','mood-up','mood-ok','mood-risk','mood-down','mood-flat'];
+    moods.forEach(function(c){ el.classList.remove(c); });
+    m.mood.split(/\s+/).forEach(function(c){ if (c) el.classList.add(c); });
+    if (imgEl && imgEl.getAttribute('src') !== m.src) imgEl.setAttribute('src', m.src);
+    if (labEl) labEl.textContent = m.label;
+  }
+
+  function ensureLevels(b, price, bb){
+    var span = Math.max(20, (bb.up - bb.lo) * 0.35);
+    if (b.side === 'KÖP') {
+      if (b.sl == null) b.sl = price - span * 0.45;
+      if (b.tp == null) b.tp = price + span * 0.55;
+      b.entry = price;
+    } else if (b.side === 'SÄLJ') {
+      if (b.sl == null) b.sl = price + span * 0.45;
+      if (b.tp == null) b.tp = price - span * 0.55;
+      b.entry = price;
+    }
+  }
+
+  function nudgeLevels(b, dSl, dTp, price){
+    var step = Math.max(5, Math.abs(price) * 0.00015);
+    if (dSl) b.sl = (b.sl == null ? price : b.sl) + dSl * step;
+    if (dTp) b.tp = (b.tp == null ? price : b.tp) + dTp * step;
+  }
+
+  function checkHits(b, price){
+    if (b.side === 'FLAT') return;
+    var hit = null;
+    if (b.side === 'KÖP') {
+      if (b.sl != null && price <= b.sl) hit = 'sl';
+      else if (b.tp != null && price >= b.tp) hit = 'tp';
+    } else if (b.side === 'SÄLJ') {
+      if (b.sl != null && price >= b.sl) hit = 'sl';
+      else if (b.tp != null && price <= b.tp) hit = 'tp';
+    }
+    if (!hit) return;
+    var bump = Math.abs((b.entry != null ? b.entry : price) - price) * 0.01;
+    if (hit === 'tp') b.pnl += Math.max(0.5, bump);
+    else b.pnl -= Math.max(0.5, bump);
+    b.faceHit = hit; b.faceFlash = 1;
+    b.side = 'FLAT'; b.sl = null; b.tp = null; b.entry = null;
+  }
+
+  function step(now){
+    if (!running) return;
+    requestAnimationFrame(step);
+    if (paused) return;
+    var dt = Math.min(32, now - (t0 || now)); t0 = now; tick++;
+
+    // F toggles flat mode (edge-trigger)
+    if (down('KeyF')) {
+      if (!fWasDown) setTerrain(terrainMode === 'flat' ? 'normal' : 'flat');
+      fWasDown = true;
+    } else fWasDown = false;
+
+    var bb = bands();
+    var price = prices[prices.length - 1] || bb.mid || 0;
+    var p1 = boats[0], p2 = boats[1];
+
+    // A/D = hävstång + hastighet (INTE sidhopp / vx)
+    if (down('KeyA')) { p1.lev = Math.max(1, p1.lev - 0.02 * dt); p1.speed = Math.max(0.4, p1.speed - 0.015 * dt); }
+    if (down('KeyD')) { p1.lev = Math.min(20, p1.lev + 0.02 * dt); p1.speed = Math.min(4, p1.speed + 0.015 * dt); }
+    // W en gång från FLAT → KÖP (buy). S → SÄLJ.
+    if (down('KeyW')) {
+      if (!p1.wWas && p1.side === 'FLAT') { p1.side = 'KÖP'; ensureLevels(p1, price, bb); p1.practiced = true; }
+      else if (p1.side !== 'FLAT') { p1.side = 'KÖP'; ensureLevels(p1, price, bb); }
+      p1.wWas = true;
+    } else p1.wWas = false;
+    if (down('KeyS')) {
+      if (!p1.sWas && p1.side === 'FLAT') { p1.side = 'SÄLJ'; ensureLevels(p1, price, bb); p1.practiced = true; }
+      else if (p1.side !== 'FLAT') { p1.side = 'SÄLJ'; ensureLevels(p1, price, bb); }
+      p1.sWas = true;
+    } else p1.sWas = false;
+    // SL/TP locked during race — set via wayfinder before start only
+    // Soft forward drift from speed — no jump
+    p1.vx = 0;
+    p1.x = Math.max(0.12, Math.min(0.88, p1.x + (p1.speed - 1) * 0.00015 * dt));
+
+    var hScreen = innerHeight;
+    var yPrice = priceToY(price, bb, hScreen);
+    var yUpPx = priceToY(bb.up, bb, hScreen);
+    var yLoPx = priceToY(bb.lo, bb, hScreen);
+    function sideY(side){
+      // Mild offset — no big hop to BB midpoints
+      if (side === 'KÖP') return (yPrice - 18) / hScreen;
+      if (side === 'SÄLJ') return (yPrice + 18) / hScreen;
+      return yPrice / hScreen;
+    }
+    var targetY1 = sideY(p1.side);
+    p1.y += (targetY1 - p1.y) * 0.045;
+    p1.y = Math.max(0.28, Math.min(0.62, p1.y));
+    p1.flash *= 0.92;
+    p1.faceFlash *= 0.96;
+    if (p1.faceFlash < 0.05) { p1.faceFlash = 0; p1.faceHit = null; }
+
+    // ←/→ = hävstång + hastighet for P2 (inte hopp)
+    if (down('ArrowLeft')) { p2.lev = Math.max(1, p2.lev - 0.02 * dt); p2.speed = Math.max(0.4, p2.speed - 0.015 * dt); }
+    if (down('ArrowRight')) { p2.lev = Math.min(20, p2.lev + 0.02 * dt); p2.speed = Math.min(4, p2.speed + 0.015 * dt); }
+    if (down('ArrowUp')) {
+      if (!p2.upWas && p2.side === 'FLAT') { p2.side = 'KÖP'; ensureLevels(p2, price, bb); p2.practiced = true; }
+      else if (p2.side !== 'FLAT') { p2.side = 'KÖP'; ensureLevels(p2, price, bb); }
+      p2.upWas = true;
+    } else p2.upWas = false;
+    if (down('ArrowDown')) {
+      if (!p2.dnWas && p2.side === 'FLAT') { p2.side = 'SÄLJ'; ensureLevels(p2, price, bb); p2.practiced = true; }
+      else if (p2.side !== 'FLAT') { p2.side = 'SÄLJ'; ensureLevels(p2, price, bb); }
+      p2.dnWas = true;
+    } else p2.dnWas = false;
+    // P2 SL/TP locked during race
+    p2.vx = 0;
+    p2.x = Math.max(0.12, Math.min(0.88, p2.x + (p2.speed - 1) * 0.00015 * dt));
+    var targetY2 = sideY(p2.side);
+    p2.y += (targetY2 - p2.y) * 0.045;
+    p2.y = Math.max(0.28, Math.min(0.62, p2.y));
+    p2.flash *= 0.92;
+    p2.faceFlash *= 0.96;
+    if (p2.faceFlash < 0.05) { p2.faceFlash = 0; p2.faceHit = null; }
+
+    boats.forEach(function(b){
+      var dir = b.side === 'KÖP' ? 1 : b.side === 'SÄLJ' ? -1 : 0;
+      // Lobby: mild practice PnL; Race: full live competition weight
+      var wgt = gamePhase === 'race' ? 0.004 : 0.0015;
+      b.pnl += dir * (price - bb.mid) * wgt * (b.lev || 1);
+      if (gamePhase === 'race') checkHits(b, price);
+      // Historisk progress mot Gränslandet
+      b.histProgress = Math.max(b.histProgress || 0, Math.min(1, b.x / GATE_X));
+      b.atGate = !!(b.sl != null && b.tp != null && b.practiced && b.x >= GATE_X);
+    });
+
+    // Auto-övergång: båda vid Gränslandet → crossing → race
+    if (gamePhase === 'lobby' && boats[0].atGate && boats[1].atGate) {
+      gamePhase = 'crossing';
+      phaseFade = 1;
+    }
+    if (gamePhase === 'crossing') {
+      phaseFade = Math.max(0, phaseFade - dt * 0.00035);
+      if (phaseFade <= 0.02) {
+        gamePhase = 'race';
+        phaseFade = 0;
+        boats.forEach(function(b){ b.flash = 1; });
+      }
+    }
+
+    // Parallax voyage: stjärnor/berg/strand rör sig i proportion till båtarnas färd
+    var avgSpd = ((boats[0].speed || 1) + (boats[1].speed || 1)) * 0.5;
+    var avgX = (boats[0].x + boats[1].x) * 0.5;
+    worldScroll += dt * (0.012 + avgSpd * 0.018 + avgX * 0.004);
+    // mild price-driven sway so layers breathe with kursen
+    var pxNow = prices[prices.length - 1] || 0;
+    var pxPrev = prices.length > 2 ? prices[prices.length - 3] : pxNow;
+    worldScroll += (pxNow - pxPrev) * 0.002;
+
+    draw(now);
+
+    document.getElementById('m1').textContent = p1.side;
+    document.getElementById('m2').textContent = p2.side;
+    function sltpStr(b){
+      return ' SL ' + (b.sl == null ? '—' : b.sl.toFixed(0)) + ' TP ' + (b.tp == null ? '—' : b.tp.toFixed(0));
+    }
+    document.getElementById('s1').textContent = 'x' + p1.lev.toFixed(1) + ' · spd ' + p1.speed.toFixed(1) + ' · pnl ' + p1.pnl.toFixed(2) + sltpStr(p1);
+    document.getElementById('s2').textContent = 'x' + p2.lev.toFixed(1) + ' · spd ' + p2.speed.toFixed(1) + ' · pnl ' + p2.pnl.toFixed(2) + sltpStr(p2);
+    var f1 = document.getElementById('face1'), f2 = document.getElementById('face2');
+    applyFaceHud(f1, document.getElementById('face1img'), document.getElementById('face1lab'), p1, price, 'p1');
+    applyFaceHud(f2, document.getElementById('face2img'), document.getElementById('face2lab'), p2, price, 'p2');
+
+    var el = document.getElementById('dbg');
+    if (el && window.__VBDBG) {
+      var K = window.__VBKEYS;
+      el.textContent =
+        'SENAST: ' + window.__VBDBG.last + '\n' +
+        'BÅT: ' + window.__VBDBG.boat + '\n' +
+        'KÖP/SÄLJ: ' + window.__VBDBG.buySell + '\n' +
+        'n=' + window.__VBDBG.n + '\n' +
+        'terrain=' + terrainMode + '\n' +
+        'WASD→GUL only · pilar→BLÅ only\n' +
+        'GUL x=' + p1.x.toFixed(3) + ' ' + p1.side + sltpStr(p1) + '\n' +
+        'BLÅ x=' + p2.x.toFixed(3) + ' ' + p2.side + sltpStr(p2) + '\n' +
+        'Arrow L/R/U/D: ' + !!K.ArrowLeft + '/' + !!K.ArrowRight + '/' + !!K.ArrowUp + '/' + !!K.ArrowDown + '\n' +
+        'heartbeat ' + new Date().toLocaleTimeString();
+    }
+  }
+
+  document.getElementById('go').onclick = function(){
+    if (!_wfSeeded) defaultLevelsFromPrice();
+    levelsLocked = true;
+    gamePhase = 'lobby';
+    phaseFade = 0;
+    boats.forEach(function(b){
+      b.histProgress = 0; b.atGate = false; b.practiced = !!(b.sl != null && b.tp != null);
+      // start left of gate in historik-zon
+      if (b.tint === 'gold') b.x = 0.28; else b.x = 0.22;
+    });
+    preRace = false;
+    document.getElementById('start').style.display = 'none';
+    var mascot = document.getElementById('mascot');
+    if (mascot) mascot.classList.add('hidden');
+    running = true; paused = false; t0 = 0;
+    cv.focus();
+    setTimeout(function(){ cv.focus(); }, 30);
+    requestAnimationFrame(step);
+  };
+
+  // Pre-race wayfinder keys (while start panel visible)
+  var wfKeyCool = 0;
+  window.addEventListener('keydown', function(e){
+    if (codeEscape(e)) { if (running) paused = !paused; return; }
+    if (running || levelsLocked) return;
+    var code = e.code || '';
+    var now = Date.now();
+    if (now < wfKeyCool) return;
+    // P1: A/D switch field, W/S nudge
+    if (code === 'KeyA') { cycleFocus(0, 0); wfFocus.f = 'sl'; syncWayfinderUI(); wfKeyCool = now + 140; }
+    else if (code === 'KeyD') { cycleFocus(0, 0); wfFocus.f = 'tp'; syncWayfinderUI(); wfKeyCool = now + 140; }
+    else if (code === 'KeyW') { nudgeWayfinder(0, wfFocus.p === 0 ? wfFocus.f : 'sl', +1); wfFocus.p = 0; wfKeyCool = now + 70; }
+    else if (code === 'KeyS') { nudgeWayfinder(0, wfFocus.p === 0 ? wfFocus.f : 'sl', -1); wfFocus.p = 0; wfKeyCool = now + 70; }
+    // P2: ←/→ field, ↑/↓ nudge
+    else if (code === 'ArrowLeft') { cycleFocus(1, 0); wfFocus.f = 'sl'; syncWayfinderUI(); wfKeyCool = now + 140; }
+    else if (code === 'ArrowRight') { cycleFocus(1, 0); wfFocus.f = 'tp'; syncWayfinderUI(); wfKeyCool = now + 140; }
+    else if (code === 'ArrowUp') { nudgeWayfinder(1, wfFocus.p === 1 ? wfFocus.f : 'sl', +1); wfFocus.p = 1; wfKeyCool = now + 70; }
+    else if (code === 'ArrowDown') { nudgeWayfinder(1, wfFocus.p === 1 ? wfFocus.f : 'sl', -1); wfFocus.p = 1; wfKeyCool = now + 70; }
+    else if (code === 'Enter') { /* activate focus flash */ syncWayfinderUI(); }
+  }, true);
+  function codeEscape(e){ return e.code === 'Escape' || e.key === 'Escape'; }
+
+  // idle preview draw while on start screen
+  (function previewLoop(t){
+    if (!running) { draw(t); requestAnimationFrame(previewLoop); }
+  })(performance.now());
+})();
+</script>
+</body>
+</html>
