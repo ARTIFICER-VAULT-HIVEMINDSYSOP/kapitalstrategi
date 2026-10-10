@@ -25,7 +25,7 @@ const INTERNAL_NOTE = [
   [/\bTODO\b/, "TODO"],
   [/(?:^|[^\p{L}])internt(?=$|[^\p{L}])/iu, "ordet internt"],
   [/(?:^|[^\p{L}\p{N}])ÖB(?=$|[^\p{L}\p{N}])/u, "ordet ÖB"],
-  [/(?:^|[^\p{L}])(?:ChatGPT|OpenAI|Anthropic|Claude|Cursor)(?=$|[^\p{L}])/iu, "bot- eller agentnamn"],
+  [/(?:^|[^\p{L}])(?:ChatGPT|Anthropic|Claude|Cursor)(?=$|[^\p{L}])/iu, "bot- eller agentnamn"],
 ];
 
 const IMAGE_SOURCES = new Set(["egen", "unsplash", "pexels", "wikimedia"]);

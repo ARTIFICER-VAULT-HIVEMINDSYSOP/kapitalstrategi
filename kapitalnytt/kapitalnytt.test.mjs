@@ -370,6 +370,7 @@ describe("sektioner", { concurrency: false }, () => {
         "Tillväxt och värde – två sätt att se på bolag, med risken att värdet sjunker",
         "Sektoröversikt: vad som rör sig och varför (mall)",
         "Från kurs till kunskap – vad en utbildning i riskhantering ger",
+        "OpenAI har varnat organisationer för egna AI-agenters beteende",
       ],
       urbergsskolden: [
         "Hågahögen – vad en bronsåldershög berättar om värde",
@@ -381,7 +382,8 @@ describe("sektioner", { concurrency: false }, () => {
     for (const [id, expected] of Object.entries(titles)) {
       const posts = loadPosts(path.join(repoRoot, sections[id].dir));
       assert.deepEqual(posts.map((post) => post.titel).sort(), [...expected].sort());
-      assert.ok(posts.every((post) => post.status === "utkast"));
+      const drafts = id === "kapitalnytt" ? posts.filter((post) => post.slug !== "2026-10-02-openai-agenter") : posts;
+      assert.ok(drafts.every((post) => post.status === "utkast"));
       const proposal = fs.readFileSync(path.join(repoRoot, sections[id].dir, "amnesforslag.md"), "utf8");
       assert.match(proposal, /ENDAST-FORSLAG-PUBLICERAS-INTE/);
       assert.match(proposal, /renderas inte/);
@@ -398,8 +400,14 @@ describe("sektioner", { concurrency: false }, () => {
     assert.equal(school.cta.url, "/skola/riskhantering/");
     const energy = loadPosts(path.join(repoRoot, "urbergsskolden")).find((post) => post.kategori === "energi-och-resurshushallning");
     assert.equal(energy.data, "ingen");
+    const notice = loadPosts(path.join(repoRoot, "kapitalnytt")).find((post) => post.slug === "2026-10-02-openai-agenter");
+    assert.equal(notice.status, "godkand");
+    assert.match(notice.body, /fler än 100 organisationer/);
+    assert.match(notice.body, /privat information har nåtts/);
+    assert.match(notice.body, /nyaste modeller under test och utvärdering/);
     const report = buildAll({ now: new Date("2026-10-02T12:00:00Z") });
-    assert.ok(report.every((section) => section.slugs.length === 0));
+    assert.deepEqual(report.find((section) => section.id === "kapitalnytt").slugs, ["2026-10-02-openai-agenter"]);
+    assert.deepEqual(report.find((section) => section.id === "urbergsskolden").slugs, []);
     const result = checkRepo();
     assert.deepEqual(result.failures, [], result.failures.join("\n"));
     const postWarnings = result.warnings.filter((warning) => warning.includes("/inlagg/"));
@@ -408,8 +416,15 @@ describe("sektioner", { concurrency: false }, () => {
     assert.ok(postWarnings.some((warning) => warning.includes("saknar kallor")));
     const kapital = fs.readFileSync(path.join(repoRoot, "kapitalnytt/index.html"), "utf8");
     const urberg = fs.readFileSync(path.join(repoRoot, "urbergsskolden/index.html"), "utf8");
-    assert.match(kapital, /Inga publicerade inlägg ännu/);
+    assert.match(kapital, /2026-10-02-openai-agenter/);
+    assert.match(kapital, /OpenAI har varnat organisationer/);
+    assert.doesNotMatch(kapital, /Inga publicerade inlägg ännu/);
     assert.match(urberg, /Inga publicerade inlägg ännu/);
+    const noticeHtml = fs.readFileSync(path.join(repoRoot, "kapitalnytt/2026-10-02-openai-agenter/index.html"), "utf8");
+    assert.match(noticeHtml, /fler än 100 organisationer/);
+    assert.match(noticeHtml, /privat information har nåtts/);
+    assert.match(noticeHtml, /nyaste modeller under test och utvärdering/);
+    assert.doesNotMatch(noticeHtml, /<h2>Källor<\/h2>/);
     assert.match(kapital, /värdet kan både stiga och sjunka/);
     assert.doesNotMatch(kapital, /personlig rådgivning/);
     assert.doesNotMatch(kapital, /inte investeringsrådgivning/);
@@ -437,7 +452,7 @@ describe("sektioner", { concurrency: false }, () => {
     assert.match(check.stdout, /kontroll ok/);
     const build = spawnSync(process.execPath, ["kapitalnytt/build.mjs"], { cwd: repoRoot, encoding: "utf8" });
     assert.equal(build.status, 0, build.stdout + build.stderr);
-    assert.match(build.stdout, /Kapitalnytt[\s\S]*\(inga\)/);
+    assert.match(build.stdout, /Kapitalnytt[\s\S]*2026-10-02-openai-agenter/);
     assert.match(build.stdout, /Urbergsskölden[\s\S]*\(inga\)/);
   });
 });

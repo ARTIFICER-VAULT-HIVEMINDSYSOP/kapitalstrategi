@@ -76,7 +76,7 @@ Kontrollen ger fel för godkända inlägg och bara varning för utkast.
 - Bild utan credit eller licens.
 - Brutna interna länkar i den genererade utdatan. Externa länkar ger varning.
 - Den bestämda formen av ordet magasin (magasin direkt följt av et).
-- Renderad text om att sidan inte är rådgivning, en rubrik Källor utanför MAR-rutan, samt TODO, ordet internt, ÖB och bot- eller agentnamn.
+- Renderad text om att sidan inte är rådgivning, en rubrik Källor utanför MAR-rutan, samt TODO, ordet internt, ÖB och interna signaturer (ChatGPT, Anthropic, Claude, Cursor). Ett bolagsnamn i en notis, till exempel OpenAI, är tillåtet.
 
 Kapitalnytt bär riskmeningen «Allt sparande och all investering innebär risk: värdet kan både stiga och sjunka, och du kan förlora pengar.» Den meningen sitter i MAR-rutan på marknadsanalys, och som en kort rad på övriga Kapitalnytt-sidor. Urbergsskölden visar den bara när `finans` är `true`. Historia, natur och energi utan den markeringen har ingen sådan rad. Källistor ritas inte ut. `kallor` ska ändå finnas i frontmatter när kontrollen kräver dem.
 
