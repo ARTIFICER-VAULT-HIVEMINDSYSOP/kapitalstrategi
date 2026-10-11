@@ -7,7 +7,8 @@ try{if(sessionStorage.getItem('pv.ok')!=='1')location.replace('../');}catch(e){}
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Vikingbåt iter5 — 2P</title>
+<link rel="icon" href="data:,"/>
+<title>Vikingbåt iter5 — 2P · CFD-race</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:transparent;color:#e9eef6;font:14px/1.4 system-ui,Segoe UI,sans-serif}
@@ -25,8 +26,6 @@ header .hint{color:#8d99ad;font-size:12px}
 #dbg{position:fixed;right:12px;top:44px;z-index:30;min-width:280px;max-width:380px;padding:10px 12px;
   background:#000;border:2px solid #0ff;border-radius:8px;color:#0ff;
   font:12px/1.45 ui-monospace,Consolas,monospace;white-space:pre-wrap;pointer-events:none}
-#dbg{display:none}
-html.vbdebug #dbg{display:block}
 #hud{position:fixed;left:12px;bottom:12px;right:12px;display:flex;gap:12px;z-index:5;pointer-events:none}
 .card{flex:1;max-width:360px;padding:10px 12px;border-radius:12px;background:rgba(8,16,28,.7);border:1px solid rgba(196,60,44,.35)}
 .card.p2{margin-left:auto;border-color:rgba(130,205,255,.45)}
@@ -104,26 +103,67 @@ html.vbdebug #dbg{display:block}
 #start .wf-row .val{min-width:72px;text-align:center;font-variant-numeric:tabular-nums;color:#ffe066}
 #start .wf-hint{color:#8d99ad;font-size:11px;margin-top:8px}
 #start .wf-field.active{outline:1px solid #e8c547;border-radius:4px;background:rgba(232,197,71,.08)}
+/* ===== iter5 mekanik + CFD (2026-10-10) ===== */
+#dbg{display:none}
+body.debug-on #dbg{display:block}
+#start{overflow:auto;align-items:flex-start;padding:2vh 0}
+#start .panel{max-width:820px;margin:auto}
+#start .dragon-intro{width:96px;height:140px;margin-bottom:6px}
+#start .wf-row .val{min-width:110px}
+#start .opt-row{display:flex;gap:8px;justify-content:center;align-items:center;margin:6px 0;flex-wrap:wrap;font-size:12px;color:#c9d2e0}
+#start .opt-row .lbl{min-width:150px;text-align:right;color:#8d99ad}
+#start .opt-row button{pointer-events:auto;border:1px solid #8d99ad;background:transparent;color:#8d99ad;padding:5px 12px;border-radius:999px;font:600 12px system-ui;cursor:pointer}
+#start .opt-row button.active{border-color:#e8c547;color:#e8c547;background:rgba(232,197,71,.12)}
+#start .opt-row button.pro.active{border-color:#ff9a6a;color:#ff9a6a;background:rgba(255,120,60,.12)}
+.keys{width:100%;border-collapse:collapse;margin:8px 0;font-size:12px;text-align:left}
+.keys th,.keys td{padding:3px 6px;border-bottom:1px solid rgba(255,255,255,.08)}
+.keys th{color:#8d99ad;font-weight:600}
+.keys td.p1{color:#ffe066}.keys td.p2{color:#9fe0ff}
+.keys kbd{display:inline-block;min-width:18px;padding:0 5px;border:1px solid rgba(255,255,255,.35);border-radius:4px;background:rgba(255,255,255,.07);font:600 11px ui-monospace,monospace;color:#fff;text-align:center}
+.rules{margin:10px 0;padding:10px 12px;border:1px solid rgba(196,60,44,.55);border-radius:12px;background:rgba(30,16,12,.72);text-align:left;font-size:11.5px;line-height:1.45;color:#e8dcc8}
+.rules .rt{color:#e8c547;font-weight:700;margin-bottom:4px;letter-spacing:.04em}
+.rules ul{margin:0 0 0 16px}.rules li{margin:1px 0}.rules b{color:#ffe066}
+.rules .warn{color:#ff9a8a;margin-top:6px;font-size:11px}
+.rules .src{color:#8d99ad;font-size:10.5px;margin-top:4px}
+#rulesFloat{position:fixed;right:12px;top:44px;z-index:12;max-width:400px;max-height:72vh;overflow:auto;display:none;margin:0}
+#rulesFloat.on{display:block}
+#finish{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;background:rgba(5,10,20,.72)}
+#finish.on{display:flex}
+#finish .panel{text-align:center;padding:22px 28px;border:2px solid #e8c547;border-radius:16px;background:linear-gradient(160deg,rgba(40,28,18,.96),rgba(10,20,36,.96));max-width:640px;box-shadow:0 0 40px rgba(232,197,71,.35)}
+#finish h2{color:#e8c547;font-size:26px;margin:6px 0}
+#finish .fin-flag{width:84px;height:56px;margin:0 auto;border-radius:6px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.6)}
+#finish .fin-flag svg{width:100%;height:100%;display:block}
+#finish .fin-sub{color:#c9d2e0;font-size:13px;margin-bottom:10px}
+#finish table{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0 14px}
+#finish td,#finish th{padding:3px 8px;border-bottom:1px solid rgba(255,255,255,.08);text-align:right;font-variant-numeric:tabular-nums}
+#finish td:first-child,#finish th:first-child{text-align:left;color:#8d99ad}
+#finish th.p1{color:#ffe066}#finish th.p2{color:#9fe0ff}
+#finish button{pointer-events:auto;border:1px solid #e8c547;background:rgba(232,197,71,.12);color:#e8c547;padding:10px 22px;border-radius:999px;font:700 14px system-ui;cursor:pointer}
+#finish .fin-note{color:#8d99ad;font-size:11px;margin-top:8px}
+#muteBtn{pointer-events:auto;margin-left:8px;border:1px solid #8d99ad;background:rgba(0,0,0,.35);color:#e9eef6;border-radius:999px;padding:1px 9px;font:600 11px system-ui;cursor:pointer}
+header .hint{display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:72vw}
+.card{max-width:460px}
+.card span{white-space:pre-line;display:block;line-height:1.35}
+#face{bottom:150px}
+#livepx{white-space:pre-line}
 </style>
 </head>
 <body>
 <header>
-  <h1>PrimeVerse · Vikingbåt iter5</h1>
-  <div class="hint">Gul: A/D · W/S · Blå: ←→ · ↑↓ · SL/TP via vägvisare före start · F flat · Esc</div>
+  <h1>PrimeVerse · Vikingbåt iter5 · CFD-race</h1>
+  <div class="hint">Gul: W köp · S sälj · Q stäng · A/D hävstång · E storlek — Blå: ↑ köp · ↓ sälj · <b>-</b> (sv) / <b>/</b> (us) stäng · ←/→ hävstång · . storlek — H regler · M ljud · F terräng · Esc paus <button id="muteBtn" type="button" title="M växlar ljud">🔊 Ljud på</button></div>
 </header>
 <div id="runpanel">
   <div class="t">ᚱ ᚢ ᚾ · Indikatorer</div>
-  <div><b>Bollinger</b> Tunnelhav: övre vågor→berg · mitt = hav · nedre vågor→strand</div>
-  <div><b>Faser</b> Lobbyn → Gränslandet (båda) → Tävling</div>
-  <div><b>MACD</b> Stjärnreflektioner i havet</div>
-  <div><b>Kurslinje</b> LIVE BTCUSDT (Binance) · gul · höger om panel</div>
+  <div><b>BB(20,2)</b> Tunnelhav: övre vågor→berg · mitt = hav · nedre vågor→strand</div>
+  <div><b>Faser</b> Lobbyn (övning) → Gränslandet → Race (historisk uppspelning) → Livevarv</div>
+  <div><b>MACD(12,26,9)</b> Stjärnreflektioner i havet (histogram)</div>
+  <div><b>RSI(14)</b> Wilder · hint i havet</div>
   <div id="livepx" style="color:#ffe066;font-weight:700;margin-top:4px">Kurs: hämtar…</div>
   <div><b>Terräng</b> <span id="terrLabel">Flat</span> (F växlar till Vanlig)</div>
-  <div><b>Runring</b> X/Y runt kanten (kompassros)</div>
-  <div style="color:#8d99ad;margin-top:6px;font-size:11px">Övning — inte råd</div>
+  <div style="color:#8d99ad;margin-top:6px;font-size:11px">Binance spot ≠ mäklarens CFD-kurs · Övning — inte råd</div>
 </div>
 <img id="mascot" src="viking-dragon-boat-SE.png?v=alpha3" alt="Trädrake" title="Syns i lobbyn — döljs vid start"/>
-<script>if(/[?&]debug\b/.test(location.search))document.documentElement.classList.add("vbdebug");</script>
 <div id="dbg">DEBUG startar…\n(tryck valfri tangent)</div>
 <svg id="rune-ring" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
   <defs>
@@ -168,25 +208,53 @@ html.vbdebug #dbg{display:block}
   </div>
 </div>
 <div id="hud">
-  <div class="card p1"><b>Gul · WASD · SE-drake</b><div class="mode" id="m1">FLAT</div><span id="s1">—</span></div>
-  <div class="card p2"><b>Blå · pilar · NO-drake</b><div class="mode" id="m2">FLAT</div><span id="s2">—</span></div>
+  <div class="card p1"><b>Gul · WASD+Q/E · SE-drake</b><div class="mode" id="m1">FLAT</div><span id="s1">—</span></div>
+  <div class="card p2"><b>Blå · pilar+-/. · NO-drake</b><div class="mode" id="m2">FLAT</div><span id="s2">—</span></div>
 </div>
+<div id="rulesFloat" class="rules" aria-live="polite"></div>
+<div id="finish"><div class="panel">
+  <div class="fin-flag" id="finFlag"></div>
+  <h2 id="finTitle">Mål!</h2>
+  <div class="fin-sub" id="finSub"></div>
+  <table id="finStats"></table>
+  <button id="rematch" type="button">⚔ Revansch (Enter / R)</button>
+  <div class="fin-note">Vinnare = högst eget kapital (avkastning %) när racet är slut. Öppna positioner stängs vid mål till bid/ask.</div>
+</div></div>
 <div id="start"><div class="panel">
   <img class="dragon-intro" src="viking-dragon-boat-SE.png?v=alpha3" alt="Trädrake intro"/>
-  <h2>Trädraken · Hav möter sand</h2>
-  <p>32-bitars trädrake: Gul = SE-segel · Blå = NO-segel.<br>
-  <b>Kurslinjen</b> = strandlinjen där vatten möter sand (live BTCUSDT).<br>
-  Startar i <b>Flat</b>. <b>Gränslandet</b> = historik → live på kursen.<br>
-  Sätt <b>SL/TP</b> i vägvisaren innan start — låses under race.</p>
+  <h2>Trädraken · CFD-race på BTC</h2>
+  <p>Gul = SE-segel · Blå = NO-segel. Båda börjar med <b>10 000 USD</b> på ett CFD-konto.<br>
+  <b>Lobbyn</b>: öva på historiska ljus — öppna och stäng en position var för att nå <b>Gränslandet</b>.<br>
+  <b>Race</b>: 60 historiska 1m-ljus spelas upp snabbare (1 ljus / 1,5 s) → sedan <b>livevarv</b> på LIVE-data.<br>
+  Den med <b>högst eget kapital</b> vid mål vinner. Farten på havet = kontots tillväxt.</p>
   <div class="mode-row">
     <button type="button" id="btnNormal">Vanlig</button>
     <button type="button" id="btnFlat" class="active">Flat</button>
   </div>
+  <div class="opt-row"><span class="lbl">Kundkategori</span>
+    <button type="button" id="btnRetail" class="active">Privatkund (ESMA/FI · max 2:1)</button>
+    <button type="button" id="btnPro" class="pro">Pro-klient (ej privatkund · ×5)</button></div>
+  <div class="opt-row"><span class="lbl">Positionsstorlek</span>
+    <button type="button" id="btnSizePct" class="active">% av köpkraft (25/50/100)</button>
+    <button type="button" id="btnSizeRisk">Risk % till SL (0,5/1/2)</button></div>
+  <div class="opt-row"><span class="lbl">Livevarv efter uppspelning</span>
+    <button type="button" id="btnLiveOn" class="active">På (60 s LIVE)</button>
+    <button type="button" id="btnLiveOff">Av</button></div>
+  <table class="keys">
+    <tr><th>Handling</th><th>Gul P1 (SE)</th><th>Blå P2 (NO)</th></tr>
+    <tr><td>KÖP (öppna lång / stäng kort)</td><td class="p1"><kbd>W</kbd></td><td class="p2"><kbd>↑</kbd></td></tr>
+    <tr><td>SÄLJ (öppna kort / stäng lång)</td><td class="p1"><kbd>S</kbd></td><td class="p2"><kbd>↓</kbd></td></tr>
+    <tr><td>STÄNG → FLAT</td><td class="p1"><kbd>Q</kbd></td><td class="p2"><kbd>-</kbd> (sv) / <kbd>/</kbd> (us) / <kbd>Num 0</kbd></td></tr>
+    <tr><td>Hävstång steg ned / upp (nästa order)</td><td class="p1"><kbd>A</kbd> / <kbd>D</kbd></td><td class="p2"><kbd>←</kbd> / <kbd>→</kbd></td></tr>
+    <tr><td>Storlek (växla steg)</td><td class="p1"><kbd>E</kbd></td><td class="p2"><kbd>.</kbd> / <kbd>Num 1</kbd></td></tr>
+    <tr><td>Före start: SL/TP i vägvisaren</td><td class="p1"><kbd>A</kbd>/<kbd>D</kbd> fält · <kbd>W</kbd>/<kbd>S</kbd> värde</td><td class="p2"><kbd>←</kbd>/<kbd>→</kbd> fält · <kbd>↑</kbd>/<kbd>↓</kbd> värde</td></tr>
+    <tr><td>Gemensamt</td><td colspan="2"><kbd>H</kbd> regler · <kbd>M</kbd> ljud av/på · <kbd>F</kbd> terräng · <kbd>Esc</kbd> paus · <kbd>Enter</kbd>/<kbd>R</kbd> revansch</td></tr>
+  </table>
   <div class="wayfinder" id="wayfinder">
-    <div class="wf-title"><span class="wf-compass">🧭</span> Vägvisare · Stop loss &amp; Take profit</div>
+    <div class="wf-title"><span class="wf-compass">🧭</span> Vägvisare · Stop loss &amp; Take profit (avstånd från ingångspris)</div>
     <div class="wf-grid">
       <div class="wf-card p1">
-        <b>Gul P1 · W/S bläddra · A/D fält</b>
+        <b>Gul P1 · W/S värde · A/D fält</b>
         <div class="wf-row wf-field" data-p="0" data-f="sl"><span>SL</span>
           <button type="button" data-act="p0-sl-">−</button>
           <span class="val" id="wf-sl0">—</span>
@@ -195,9 +263,10 @@ html.vbdebug #dbg{display:block}
           <button type="button" data-act="p0-tp-">−</button>
           <span class="val" id="wf-tp0">—</span>
           <button type="button" data-act="p0-tp+">+</button></div>
+        <label class="wf-row" style="justify-content:flex-start;gap:6px"><input type="checkbox" id="gsl0" style="pointer-events:auto"> Garanterad stop (premie om den utlöses)</label>
       </div>
       <div class="wf-card p2">
-        <b>Blå P2 · ↑↓ bläddra · ←→ fält</b>
+        <b>Blå P2 · ↑↓ värde · ←→ fält</b>
         <div class="wf-row wf-field" data-p="1" data-f="sl"><span>SL</span>
           <button type="button" data-act="p1-sl-">−</button>
           <span class="val" id="wf-sl1">—</span>
@@ -206,9 +275,29 @@ html.vbdebug #dbg{display:block}
           <button type="button" data-act="p1-tp-">−</button>
           <span class="val" id="wf-tp1">—</span>
           <button type="button" data-act="p1-tp+">+</button></div>
+        <label class="wf-row" style="justify-content:flex-start;gap:6px"><input type="checkbox" id="gsl1" style="pointer-events:auto"> Garanterad stop (premie om den utlöses)</label>
       </div>
     </div>
-    <div class="wf-hint">Upp/ner justerar aktiv nivå · Enter aktiverar · nivåerna syns som markörer i sanden</div>
+    <div class="wf-hint">SL/TP sätts som % från ingångspriset och följer med varje ny order. Låses under racet.</div>
+  </div>
+  <div class="rules" id="rulesBox">
+    <div class="rt">ᚱ Regler (CFD) — spelet följer riktig CFD-handel för privatkund</div>
+    <ul>
+      <li><b>Hävstång:</b> krypto-CFD max <b>2:1</b> för privatkund (ESMA, FI FFFS 2019:7 = 50 % initial marginal). Här ×1 eller ×2. Jämför: stora valutapar 30:1, stora index 20:1, råvaror 10:1, aktier 5:1.</li>
+      <li><b>Pro-läge</b> (ej privatkund): ×1/×2/×5 — t.ex. IG pro BTC-marginal 16–18 %. Inget negativt saldoskydd.</li>
+      <li><b>Initial marginal</b> = nominellt värde ÷ hävstång. Eget kapital = saldo + orealiserat. Marginalnivå = eget kapital ÷ marginal.</li>
+      <li><b>Marginalavslut:</b> när eget kapital &lt; <b>50 %</b> av krävd initial marginal stängs positionen (röd streckad linje = close-out-priset).</li>
+      <li><b>Negativt saldoskydd:</b> en privatkund kan inte förlora mer än kontot.</li>
+      <li><b>Spread:</b> köp på <b>ask</b>, sälj på <b>bid</b> (BTC ≈ 45 USD hos IG, vidgas vid oro) → ny position startar lite negativ.</li>
+      <li><b>Stop loss</b> utlöses när priset nuddar nivån (bid för köp, ask för sälj), även mitt i ett ljus, och kan <b>slira</b> vid gap. <b>Garanterad stop</b> = exakt nivå mot premie (IG BTC: 90 punkter, betalas bara om den utlöses). TP = limit (nivån eller bättre).</li>
+      <li><b>Finansiering</b> (overnight) på nominellt värde: köp ca −16 %/år, sälj ca −4 %/år (IG exempel, ÷360 per dygn). <i>Komprimerad tid: 1 race ≈ 1 dygn.</i></li>
+      <li><b>Kurtage:</b> 0 (spread-modell, som IG för BTC-CFD).</li>
+      <li><b>Data:</b> Binance spot 1m. En mäklares CFD-kurs (mitt/bid/ask, helgpriser, ljustider) skiljer sig något. Race = <b>historisk uppspelning</b> ×40, livevarv = LIVE.</li>
+      <li><b>UK:</b> FCA förbjuder krypto-CFD till privatkunder sedan 6 jan 2021.</li>
+      <li><b>Odins vind ᚨ</b> är bara moral/visning (risk/belöning-tips) — påverkar aldrig pris, PnL eller avgifter.</li>
+    </ul>
+    <div class="warn">ESMA:s standardvarning: CFD-kontrakt är komplexa instrument med stor risk för snabba förluster på grund av hävstången. 74–89 % av privatkunders konton förlorar pengar. Övning — inte råd.</div>
+    <div class="src">Källor: ESMA produktingripande (2018), FI FFFS 2019:7, FCA PS20/10, IG produktdetaljer krypto-CFD. Se CFD-AVVIKELSER.md.</div>
   </div>
   <button id="go" type="button">Aktivera vägvisare &amp; starta</button>
 </div></div>
@@ -244,7 +333,8 @@ window.__VBDBG = { last:'—', boat:'—', n:0, buySell:'—' };
   function onKey(e, down){
     var code = codeOf(e);
     var trap = code.indexOf('Arrow') === 0 || code.indexOf('Key') === 0 || code === 'Space' || code === 'Escape'
-      || code === 'BracketLeft' || code === 'BracketRight' || code === 'Semicolon' || code === 'Quote';
+      || code === 'BracketLeft' || code === 'BracketRight' || code === 'Semicolon' || code === 'Quote'
+      || code === 'Slash' || code === 'Period' || code === 'Minus' || code.indexOf('Numpad') === 0;
     if (trap) { e.preventDefault(); e.stopPropagation(); }
     window.__VBKEYS[code] = down;
     if (down) {
@@ -313,9 +403,9 @@ window.__VBDBG = { last:'—', boat:'—', n:0, buySell:'—' };
   }
   var SYMBOL = 'BTCUSDT';
   var prices = [];
-  var candles = []; // {o,h,l,c} OHLC for sticks + vekar
-  var liveStatus = 'ansluter…';
-  var liveSource = 'Binance data-api';
+  var candles = [];
+  var liveStatus = 'HISTORIK';
+  var liveSource = 'Binance spot (data-api)';
   var lastLiveAt = 0;
   var terrainMode = 'flat'; // 'normal' | 'flat' — start flat
   var fWasDown = false;
@@ -341,10 +431,15 @@ window.__VBDBG = { last:'—', boat:'—', n:0, buySell:'—' };
   var levelsLocked = false;
   var _wfSeeded = false;
 
-  var boats = [
-    { x:0.28, y:0.50, vx:0, side:'FLAT', pnl:0, tint:'gold', flash:0, sl:null, tp:null, entry:null, faceFlash:0, faceHit:null, flag:'SE', lev:1, speed:1, wWas:false, sWas:false, practiced:false, histProgress:0, atGate:false },
-    { x:0.22, y:0.55, vx:0, side:'FLAT', pnl:0, tint:'cyan', flash:0, sl:null, tp:null, entry:null, faceFlash:0, faceHit:null, flag:'NO', lev:1, speed:1, upWas:false, dnWas:false, practiced:false, histProgress:0, atGate:false }
-  ];
+  function newBoat(tint, flag, x, y){
+    return { x:x, y:y, vx:0, side:'FLAT', pnl:0, tint:tint, flash:0, faceFlash:0, faceHit:null, flag:flag,
+      levIdx:1, sizeIdx:1, slPct:0.40, tpPct:0.80, gsl:false,
+      bal:10000, pos:0, units:0, entry:null, posLev:1, slPx:null, tpPx:null,
+      fin:0, spreadPaid:0, gslPaid:0, slip:0, nbp:0, trades:0, wins:0, closeouts:0, realized:0, peakEq:10000, maxDD:0,
+      capsize:0, cu:null, toast:null, odin:false,
+      practicedOpen:false, practicedClose:false, histProgress:0, atGate:false, speed:1, _sx:0, _sy:0 };
+  }
+  var boats = [ newBoat('gold', 'SE', 0.28, 0.50), newBoat('cyan', 'NO', 0.22, 0.55) ];
 
   function resize(){
     var dpr = devicePixelRatio || 1;
@@ -370,11 +465,7 @@ window.__VBDBG = { last:'—', boat:'—', n:0, buySell:'—' };
     var sd = stdev(prices, n, m);
     return { mid: m, up: m + 2 * sd, lo: m - 2 * sd };
   }
-  function macdHist(){
-    var a = sma(prices, 12), b = sma(prices, 26);
-    if (a == null || b == null) return 0;
-    return a - b;
-  }
+  function macdHist(){ return macdParts().hist; }
   function priceToY(px, bb, h){
     var span = Math.max(1e-6, bb.up - bb.lo);
     var t = (px - bb.lo) / span;
@@ -388,74 +479,159 @@ window.__VBDBG = { last:'—', boat:'—', n:0, buySell:'—' };
     return bb.lo + t * (bb.up - bb.lo);
   }
 
-  function applyKlines(rows){
-    if (!rows || !rows.length) return;
-    candles = rows.map(function(k){
-      return {
-        o: parseFloat(k[1]),
-        h: parseFloat(k[2]),
-        l: parseFloat(k[3]),
-        c: parseFloat(k[4])
-      };
-    });
-    prices = candles.map(function(c){ return c.c; });
-    liveStatus = 'LIVE';
-    lastLiveAt = Date.now();
-    var el = document.getElementById('livepx');
-    var rsi = rsi14();
-    var hint = rsi == null ? '' : (rsi >= 70 ? ' · ÖVERSKÖPT' : rsi <= 30 ? ' · UNDERSKÖPT' : ' · RSI ' + rsi.toFixed(0));
-    if (el) el.textContent = SYMBOL + ' ' + prices[prices.length-1].toFixed(2) + ' · ' + liveSource + hint;
-    if (!_wfSeeded) { _wfSeeded = true; defaultLevelsFromPrice(); }
-    else if (!running) syncWayfinderUI();
+  /* ===== CFD-modell (privatkund enligt ESMA / FI FFFS 2019:7) & dataflöde ===== */
+  var START_EQ = 10000;            // startkapital per spelare (USD)
+  var SPREAD = 45;                 // USD — IG minsta spread BTC-CFD (vidgas vid volatilitet)
+  var GSL_PREMIUM = 90;            // USD-punkter per BTC — IG "limited risk premium" BTC, betalas om den utlöses
+  var FIN_LONG = 0.16, FIN_SHORT = 0.04; // %/år debet på nominellt värde (IG exempel), ÷360 per dygn
+  var MCO = 0.5;                   // marginalavslut vid 50 % av initial marginal (ESMA)
+  var LEV_RETAIL = [1, 2], LEV_PRO = [1, 2, 5];
+  var SIZE_PCT = [0.25, 0.5, 1.0]; // andel av köpkraft (eget kapital × hävstång)
+  var SIZE_RISK = [0.005, 0.01, 0.02]; // risk till SL som andel av eget kapital
+  var clientMode = 'retail', sizeMode = 'pct', liveLapOn = true;
+  var REPLAY_N = 60, CANDLE_MS = 1500, LIVE_LAP_MS = 60000, GAME_DAY_MS = REPLAY_N * CANDLE_MS;
+  var INPUT_BUFFER_MS = 150;
+  var VIEW_N = 120, FETCH_N = 240;
+  var RAW = [], pendingRAW = null, synthetic = false, curMid = 0;
+  var feed = { mode:'idle', idx:0, f:0, lobbyFrom:0, lobbyTo:0, raceFrom:0, liveEnd:0 };
+  var liveTimer = null;
+
+  function feedTag(){
+    if (feed.mode === 'live') return synthetic ? 'SYNTETISK (offline)' : 'LIVE';
+    if (feed.mode === 'lobby' || feed.mode === 'race') return 'HISTORISK UPPSPELNING';
+    return 'HISTORIK';
   }
-  function applyCloses(closes){
-    // fallback if only closes available
-    if (!closes || !closes.length) return;
-    prices = closes.slice();
-    candles = closes.map(function(c, i, arr){
-      var prev = i ? arr[i-1] : c;
-      var hi = Math.max(prev, c), lo = Math.min(prev, c);
-      return { o: prev, h: hi, l: lo, c: c };
-    });
-    liveStatus = 'LIVE';
-    lastLiveAt = Date.now();
-    var el = document.getElementById('livepx');
-    if (el) el.textContent = SYMBOL + ' ' + prices[prices.length-1].toFixed(2) + ' · ' + liveSource;
-    if (!_wfSeeded) { _wfSeeded = true; defaultLevelsFromPrice(); }
-    else if (!running) syncWayfinderUI();
+  function parseRows(rows){
+    return rows.map(function(k){ return { t:+k[0], o:parseFloat(k[1]), h:parseFloat(k[2]), l:parseFloat(k[3]), c:parseFloat(k[4]) }; });
   }
-  function rsi14(){
-    if (prices.length < 16) return null;
-    var n = 14, gains = 0, losses = 0;
-    for (var i = prices.length - n; i < prices.length; i++) {
-      var d = prices[i] - prices[i - 1];
-      if (d >= 0) gains += d; else losses -= d;
-    }
-    if (losses < 1e-12) return 100;
-    var rs = (gains / n) / (losses / n);
-    return 100 - (100 / (1 + rs));
-  }
-  function fetchLive(){
-    var url = 'https://data-api.binance.vision/api/v3/klines?symbol=' + SYMBOL + '&interval=1m&limit=120';
-    fetch(url, { cache: 'no-store' })
-      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(function(rows){ applyKlines(rows); })
-      .catch(function(err){
-        return fetch('https://api.binance.com/api/v3/klines?symbol=' + SYMBOL + '&interval=1m&limit=120', { cache: 'no-store' })
-          .then(function(r){ if (!r.ok) throw err; return r.json(); })
-          .then(function(rows){
-            applyKlines(rows);
-            liveSource = 'Binance api';
-          });
+  function fetchKlines(limit){
+    var q = '/api/v3/klines?symbol=' + SYMBOL + '&interval=1m&limit=' + limit;
+    return fetch('https://data-api.binance.vision' + q, { cache: 'no-store' })
+      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); liveSource = 'Binance spot (data-api)'; return r.json(); })
+      .catch(function(){
+        return fetch('https://api.binance.com' + q, { cache: 'no-store' })
+          .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); liveSource = 'Binance spot (api)'; return r.json(); });
       })
-      .catch(function(err){
-        liveStatus = 'FEL: ' + (err && err.message ? err.message : err) + ' — kontrollera nätverket';
-        var el = document.getElementById('livepx');
-        if (el) el.textContent = liveStatus;
+      .then(function(rows){
+        if (!rows || !rows.length) throw new Error('tomt svar');
+        synthetic = false; lastLiveAt = Date.now();
+        return parseRows(rows);
       });
   }
-  fetchLive();
-  setInterval(fetchLive, 5000);
+  function synthRows(n){
+    var out = [], p = 83000, t = Date.now() - n * 60000; t -= t % 60000;
+    for (var i = 0; i < n; i++) {
+      var o = p, c = o + (Math.random() - 0.5) * 90 + Math.sin(i / 9) * 25;
+      out.push({ t: t + i * 60000, o: o, h: Math.max(o, c) + Math.random() * 40, l: Math.min(o, c) - Math.random() * 40, c: c });
+      p = c;
+    }
+    return out;
+  }
+  function setRaw(rows){
+    RAW = rows;
+    feed.lobbyTo = Math.max(1, RAW.length - REPLAY_N);
+    feed.lobbyFrom = Math.max(0, feed.lobbyTo - 60);
+    if (feed.mode === 'lobby' && (feed.idx < feed.lobbyFrom || feed.idx >= feed.lobbyTo)) { feed.idx = feed.lobbyFrom; feed.f = 0; }
+  }
+  function initialLoad(attempt){
+    attempt = attempt || 0;
+    fetchKlines(FETCH_N).then(function(rows){
+      if (feed.mode === 'idle' || feed.mode === 'lobby') setRaw(rows);
+      liveStatus = 'HISTORIK';
+      rebuildView(); syncWayfinderUI(); updateReadout();
+    }).catch(function(err){
+      if (!RAW.length) {
+        synthetic = true; liveSource = 'SYNTETISK (offline)';
+        setRaw(synthRows(FETCH_N)); rebuildView(); syncWayfinderUI(); updateReadout();
+      }
+      liveStatus = 'FEL: ' + (err && err.message ? err.message : err) + ' — kör via http://localhost (inte file://)';
+      if (attempt < 3) setTimeout(function(){ initialLoad(attempt + 1); }, 5000);
+    });
+  }
+
+  /* Uppspelning inom ett ljus: open → (low/high) → (high/low) → close — gör att SL kan nuddas mitt i ljuset */
+  function pathPts(c){ var bull = c.c >= c.o; return [c.o, bull ? c.l : c.h, bull ? c.h : c.l, c.c]; }
+  function pathAt(c, f){
+    if (f >= 1) return c.c;
+    var p = pathPts(c), s = Math.max(0, f) * 3, i = Math.floor(s), u = s - i;
+    return p[i] + (p[i + 1] - p[i]) * u;
+  }
+  function partial(c, f){
+    if (f >= 1) return c;
+    var p = pathPts(c), s = Math.max(0, f) * 3, i = Math.floor(s), hi = c.o, lo = c.o;
+    for (var k = 1; k <= i; k++) { hi = Math.max(hi, p[k]); lo = Math.min(lo, p[k]); }
+    var cur = pathAt(c, f); hi = Math.max(hi, cur); lo = Math.min(lo, cur);
+    return { t: c.t, o: c.o, h: hi, l: lo, c: cur };
+  }
+  function rebuildView(){
+    if (!RAW.length) return;
+    var k, last;
+    if (feed.mode === 'lobby' || feed.mode === 'race') { k = Math.min(feed.idx, RAW.length - 1); last = partial(RAW[k], feed.f); }
+    else if (feed.mode === 'idle') { k = Math.max(0, RAW.length - 1 - REPLAY_N); last = RAW[k]; }
+    else { k = RAW.length - 1; last = RAW[k]; }
+    var from = Math.max(0, k - VIEW_N + 1);
+    candles = RAW.slice(from, k); candles.push(last);
+    prices = candles.map(function(c){ return c.c; });
+    curMid = last.c;
+  }
+
+  /* Standardindikatorer på samma OHLC-ljus som spelarna ser */
+  function rsi14(){
+    var n = 14;
+    if (prices.length < n + 1) return null;
+    var g = 0, l = 0, i, d;
+    for (i = 1; i <= n; i++) { d = prices[i] - prices[i - 1]; if (d > 0) g += d; else l -= d; }
+    g /= n; l /= n;
+    for (i = n + 1; i < prices.length; i++) {
+      d = prices[i] - prices[i - 1];
+      g = (g * (n - 1) + Math.max(d, 0)) / n;
+      l = (l * (n - 1) + Math.max(-d, 0)) / n;
+    }
+    if (l < 1e-12) return 100;
+    return 100 - 100 / (1 + g / l);
+  }
+  function emaSeries(arr, n){
+    var k = 2 / (n + 1), out = [], e = 0;
+    for (var i = 0; i < arr.length; i++) {
+      if (i < n) { e = (e * i + arr[i]) / (i + 1); }   // SMA-seed för de första n värdena
+      else e = arr[i] * k + e * (1 - k);
+      out.push(e);
+    }
+    return out;
+  }
+  function macdParts(){
+    if (prices.length < 35) return { macd: 0, signal: 0, hist: 0 };
+    var e12 = emaSeries(prices, 12), e26 = emaSeries(prices, 26);
+    var m = e12.map(function(v, i){ return v - e26[i]; }).slice(25);
+    var sig = emaSeries(m, 9);
+    var mm = m[m.length - 1], ss = sig[sig.length - 1];
+    return { macd: mm, signal: ss, hist: mm - ss };
+  }
+  function updateReadout(){
+    var el = document.getElementById('livepx');
+    if (!el || !(curMid > 0)) return;
+    var r = rsi14(), m = macdParts();
+    el.textContent = SYMBOL + ' mitt ' + curMid.toFixed(1) + ' · bid ' + (curMid - SPREAD / 2).toFixed(1) + ' / ask ' + (curMid + SPREAD / 2).toFixed(1) +
+      '\n' + feedTag() + ' · ' + liveSource +
+      '\nRSI(14) ' + (r == null ? '—' : r.toFixed(0) + (r >= 70 ? ' ÖVERKÖPT' : r <= 30 ? ' ÖVERSÅLT' : '')) +
+      ' · MACD hist ' + m.hist.toFixed(1);
+  }
+  function pollLive(){
+    if (synthetic) {
+      var L = RAW[RAW.length - 1], c = L.c + (Math.random() - 0.5) * 60;
+      if (Date.now() - L.t >= 60000) RAW.push({ t: L.t + 60000, o: L.c, h: Math.max(L.c, c), l: Math.min(L.c, c), c: c });
+      else { L.c = c; L.h = Math.max(L.h, c); L.l = Math.min(L.l, c); }
+      return;
+    }
+    fetchKlines(5).then(function(rows){
+      rows.forEach(function(r){
+        var L = RAW[RAW.length - 1];
+        if (r.t === L.t) RAW[RAW.length - 1] = r; else if (r.t > L.t) RAW.push(r);
+      });
+      liveStatus = 'LIVE';
+    }).catch(function(){ liveStatus = 'LIVE (fördröjd)'; });
+  }
+  initialLoad(0);
 
   function setTerrain(mode){
     terrainMode = mode === 'flat' ? 'flat' : 'normal';
@@ -467,36 +643,26 @@ window.__VBDBG = { last:'—', boat:'—', n:0, buySell:'—' };
   document.getElementById('btnNormal').onclick = function(){ setTerrain('normal'); };
   document.getElementById('btnFlat').onclick = function(){ setTerrain('flat'); };
 
-  function defaultLevelsFromPrice(){
-    var bb = bands();
-    var price = prices[prices.length - 1] || bb.mid || 100;
-    if (!(price > 0)) price = 100;
-    var span = Math.max(20, (bb.up - bb.lo) || price * 0.01);
-    boats.forEach(function(b){
-      if (b.sl == null) b.sl = price - span * 0.45;
-      if (b.tp == null) b.tp = price + span * 0.55;
-    });
-    syncWayfinderUI();
-  }
+  function defaultLevelsFromPrice(){ syncWayfinderUI(); }
   function syncWayfinderUI(){
-    function fmt(v){ return v == null ? '—' : v.toFixed(0); }
+    var px = curMid || 0;
+    function f(b, k){ var pct = b[k]; return pct.toFixed(2) + ' %' + (px > 0 ? ' ≈ ' + Math.round(px * pct / 100) : ''); }
     var a;
-    a = document.getElementById('wf-sl0'); if (a) a.textContent = fmt(boats[0].sl);
-    a = document.getElementById('wf-tp0'); if (a) a.textContent = fmt(boats[0].tp);
-    a = document.getElementById('wf-sl1'); if (a) a.textContent = fmt(boats[1].sl);
-    a = document.getElementById('wf-tp1'); if (a) a.textContent = fmt(boats[1].tp);
+    a = document.getElementById('wf-sl0'); if (a) a.textContent = f(boats[0], 'slPct');
+    a = document.getElementById('wf-tp0'); if (a) a.textContent = f(boats[0], 'tpPct');
+    a = document.getElementById('wf-sl1'); if (a) a.textContent = f(boats[1], 'slPct');
+    a = document.getElementById('wf-tp1'); if (a) a.textContent = f(boats[1], 'tpPct');
     document.querySelectorAll('#wayfinder .wf-field').forEach(function(el){
       var on = +el.getAttribute('data-p') === wfFocus.p && el.getAttribute('data-f') === wfFocus.f;
       el.classList.toggle('active', on);
     });
+    a = document.getElementById('gsl0'); if (a) a.checked = !!boats[0].gsl;
+    a = document.getElementById('gsl1'); if (a) a.checked = !!boats[1].gsl;
   }
   function nudgeWayfinder(player, field, dir){
     if (levelsLocked || running) return;
-    var price = prices[prices.length - 1] || bands().mid || 100;
-    var step = Math.max(5, Math.abs(price) * 0.00025);
-    var b = boats[player];
-    if (b[field] == null) b[field] = price;
-    b[field] += dir * step;
+    var b = boats[player], k = field === 'sl' ? 'slPct' : 'tpPct';
+    b[k] = Math.max(0.10, Math.min(5, Math.round((b[k] + dir * 0.05) * 100) / 100));
     syncWayfinderUI();
   }
   function cycleFocus(player, dir){
@@ -508,14 +674,15 @@ window.__VBDBG = { last:'—', boat:'—', n:0, buySell:'—' };
   document.getElementById('wayfinder').addEventListener('click', function(e){
     var btn = e.target.closest('button[data-act]');
     if (!btn) return;
-    var act = btn.getAttribute('data-act');
-    // p0-sl+ etc
-    var m = /^p([01])-(sl|tp)([+-])$/.exec(act);
+    var m = /^p([01])-(sl|tp)([+-])$/.exec(btn.getAttribute('data-act'));
     if (!m) return;
     wfFocus.p = +m[1]; wfFocus.f = m[2];
     nudgeWayfinder(+m[1], m[2], m[3] === '+' ? 1 : -1);
   });
-  // wayfinder seeded via applyCloses
+  ['gsl0', 'gsl1'].forEach(function(id, i){
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('change', function(){ if (!running) boats[i].gsl = !!el.checked; syncWayfinderUI(); });
+  });
 
   function midgard(g, w, h, now, yHoriz){
     // Midgårdsormen — stiliserad RÖD runstensorm (Jelling/Rök), bobbar i vattnet
@@ -863,10 +1030,9 @@ function drawHouse(g, x, baseY, scale, accent){
     g.save();
     g.fillStyle = 'rgba(20,14,28,0.72)';
     g.strokeStyle = 'rgba(232,197,71,0.85)'; g.lineWidth = 2;
-    roundRect(g, cx - 120, cy - 42, 240, 78, 10); g.fill(); g.stroke();
-    // compass rose
+    roundRect(g, cx - 130, cy - 42, 330, 78, 10); g.fill(); g.stroke();
     g.save();
-    g.translate(cx - 78, cy);
+    g.translate(cx - 88, cy);
     g.rotate(now * 0.0004);
     g.strokeStyle = '#e8c547'; g.lineWidth = 2;
     g.beginPath(); g.arc(0, 0, 18, 0, Math.PI*2); g.stroke();
@@ -877,15 +1043,16 @@ function drawHouse(g, x, baseY, scale, accent){
     g.restore();
     g.font = 'bold 11px system-ui';
     g.fillStyle = '#e8c547';
-    g.fillText('Vägvisare · SL / TP', cx - 40, cy - 22);
+    g.fillText('Vägvisare · SL / TP från ingång', cx - 50, cy - 22);
     g.font = '10px system-ui';
-    g.fillStyle = '#c9b896';
-    var p1 = boats[0], p2 = boats[1];
-    g.fillText('Gul SL ' + (p1.sl != null ? p1.sl.toFixed(0) : '—') + '  TP ' + (p1.tp != null ? p1.tp.toFixed(0) : '—'), cx - 40, cy - 4);
-    g.fillStyle = '#82cdff';
-    g.fillText('Blå SL ' + (p2.sl != null ? p2.sl.toFixed(0) : '—') + '  TP ' + (p2.tp != null ? p2.tp.toFixed(0) : '—'), cx - 40, cy + 12);
+    function line(b){
+      return 'SL ' + b.slPct.toFixed(2) + ' %  TP ' + b.tpPct.toFixed(2) + ' %  R:R 1:' + (b.tpPct / b.slPct).toFixed(1) +
+        '  ×' + levOf(b) + '  ' + sizeLabel(b) + (b.gsl ? '  GSL' : '');
+    }
+    g.fillStyle = '#ffe066'; g.fillText('Gul ' + line(boats[0]), cx - 50, cy - 4);
+    g.fillStyle = '#82cdff'; g.fillText('Blå ' + line(boats[1]), cx - 50, cy + 12);
     g.fillStyle = 'rgba(200,190,170,0.85)';
-    g.fillText(running ? 'Låst under race' : 'Ställ innan start · W/S · ↑/↓', cx - 40, cy + 28);
+    g.fillText(running ? 'Låst under race · ' + (clientMode === 'pro' ? 'PRO-KLIENT (ej privatkund)' : 'Privatkund · max 2:1') : 'Ställ innan start · W/S · ↑/↓', cx - 50, cy + 28);
     g.restore();
   }
 
@@ -918,17 +1085,17 @@ function drawHouse(g, x, baseY, scale, accent){
       g.fillRect(0, yUp, w, Math.max(1, (yLo - yUp) * 0.35));
       g.fillStyle = 'rgba(255,120,100,0.85)';
       g.font = 'bold 12px system-ui';
-      g.fillText('ÖVERSKÖPT · RSI ' + rsi.toFixed(0) + ' · hint: nedåt-risk', 300, yUp + 18);
+      g.fillText('ÖVERKÖPT · RSI(14) ' + rsi.toFixed(0) + ' · hint: nedåt-risk', 300, yUp + 18);
     } else if (os) {
       g.fillStyle = 'rgba(70,200,120,0.10)';
       g.fillRect(0, yLo - (yLo - yUp) * 0.35, w, (yLo - yUp) * 0.35);
       g.fillStyle = 'rgba(100,230,150,0.9)';
       g.font = 'bold 12px system-ui';
-      g.fillText('UNDERSKÖPT · RSI ' + rsi.toFixed(0) + ' · hint: uppåt-chans', 300, yLo - 10);
+      g.fillText('ÖVERSÅLT · RSI(14) ' + rsi.toFixed(0) + ' · hint: uppåt-chans', 300, yLo - 10);
     } else if (rsi != null) {
       g.fillStyle = 'rgba(200,210,230,0.7)';
       g.font = '11px system-ui';
-      g.fillText('RSI ' + rsi.toFixed(0) + ' · neutralt', 300, yUp + 16);
+      g.fillText('RSI(14) ' + rsi.toFixed(0) + ' · neutralt', 300, yUp + 16);
     }
 
     for (var i = 0; i < show; i++) {
@@ -972,7 +1139,7 @@ function drawHouse(g, x, baseY, scale, accent){
     else if ((Math.min(last.o, last.c) - last.l) > 2 * Math.abs(last.c - last.o) && Math.abs(last.c - last.o) < (last.h - last.l) * 0.3)
       hint = 'Hammer?';
     else if (ob) hint = 'Översköpt tryck';
-    else if (os) hint = 'Undersköpt studs';
+    else if (os) hint = 'Översåld studs';
     if (hint) {
       g.fillStyle = '#ffe066';
       g.font = 'bold 11px system-ui';
@@ -1228,28 +1395,34 @@ function drawHouse(g, x, baseY, scale, accent){
   }
 
 
-  function drawSlTp(g, w, h, bb, boat, color, labelPrefix){
-    if (boat.sl == null && boat.tp == null) return;
-    g.save();
-    g.setLineDash([8, 6]);
-    g.lineWidth = 1.8;
-    g.font = 'bold 11px system-ui';
-    if (boat.sl != null) {
-      var ys = priceToY(boat.sl, bb, h);
-      g.strokeStyle = color;
-      g.beginPath(); g.moveTo(290, ys); g.lineTo(w - 20, ys); g.stroke();
-      g.fillStyle = color;
-      g.fillText(labelPrefix + ' SL ' + boat.sl.toFixed(0), 294, ys - 4);
+  function fmt0(v){ return (v < 0 ? '−' : '') + Math.round(Math.abs(v)).toLocaleString('sv-SE'); }
+  function fmt2(v){ return (v < 0 ? '−' : '') + Math.abs(v).toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function sgn2(v){ return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2); }
+  // Ingångslinje, SL/TP och marginalavslutslinje (close-out) i spelarens färg
+  function drawTradeLines(g, w, h, bb, b, col, name, row){
+    if (!b.pos) return;
+    var x0 = 290, x1 = w - 20, lx = x0 + 8 + row * 300;
+    function hline(p, dash, width, color, text){
+      if (p == null || !isFinite(p)) return;
+      var y = priceToY(p, bb, h), arrow = '';
+      var top = 134, bot = h - 170;
+      if (y < top) { y = top + row * 12; arrow = ' ↑ utanför skala'; }
+      else if (y > bot) { y = bot - row * 12; arrow = ' ↓ utanför skala'; }
+      g.save();
+      g.setLineDash(dash); g.lineWidth = width; g.strokeStyle = color;
+      g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke();
+      g.setLineDash([]);
+      g.font = 'bold 11px system-ui';
+      var t = text + arrow, tw = g.measureText(t).width;
+      g.fillStyle = 'rgba(0,0,0,0.6)'; g.fillRect(lx - 3, y - 14, tw + 6, 13);
+      g.fillStyle = color; g.fillText(t, lx, y - 4);
+      g.restore();
     }
-    if (boat.tp != null) {
-      var yt = priceToY(boat.tp, bb, h);
-      g.strokeStyle = color;
-      g.beginPath(); g.moveTo(290, yt); g.lineTo(w - 20, yt); g.stroke();
-      g.fillStyle = color;
-      g.fillText(labelPrefix + ' TP ' + boat.tp.toFixed(0), 294, yt - 4);
-    }
-    g.setLineDash([]);
-    g.restore();
+    hline(b.entry, [], 1.4, col, name + ' ingång ' + fmt0(b.entry) + (b.pos > 0 ? ' (ask)' : ' (bid)') + ' · ×' + b.posLev);
+    hline(b.slPx, [8, 6], 1.6, col, name + ' SL ' + fmt0(b.slPx) + (b.gsl ? ' (garanterad)' : ' (kan slira)'));
+    hline(b.tpPx, [2, 5], 1.6, col, name + ' TP ' + fmt0(b.tpPx));
+    var co = closeOutPrice(b);
+    if (co != null && co > 0) hline(co, [12, 4, 2, 4], 2.2, b.tint === 'gold' ? '#ff8a3a' : '#ff5a8a', name + ' marginalavslut 50 % · ' + fmt0(co));
   }
 
 
@@ -1325,12 +1498,12 @@ function drawHouse(g, x, baseY, scale, accent){
 
     g.font = 'bold 14px system-ui';
     g.fillStyle = 'rgba(0,0,0,0.85)';
-    g.fillText('KURSLINJE LIVE', lastX - 132, lastY - 22);
+    g.fillText('KURSLINJE · ' + feedTag(), lastX - 182, lastY - 22);
     g.fillStyle = '#ffe066';
-    g.fillText('KURSLINJE LIVE', lastX - 133, lastY - 23);
+    g.fillText('KURSLINJE · ' + feedTag(), lastX - 183, lastY - 23);
     g.font = 'bold 12px system-ui';
     g.fillStyle = '#fff3a0';
-    g.fillText((liveStatus === 'LIVE' ? 'LIVE ' : '') + SYMBOL + ' ' + prices[prices.length - 1].toFixed(2), lastX - 132, lastY - 6);
+    g.fillText((liveStatus === 'LIVE' ? 'LIVE ' : '') + SYMBOL + ' ' + prices[prices.length - 1].toFixed(2), lastX - 182, lastY - 6);
     return { lastX: lastX, lastY: lastY, leftPad: leftPad, plotW: plotW };
   }
 
@@ -1361,6 +1534,8 @@ function drawHouse(g, x, baseY, scale, accent){
   function draw(now){
     var w = innerWidth, h = innerHeight, g = ctx;
     g.clearRect(0, 0, w, h);
+    g.save();
+    if (shake > 0) g.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
     var bb = bands();
     var hist = macdHist();
     var yUp = priceToY(bb.up, bb, h);
@@ -1451,16 +1626,15 @@ function drawHouse(g, x, baseY, scale, accent){
       g.beginPath(); g.ellipse(rx, ry, 3, 1.4, 0, 0, Math.PI * 2); g.fill();
     }
 
-    // SL/TP markers (under price line)
-    drawSlTp(g, w, h, bb, boats[0], 'rgba(232,197,71,0.9)', 'Gul');
-    drawSlTp(g, w, h, bb, boats[1], 'rgba(130,205,255,0.9)', 'Blå');
+    // Handelslinjer: ingång (tunn, spelarfärg), SL/TP, marginalavslut
+    drawTradeLines(g, w, h, bb, boats[0], '#ffe066', 'Gul', 0);
+    drawTradeLines(g, w, h, bb, boats[1], '#9fe0ff', 'Blå', 1);
 
     // 7) Gränslandet portal + shoreline already IS the kurslinje (drawBeach)
     drawGranslandet(g, w, h, bb, 290, w - 290 - 20);
-    // light gold echo kept via drawPriceLine accent (thin) — shoreline carries the read
     drawPriceLine(g, w, h, bb);
 
-    // 8) boats LAST — pinned in SEA between BB (never under sand, never invisible)
+    // 8) boats LAST — pinned in SEA between BB
     var livePx = prices[prices.length - 1] || bb.mid;
     var yKurs = priceToY(livePx, bb, h);
     boats.forEach(function(b){
@@ -1469,45 +1643,154 @@ function drawHouse(g, x, baseY, scale, accent){
       if (b.side === 'KÖP') by = yUp + (yKurs - yUp) * 0.45;
       else if (b.side === 'SÄLJ') by = yKurs + (yLo - yKurs) * 0.45;
       else by = yKurs;
-      // hard clamp into water band ABOVE lower BB / shoreline
       by = Math.max(yUp + 36, Math.min(yLo - 28, by));
-      try {
-        drawBoatSprite(g, b, bx, by, now);
-      } catch (err) {
-        g.fillStyle = b.tint === 'gold' ? '#e8c547' : '#82cdff';
-        g.fillRect(bx - 40, by - 20, 80, 40);
-      }
+      b._sx = bx; b._sy = by;
+      var col = b.tint === 'gold' ? '#ffe066' : '#9fe0ff';
+      var lev = b.pos ? b.posLev : levOf(b);
       g.save();
-      g.strokeStyle = b.tint === 'gold' ? '#ffe066' : '#9fe0ff';
-      g.lineWidth = 5;
+      if (b.capsize > 0) {
+        // Kantring vid marginalavslut: rulla runt, sjunk, kom tillbaka
+        var p = 1 - b.capsize;
+        var roll = Math.min(1, p * 2.2) * 2.5 * (b.tint === 'gold' ? 1 : -1);
+        var sink = Math.min(1, p * 1.6) * 28;
+        if (p > 0.8) { roll *= (1 - (p - 0.8) / 0.2); sink *= (1 - (p - 0.8) / 0.2); }
+        g.translate(bx, by + sink); g.rotate(roll); g.translate(-bx, -by);
+        g.globalAlpha = p > 0.4 && p < 0.85 ? 0.55 : 1;
+      }
+      try { drawBoatSprite(g, b, bx, by, now); }
+      catch (err) { g.fillStyle = col; g.fillRect(bx - 40, by - 20, 80, 40); }
+      // Hävstångsglöd: högre steg = tjockare ring + mer glöd
+      g.strokeStyle = col;
+      g.lineWidth = 3 + (lev - 1) * 1.8;
+      g.shadowColor = lev >= 5 ? '#ff8a3a' : col;
+      g.shadowBlur = b.pos ? 8 + lev * 8 : 3;
       g.beginPath(); g.arc(bx, by, 56, 0, Math.PI * 2); g.stroke();
-      g.fillStyle = b.tint === 'gold' ? '#ffe066' : '#9fe0ff';
+      g.restore();
+      g.save();
+      g.fillStyle = col;
       g.font = 'bold 13px system-ui';
-      g.fillText(b.tint === 'gold' ? 'GUL P1 · WASD' : 'BLÅ P2 · PILAR', bx - 55, by + 72);
+      g.fillText((b.tint === 'gold' ? 'GUL P1' : 'BLÅ P2') + ' · ×' + lev + ' · ' + sizeLabel(b), bx - 60, by + 72);
+      // Odins vind (endast moral/visning)
+      if (b.odin && (gamePhase === 'race' || gamePhase === 'live')) {
+        var ox = bx - 112, oy = by - 34 + Math.sin(now * 0.004) * 3;
+        g.globalAlpha = 0.85;
+        g.strokeStyle = 'rgba(200,235,255,0.55)'; g.lineWidth = 1.4;
+        for (var wl = 0; wl < 3; wl++) {
+          var wx = ox - 40 + ((now * 0.06 + wl * 23) % 46);
+          g.beginPath(); g.moveTo(wx, oy + 10 + wl * 7); g.quadraticCurveTo(wx + 12, oy + 6 + wl * 7, wx + 24, oy + 10 + wl * 7); g.stroke();
+        }
+        g.fillStyle = 'rgba(10,20,40,0.75)'; g.beginPath(); g.arc(ox, oy, 13, 0, Math.PI * 2); g.fill();
+        g.strokeStyle = '#c9e8ff'; g.lineWidth = 1.5; g.stroke();
+        g.fillStyle = '#e9f6ff'; g.font = 'bold 16px ui-monospace,"Segoe UI Historic",monospace'; g.textAlign = 'center';
+        g.fillText('ᚨ', ox, oy + 6); g.textAlign = 'left';
+        g.font = 'bold 10px system-ui'; g.fillStyle = '#c9e8ff';
+        g.fillText('Odins vind', ox + 17, oy + 4);
+        g.globalAlpha = 1;
+      }
+      // Kort toast över båten
+      if (b.toast && now - b.toast.t0 < 1600) {
+        g.globalAlpha = 1 - Math.max(0, (now - b.toast.t0 - 1100) / 500);
+        g.font = 'bold 12px system-ui'; g.fillStyle = 'rgba(0,0,0,0.65)';
+        var tw = g.measureText(b.toast.text).width;
+        g.fillRect(bx - tw / 2 - 5, by - 128, tw + 10, 17);
+        g.fillStyle = col; g.textAlign = 'center'; g.fillText(b.toast.text, bx, by - 115); g.textAlign = 'left';
+        g.globalAlpha = 1;
+      }
+      // Uppräkning av realiserad PnL (Balatro-stil): Δpris × enheter = summa
+      if (b.cu) {
+        var ct = (now - b.cu.t0) / b.cu.dur;
+        if (ct > 2.4) b.cu = null;
+        else {
+          var stepT = Math.min(1, Math.floor(Math.max(0, ct) * 24) / 24);
+          if (stepT !== b.cu.lastStep) { b.cu.lastStep = stepT; if (stepT > 0 && stepT < 1 && Math.round(stepT * 24) % 3 === 0) sfx('tick', Math.round(stepT * 24)); }
+          var shown = b.cu.pnl * stepT;
+          var up = b.cu.pnl >= 0;
+          var cy = by - 150 - Math.min(1, ct) * 18;
+          g.globalAlpha = ct > 1.9 ? Math.max(0, 1 - (ct - 1.9) / 0.5) : 1;
+          g.textAlign = 'center';
+          g.font = 'bold 12px system-ui'; g.fillStyle = '#e9eef6';
+          g.fillText('Δ ' + sgn2(b.cu.dp) + ' × ' + b.cu.units.toFixed(3) + ' BTC' + (b.cu.extra ? ' ' + b.cu.extra : ''), bx, cy);
+          g.font = 'bold ' + (20 + (ct >= 1 ? 4 : 0)) + 'px system-ui';
+          g.lineWidth = 4; g.strokeStyle = 'rgba(0,0,0,0.75)';
+          var txt = '= ' + (up ? '+' : '−') + Math.abs(shown).toFixed(2) + ' USD';
+          g.strokeText(txt, bx, cy + 24);
+          g.fillStyle = up ? '#7dffb0' : '#ff7a7a'; g.fillText(txt, bx, cy + 24);
+          if (ct >= 1) { g.font = 'bold 11px system-ui'; g.fillStyle = '#ffe066'; g.fillText(b.cu.reason + ' · ' + sgn2(b.cu.pnl / START_EQ * 100) + ' % av start', bx, cy + 40); }
+          g.textAlign = 'left'; g.globalAlpha = 1;
+        }
+      }
       g.restore();
     });
-    // Fas-HUD: lobbyn / Gränslandet / tävling
+    // partiklar (skum/stänk vid fören, träflis vid kantring)
+    for (var pi = 0; pi < parts.length; pi++) {
+      var pp = parts[pi];
+      g.globalAlpha = Math.max(0, pp.life);
+      g.fillStyle = pp.col;
+      g.beginPath(); g.arc(pp.x, pp.y, pp.r, 0, Math.PI * 2); g.fill();
+    }
+    g.globalAlpha = 1;
+
+    // Fas-HUD
     g.save();
     g.font = 'bold 13px system-ui';
-    var phaseLabel = gamePhase === 'lobby' ? 'FAS · Lobbyn (historik → Gränslandet)'
-      : gamePhase === 'crossing' ? 'FAS · Gränslandet — övergång…'
-      : 'FAS · Tävling (live trading)';
-    g.fillStyle = 'rgba(0,0,0,0.55)';
-    g.fillRect(w * 0.5 - 170, 44, 340, 28);
-    g.fillStyle = gamePhase === 'race' ? '#ffe066' : '#c9d2e0';
-    g.fillText(phaseLabel, w * 0.5 - 160, 63);
-    // progress per spelare
-    function drawProg(b, x0, col, name){
-      var ready = b.atGate;
-      var pct = Math.min(1, (b.histProgress || 0));
-      g.fillStyle = 'rgba(0,0,0,0.45)'; g.fillRect(x0, 78, 140, 10);
-      g.fillStyle = col; g.fillRect(x0, 78, 140 * pct, 10);
-      g.fillStyle = ready ? '#7dffb0' : col;
-      g.font = '10px system-ui';
-      g.fillText(name + (ready ? ' · GRÄNSLAND' : ' · ' + Math.round(pct * 100) + '%'), x0, 74);
+    var phaseLabel = gamePhase === 'lobby' ? 'FAS · Lobbyn · övning (historisk uppspelning) → Gränslandet'
+      : gamePhase === 'crossing' ? 'FAS · Gränslandet — historik → live…'
+      : gamePhase === 'race' ? 'FAS · Race · HISTORISK UPPSPELNING (1 ljus / 1,5 s ≈ ×40)'
+      : gamePhase === 'live' ? 'FAS · LIVEVARV · ' + (synthetic ? 'SYNTETISK (offline)' : 'LIVE ' + SYMBOL + ' (Binance spot)')
+      : gamePhase === 'finished' ? 'FAS · Mål' : 'FAS · Start — välj inställningar';
+    var pw = Math.max(380, g.measureText(phaseLabel).width + 24);
+    g.fillStyle = 'rgba(0,0,0,0.6)';
+    g.fillRect(w * 0.5 - pw / 2, 44, pw, 26);
+    g.fillStyle = (gamePhase === 'race' || gamePhase === 'live') ? '#ffe066' : '#c9d2e0';
+    g.textAlign = 'center'; g.fillText(phaseLabel, w * 0.5, 62); g.textAlign = 'left';
+    // Raceklocka
+    if (gamePhase === 'race' || gamePhase === 'live' || gamePhase === 'finished') {
+      var cf, ctext;
+      if (gamePhase === 'race') { var done = Math.min(REPLAY_N, feed.idx - feed.raceFrom + feed.f); cf = done / REPLAY_N; ctext = 'Ljus ' + Math.min(REPLAY_N, Math.floor(done) + 1) + ' / ' + REPLAY_N + (liveLapOn ? ' → livevarv' : ' → mål'); }
+      else if (gamePhase === 'live') { var rem = Math.max(0, feed.liveEnd - now); cf = 1 - rem / LIVE_LAP_MS; ctext = 'LIVEVARV · ' + Math.ceil(rem / 1000) + ' s kvar'; }
+      else { cf = 1; ctext = 'MÅL'; }
+      g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillRect(w * 0.5 - 150, 74, 300, 9);
+      g.fillStyle = gamePhase === 'live' ? '#ff6a4a' : '#e8c547'; g.fillRect(w * 0.5 - 150, 74, 300 * Math.max(0, Math.min(1, cf)), 9);
+      g.font = '10px system-ui'; g.fillStyle = '#e9eef6'; g.textAlign = 'center'; g.fillText(ctext, w * 0.5, 95); g.textAlign = 'left';
+    } else if (gamePhase === 'lobby') {
+      g.font = '11px system-ui'; g.fillStyle = '#e9eef6'; g.textAlign = 'center';
+      g.fillText('Öva: öppna (W/S · ↑/↓) och stäng (Q · -) en gång var → båten seglar till Gränslandet · H = Regler (CFD)', w * 0.5, 86);
+      g.textAlign = 'left';
     }
-    drawProg(boats[0], 16, '#e8c547', 'Gul');
-    drawProg(boats[1], w - 156, '#82cdff', 'Blå');
+    // Framsteg per båt: lobby = övning, race = eget kapital (avkastning %)
+    function drawProg(b, x0, col, name){
+      g.font = '10px system-ui';
+      if (gamePhase === 'lobby' || gamePhase === 'start' || !running) {
+        var pct = Math.min(1, b.histProgress || 0);
+        g.fillStyle = 'rgba(0,0,0,0.45)'; g.fillRect(x0, 78, 150, 10);
+        g.fillStyle = col; g.fillRect(x0, 78, 150 * pct, 10);
+        g.fillStyle = b.atGate ? '#7dffb0' : col;
+        g.fillText(name + (b.atGate ? ' · GRÄNSLAND' : ' · övning ' + Math.round(pct * 100) + '% (öppna+stäng)'), x0, 74);
+        return;
+      }
+      var ret = (equity(b) / START_EQ - 1) * 100;
+      var scale = progScale();
+      var fr = Math.max(-1, Math.min(1, ret / scale));
+      g.fillStyle = 'rgba(0,0,0,0.5)'; g.fillRect(x0, 78, 150, 10);
+      g.fillStyle = 'rgba(255,255,255,0.5)'; g.fillRect(x0 + 74, 76, 2, 14);
+      g.fillStyle = fr >= 0 ? '#7dffb0' : '#ff7a7a';
+      if (fr >= 0) g.fillRect(x0 + 75, 78, 75 * fr, 10); else g.fillRect(x0 + 75 + 75 * fr, 78, -75 * fr, 10);
+      g.fillStyle = col;
+      g.fillText(name + ' · ' + sgn2(ret) + ' % · ' + fmt0(equity(b)) + ' USD' + (b.odin ? ' · ᚨ' : ''), x0, 74);
+      if (b.odin && (gamePhase === 'race' || gamePhase === 'live')) {
+        g.fillStyle = '#c9e8ff';
+        g.fillText('ᚨ Odins vind: ' + odinHint(b), x0, 102);
+        g.fillStyle = 'rgba(201,232,255,0.6)';
+        g.fillText('(endast moral — ändrar inte pris/PnL/avgifter)', x0, 114);
+      }
+    }
+    drawProg(boats[0], 290, '#e8c547', 'Gul');
+    drawProg(boats[1], w - 166 - (boats[1].odin ? 120 : 0), '#82cdff', 'Blå');
+    if (paused) {
+      g.fillStyle = 'rgba(0,0,0,0.5)'; g.fillRect(0, 0, w, h);
+      g.fillStyle = '#ffe066'; g.font = 'bold 28px system-ui'; g.textAlign = 'center';
+      g.fillText('PAUS (Esc)', w * 0.5, h * 0.45); g.textAlign = 'left';
+    }
     if (gamePhase === 'crossing' || phaseFade > 0.01) {
       g.fillStyle = 'rgba(8,4,20,' + (0.25 + phaseFade * 0.55) + ')';
       g.fillRect(0, 0, w, h);
@@ -1517,13 +1800,15 @@ function drawHouse(g, x, baseY, scale, accent){
       g.fillText('Gränslandet passerat', w * 0.5, h * 0.42);
       g.font = '16px system-ui';
       g.fillStyle = '#e9eef6';
-      g.fillText('Tävling börjar — live trading mot varandra', w * 0.5, h * 0.42 + 34);
+      g.fillText('Race: ' + REPLAY_N + ' historiska 1m-ljus (historisk uppspelning) ' + (liveLapOn ? '→ livevarv på LIVE-data' : '→ mål'), w * 0.5, h * 0.42 + 34);
+      g.fillText('Konton nollställs till ' + fmt0(START_EQ) + ' USD · ' + (clientMode === 'pro' ? 'PRO-KLIENT (ej privatkund)' : 'privatkund · max 2:1'), w * 0.5, h * 0.42 + 58);
       g.textAlign = 'left';
     }
     g.restore();
 
     // runisk XY-kompass på canvas (SVG-ringen ligger ovanpå)
     drawRuneBorder(g, w, h, now);
+    g.restore(); // skärmskak
   }
 
   // Trädraksansikten (mode-sprites) — speglar live status
@@ -1543,28 +1828,25 @@ function drawHouse(g, x, baseY, scale, accent){
   }
   function faceMood(b, price, tag){
     var S = function(k){ return faceSrcFor(tag, k); };
-    if (b.faceHit === 'tp' && b.faceFlash > 0.15)
-      return { src: S('uppgang'), mood: 'hit-tp mood-up', label: 'TP ✓' };
-    if (b.faceHit === 'sl' && b.faceFlash > 0.15)
-      return { src: S('broken'), mood: 'hit-sl mood-down', label: 'SL ✗' };
-    if (b.side === 'FLAT')
-      return { src: S('medgang'), mood: 'mood-flat', label: 'FLAT · lobbyn' };
-    var nearSl = distToLevel(price, b.sl);
-    var nearTp = distToLevel(price, b.tp);
-    var lev = b.lev || 1;
-    if (nearSl < 8)
-      return { src: S('broken'), mood: 'mood-risk', label: 'SL-NÄRA · x' + lev.toFixed(1) };
-    if (nearTp < 8)
-      return { src: S('uppgang'), mood: 'mood-up', label: 'TP-NÄRA · x' + lev.toFixed(1) };
-    if (b.pnl > 1.5 || (b.pnl > 0.4 && nearTp < 25))
-      return { src: S('uppgang'), mood: 'mood-up', label: (b.side === 'KÖP' ? 'KÖP ↑' : 'SÄLJ ↑') + ' · ' + b.pnl.toFixed(1) };
-    if (b.pnl > 0.15)
-      return { src: S('medgang'), mood: 'mood-ok', label: b.side + ' · +' + b.pnl.toFixed(1) + ' · x' + lev.toFixed(1) };
-    if (b.pnl > -0.35)
-      return { src: S('medgang'), mood: 'mood-ok', label: b.side + ' · x' + lev.toFixed(1) };
-    if (b.pnl > -1.5 || nearSl < 20)
-      return { src: S('motgang'), mood: 'mood-risk', label: 'RISK · ' + b.pnl.toFixed(1) };
-    return { src: S('motgangAlt'), mood: 'mood-down', label: 'MOTGÅNG · ' + b.pnl.toFixed(1) };
+    var L = b.pos ? b.posLev : levOf(b);
+    if (b.capsize > 0 || (b.faceHit === 'closeout' && b.faceFlash > 0.15))
+      return { src: S('broken'), mood: 'hit-sl mood-down', label: 'MARGINALAVSLUT ✗' };
+    if (b.faceHit === 'tp' && b.faceFlash > 0.15) return { src: S('uppgang'), mood: 'hit-tp mood-up', label: 'TP ✓' };
+    if (b.faceHit === 'sl' && b.faceFlash > 0.15) return { src: S('broken'), mood: 'hit-sl mood-down', label: 'SL ✗' };
+    if (b.faceHit === 'win' && b.faceFlash > 0.15) return { src: S('uppgang'), mood: 'hit-tp mood-up', label: 'STÄNGD +' };
+    if (b.faceHit === 'loss' && b.faceFlash > 0.15) return { src: S('motgang'), mood: 'mood-down', label: 'STÄNGD −' };
+    if (!b.pos) return { src: S('medgang'), mood: 'mood-flat', label: 'FLAT · ×' + L };
+    var ml = marginLevel(b);
+    if (ml < 80) return { src: S('broken'), mood: 'mood-risk', label: 'MARGINAL ' + ml.toFixed(0) + ' %' };
+    var px = b.pos > 0 ? curMid - SPREAD / 2 : curMid + SPREAD / 2;
+    var slD = Math.abs(b.entry - b.slPx), toSl = Math.abs(px - b.slPx), toTp = Math.abs(b.tpPx - px);
+    if (toSl < slD * 0.25) return { src: S('broken'), mood: 'mood-risk', label: 'SL-NÄRA · ×' + L };
+    if (toTp < slD * 0.25) return { src: S('uppgang'), mood: 'mood-up', label: 'TP-NÄRA · ×' + L };
+    var u = unreal(b) / START_EQ * 100;
+    if (u > 0.25) return { src: S('uppgang'), mood: 'mood-up', label: b.side + ' ' + sgn2(u) + ' %' };
+    if (u > -0.05) return { src: S('medgang'), mood: 'mood-ok', label: b.side + ' · ×' + L };
+    if (u > -0.3) return { src: S('motgang'), mood: 'mood-risk', label: 'RISK ' + sgn2(u) + ' %' };
+    return { src: S('motgangAlt'), mood: 'mood-down', label: 'MOTGÅNG ' + sgn2(u) + ' %' };
   }
   function applyFaceHud(el, imgEl, labEl, b, price, tag){
     var m = faceMood(b, price, tag || 'p1');
@@ -1575,192 +1857,447 @@ function drawHouse(g, x, baseY, scale, accent){
     if (labEl) labEl.textContent = m.label;
   }
 
-  function ensureLevels(b, price, bb){
-    var span = Math.max(20, (bb.up - bb.lo) * 0.35);
-    if (b.side === 'KÖP') {
-      if (b.sl == null) b.sl = price - span * 0.45;
-      if (b.tp == null) b.tp = price + span * 0.55;
-      b.entry = price;
-    } else if (b.side === 'SÄLJ') {
-      if (b.sl == null) b.sl = price + span * 0.45;
-      if (b.tp == null) b.tp = price - span * 0.55;
-      b.entry = price;
+  /* ===== Konto & CFD-räkning ===== */
+  function levSteps(){ return clientMode === 'pro' ? LEV_PRO : LEV_RETAIL; }
+  function levOf(b){ var s = levSteps(); return s[Math.min(b.levIdx, s.length - 1)]; }
+  function sizeLabel(b){ return sizeMode === 'risk' ? 'risk ' + (SIZE_RISK[b.sizeIdx] * 100).toFixed(1) + ' %' : (SIZE_PCT[b.sizeIdx] * 100).toFixed(0) + ' % köpkraft'; }
+  function bidPx(){ return curMid - SPREAD / 2; }
+  function askPx(){ return curMid + SPREAD / 2; }
+  function unreal(b){ if (!b.pos) return 0; return b.pos > 0 ? b.units * (bidPx() - b.entry) : b.units * (b.entry - askPx()); }
+  function equity(b){ return b.bal + unreal(b); }
+  function usedMargin(b){ return b.pos ? b.units * curMid / b.posLev : 0; }
+  function marginLevel(b){ var m = usedMargin(b); return m > 0 ? equity(b) / m * 100 : Infinity; }
+  // Pris (mitt) där eget kapital = 50 % av initial marginal → marginalavslut
+  function closeOutPrice(b){
+    if (!b.pos) return null;
+    var u = b.units, L = b.posLev, s = SPREAD / 2;
+    if (b.pos > 0) return (u * (b.entry + s) - b.bal) / (u * (1 - MCO / L));
+    return (b.bal + u * (b.entry - s)) / (u * (1 + MCO / L));
+  }
+  function riskToSlPct(b){
+    var eq = Math.max(1, equity(b));
+    if (b.pos) return b.units * Math.abs(b.entry - b.slPx) / eq * 100;
+    if (!(curMid > 0)) return 0;
+    var slDist = curMid * b.slPct / 100;
+    if (sizeMode === 'risk') return SIZE_RISK[b.sizeIdx] * 100;
+    var units = eq * levOf(b) / curMid * SIZE_PCT[b.sizeIdx];
+    return units * slDist / eq * 100;
+  }
+  function odinHint(b){
+    return 'R:R 1:' + (b.tpPct / b.slPct).toFixed(1) + ' · risk till SL ' + riskToSlPct(b).toFixed(2) + ' % av kontot' + (b.pos ? '' : ' (nästa order)');
+  }
+  function progScale(){
+    var m = 0.3;
+    boats.forEach(function(b){ m = Math.max(m, Math.abs((equity(b) / START_EQ - 1) * 100) * 1.25); });
+    return m;
+  }
+  function toast(b, text){ b.toast = { text: text, t0: performance.now() }; }
+  function resetAccount(b){
+    b.bal = START_EQ; b.pos = 0; b.units = 0; b.entry = null; b.slPx = null; b.tpPx = null; b.side = 'FLAT';
+    b.fin = 0; b.spreadPaid = 0; b.gslPaid = 0; b.slip = 0; b.nbp = 0; b.trades = 0; b.wins = 0; b.closeouts = 0;
+    b.realized = 0; b.peakEq = START_EQ; b.maxDD = 0; b.capsize = 0; b.cu = null; b.toast = null; b.faceHit = null; b.faceFlash = 0; b.odin = false;
+  }
+  function openPos(b, dir){
+    if (b.pos === -dir) { closePos(b, 'motorder'); return; }   // nettning: motsatt order stänger positionen
+    if (b.pos === dir) { toast(b, dir > 0 ? 'Redan KÖP' : 'Redan SÄLJ'); return; }
+    var eq = equity(b);
+    if (eq <= 1) { toast(b, 'Kontot är tomt'); return; }
+    var L = levOf(b);
+    var fill = dir > 0 ? askPx() : bidPx();
+    var slDist = Math.max(curMid * b.slPct / 100, 2 * SPREAD);   // minsta stoppavstånd (mäklare kräver ett minimum, här 2 × spread)
+    var maxUnits = eq * L / curMid;               // initial marginal (nominellt / hävstång) ≤ eget kapital
+    var units = sizeMode === 'risk' ? Math.min(maxUnits, eq * SIZE_RISK[b.sizeIdx] / slDist) : maxUnits * SIZE_PCT[b.sizeIdx];
+    units = Math.floor(units * 1000) / 1000;
+    if (units < 0.001) { toast(b, 'För liten storlek'); return; }
+    b.pos = dir; b.units = units; b.entry = fill; b.posLev = L;
+    b.slPx = dir > 0 ? fill - slDist : fill + slDist;
+    b.tpPx = dir > 0 ? fill + curMid * b.tpPct / 100 : fill - curMid * b.tpPct / 100;
+    b.spreadPaid += units * SPREAD;
+    b.side = dir > 0 ? 'KÖP' : 'SÄLJ';
+    b.flash = 1;
+    if (gamePhase === 'lobby') b.practicedOpen = true;
+    toast(b, (dir > 0 ? 'KÖP ' : 'SÄLJ ') + units.toFixed(3) + ' BTC @ ' + fmt0(fill) + ' · spread −' + fmt0(units * SPREAD));
+    spray(b._sx + 46, b._sy + 8, 22, b.tint === 'gold' ? 'rgba(255,240,180,0.9)' : 'rgba(200,240,255,0.9)', 1.2);
+    sfx('splash', 1);
+  }
+  function closePos(b, reason, fillPx){
+    if (!b.pos) return;
+    var exit = fillPx != null ? fillPx : (b.pos > 0 ? bidPx() : askPx());
+    var dp = b.pos * (exit - b.entry);
+    var pnl = dp * b.units;
+    var extra = '';
+    if (reason === 'sl') {
+      if (b.gsl) { var prem = b.units * GSL_PREMIUM; b.bal -= prem; b.gslPaid += prem; extra = '(GSL-premie −' + prem.toFixed(0) + ')'; }
+      else { var slip = Math.abs(exit - b.slPx) * b.units; if (slip > 0.005) { b.slip += slip; extra = '(slirning −' + slip.toFixed(2) + ')'; } }
+    }
+    b.bal += pnl; b.realized += pnl; b.trades++; if (pnl > 0) b.wins++;
+    if (clientMode === 'retail' && b.bal < 0) { b.nbp += -b.bal; b.bal = 0; }   // negativt saldoskydd (privatkund)
+    var labels = { sl: 'STOP LOSS', tp: 'TAKE PROFIT', closeout: 'MARGINALAVSLUT 50 %', manual: 'STÄNGD', motorder: 'STÄNGD (motorder)', 'mål': 'STÄNGD VID MÅL', 'övning': 'ÖVNING SLUT' };
+    b.cu = { t0: performance.now(), dur: 900, pnl: pnl, dp: dp, units: b.units, reason: labels[reason] || reason, extra: extra, lastStep: -1 };
+    b.pos = 0; b.units = 0; b.side = 'FLAT'; b.entry = null; b.slPx = null; b.tpPx = null;
+    if (gamePhase === 'lobby') b.practicedClose = true;
+    var bx = b._sx + 46, by = b._sy + 6;
+    if (reason === 'closeout') {
+      b.closeouts++; b.capsize = 1; b.faceHit = 'closeout'; b.faceFlash = 1; shake = Math.max(shake, 14);
+      sfx('crack'); spray(b._sx, b._sy, 50, 'rgba(150,100,60,0.95)', 2.2); spray(b._sx, b._sy, 30, 'rgba(230,245,255,0.9)', 1.8);
+    } else {
+      b.faceHit = reason === 'tp' ? 'tp' : reason === 'sl' ? 'sl' : (pnl >= 0 ? 'win' : 'loss'); b.faceFlash = 1;
+      if (pnl >= 0) { sfx('win'); spray(bx, by, 36, 'rgba(255,214,90,0.95)', 1.6); }
+      else { sfx('lose'); spray(bx, by, 16, 'rgba(230,245,255,0.85)', 1); }
+      if (pnl > START_EQ * 0.005) shake = Math.max(shake, 6);
     }
   }
-
-  function nudgeLevels(b, dSl, dTp, price){
-    var step = Math.max(5, Math.abs(price) * 0.00015);
-    if (dSl) b.sl = (b.sl == null ? price : b.sl) + dSl * step;
-    if (dTp) b.tp = (b.tp == null ? price : b.tp) + dTp * step;
-  }
-
-  function checkHits(b, price){
-    if (b.side === 'FLAT') return;
-    var hit = null;
-    if (b.side === 'KÖP') {
-      if (b.sl != null && price <= b.sl) hit = 'sl';
-      else if (b.tp != null && price >= b.tp) hit = 'tp';
-    } else if (b.side === 'SÄLJ') {
-      if (b.sl != null && price >= b.sl) hit = 'sl';
-      else if (b.tp != null && price <= b.tp) hit = 'tp';
+  function checkStops(b){
+    if (!b.pos) return;
+    var bd = bidPx(), ak = askPx();
+    // SL utlöses när priset NUDDAR nivån (bid för köp, ask för sälj) — även mitt i ljuset; kan slira vid gap
+    if (b.pos > 0) {
+      if (bd <= b.slPx) return closePos(b, 'sl', b.gsl ? b.slPx : bd);
+      if (bd >= b.tpPx) return closePos(b, 'tp', bd);
+    } else {
+      if (ak >= b.slPx) return closePos(b, 'sl', b.gsl ? b.slPx : ak);
+      if (ak <= b.tpPx) return closePos(b, 'tp', ak);
     }
-    if (!hit) return;
-    var bump = Math.abs((b.entry != null ? b.entry : price) - price) * 0.01;
-    if (hit === 'tp') b.pnl += Math.max(0.5, bump);
-    else b.pnl -= Math.max(0.5, bump);
-    b.faceHit = hit; b.faceFlash = 1;
-    b.side = 'FLAT'; b.sl = null; b.tp = null; b.entry = null;
+    if (equity(b) < MCO * usedMargin(b)) closePos(b, 'closeout');
   }
+  function financing(b, dt){
+    if (!b.pos) return;
+    var rate = b.pos > 0 ? FIN_LONG : FIN_SHORT;
+    var cost = b.units * curMid * rate / 360 * dt / GAME_DAY_MS;   // komprimerad tid: 1 race ≈ 1 dygn
+    b.bal -= cost; b.fin += cost;
+  }
+
+  /* ===== Ljud (WebAudio, inga filer) ===== */
+  var AC = null, master = null, muted = false, VOL = 0.16;
+  function audioInit(){
+    if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
+    try {
+      var C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+      AC = new C(); master = AC.createGain(); master.gain.value = muted ? 0 : VOL; master.connect(AC.destination);
+    } catch (e) { AC = null; }
+  }
+  function noiseSrc(dur){
+    var len = Math.max(1, Math.floor(AC.sampleRate * dur)), buf = AC.createBuffer(1, len, AC.sampleRate), d = buf.getChannelData(0);
+    for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    var s = AC.createBufferSource(); s.buffer = buf; return s;
+  }
+  function envGain(t, a, peak, dec){
+    var gn = AC.createGain();
+    gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak), t + a);
+    gn.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); gn.connect(master); return gn;
+  }
+  function tone(type, f0, f1, t, a, peak, dec){
+    var o = AC.createOscillator(); o.type = type; o.frequency.setValueAtTime(f0, t);
+    if (f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + a + dec);
+    o.connect(envGain(t, a, peak, dec)); o.start(t); o.stop(t + a + dec + 0.05);
+  }
+  function sfx(name, p){
+    if (!AC || muted) return;
+    try {
+      var t = AC.currentTime;
+      if (name === 'splash') {          // åraplask
+        var n = noiseSrc(0.5), f = AC.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 0.9;
+        f.frequency.setValueAtTime(1500, t); f.frequency.exponentialRampToValueAtTime(320, t + 0.42);
+        n.connect(f); f.connect(envGain(t, 0.02, 0.8 * (p || 1), 0.42)); n.start(t); n.stop(t + 0.5);
+      } else if (name === 'horn') {     // lur vid mål
+        [110, 164.8, 220].forEach(function(fr, i){
+          var o = AC.createOscillator(); o.type = 'sawtooth';
+          o.frequency.setValueAtTime(fr * 0.96, t); o.frequency.linearRampToValueAtTime(fr, t + 0.25);
+          var lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 650;
+          var gO = AC.createGain(); var pk = 0.32 / (i + 1);
+          gO.gain.setValueAtTime(0.0001, t); gO.gain.exponentialRampToValueAtTime(pk, t + 0.2);
+          gO.gain.setValueAtTime(pk, t + 1.3); gO.gain.exponentialRampToValueAtTime(0.0001, t + 2.1);
+          o.connect(lp); lp.connect(gO); gO.connect(master); o.start(t); o.stop(t + 2.2);
+        });
+      } else if (name === 'crack') {    // trä som spricker vid kantring
+        [0, 0.06, 0.15].forEach(function(dt0, i){
+          var n2 = noiseSrc(0.12), hp = AC.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1600 + i * 500;
+          n2.connect(hp); hp.connect(envGain(t + dt0, 0.003, 0.9 - i * 0.2, 0.09)); n2.start(t + dt0); n2.stop(t + dt0 + 0.13);
+        });
+        tone('sine', 95, 38, t, 0.01, 0.9, 0.45);
+      } else if (name === 'tick') {
+        tone('sine', 520 + (p || 0) * 28, 0, t, 0.004, 0.22, 0.06);
+      } else if (name === 'win') {
+        tone('triangle', 660, 0, t, 0.01, 0.35, 0.18); tone('triangle', 990, 0, t + 0.12, 0.01, 0.3, 0.3);
+      } else if (name === 'lose') {
+        tone('triangle', 330, 160, t, 0.01, 0.3, 0.38);
+      } else if (name === 'click') {
+        tone('square', 880, 0, t, 0.002, 0.08, 0.04);
+      }
+    } catch (e) {}
+  }
+  function setMuted(m){
+    muted = m; if (master) master.gain.value = m ? 0 : VOL;
+    var bt = document.getElementById('muteBtn'); if (bt) bt.textContent = m ? '🔇 Ljud av' : '🔊 Ljud på';
+  }
+  document.getElementById('muteBtn').addEventListener('click', function(e){ audioInit(); setMuted(!muted); e.currentTarget.blur(); cv.focus(); });
+
+  /* ===== Partiklar & skärmskak ===== */
+  var parts = [], shake = 0;
+  function spray(x, y, n, col, spd){
+    for (var i = 0; i < n; i++) parts.push({ x: x, y: y, vx: (Math.random() * 1.6 - 0.3) * spd, vy: -(Math.random() * 2.2 + 0.4) * spd, life: 1, col: col, r: 1 + Math.random() * 2.4 });
+    if (parts.length > 500) parts.splice(0, parts.length - 500);
+  }
+  function updateParts(dt){
+    for (var i = parts.length - 1; i >= 0; i--) {
+      var p = parts[i];
+      p.x += p.vx * dt * 0.06; p.vy += 0.0045 * dt; p.y += p.vy * dt * 0.06; p.life -= dt / 900;
+      if (p.life <= 0) parts.splice(i, 1);
+    }
+    shake *= Math.pow(0.88, dt / 16); if (shake < 0.2) shake = 0;
+  }
+
+  /* ===== Input med kort buffert (~150 ms) ===== */
+  var inputQ = [];
+  var KEYMAP = {
+    KeyW: [0, 'buy'], KeyS: [0, 'sell'], KeyQ: [0, 'flat'], KeyA: [0, 'lev-'], KeyD: [0, 'lev+'], KeyE: [0, 'size'],
+    ArrowUp: [1, 'buy'], ArrowDown: [1, 'sell'], Slash: [1, 'flat'], Minus: [1, 'flat'], NumpadSubtract: [1, 'flat'], Numpad0: [1, 'flat'],
+    ArrowLeft: [1, 'lev-'], ArrowRight: [1, 'lev+'], Period: [1, 'size'], Numpad1: [1, 'size'], NumpadDecimal: [1, 'size']
+  };
+  function keyCode(e){
+    if (e.code && e.code !== 'Unidentified') return e.code;
+    var k = e.key;
+    var m = { ArrowUp:'ArrowUp', ArrowDown:'ArrowDown', ArrowLeft:'ArrowLeft', ArrowRight:'ArrowRight', '-':'Slash', '/':'Slash', '.':'Period', Escape:'Escape', Enter:'Enter' };
+    if (m[k]) return m[k];
+    if (k && k.length === 1) return 'Key' + k.toUpperCase();
+    return '';
+  }
+  function tryAction(c){
+    var m = KEYMAP[c]; if (!m) return true;
+    if (gamePhase === 'finished') return true;
+    if (gamePhase === 'crossing' || paused || !(curMid > 0)) return false;
+    var b = boats[m[0]];
+    if (b.capsize > 0) return false;
+    var act = m[1];
+    if (act === 'buy') openPos(b, 1);
+    else if (act === 'sell') openPos(b, -1);
+    else if (act === 'flat') { if (b.pos) closePos(b, 'manual'); else toast(b, 'Redan FLAT'); }
+    else if (act === 'lev-' || act === 'lev+') {
+      var s = levSteps(); b.levIdx = Math.max(0, Math.min(s.length - 1, b.levIdx + (act === 'lev+' ? 1 : -1)));
+      toast(b, 'Hävstång ×' + levOf(b) + (b.pos ? ' · gäller nästa order' : '') + (levOf(b) === s[s.length - 1] ? (clientMode === 'pro' ? ' (pro-max)' : ' (privatkund max 2:1)') : ''));
+      sfx('click');
+    } else if (act === 'size') {
+      b.sizeIdx = (b.sizeIdx + 1) % 3; toast(b, 'Storlek ' + sizeLabel(b) + (b.pos ? ' · nästa order' : '')); sfx('click');
+    }
+    return true;
+  }
+  function processInput(now){
+    var keep = [];
+    for (var i = 0; i < inputQ.length; i++) {
+      var it = inputQ[i];
+      if (!tryAction(it.c) && now - it.t < INPUT_BUFFER_MS) keep.push(it);
+    }
+    inputQ = keep;
+  }
+  window.addEventListener('keydown', function(e){
+    if (e.repeat) return;
+    var c = keyCode(e);
+    if (c === 'KeyM') { audioInit(); setMuted(!muted); return; }
+    if (c === 'KeyH') { toggleRules(); return; }
+    if (c === 'Escape') { if (running && gamePhase !== 'finished') paused = !paused; return; }
+    if (!running) return;
+    if (gamePhase === 'finished') { if (c === 'Enter' || c === 'KeyR') rematch(); return; }
+    if (KEYMAP[c]) inputQ.push({ c: c, t: performance.now() });
+  }, true);
+
+  function toggleRules(force){
+    var rf = document.getElementById('rulesFloat');
+    if (!rf.innerHTML) rf.innerHTML = document.getElementById('rulesBox').innerHTML;
+    rf.classList.toggle('on', force != null ? force : !rf.classList.contains('on'));
+  }
+
+  /* ===== Faser ===== */
+  function beginCrossing(){
+    gamePhase = 'crossing'; phaseFade = 1;
+    boats.forEach(function(b){ if (b.pos) { b.pos = 0; b.units = 0; b.side = 'FLAT'; b.entry = null; } });
+    pendingRAW = null;
+    if (!synthetic) fetchKlines(FETCH_N).then(function(rows){ pendingRAW = rows; }).catch(function(){});
+    sfx('splash', 1.3);
+    toggleRules(false);
+  }
+  function startRace(){
+    if (pendingRAW && pendingRAW.length >= REPLAY_N + 40) RAW = pendingRAW;
+    pendingRAW = null;
+    boats.forEach(function(b){ resetAccount(b); b.flash = 1; });
+    boats[0].x = 0.52; boats[1].x = 0.48;
+    feed.raceFrom = Math.max(0, RAW.length - REPLAY_N); feed.idx = feed.raceFrom; feed.f = 0; feed.mode = 'race';
+    gamePhase = 'race'; phaseFade = 0; liveStatus = 'HISTORISK';
+  }
+  function startLive(now){
+    gamePhase = 'live'; feed.mode = 'live'; feed.liveEnd = now + LIVE_LAP_MS; liveStatus = 'LIVE';
+    pollLive(); if (liveTimer) clearInterval(liveTimer); liveTimer = setInterval(pollLive, 3000);
+    boats.forEach(function(b){ toast(b, 'LIVEVARV!'); });
+  }
+  function onCandleClose(){
+    if (gamePhase === 'race') sfx('splash', 0.25);   // mjukt åraslag varje ljus
+  }
+  function feedAdvance(dt, now){
+    if (!RAW.length) return;
+    feed.f += dt / CANDLE_MS;
+    while (feed.f >= 1) {
+      if (feed.mode === 'race' && feed.idx >= RAW.length - 1) {
+        feed.f = 1;
+        if (liveLapOn) startLive(now); else finishRace();
+        return;
+      }
+      feed.f -= 1; feed.idx++;
+      onCandleClose();
+      if (feed.mode === 'lobby' && feed.idx >= feed.lobbyTo) { feed.idx = feed.lobbyFrom; }
+    }
+  }
+  function flagSvg(kind){
+    var el = document.querySelector(kind === 'SE' ? '#face1 .face-flag svg' : '#face2 .face-flag svg');
+    return el ? el.outerHTML : kind;
+  }
+  function finishRace(){
+    if (liveTimer) { clearInterval(liveTimer); liveTimer = null; }
+    boats.forEach(function(b){ if (b.pos) closePos(b, 'mål'); });
+    gamePhase = 'finished'; feed.mode = 'stopped';
+    var e0 = equity(boats[0]), e1 = equity(boats[1]);
+    var tie = Math.abs(e0 - e1) < 0.01, wi = e0 > e1 ? 0 : 1;
+    var W = boats[wi];
+    document.getElementById('finFlag').innerHTML = tie ? '' : flagSvg(W.flag);
+    document.getElementById('finTitle').textContent = tie ? 'Oavgjort!' : (wi === 0 ? 'SE · Gul vinner!' : 'NO · Blå vinner!');
+    document.getElementById('finSub').textContent = tie ? 'Lika eget kapital.' :
+      'Slutkapital ' + fmt2(equity(W)) + ' USD (' + sgn2((equity(W) / START_EQ - 1) * 100) + ' %) · ' + (clientMode === 'pro' ? 'pro-klient' : 'privatkund, max 2:1') +
+      ' · ' + REPLAY_N + ' ljus historisk uppspelning' + (liveLapOn ? ' + livevarv' : '');
+    function row(lbl, f){ return '<tr><td>' + lbl + '</td><td>' + f(boats[0]) + '</td><td>' + f(boats[1]) + '</td></tr>'; }
+    document.getElementById('finStats').innerHTML =
+      '<tr><th></th><th class="p1">Gul · SE</th><th class="p2">Blå · NO</th></tr>' +
+      row('Eget kapital (USD)', function(b){ return fmt2(equity(b)); }) +
+      row('Avkastning', function(b){ return sgn2((equity(b) / START_EQ - 1) * 100) + ' %'; }) +
+      row('Affärer / vinnande', function(b){ return b.trades + ' / ' + b.wins; }) +
+      row('Realiserat (brutto)', function(b){ return fmt2(b.realized); }) +
+      row('Spread betald', function(b){ return '−' + fmt2(b.spreadPaid); }) +
+      row('Finansiering (komprimerad)', function(b){ return '−' + fmt2(b.fin); }) +
+      row('Slirning SL / GSL-premie', function(b){ return '−' + fmt2(b.slip) + ' / −' + fmt2(b.gslPaid); }) +
+      row('Marginalavslut', function(b){ return String(b.closeouts); }) +
+      row('Max drawdown', function(b){ return (b.maxDD * 100).toFixed(2) + ' %'; }) +
+      (clientMode === 'retail' ? row('Neg. saldoskydd täckte', function(b){ return fmt2(b.nbp); }) : '');
+    document.getElementById('finish').classList.add('on');
+    sfx('horn'); shake = Math.max(shake, 7);
+    if (!tie) spray(W._sx, W._sy - 40, 80, 'rgba(255,214,90,0.95)', 2.4);
+  }
+  function rematch(){
+    document.getElementById('finish').classList.remove('on');
+    audioInit();
+    beginCrossing();
+    cv.focus();
+  }
+  document.getElementById('rematch').onclick = rematch;
 
   function step(now){
     if (!running) return;
     requestAnimationFrame(step);
-    if (paused) return;
-    var dt = Math.min(32, now - (t0 || now)); t0 = now; tick++;
+    var dt = Math.min(50, now - (t0 || now)); t0 = now; tick++;
+    if (paused) { draw(now); return; }
 
-    // F toggles flat mode (edge-trigger)
-    if (down('KeyF')) {
-      if (!fWasDown) setTerrain(terrainMode === 'flat' ? 'normal' : 'flat');
-      fWasDown = true;
-    } else fWasDown = false;
+    if (down('KeyF')) { if (!fWasDown) setTerrain(terrainMode === 'flat' ? 'normal' : 'flat'); fWasDown = true; }
+    else fWasDown = false;
 
-    var bb = bands();
-    var price = prices[prices.length - 1] || bb.mid || 0;
-    var p1 = boats[0], p2 = boats[1];
+    if (gamePhase === 'lobby' || gamePhase === 'race') feedAdvance(dt, now);
+    if (gamePhase === 'live' && now >= feed.liveEnd) finishRace();
+    rebuildView();
+    processInput(now);
 
-    // A/D = hävstång + hastighet (INTE sidhopp / vx)
-    if (down('KeyA')) { p1.lev = Math.max(1, p1.lev - 0.02 * dt); p1.speed = Math.max(0.4, p1.speed - 0.015 * dt); }
-    if (down('KeyD')) { p1.lev = Math.min(20, p1.lev + 0.02 * dt); p1.speed = Math.min(4, p1.speed + 0.015 * dt); }
-    // W en gång från FLAT → KÖP (buy). S → SÄLJ.
-    if (down('KeyW')) {
-      if (!p1.wWas && p1.side === 'FLAT') { p1.side = 'KÖP'; ensureLevels(p1, price, bb); p1.practiced = true; }
-      else if (p1.side !== 'FLAT') { p1.side = 'KÖP'; ensureLevels(p1, price, bb); }
-      p1.wWas = true;
-    } else p1.wWas = false;
-    if (down('KeyS')) {
-      if (!p1.sWas && p1.side === 'FLAT') { p1.side = 'SÄLJ'; ensureLevels(p1, price, bb); p1.practiced = true; }
-      else if (p1.side !== 'FLAT') { p1.side = 'SÄLJ'; ensureLevels(p1, price, bb); }
-      p1.sWas = true;
-    } else p1.sWas = false;
-    // SL/TP locked during race — set via wayfinder before start only
-    // Soft forward drift from speed — no jump
-    p1.vx = 0;
-    p1.x = Math.max(0.12, Math.min(0.88, p1.x + (p1.speed - 1) * 0.00015 * dt));
-
-    var hScreen = innerHeight;
-    var yPrice = priceToY(price, bb, hScreen);
-    var yUpPx = priceToY(bb.up, bb, hScreen);
-    var yLoPx = priceToY(bb.lo, bb, hScreen);
-    function sideY(side){
-      // Mild offset — no big hop to BB midpoints
-      if (side === 'KÖP') return (yPrice - 18) / hScreen;
-      if (side === 'SÄLJ') return (yPrice + 18) / hScreen;
-      return yPrice / hScreen;
-    }
-    var targetY1 = sideY(p1.side);
-    p1.y += (targetY1 - p1.y) * 0.045;
-    p1.y = Math.max(0.28, Math.min(0.62, p1.y));
-    p1.flash *= 0.92;
-    p1.faceFlash *= 0.96;
-    if (p1.faceFlash < 0.05) { p1.faceFlash = 0; p1.faceHit = null; }
-
-    // ←/→ = hävstång + hastighet for P2 (inte hopp)
-    if (down('ArrowLeft')) { p2.lev = Math.max(1, p2.lev - 0.02 * dt); p2.speed = Math.max(0.4, p2.speed - 0.015 * dt); }
-    if (down('ArrowRight')) { p2.lev = Math.min(20, p2.lev + 0.02 * dt); p2.speed = Math.min(4, p2.speed + 0.015 * dt); }
-    if (down('ArrowUp')) {
-      if (!p2.upWas && p2.side === 'FLAT') { p2.side = 'KÖP'; ensureLevels(p2, price, bb); p2.practiced = true; }
-      else if (p2.side !== 'FLAT') { p2.side = 'KÖP'; ensureLevels(p2, price, bb); }
-      p2.upWas = true;
-    } else p2.upWas = false;
-    if (down('ArrowDown')) {
-      if (!p2.dnWas && p2.side === 'FLAT') { p2.side = 'SÄLJ'; ensureLevels(p2, price, bb); p2.practiced = true; }
-      else if (p2.side !== 'FLAT') { p2.side = 'SÄLJ'; ensureLevels(p2, price, bb); }
-      p2.dnWas = true;
-    } else p2.dnWas = false;
-    // P2 SL/TP locked during race
-    p2.vx = 0;
-    p2.x = Math.max(0.12, Math.min(0.88, p2.x + (p2.speed - 1) * 0.00015 * dt));
-    var targetY2 = sideY(p2.side);
-    p2.y += (targetY2 - p2.y) * 0.045;
-    p2.y = Math.max(0.28, Math.min(0.62, p2.y));
-    p2.flash *= 0.92;
-    p2.faceFlash *= 0.96;
-    if (p2.faceFlash < 0.05) { p2.faceFlash = 0; p2.faceHit = null; }
-
+    var trading = gamePhase === 'lobby' || gamePhase === 'race' || gamePhase === 'live';
     boats.forEach(function(b){
-      var dir = b.side === 'KÖP' ? 1 : b.side === 'SÄLJ' ? -1 : 0;
-      // Lobby: mild practice PnL; Race: full live competition weight
-      var wgt = gamePhase === 'race' ? 0.004 : 0.0015;
-      b.pnl += dir * (price - bb.mid) * wgt * (b.lev || 1);
-      if (gamePhase === 'race') checkHits(b, price);
-      // Historisk progress mot Gränslandet
-      b.histProgress = Math.max(b.histProgress || 0, Math.min(1, b.x / GATE_X));
-      b.atGate = !!(b.sl != null && b.tp != null && b.practiced && b.x >= GATE_X);
+      if (trading) { financing(b, dt); checkStops(b); }
+      if (gamePhase === 'race' || gamePhase === 'live') {
+        var e = equity(b); b.peakEq = Math.max(b.peakEq, e); b.maxDD = Math.max(b.maxDD, (b.peakEq - e) / b.peakEq);
+      }
+      b.pnl = (equity(b) / START_EQ - 1) * 100;
+      b.side = b.pos > 0 ? 'KÖP' : b.pos < 0 ? 'SÄLJ' : 'FLAT';
+      b.flash *= 0.92;
+      b.faceFlash *= 0.97; if (b.faceFlash < 0.05) { b.faceFlash = 0; b.faceHit = null; }
+      if (b.capsize > 0) b.capsize = Math.max(0, b.capsize - dt / 2200);
+      if (b.pos && Math.random() < 0.05 * b.posLev) spray(b._sx + 46, b._sy + 10, 1, 'rgba(230,245,255,0.8)', 0.6 + 0.2 * b.posLev);
+      b.speed = b.pos ? 1 + 0.5 * (b.posLev - 1) : 0.7;
     });
 
-    // Auto-övergång: båda vid Gränslandet → crossing → race
-    if (gamePhase === 'lobby' && boats[0].atGate && boats[1].atGate) {
-      gamePhase = 'crossing';
-      phaseFade = 1;
-    }
+    // Båtarnas läge: lobby = övningsframsteg, race = eget kapital (avkastning %)
+    boats.forEach(function(b, i){
+      var target;
+      if (gamePhase === 'lobby' || gamePhase === 'crossing') {
+        var ready = (b.practicedOpen ? 0.5 : 0) + (b.practicedClose ? 0.5 : 0);
+        target = (i === 0 ? 0.26 : 0.22) + (GATE_X + 0.02 - (i === 0 ? 0.26 : 0.22)) * ready;
+        b.histProgress = ready;
+        b.atGate = ready >= 1 && b.x >= GATE_X - 0.01;
+      } else {
+        var r = (equity(b) / START_EQ - 1) * 100;
+        target = 0.5 + (i === 0 ? 0.02 : -0.02) + 0.3 * Math.max(-1, Math.min(1, r / progScale()));
+      }
+      b.x += (target - b.x) * Math.min(1, dt * 0.003);
+    });
+    if (gamePhase === 'lobby' && boats[0].atGate && boats[1].atGate) beginCrossing();
     if (gamePhase === 'crossing') {
       phaseFade = Math.max(0, phaseFade - dt * 0.00035);
-      if (phaseFade <= 0.02) {
-        gamePhase = 'race';
-        phaseFade = 0;
-        boats.forEach(function(b){ b.flash = 1; });
-      }
+      if (phaseFade <= 0.02) startRace();
     }
+    // Odins vind: efterliggande båt får rune + risk/belöning-tips (ingen effekt på pris, PnL eller avgifter)
+    var e0 = equity(boats[0]), e1 = equity(boats[1]);
+    var gap = Math.abs(e0 - e1) > START_EQ * 0.0005;
+    boats[0].odin = (gamePhase === 'race' || gamePhase === 'live') && gap && e0 < e1;
+    boats[1].odin = (gamePhase === 'race' || gamePhase === 'live') && gap && e1 < e0;
 
-    // Parallax voyage: stjärnor/berg/strand rör sig i proportion till båtarnas färd
-    var avgSpd = ((boats[0].speed || 1) + (boats[1].speed || 1)) * 0.5;
-    var avgX = (boats[0].x + boats[1].x) * 0.5;
-    worldScroll += dt * (0.012 + avgSpd * 0.018 + avgX * 0.004);
-    // mild price-driven sway so layers breathe with kursen
-    var pxNow = prices[prices.length - 1] || 0;
-    var pxPrev = prices.length > 2 ? prices[prices.length - 3] : pxNow;
-    worldScroll += (pxNow - pxPrev) * 0.002;
+    updateParts(dt);
+    var avgSpd = (boats[0].speed + boats[1].speed) * 0.5;
+    worldScroll += dt * (0.012 + avgSpd * 0.018);
+    if (prices.length > 2) worldScroll += (prices[prices.length - 1] - prices[prices.length - 3]) * 0.002;
 
     draw(now);
+    if (tick % 15 === 0) updateReadout();
 
-    document.getElementById('m1').textContent = p1.side;
-    document.getElementById('m2').textContent = p2.side;
-    function sltpStr(b){
-      return ' SL ' + (b.sl == null ? '—' : b.sl.toFixed(0)) + ' TP ' + (b.tp == null ? '—' : b.tp.toFixed(0));
+    function hud(b){
+      var eq = equity(b), L = levOf(b);
+      var s = 'Eget kapital ' + fmt2(eq) + ' USD (' + sgn2((eq / START_EQ - 1) * 100) + ' %) · nästa: ×' + L + ', ' + sizeLabel(b) + '\n';
+      if (b.pos) {
+        var um = usedMargin(b);
+        s += (b.pos > 0 ? 'KÖP ' : 'SÄLJ ') + b.units.toFixed(3) + ' BTC @ ' + fmt0(b.entry) + ' · ×' + b.posLev + ' · orealiserat ' + sgn2(unreal(b)) + '\n' +
+          'Marginal ' + fmt0(um) + ' · fri ' + fmt0(eq - um) + ' · nivå ' + marginLevel(b).toFixed(0) + ' % (avslut < 50 %) · risk till SL ' + riskToSlPct(b).toFixed(2) + ' %\n';
+      } else s += 'FLAT · fri marginal ' + fmt0(eq) + ' · SL ' + b.slPct.toFixed(2) + ' % / TP ' + b.tpPct.toFixed(2) + ' %' + (b.gsl ? ' (GSL)' : '') + '\n';
+      s += 'Kostnader: spread −' + fmt0(b.spreadPaid) + ' · finansiering −' + b.fin.toFixed(2) + (b.gslPaid ? ' · GSL −' + fmt0(b.gslPaid) : '') + (b.slip ? ' · slirning −' + b.slip.toFixed(2) : '') + ' · kurtage 0';
+      return s;
     }
-    document.getElementById('s1').textContent = 'x' + p1.lev.toFixed(1) + ' · spd ' + p1.speed.toFixed(1) + ' · pnl ' + p1.pnl.toFixed(2) + sltpStr(p1);
-    document.getElementById('s2').textContent = 'x' + p2.lev.toFixed(1) + ' · spd ' + p2.speed.toFixed(1) + ' · pnl ' + p2.pnl.toFixed(2) + sltpStr(p2);
-    var f1 = document.getElementById('face1'), f2 = document.getElementById('face2');
-    applyFaceHud(f1, document.getElementById('face1img'), document.getElementById('face1lab'), p1, price, 'p1');
-    applyFaceHud(f2, document.getElementById('face2img'), document.getElementById('face2lab'), p2, price, 'p2');
+    var p1 = boats[0], p2 = boats[1];
+    document.getElementById('m1').textContent = p1.side + (p1.pos ? ' · ×' + p1.posLev : '') + (clientMode === 'pro' ? ' · PRO' : '');
+    document.getElementById('m2').textContent = p2.side + (p2.pos ? ' · ×' + p2.posLev : '') + (clientMode === 'pro' ? ' · PRO' : '');
+    document.getElementById('s1').textContent = hud(p1);
+    document.getElementById('s2').textContent = hud(p2);
+    applyFaceHud(document.getElementById('face1'), document.getElementById('face1img'), document.getElementById('face1lab'), p1, curMid, 'p1');
+    applyFaceHud(document.getElementById('face2'), document.getElementById('face2img'), document.getElementById('face2lab'), p2, curMid, 'p2');
 
-    var el = document.getElementById('dbg');
-    if (el && window.__VBDBG) {
-      var K = window.__VBKEYS;
-      el.textContent =
-        'SENAST: ' + window.__VBDBG.last + '\n' +
-        'BÅT: ' + window.__VBDBG.boat + '\n' +
-        'KÖP/SÄLJ: ' + window.__VBDBG.buySell + '\n' +
-        'n=' + window.__VBDBG.n + '\n' +
-        'terrain=' + terrainMode + '\n' +
-        'WASD→GUL only · pilar→BLÅ only\n' +
-        'GUL x=' + p1.x.toFixed(3) + ' ' + p1.side + sltpStr(p1) + '\n' +
-        'BLÅ x=' + p2.x.toFixed(3) + ' ' + p2.side + sltpStr(p2) + '\n' +
-        'Arrow L/R/U/D: ' + !!K.ArrowLeft + '/' + !!K.ArrowRight + '/' + !!K.ArrowUp + '/' + !!K.ArrowDown + '\n' +
-        'heartbeat ' + new Date().toLocaleTimeString();
+    if (DEBUG) {
+      var el = document.getElementById('dbg');
+      if (el && window.__VBDBG) {
+        el.textContent = 'SENAST: ' + window.__VBDBG.last + '\nfas=' + gamePhase + ' feed=' + feed.mode + ' idx=' + feed.idx + ' f=' + feed.f.toFixed(2) +
+          '\nmid=' + curMid.toFixed(1) + ' RAW=' + RAW.length + (synthetic ? ' SYNT' : '') +
+          '\nGul pos=' + p1.pos + ' eq=' + equity(p1).toFixed(2) + ' co=' + (closeOutPrice(p1) || 0).toFixed(0) +
+          '\nBlå pos=' + p2.pos + ' eq=' + equity(p2).toFixed(2) + ' co=' + (closeOutPrice(p2) || 0).toFixed(0) +
+          '\ninputQ=' + inputQ.length + ' parts=' + parts.length + '\nheartbeat ' + new Date().toLocaleTimeString();
+      }
     }
   }
 
+  // Inställningsknappar i lobbyn
+  function setOpt(idOn, idOff){ document.getElementById(idOn).classList.add('active'); document.getElementById(idOff).classList.remove('active'); }
+  document.getElementById('btnRetail').onclick = function(){ clientMode = 'retail'; setOpt('btnRetail', 'btnPro'); boats.forEach(function(b){ b.levIdx = Math.min(b.levIdx, LEV_RETAIL.length - 1); }); };
+  document.getElementById('btnPro').onclick = function(){ clientMode = 'pro'; setOpt('btnPro', 'btnRetail'); };
+  document.getElementById('btnSizePct').onclick = function(){ sizeMode = 'pct'; setOpt('btnSizePct', 'btnSizeRisk'); };
+  document.getElementById('btnSizeRisk').onclick = function(){ sizeMode = 'risk'; setOpt('btnSizeRisk', 'btnSizePct'); };
+  document.getElementById('btnLiveOn').onclick = function(){ liveLapOn = true; setOpt('btnLiveOn', 'btnLiveOff'); };
+  document.getElementById('btnLiveOff').onclick = function(){ liveLapOn = false; setOpt('btnLiveOff', 'btnLiveOn'); };
+
   document.getElementById('go').onclick = function(){
-    if (!_wfSeeded) defaultLevelsFromPrice();
+    audioInit();
     levelsLocked = true;
-    gamePhase = 'lobby';
-    phaseFade = 0;
-    boats.forEach(function(b){
-      b.histProgress = 0; b.atGate = false; b.practiced = !!(b.sl != null && b.tp != null);
-      // start left of gate in historik-zon
-      if (b.tint === 'gold') b.x = 0.28; else b.x = 0.22;
+    gamePhase = 'lobby'; phaseFade = 0;
+    boats.forEach(function(b, i){
+      resetAccount(b);
+      b.histProgress = 0; b.atGate = false; b.practicedOpen = false; b.practicedClose = false;
+      b.x = i === 0 ? 0.26 : 0.22;
     });
+    feed.mode = 'lobby'; feed.idx = feed.lobbyFrom; feed.f = 0;
     preRace = false;
     document.getElementById('start').style.display = 'none';
     var mascot = document.getElementById('mascot');
@@ -1771,31 +2308,30 @@ function drawHouse(g, x, baseY, scale, accent){
     requestAnimationFrame(step);
   };
 
-  // Pre-race wayfinder keys (while start panel visible)
+  // Vägvisare före start (medan startpanelen syns)
   var wfKeyCool = 0;
   window.addEventListener('keydown', function(e){
-    if (codeEscape(e)) { if (running) paused = !paused; return; }
     if (running || levelsLocked) return;
     var code = e.code || '';
     var now = Date.now();
     if (now < wfKeyCool) return;
-    // P1: A/D switch field, W/S nudge
     if (code === 'KeyA') { cycleFocus(0, 0); wfFocus.f = 'sl'; syncWayfinderUI(); wfKeyCool = now + 140; }
     else if (code === 'KeyD') { cycleFocus(0, 0); wfFocus.f = 'tp'; syncWayfinderUI(); wfKeyCool = now + 140; }
     else if (code === 'KeyW') { nudgeWayfinder(0, wfFocus.p === 0 ? wfFocus.f : 'sl', +1); wfFocus.p = 0; wfKeyCool = now + 70; }
     else if (code === 'KeyS') { nudgeWayfinder(0, wfFocus.p === 0 ? wfFocus.f : 'sl', -1); wfFocus.p = 0; wfKeyCool = now + 70; }
-    // P2: ←/→ field, ↑/↓ nudge
     else if (code === 'ArrowLeft') { cycleFocus(1, 0); wfFocus.f = 'sl'; syncWayfinderUI(); wfKeyCool = now + 140; }
     else if (code === 'ArrowRight') { cycleFocus(1, 0); wfFocus.f = 'tp'; syncWayfinderUI(); wfKeyCool = now + 140; }
     else if (code === 'ArrowUp') { nudgeWayfinder(1, wfFocus.p === 1 ? wfFocus.f : 'sl', +1); wfFocus.p = 1; wfKeyCool = now + 70; }
     else if (code === 'ArrowDown') { nudgeWayfinder(1, wfFocus.p === 1 ? wfFocus.f : 'sl', -1); wfFocus.p = 1; wfKeyCool = now + 70; }
-    else if (code === 'Enter') { /* activate focus flash */ syncWayfinderUI(); }
   }, true);
-  function codeEscape(e){ return e.code === 'Escape' || e.key === 'Escape'; }
+
+  var DEBUG = /(^|[?&])debug(=|&|$)/.test(location.search);
+  if (DEBUG) document.body.classList.add('debug-on');
+  if (DEBUG || /(^|[?&])test(=|&|$)/.test(location.search)) window.__VB = { boats: boats, feed: feed, equity: equity, closeOutPrice: closeOutPrice, phase: function(){ return gamePhase; }, setSpeed: function(ms){ CANDLE_MS = ms; GAME_DAY_MS = REPLAY_N * ms; }, setLiveLap: function(ms){ LIVE_LAP_MS = ms; } };
 
   // idle preview draw while on start screen
   (function previewLoop(t){
-    if (!running) { draw(t); requestAnimationFrame(previewLoop); }
+    if (!running) { rebuildView(); draw(t); requestAnimationFrame(previewLoop); }
   })(performance.now());
 })();
 </script>
