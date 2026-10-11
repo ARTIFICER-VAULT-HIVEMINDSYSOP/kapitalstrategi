@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a1628" />
+    <meta name="description" content="Studiegrupp i Tradingskolan. Bjud in en vän till ett extra kursblad. Simulerat spel." />
+    <title>Studiegrupp · Tradingskolan</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/skolan/skolan.css" />
+  </head>
+  <body>
+    <a class="skip" href="#innehall">Till innehållet</a>
+    <header class="site-header">
+      <a class="brand" href="/skolan/">
+        <img class="brand-avatar" src="/brand/robban-portrait-transparent.png" alt="" width="48" height="48" />
+        <span><strong>Tradingskolan</strong><small>Kapital och Strategi</small></span>
+      </a>
+      <nav class="site-nav" aria-label="Skolsidor">
+        <a href="/skolan/">Start</a>
+        <a href="/skolan/coach/">Fråga Robban</a>
+        <a href="/skolan/signaler/">Signaler</a>
+        <a href="/skolan/framsteg/">Framsteg</a>
+        <a href="/skolan/studiegrupp/" aria-current="page">Studiegrupp</a>
+        <a href="/skolan/signalhistorik/">Signalhistorik</a>
+      </nav>
+    </header>
+    <main id="innehall" class="shell">
+      <p class="lede">Läsa samma lektion</p>
+      <h1>Studiegrupp</h1>
+      <p>En studiegrupp läser samma lektion och tar kontrollfrågan tillsammans. Inbjudan låser upp ett extra kursblad, samma blad för alla.</p>
+      <section class="panel">
+        <h2>Bjud in en vän</h2>
+        <p>Knappen skapar en länk till det extra kursbladet. Sidan ber inte om namn eller e-post.</p>
+        <button type="button" class="btn" id="invite-button">Bjud in en vän</button>
+        <p class="status" id="invite-link">saknas</p>
+        <p><a href="/skolan/extra/">Öppna det extra kursbladet</a></p>
+      </section>
+      <section class="panel">
+        <h2>Simulerat spel</h2>
+        <p>Det här är ett simulerat spel. Poängen hör till spelet på den här sidan. Den är inte handel med riktiga pengar och ger ingen ersättning.</p>
+        <form id="sim-form" class="stack"></form>
+        <h3>Poänglista för det simulerade spelet</h3>
+        <table>
+          <thead>
+            <tr><th>Deltagare</th><th>Poäng</th></tr>
+          </thead>
+          <tbody id="board-body">
+            <tr><td>Den här webbläsaren</td><td>saknas</td></tr>
+            <tr><td>Andra deltagare</td><td>saknas</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+    <footer class="site-foot">
+      <p>Det här är utbildning. Det är inte personlig investeringsrådgivning. Efter kursen kan du själv välja att handla med egna pengar hos en mäklare som du väljer. Skolan låser aldrig upp handel med riktiga pengar. <a href="/tradingskolan">Till kursen</a></p>
+    </footer>
+    <script type="module" src="/skolan/studiegrupp/studiegrupp.js"></script>
+  </body>
+</html>
