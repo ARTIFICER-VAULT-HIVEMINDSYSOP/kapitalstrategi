@@ -1,0 +1,94 @@
+name: Kapitalnytt och Urbergsskölden
+
+on:
+  schedule:
+    # 06:47 summer time, 05:47 winter time
+    - cron: "47 4 * * *"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "kapitalnytt/**"
+      - "urbergsskolden/**"
+      - ".github/workflows/magasin.yml"
+  push:
+    branches: [main]
+    paths:
+      - "kapitalnytt/inlagg/**"
+      - "urbergsskolden/inlagg/**"
+
+permissions:
+  contents: write
+  actions: write
+  issues: write
+
+concurrency:
+  group: sektioner-publicering
+  cancel-in-progress: false
+
+jobs:
+  kor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Test
+        run: node --test kapitalnytt/
+
+      - name: Kontroll
+        id: kontroll
+        continue-on-error: ${{ github.event_name != 'pull_request' }}
+        run: |
+          set +e
+          node kapitalnytt/check.mjs > "$RUNNER_TEMP/check.txt" 2>&1
+          code=$?
+          cat "$RUNNER_TEMP/check.txt"
+          exit "$code"
+
+      - name: Öppna eller uppdatera ärende
+        if: github.event_name != 'pull_request' && steps.kontroll.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh label create kapitalnytt-underhall --color B60205 --description "Stoppad publicering av Kapitalnytt eller Urbergsskölden" || true
+          BODY_FILE="$RUNNER_TEMP/issue.md"
+          {
+            echo "Kontrollen stoppade publicering. Inget byggdes och inget skickades till Pages."
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/check.txt"
+            echo '```'
+          } > "$BODY_FILE"
+          NUMBER="$(gh issue list --label kapitalnytt-underhall --state open --limit 1 --json number --jq '.[0].number // empty')"
+          if [ -n "$NUMBER" ]; then
+            gh issue edit "$NUMBER" --body-file "$BODY_FILE"
+            gh issue comment "$NUMBER" --body-file "$BODY_FILE"
+          else
+            gh issue create --title "Underhåll: publicering stoppad" --label kapitalnytt-underhall --body-file "$BODY_FILE"
+          fi
+
+      - name: Markera jobbet som misslyckat
+        if: steps.kontroll.outcome == 'failure'
+        run: exit 1
+
+      - name: Bygg och publicera
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && steps.kontroll.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node kapitalnytt/build.mjs
+          git add -A -- kapitalnytt urbergsskolden
+          if git diff --cached --quiet; then
+            echo "Ingen ändring i utdata"
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Kapitalnytt och Urbergsskölden: schemalagda inlägg"
+          git push
+          gh workflow run pages.yml --ref main
