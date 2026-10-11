@@ -407,7 +407,7 @@ export function createAkademin({ engine, skinFrom, storage = window.localStorage
       task = `<div class="nlr-ak-row">
         <div class="nlr-ak-choice"><span>${t('ak.direction')}</span>${chip(`${t('side.long')} <kbd>${hk.buy}</kbd>`, side === 'long', `data-act="side" data-v="long" ${locked ? 'disabled' : ''}`, 'on-green')}${chip(`${t('side.short')} <kbd>${hk.sell}</kbd>`, side === 'short', `data-act="side" data-v="short" ${locked ? 'disabled' : ''}`, 'on-red')}</div>
         ${choice(t('ak.stopSigma'), A.STOP_SIGMAS, sigma, 'sigma', (v) => `${String(v).replace('.', ',')}σ`)}
-        ${choice(t('ak.targetR'), A.TP_R_MULTIPLES, rMult, 'r', (v) => `${(getLang() === 'sv' ? String(v).replace('.', ',') : String(v))}R`)}
+        ${choice(t('ak.targetR'), A.TP_R_MULTIPLES, rMult, 'r', (v) => `${(getLang() === 'sv' || getLang() === 'no' ? String(v).replace('.', ',') : String(v))}R`)}
         <div class="nlr-ak-choice"><span>${t('ak.plan')}</span>${chip(slSet ? t('ak.slSet', { price: fmtP(locked ? trade.stop : l2Stop) }) : t('ak.setSl'), slSet, 'data-act="sl"', 'on-red')}${chip(tpSet ? t('ak.tpSet', { price: fmtP(locked ? trade.target : l2Target) }) : t('ak.setTp'), tpSet, `data-act="tp" ${slSet ? '' : 'disabled'}`, 'on-green')}</div>
         <div><button type="button" class="nlr-ak-btn" data-act="open" ${!slSet || !tpSet || locked ? 'disabled' : ''}>${t('ak.open')}</button></div>
         ${!slSet || !tpSet ? `<span class="muted">${t('ak.openLocked')}</span>` : ''}

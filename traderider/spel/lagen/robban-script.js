@@ -72,6 +72,8 @@ const BANNED = [
   /\baccounts?\b/i,
   /\bköp(?:a|er|t)?\b/i,
   /\bsälj(?:a|er|t)?\b/i,
+  /\bkjøp(?:e|er|t)?\b/i,
+  /\bselg(?:e|er)?\b/i,
   /\bbuy\b/i,
   /\bsell\b/i,
   /ÖB/,
@@ -87,8 +89,8 @@ const BANNED = [
   /\bSources\b/,
 ]
 
-const UPSIDE = /vinst|uppgång|gain|rise|прибуток|зростання/i
-const RISK = /risk|ризик/i
+const UPSIDE = /vinst|uppgång|oppgang|gain|rise|прибуток|зростання/i
+const RISK = /risk|risiko|ризик/i
 
 export function tableFor(lang) {
   const table = STRINGS[lang] || STRINGS.sv
