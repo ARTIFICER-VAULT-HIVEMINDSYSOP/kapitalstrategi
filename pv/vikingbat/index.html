@@ -5,6 +5,7 @@
 try{if(sessionStorage.getItem('pv.ok')!=='1')location.replace('../');}catch(e){}
 </script>
 <meta name="robots" content="noindex,nofollow,noarchive">
+<script type="module">import * as G from '/traderider/spel/lagen/granslandet.js'; window.Granslandet = G;</script>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <link rel="icon" href="data:,"/>
@@ -1735,6 +1736,7 @@ function drawHouse(g, x, baseY, scale, accent){
     g.font = 'bold 13px system-ui';
     var phaseLabel = gamePhase === 'lobby' ? 'FAS · Lobbyn · övning (historisk uppspelning) → Gränslandet'
       : gamePhase === 'crossing' ? 'FAS · Gränslandet — historik → live…'
+      : gamePhase === 'granslandet' ? 'FAS · Gränslandet · tänd båda runstenarna för livevarvet'
       : gamePhase === 'race' ? 'FAS · Race · HISTORISK UPPSPELNING (1 ljus / 1,5 s ≈ ×40)'
       : gamePhase === 'live' ? 'FAS · LIVEVARV · ' + (synthetic ? 'SYNTETISK (offline)' : 'LIVE ' + SYMBOL + ' (Binance spot)')
       : gamePhase === 'finished' ? 'FAS · Mål' : 'FAS · Start — välj inställningar';
@@ -2091,6 +2093,7 @@ function drawHouse(g, x, baseY, scale, accent){
   }
   window.addEventListener('keydown', function(e){
     if (e.repeat) return;
+    if (gamePhase === 'granslandet') return; // lobbyn (granslandet.js) äger tangenterna
     var c = keyCode(e);
     if (c === 'KeyM') { audioInit(); setMuted(!muted); return; }
     if (c === 'KeyH') { toggleRules(); return; }
@@ -2123,6 +2126,25 @@ function drawHouse(g, x, baseY, scale, accent){
     feed.raceFrom = Math.max(0, RAW.length - REPLAY_N); feed.idx = feed.raceFrom; feed.f = 0; feed.mode = 'race';
     gamePhase = 'race'; phaseFade = 0; liveStatus = 'HISTORISK';
   }
+  /* Gränslandet: liten lobby mellan historisk race och livevarv. Båda runstenarna
+     måste tändas. Avböj/timeout -> historiska racet igen. Modul: /traderider/spel/lagen/granslandet.js */
+  function enterGranslandet(now){
+    var G = window.Granslandet;
+    if (!G || typeof G.enterLobby !== 'function') { startLive(now); return; }
+    gamePhase = 'granslandet'; feed.mode = 'gate'; inputQ = [];
+    toggleRules(false);
+    var hist = RAW.slice(-REPLAY_N).map(function(r){ return r.c; });
+    G.enterLobby({
+      players: [{ name: 'SE · Gul', color: '#e8c547' }, { name: 'NO · Blå', color: '#82cdff' }],
+      theme: 'rune',
+      lang: 'sv',
+      history: hist,
+      source: synthetic ? { name: 'SYNTETISK (offline) – ingen verklig kurs', time: Date.now() } : { name: 'Binance spot ' + SYMBOL, time: Date.now() },
+      keys: { 1: ['KeyE', 'Digit1'], 2: ['Enter', 'NumpadEnter', 'Digit2'], solo: ['KeyE', 'Enter'], back: ['Escape'] },
+      onLive: function(){ startLive(performance.now()); },
+      onBack: function(){ startRace(); }
+    });
+  }
   function startLive(now){
     gamePhase = 'live'; feed.mode = 'live'; feed.liveEnd = now + LIVE_LAP_MS; liveStatus = 'LIVE';
     pollLive(); if (liveTimer) clearInterval(liveTimer); liveTimer = setInterval(pollLive, 3000);
@@ -2137,7 +2159,7 @@ function drawHouse(g, x, baseY, scale, accent){
     while (feed.f >= 1) {
       if (feed.mode === 'race' && feed.idx >= RAW.length - 1) {
         feed.f = 1;
-        if (liveLapOn) startLive(now); else finishRace();
+        if (liveLapOn) enterGranslandet(now); else finishRace();
         return;
       }
       feed.f -= 1; feed.idx++;
