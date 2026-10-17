@@ -1,0 +1,17 @@
+/* UK bank map: reuses the Swedish bank map's bank-map-* styles. Only the
+   section separation and the disclaimer box (own class, so the money
+   explainer keeps mounting under the Swedish disclaimer) are added here. */
+.bank-map--uk {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid color-mix(in srgb, #c4a35a 30%, var(--border, #2a3a50));
+}
+.bank-map-uk-disclaimer {
+  border: 1px solid color-mix(in srgb, #c4a35a 30%, var(--border, #2a3a50));
+  background: #c4a35a14;
+  border-radius: 10px;
+  margin: 0;
+  padding: 0.65rem 0.8rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
