@@ -1,0 +1,71 @@
+/* Gränslandet – lobbyn mellan historik och live. Helskärmsscen: inga rutor läggs ovanpå spelplanen,
+   hela spelet ligger bakom en täckande bakgrund medan lobbyn är öppen. */
+.gl-lobby{
+  --gl-bg:rgba(13,12,10,.94);--gl-panel:#f6f2ea;--gl-ink:#1c1915;--gl-muted:#6b655a;
+  --gl-hist:#8a8478;--gl-live:#76b900;--gl-seat:#2f8f7a;--gl-lit:0;
+  position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;
+  padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+  background:var(--gl-bg);box-sizing:border-box;overflow:auto;
+  font:500 15px/1.45 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;color:var(--gl-ink);
+  animation:gl-in .28s ease-out both
+}
+.gl-lobby *{box-sizing:border-box}
+.gl-lobby-panel{width:min(560px,100%);max-height:100%;overflow:auto;background:var(--gl-panel);border-radius:18px;padding:18px 18px 14px;box-shadow:0 18px 60px rgba(0,0,0,.45)}
+.gl-lobby-title{margin:0 0 4px;font:700 24px/1.15 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.02em}
+.gl-lobby-lead{margin:0 0 10px}
+.gl-lobby-rule{margin:10px 0 10px;color:var(--gl-muted);font-size:14px}
+.gl-lobby-line{margin:0;background:#1c1915;border-radius:12px;padding:8px 10px 6px}
+.gl-lobby-line svg{display:block;width:100%;height:auto;aspect-ratio:320/90}
+.gl-line-hist{stroke:var(--gl-hist);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.gl-line-live{stroke:var(--gl-live);stroke-width:3;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:calc(100 - (30 + 70 * var(--gl-lit)));transition:stroke-dashoffset .5s ease;animation:gl-sweep 3.2s ease-in-out infinite alternate}
+.gl-line-dot{fill:var(--gl-live);animation:gl-pulse 1.2s ease-in-out infinite}
+.gl-lobby-caption{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px;color:#f3ede2;font-size:12px}
+.gl-tag{display:inline-block;padding:2px 8px;border-radius:999px;font:700 11px/1.4 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;letter-spacing:.08em}
+.gl-tag-hist{background:var(--gl-hist);color:#1c1915}
+.gl-tag-live{background:var(--gl-live);color:#1c1915}
+.gl-source{color:#d8d1c3}
+.gl-lobby-seats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.gl-lobby[data-players="1"] .gl-lobby-seats{grid-template-columns:1fr}
+.gl-seat{border:2px solid rgba(28,25,21,.14);border-radius:14px;padding:10px;text-align:center;transition:border-color .2s,background .2s}
+.gl-seat.is-accepted{border-color:var(--gl-seat);background:color-mix(in srgb,var(--gl-seat) 12%,transparent)}
+.gl-seat-name{margin:0 0 8px;font:700 15px/1.2 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif}
+.gl-accept{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;min-height:72px;border-radius:12px;border:2px solid var(--gl-seat);background:#fff;color:var(--gl-ink);font:700 15px/1.25 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.gl-accept[aria-pressed="true"]{background:var(--gl-seat);color:#fff}
+.gl-accept:disabled{opacity:.55;cursor:default}
+.gl-accept-glyph{font-size:26px;line-height:1;opacity:.35;transition:opacity .2s,text-shadow .2s}
+.gl-accept[aria-pressed="true"] .gl-accept-glyph{opacity:1}
+.gl-accept-text{font-size:13px}
+.gl-seat-state{margin:6px 0 0;font-weight:700;font-size:13px}
+.gl-seat-key{margin:2px 0 0;color:var(--gl-muted);font-size:12px}
+.gl-lobby-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}
+.gl-lobby-timer{margin:0;color:var(--gl-muted);font-variant-numeric:tabular-nums}
+.gl-back{border-radius:999px;border:1px solid rgba(28,25,21,.25);background:#1c1915;color:#f3ede2;font:600 14px "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;padding:10px 14px;min-height:44px;cursor:pointer}
+.gl-lobby-status{margin:8px 0 0;min-height:1.2em;font-weight:600}
+.gl-lobby-note{margin:4px 0 0;color:var(--gl-muted);font-size:12px}
+.gl-lobby button:focus-visible{outline:3px solid var(--gl-live);outline-offset:2px}
+
+/* Tema: runsten (Vikingbåt, Roddtakt) */
+.gl-theme-rune{--gl-bg:rgba(8,4,20,.93);--gl-panel:#1b1530;--gl-ink:#efe8ff;--gl-muted:#a89bc4;--gl-hist:#8d8a99;--gl-live:#ffe066;--gl-seat:#d4af37}
+.gl-theme-rune .gl-lobby-panel{border:1px solid rgba(212,175,55,.5)}
+.gl-theme-rune .gl-seat{border-color:rgba(212,175,55,.25)}
+.gl-theme-rune .gl-accept{background:#2a2244;color:var(--gl-ink);border-color:#6b5d8f}
+.gl-theme-rune .gl-accept-glyph{font-size:34px;color:#8d8a99}
+.gl-theme-rune .gl-accept[aria-pressed="true"]{background:#3a2d12;border-color:var(--gl-seat);color:#ffe9a8}
+.gl-theme-rune .gl-accept[aria-pressed="true"] .gl-accept-glyph{color:#ffe066;text-shadow:0 0 10px #ffd84a,0 0 22px #ffb000}
+.gl-rune-stone{fill:#3b3552;stroke:#6b5d8f;stroke-width:1.2}
+.gl-rune-mark{fill:none;stroke:#8d8a99;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.gl-theme-rune .gl-accept[aria-pressed="true"] .gl-rune-stone{fill:#4a3a14;stroke:#d4af37}
+.gl-theme-rune .gl-accept[aria-pressed="true"] .gl-rune-mark{stroke:#ffe066;filter:drop-shadow(0 0 3px #ffd84a) drop-shadow(0 0 6px #ffb000)}
+.gl-theme-rune .gl-back{background:#d4af37;color:#1b1530;border-color:#d4af37}
+.gl-theme-rune .gl-seat-key,.gl-theme-rune .gl-lobby-rule,.gl-theme-rune .gl-lobby-timer,.gl-theme-rune .gl-lobby-note{color:var(--gl-muted)}
+
+/* Tema: RaceX (rymd) och Rabbit Hole */
+.gl-theme-racex{--gl-bg:rgba(6,6,20,.93);--gl-live:#5fd4ff;--gl-seat:#7a5cff}
+.gl-theme-rabbit{--gl-live:#ff9f43;--gl-seat:#c2185b}
+
+@media (max-width:360px){.gl-lobby-seats{grid-template-columns:1fr}.gl-lobby-title{font-size:20px}}
+@media (max-height:480px){.gl-lobby-panel{width:min(720px,100%);padding:8px 12px}.gl-lobby-title{font-size:18px;margin:0}.gl-lobby-lead{margin:0 0 4px;font-size:13px}.gl-lobby-line{padding:4px 8px}.gl-lobby-line svg{max-height:48px}.gl-lobby-caption{margin-top:2px}.gl-lobby-rule{margin:4px 0;font-size:12px}.gl-seat{padding:6px}.gl-seat-name{margin-bottom:4px;font-size:13px}.gl-accept{min-height:48px;flex-direction:row}.gl-accept-glyph{font-size:20px}.gl-seat-state{margin-top:2px}.gl-seat-key,.gl-lobby-note{display:none}.gl-lobby-foot{margin-top:6px}.gl-lobby-status{margin:2px 0 0}}
+@keyframes gl-in{from{opacity:0}to{opacity:1}}
+@keyframes gl-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes gl-sweep{from{filter:saturate(.6)}to{filter:saturate(1.2)}}
+@media (prefers-reduced-motion:reduce){.gl-lobby,.gl-line-dot,.gl-line-live{animation:none}.gl-line-live,.gl-seat,.gl-accept-glyph{transition:none}}

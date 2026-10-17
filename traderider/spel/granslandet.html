@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Gränslandet – förhandsvisning av lobbyn</title>
+<style>
+body{margin:0;min-height:100vh;background:#1c1915;color:#f3ede2;font:500 15px/1.5 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:24px 16px}
+h1{margin:0 0 8px;font-size:22px}
+fieldset{border:1px solid rgba(243,237,226,.25);border-radius:12px;margin:12px 0;padding:10px 12px}
+label{margin-right:12px}
+button{border-radius:999px;border:0;background:#76b900;color:#1c1915;font:700 15px inherit;padding:10px 16px;cursor:pointer}
+#out{min-height:1.5em;font-weight:600}
+</style>
+</head>
+<body>
+<main>
+  <h1>Gränslandet – förhandsvisning</h1>
+  <p>Lobbyn mellan historiken och live. Båda spelarna accepterar, det går att ångra tills båda har accepterat. Avböj eller timeout går tillbaka till historiken. Ingen kurskälla är ansluten här.</p>
+  <fieldset><legend>Spelare</legend>
+    <label><input type="radio" name="p" value="2" checked> 2 spelare</label>
+    <label><input type="radio" name="p" value="1"> 1 spelare</label>
+  </fieldset>
+  <fieldset><legend>Tema</legend>
+    <label><input type="radio" name="th" value="default" checked> Trade Rider</label>
+    <label><input type="radio" name="th" value="racex"> RaceX</label>
+    <label><input type="radio" name="th" value="rabbit"> Rabbit Hole</label>
+    <label><input type="radio" name="th" value="rune"> Runsten</label>
+  </fieldset>
+  <p><button id="open" type="button">Öppna Gränslandet</button></p>
+  <p id="out" role="status" aria-live="polite"></p>
+</main>
+<script type="module">
+import { enterLobby } from './lagen/granslandet.js'
+const out = document.getElementById('out')
+const pick = (n) => document.querySelector(`input[name="${n}"]:checked`).value
+const hist = Array.from({ length: 40 }, (_, i) => 100 + Math.sin(i / 4) * 6 + i * 0.4)
+function open() {
+  out.textContent = ''
+  enterLobby({
+    players: Number(pick('p')),
+    theme: pick('th'),
+    history: hist,
+    onLive: () => { out.textContent = 'LIVE: alla accepterade.' },
+    onBack: (info) => { out.textContent = info.reason === 'timeout' ? 'Tiden gick ut: tillbaka till historiken.' : 'Avböjt: tillbaka till historiken.' },
+  })
+}
+document.getElementById('open').addEventListener('click', open)
+if (!location.hash.includes('stängd')) open()
+</script>
+</body>
+</html>
