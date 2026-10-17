@@ -497,6 +497,9 @@ async function main() {
     getPlace: () => (view === 'rabbit' ? 'bottom' : 'chart'),
     isActive: () => !instr.isOpen(),
     onFreeze: (frozen) => (frozen ? rabbit.freeze() : rabbit.resume()),
+    // Gränslandet-lobbyn: 2P när två spelare delar skärmen, tema per läge.
+    getPlayers: () => (mode === '2p' && view !== 'akademin' && view !== 'rabbit' ? 2 : 1),
+    getTheme: () => (view === 'raket' ? 'racex' : view === 'rabbit' ? 'rabbit' : 'default'),
   })
   instr.onStart(() => {
     if (eng.playing) eng.pause()
