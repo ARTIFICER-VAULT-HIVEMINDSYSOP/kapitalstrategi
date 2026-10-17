@@ -8,7 +8,8 @@ import { useLiveFeed } from './live-port.js'
 import { keyAction } from './keys.js'
 import { applyIntent, wheelToIntent } from './orientation.js'
 import { createGestureLock } from './styrmotor.js'
-import { t, onLang } from './i18n.js'
+import { t, onLang, getLang } from './i18n.js'
+import { enterLobby, closeLobby } from './granslandet.js'
 
 export const PHASES = ['historia', 'granslandet', 'live']
 
@@ -274,12 +275,8 @@ export function mountFas(host, opts) {
         button.type = 'button'
         button.dataset.trCross = '1'
         button.textContent = t('grans.cross')
-        button.addEventListener('click', () => {
-          if (!phases.tryCross()) return
-          const feed = useLiveFeed()
-          if (feed) openLiveSource(feed, HISTORIA.seriesId)
-          paint()
-        })
+        // Gränslandet-lobbyn: alla spelare accepterar innan live. Avböj/timeout -> Historia igen.
+        button.addEventListener('click', () => openLobby())
         card.appendChild(button)
       } else cross.textContent = t('grans.cross')
     } else if (cross) cross.remove()
@@ -293,12 +290,35 @@ export function mountFas(host, opts) {
     hideSimulatedMarks(historia && covering && !root.hidden)
   }
 
+  function openLobby() {
+    if (!phases.showCross()) return null
+    const feed = useLiveFeed()
+    return enterLobby({
+      players: opts.getPlayers?.() === 2 ? 2 : 1,
+      theme: opts.getTheme?.() || 'default',
+      lang: getLang(),
+      history: HISTORIA.bars.map((bar) => bar.c),
+      source: typeof feed?.source === 'function' ? feed.source() : null,
+      timeoutMs: opts.lobbyTimeoutMs,
+      onLive() {
+        if (!phases.tryCross()) return
+        const live = useLiveFeed()
+        if (live) openLiveSource(live, HISTORIA.seriesId)
+        paint()
+      },
+      onBack() {
+        play()
+      },
+    })
+  }
+
   function stop() {
     if (timer) clearInterval(timer)
     timer = 0
   }
 
   function play() {
+    closeLobby()
     stop()
     side = 'flat'
     leverage = 1
@@ -350,6 +370,7 @@ export function mountFas(host, opts) {
     sync: paint,
     isCovering: () => covering && !root.hidden,
     phases,
+    openLobby,
     source: () => historicalSource(HISTORIA.bars),
   }
 }
