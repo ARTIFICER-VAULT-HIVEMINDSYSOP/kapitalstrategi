@@ -32,7 +32,6 @@ const css = `
 .nlr-rh-hud{position:absolute;left:12px;right:12px;top:12px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 12px;pointer-events:none;font:600 12px/1.35 "IBM Plex Sans",sans-serif}
 .nlr-rh-hud b{color:#e7b15a}
 .nlr-rh-note{position:absolute;left:12px;right:12px;bottom:12px;max-width:min(520px,calc(100% - 24px));font:500 12px/1.35 "IBM Plex Sans",sans-serif;color:#f4efe6;text-shadow:0 1px 2px #07060c;pointer-events:none}
-.nlr-rh[data-phase="race"] .nlr-rh-note{bottom:auto;top:34px}
 .nlr-rh-home{position:absolute;left:50%;top:12px;transform:translateX(-50%);width:min(360px,calc(100% - 24px));pointer-events:none;z-index:2}
 .nlr-rh-card{pointer-events:auto;background:rgba(246,242,234,.97);color:#1c1915;border:1px solid rgba(28,25,21,.16);border-radius:16px;padding:12px 14px 14px;box-shadow:0 12px 28px rgba(7,6,12,.28)}
 .nlr-rh-claim{margin:0 0 6px;font:700 11px/1.3 "IBM Plex Sans",sans-serif;letter-spacing:.04em;color:#8a5a22}
@@ -68,6 +67,21 @@ const css = `
 .nlr-rh-market[hidden]{display:none}
 .nlr-rh-signal{color:#ffd27a}
 .nlr-rh-bat{width:28px;height:14px}
+.nlr-rh[data-phase="race"] canvas{position:absolute;left:0;right:0;top:var(--rh-top,0);height:calc(100% - var(--rh-top,0px) - var(--rh-bot,0px));width:100%}
+.nlr-rh[data-phase="race"] .nlr-rh-hud{top:0;left:0;right:auto;height:var(--rh-top);max-width:50%;padding:0 10px;align-items:center;flex-wrap:nowrap;overflow:hidden;white-space:nowrap;gap:10px}
+.nlr-rh[data-phase="race"] .nlr-rh-market{top:0;left:auto;right:0;height:var(--rh-top);max-width:50%;padding:0 10px;display:flex;align-items:center;gap:10px;overflow:hidden;white-space:nowrap;font-size:11px;text-shadow:none}
+.nlr-rh[data-phase="race"] .nlr-rh-indicators{bottom:20px;left:0;right:0;height:calc(var(--rh-bot) - 20px);gap:0;align-content:center;padding:0 10px}
+.nlr-rh[data-phase="race"] .nlr-rh-player{background:none;border:0;border-radius:0;padding:0;display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden;font-size:12px}
+.nlr-rh[data-phase="race"] .nlr-rh-meter,.nlr-rh[data-phase="race"] .nlr-rh-lane-labels,.nlr-rh[data-phase="race"] .nlr-rh-track,.nlr-rh[data-phase="race"] .nlr-rh-cue:not([data-rh-result]),.nlr-rh[data-phase="race"] .nlr-rh-risk,.nlr-rh[data-phase="race"] [data-rh-lane-name]{display:none}
+.nlr-rh[data-phase="race"] .nlr-rh-decision{font-size:14px;margin:0}
+.nlr-rh[data-phase="race"] .nlr-rh-fall{font-size:12px}
+.nlr-rh[data-phase="race"] .nlr-rh-note{top:auto;bottom:0;left:0;right:0;max-width:none;height:20px;padding:0 10px;line-height:20px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:639px){
+  .nlr-rh[data-phase="race"] .nlr-rh-hud{max-width:none;right:0;height:22px;font-size:11px}
+  .nlr-rh[data-phase="race"] .nlr-rh-market{top:22px;left:0;max-width:none;height:22px}
+  .nlr-rh[data-phase="race"] .nlr-rh-note{height:34px;line-height:17px;white-space:normal}
+  .nlr-rh[data-phase="race"] .nlr-rh-indicators{bottom:34px;height:calc(var(--rh-bot) - 34px)}
+}
 @media (max-width:640px){
   .nlr-rh-indicators[data-players="2"]{grid-template-columns:minmax(0,1fr)}
   .nlr-rh-home{width:min(340px,calc(100% - 16px))}
@@ -81,9 +95,7 @@ const css = `
   .nlr-rh-home{left:12px;transform:none;width:min(280px,48vw)}
   .nlr-rh-card{padding:8px 10px}
   .nlr-rh-card p{font-size:12px}
-  .nlr-rh-indicators{bottom:8px}
   .nlr-rh-risk{display:none}
-  .nlr-rh[data-phase="race"] .nlr-rh-note{top:28px}
 }
 @media (prefers-reduced-motion: reduce){
   .nlr-rh,.nlr-rh canvas,.nlr-rh-marker{animation:none;transition:none;scroll-behavior:auto}
@@ -471,6 +483,95 @@ export function gamepadIntent(pad, deadzone = PAD_DEADZONE) {
   return { move, confirm }
 }
 
+/* ---- Trade Rider-principer P11/P12/P19/P20/P10/P7 (se TRADE-RIDER-PRINCIPER.md) ---- */
+/** P11: fast 60 Hz-steg. Samma tuning oavsett skärmens Hz (lärdom från Roddtakt). */
+export const STEP_SEC = 1 / 60
+export function fixedSteps(acc, dt, step = STEP_SEC, maxSteps = 15) {
+  let a = (Number(acc) || 0) + Math.min(0.25, Math.max(0, Number(dt) || 0))
+  let steps = 0
+  while (a >= step - 1e-9 && steps < maxSteps) {
+    a -= step
+    steps++
+  }
+  if (steps >= maxSteps) a = 0
+  return { steps, acc: Math.max(0, a) }
+}
+
+/** P20: takt som i Roddtakt. Ett tag per stapel = i takt (+0,55, tak 4,2). Två tag i samma stapel = ×0,55. */
+export const RHYTHM = { gain: 0.55, cap: 4.2, miss: 0.55, start: 1 }
+export function rhythmStroke(v, lastBar, bar) {
+  const cur = Number.isFinite(v) ? v : RHYTHM.start
+  if (lastBar != null && lastBar === bar) return { v: cur * RHYTHM.miss, lastBar: bar, good: false }
+  return { v: Math.min(cur + RHYTHM.gain, RHYTHM.cap), lastBar: bar, good: true }
+}
+
+/** P19: hinder och belöningar har mekanisk effekt. */
+export const STOP_STEPS = 40
+export const CARROT_BOOST = 1.5
+export const BOOST_CAP = 5
+export const CHILI_FACTOR = 0.55
+/** Bollingerväggen: priset slår i övre band (KÖP-väggen, höger) eller undre (SÄLJ-väggen, vänster) där kaninen ligger. */
+export function wallHit(touch, side) {
+  return (touch === 'upper' && side === 'buy') || (touch === 'lower' && side === 'sell')
+}
+export function hitWall(rider) {
+  return { ...rider, v: 0, stop: STOP_STEPS }
+}
+export function carrotBoost(v) {
+  return Math.min((Number(v) || 0) + CARROT_BOOST, BOOST_CAP)
+}
+export function chiliPenalty(v) {
+  return (Number(v) || 0) * CHILI_FACTOR
+}
+/** Falltempo per steg. Stopp (skär/vägg) = 0. Takten skalar fallet. */
+export function fallSpeed(leverage, v, stop, reduced = false) {
+  if (stop > 0) return 0
+  return fallRate(leverage, reduced) * (0.4 + 0.6 * Math.min(BOOST_CAP, Math.max(0, Number(v) || 0)) / RHYTHM.cap)
+}
+export function applyChili(items, rabbit, hit) {
+  const skip = new Set(hit || [])
+  let n = 0
+  const rx = Number(rabbit?.x) || 0
+  const ry = Number(rabbit?.y) || 0
+  for (const item of items || []) {
+    if (!item || item.kind !== 'chili' || skip.has(item.id)) continue
+    const reach = Number(item.reach) > 0 ? Number(item.reach) * 0.7 : 30
+    const dx = item.x - rx
+    const dy = item.y - ry
+    if (dx * dx + dy * dy <= reach * reach) {
+      n++
+      skip.add(item.id)
+    }
+  }
+  return { hits: n, hit: [...skip] }
+}
+
+/** P10: små signaler på kaninen. Öron = läge, glasögon = resultat, batteri = marginal. */
+export function earLean(side) {
+  return side === 'buy' ? 1 : side === 'sell' ? -1 : 0
+}
+export function lensTint(result) {
+  if (!Number.isFinite(result) || Math.abs(result) < 0.05) return 'neutral'
+  return result > 0 ? 'gain' : 'loss'
+}
+/** Marginal 0..1. Proxy tills CFD-modulen (RaceX-PR) finns: 1 vid FLAT, sjunker med förlust × hävstång. */
+export function batteryLevel(result, side = 'flat') {
+  if (side === 'flat' || !Number.isFinite(result)) return 1
+  return Math.max(0, Math.min(1, 1 + result / 50))
+}
+
+/** P7: smala remsor utanför schaktet. Ingen HUD-ruta över spelplanen. */
+export function stripLayout(width, height, players = 1, phase = 'race') {
+  const w = Number(width) || 800
+  const h = Number(height) || 600
+  if (phase !== 'race') return { top: 0, bottom: 0, field: { top: 0, bottom: h, height: h } }
+  const narrow = w < 640
+  const top = narrow ? 44 : 28
+  const rows = players === 2 && narrow ? 2 : 1
+  const bottom = (narrow ? 22 : 20) * rows + (narrow ? 34 : 20)
+  return { top, bottom, field: { top, bottom: h - bottom, height: Math.max(0, h - top - bottom) } }
+}
+
 export const CARROT_HP = 1
 export const HP_MAX = 8
 
@@ -560,8 +661,11 @@ export function applyPickups(items, rabbit, hp, eaten) {
  * Huvudet leder fallet (större y). Öronen sitter på huvudet och pekar uppåt
  * (mindre y). Två linser på huvudet, mellan öronen.
  */
-export function rabbitSprite({ eating = false } = {}) {
+export function rabbitSprite({ eating = false, side = 'flat', result = null, margin = 1 } = {}) {
   const frame = eating ? 'black' : 'red'
+  const lean = earLean(side)
+  const tint = lensTint(result)
+  const level = Math.max(0, Math.min(1, Number.isFinite(margin) ? margin : 1))
   return {
     pose: 'head-first-down',
     fall: 'down',
@@ -574,12 +678,12 @@ export function rabbitSprite({ eating = false } = {}) {
       { id: 'body', kind: 'body', on: 'body', x: 0, y: -48 },
       { id: 'arm-l', kind: 'arm', on: 'body', x: -40, y: -74 },
       { id: 'arm-r', kind: 'arm', on: 'body', x: 42, y: -66 },
-      { id: 'ear-l', kind: 'ear', on: 'head', x: -20, y: -96, inner: 'pink' },
-      { id: 'ear-r', kind: 'ear', on: 'head', x: 22, y: -90, inner: 'pink' },
-      { id: 'battery', kind: 'battery', on: 'arm-r', x: 62, y: -66, logo: false },
+      { id: 'ear-l', kind: 'ear', on: 'head', x: -20 + lean * 16, y: -96 + Math.abs(lean) * 6, inner: 'pink', lean },
+      { id: 'ear-r', kind: 'ear', on: 'head', x: 22 + lean * 16, y: -90 + Math.abs(lean) * 6, inner: 'pink', lean },
+      { id: 'battery', kind: 'battery', on: 'arm-r', x: 62, y: -66, logo: false, level },
       { id: 'head', kind: 'head', on: 'head', x: 0, y: 10 },
-      { id: 'eye-l', kind: 'eye', on: 'head', x: -12, y: 8, frame },
-      { id: 'eye-r', kind: 'eye', on: 'head', x: 12, y: 8, frame },
+      { id: 'eye-l', kind: 'eye', on: 'head', x: -12, y: 8, frame, tint },
+      { id: 'eye-r', kind: 'eye', on: 'head', x: 12, y: 8, frame, tint },
       { id: 'glint-l', kind: 'glint', on: 'eye-l', x: -16, y: 4 },
       { id: 'glint-r', kind: 'glint', on: 'eye-r', x: 8, y: 4 },
       { id: 'cheek-l', kind: 'cheek', on: 'head', x: -18, y: 20 },
@@ -685,8 +789,9 @@ function drawBattery(c, p) {
   c.strokeStyle = '#8a5a22'
   c.lineWidth = 1.4
   c.stroke()
-  c.fillStyle = 'rgba(255,236,200,0.45)'
-  c.fillRect(x + 3, y + 3, 7, 16)
+  const level = Number.isFinite(p.level) ? p.level : 1
+  c.fillStyle = level > 0.5 ? '#2ee6d6' : level > 0.25 ? '#ffd27a' : '#ff4f6a'
+  c.fillRect(x + 3, y + 3, Math.max(2, 26 * level), 16)
   c.fillStyle = '#f4f1ea'
   c.fillRect(x + 32, y + 6, 5, 10)
   c.fillRect(x + 13, y + 5, 3, 12)
@@ -845,7 +950,7 @@ function drawRabbit(c, x, y, scale, sprite) {
     c.fillStyle = frame
     roundRect(c, eye.x - 12, eye.y - 8, 24, 16, 7)
     c.fill()
-    c.fillStyle = '#140e16'
+    c.fillStyle = eye.tint === 'gain' ? '#0f6b63' : eye.tint === 'loss' ? '#8a1f4f' : '#140e16'
     c.beginPath()
     c.ellipse(eye.x, eye.y, 8.5, 6, 0, 0, Math.PI * 2)
     c.fill()
@@ -1076,19 +1181,21 @@ function drawPricePip(c, x, y, region) {
   c.restore()
 }
 
-function drawFloater(c, floater) {
+function drawFloater(c, floater, cx, cy) {
   if (!floater || floater.life <= 0) return
   c.save()
   c.globalAlpha = Math.max(0, Math.min(1, floater.life))
-  c.translate(floater.x, floater.y)
-  c.fillStyle = '#ff4fa8'
+  if (floater.centre) c.translate((cx || 0) - 60, (cy || 0) + 70 + floater.y)
+  else c.translate(floater.x, floater.y)
+  c.fillStyle = floater.bad ? '#ffb020' : '#ff4fa8'
   c.strokeStyle = '#fff4fb'
   c.lineWidth = 4
   c.font = '800 28px "IBM Plex Sans", sans-serif'
   c.textAlign = 'left'
   c.textBaseline = 'middle'
-  c.strokeText('+HP', 0, 0)
-  c.fillText('+HP', 0, 0)
+  const text = floater.text || '+HP'
+  c.strokeText(text, 0, 0)
+  c.fillText(text, 0, 0)
   c.restore()
 }
 
@@ -1378,10 +1485,13 @@ export function createRabbit() {
   let priceDebt = 0
   let lastFrame = 0
   let lastSprite = null
+  let stepAcc = 0
+  let strips = stripLayout(800, 600, 1, 'home')
+  const held = new Set()
   const lock = createGestureLock(480)
 
   function freshRider() {
-    return { side: 'flat', leverage: 1, entry: null, result: null, y: 0, spin: 0, hp: 0, eatLeft: 0, floater: null, eaten: [], cam: { pan: 0, roll: 0 } }
+    return { side: 'flat', leverage: 1, entry: null, result: null, y: 0, spin: 0, hp: 0, eatLeft: 0, floater: null, eaten: [], cam: { pan: 0, roll: 0 }, v: RHYTHM.start, stop: 0, lastBar: null, chili: [], strokes: { good: 0, bad: 0 }, walls: 0 }
   }
   let marks = { band: { life: 0, key: '', side: '' }, rsi: { life: 0, key: '' }, macd: { life: 0, key: '' } }
   let prevTouch = null
@@ -1564,6 +1674,15 @@ export function createRabbit() {
   function noteBar() {
     const reading = marketReading(closesOf(series()), priceIndex)
     const edge = edgeSignal(prevTouch, reading.touch)
+    if (edge === 'upper' || edge === 'lower') {
+      for (const rider of activeRiders()) {
+        if (rider.stop <= 0 && wallHit(edge, rider.side)) {
+          Object.assign(rider, hitWall(rider))
+          rider.walls++
+          rider.floater = { life: 1.2, x: 0, y: 0, text: t('rh.wallHit'), bad: true, centre: true }
+        }
+      }
+    }
     if (edge === 'upper' || edge === 'near-upper') {
       marks.band = { life: MARK_HOLD, key: edge === 'upper' ? 'rh.touchUpper' : 'rh.nearUpper', side: 'buy' }
     } else if (edge === 'lower' || edge === 'near-lower') {
@@ -1660,11 +1779,16 @@ export function createRabbit() {
     if (picked.gained) {
       rider.hp = picked.hp
       rider.eatLeft = Math.max(rider.eatLeft, 0.9)
-      rider.floater = { life: 1, x: xPos + 46, y: rabbitY - 10 }
+      rider.floater = { life: 1, x: xPos + 46, y: rabbitY - 10, text: '+HP' }
+      rider.v = carrotBoost(rider.v)
     }
     rider.eaten = picked.eaten.slice(-48)
+    const burnt = applyChili(items, { x: xPos, y: rabbitY }, rider.chili)
+    for (let k = 0; k < burnt.hits; k++) rider.v = chiliPenalty(rider.v)
+    if (burnt.hits) rider.floater = { life: 1, x: xPos + 46, y: rabbitY - 10, text: '×0,55', bad: true }
+    rider.chili = burnt.hit.slice(-48)
     const scale = Math.max(0.85, Math.min(1.5, box.width / 420))
-    const sprite = rabbitSprite({ eating: rider.eatLeft > 0 })
+    const sprite = rabbitSprite({ eating: rider.eatLeft > 0, side: rider.side, result: rider.result, margin: batteryLevel(rider.result, rider.side) })
     if (box.player === 1) lastSprite = sprite
     const inFront = (item) => drawsInFront(item, xPos, rabbitY, scale)
     for (const item of items) {
@@ -1682,8 +1806,8 @@ export function createRabbit() {
       if (!inFront(item)) continue
       drawChili(c, item.x, item.y, item.scale || 1)
     }
-    drawFloater(c, rider.floater)
-    drawHp(c, rider.hp, box.width, 58)
+    drawFloater(c, rider.floater, xPos, rabbitY)
+    drawHp(c, rider.hp, box.width, 8)
     if (players === 2) {
       c.fillStyle = '#e7b15a'
       c.font = '700 14px "IBM Plex Sans", sans-serif'
@@ -1712,7 +1836,11 @@ export function createRabbit() {
       paintMarket()
     }
     const w = root.clientWidth || 800
-    const h = root.clientHeight || 600
+    const fullH = root.clientHeight || 600
+    strips = stripLayout(w, fullH, players, phase)
+    root.style.setProperty('--rh-top', `${strips.top}px`)
+    root.style.setProperty('--rh-bot', `${strips.bottom}px`)
+    const h = phase === 'race' ? strips.field.height || 1 : fullH
     const dpr = Math.min(2, globalThis.devicePixelRatio || 1)
     canvas.width = Math.round(w * dpr)
     canvas.height = Math.round(h * dpr)
@@ -1746,6 +1874,13 @@ export function createRabbit() {
 
   function applyTo(index, intent) {
     const rider = riders[index] || riders[0]
+    if (intent === 'FORWARD' && phase === 'race') {
+      const r = rhythmStroke(rider.v, rider.lastBar, priceIndex)
+      rider.v = r.v
+      rider.lastBar = r.lastBar
+      if (r.good) rider.strokes.good++
+      else rider.strokes.bad++
+    }
     const next = steering.applyIntent({ side: rider.side, leverage: rider.leverage }, intent)
     const was = rider.side
     rider.side = next.side
@@ -1786,6 +1921,11 @@ export function createRabbit() {
 
   function onKey(e) {
     if (!visible || frozen) return
+    if (!isTypingTarget(e.target)) {
+      held.add(e.code)
+      if (PREVENT_DEFAULT.has(e.code)) e.preventDefault()
+    }
+    if (e.repeat && phase === 'race') return
     if (phase === 'home' && e.code === 'Enter' && !e.repeat) {
       const tag = (e.target?.tagName || '').toUpperCase()
       if (tag !== 'BUTTON' && tag !== 'A' && !isTypingTarget(e.target)) {
@@ -1804,7 +1944,12 @@ export function createRabbit() {
     applyTo(index, a.intent)
   }
   addEventListener('keydown', onKey, true)
+  addEventListener('blur', () => held.clear())
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) held.clear()
+  })
   addEventListener('keyup', (e) => {
+    held.delete(e.code)
     if (visible && PREVENT_DEFAULT.has(e.code) && keyAction(e, '1p', O)) e.preventDefault()
   }, true)
   root.addEventListener('click', (e) => {
@@ -1824,9 +1969,10 @@ export function createRabbit() {
     const offset = rider.side === 'buy' ? 0.5 : rider.side === 'sell' ? -0.5 : 0
     rider.cam = chaseCamera(rider.cam, offset, dt, reduced)
     if (!reduced) {
-      rider.y += fallRate(rider.leverage, false)
+      rider.y += fallSpeed(rider.leverage, rider.v, rider.stop, false)
       rider.spin += dt
     }
+    if (rider.stop > 0) rider.stop--
     if (rider.eatLeft > 0) rider.eatLeft = Math.max(0, rider.eatLeft - dt)
     if (rider.floater) {
       rider.floater.life -= dt
@@ -1860,7 +2006,7 @@ export function createRabbit() {
     if (!visible || frozen) return
     inFrame = true
     const stamp = typeof now === 'number' ? now : performance.now()
-    const dt = lastFrame ? Math.min(0.05, (stamp - lastFrame) / 1000) : 0.016
+    const dt = lastFrame ? (stamp - lastFrame) / 1000 : STEP_SEC
     lastFrame = stamp
     const reduced = reducedMotion()
     if (phase === 'home') {
@@ -1869,9 +2015,13 @@ export function createRabbit() {
       jumpT += dt
       if (jumpProgress(jumpT, reduced) >= 1) enterRace()
     } else {
-      for (const rider of activeRiders()) tickRider(rider, dt, reduced)
-      advancePrice(dt)
-      decayMarks(dt)
+      const fs = fixedSteps(stepAcc, dt)
+      stepAcc = fs.acc
+      for (let i = 0; i < fs.steps && phase === 'race'; i++) {
+        for (const rider of activeRiders()) tickRider(rider, STEP_SEC, reduced)
+        advancePrice(STEP_SEC)
+        decayMarks(STEP_SEC)
+      }
       pollPads()
     }
     if (phase === 'home') pollPads()
@@ -1884,6 +2034,7 @@ export function createRabbit() {
     cancelAnimationFrame(raf)
     if (!visible || frozen) return
     lastFrame = 0
+    stepAcc = 0
     raf = requestAnimationFrame(frame)
   }
 
@@ -1944,13 +2095,12 @@ export function createRabbit() {
         paint()
         return
       }
-      const ticks = Math.max(1, Math.min(12, Math.round((dt || 0.016) / 0.016) || 1))
-      const slice = dt > 0 ? dt / ticks : 0.016
+      const ticks = Math.max(1, Math.round((dt || STEP_SEC) / STEP_SEC))
       for (let i = 0; i < ticks; i++) {
-        for (const rider of activeRiders()) tickRider(rider, slice, reduced)
+        for (const rider of activeRiders()) tickRider(rider, STEP_SEC, reduced)
+        advancePrice(STEP_SEC)
+        decayMarks(STEP_SEC)
       }
-      advancePrice(dt)
-      decayMarks(dt)
       paint()
     },
     state() {
@@ -1964,6 +2114,10 @@ export function createRabbit() {
       return {
         phase,
         players,
+        held: held.size,
+        strips,
+        v: lead.v,
+        stop: lead.stop,
         started: phase === 'race',
         side: lead.side,
         leverage: lead.leverage,
@@ -1988,6 +2142,10 @@ export function createRabbit() {
           leverage: rider.leverage,
           y: rider.y,
           result: rider.result,
+          v: rider.v,
+          stop: rider.stop,
+          walls: rider.walls,
+          strokes: { ...rider.strokes },
           indicators: movementIndicators({ side: rider.side, leverage: rider.leverage, width: span, reduced, lanes: walls }),
         })),
       }
