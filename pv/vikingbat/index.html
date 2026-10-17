@@ -433,7 +433,7 @@ window.__VBDBG = { last:'—', boat:'—', n:0, buySell:'—' };
 
   function newBoat(tint, flag, x, y){
     return { x:x, y:y, vx:0, side:'FLAT', pnl:0, tint:tint, flash:0, faceFlash:0, faceHit:null, flag:flag,
-      levIdx:1, sizeIdx:1, slPct:0.40, tpPct:0.80, gsl:false,
+      levIdx:1, sizeIdx:1, slPct:1.00, tpPct:2.00, gsl:false,
       bal:10000, pos:0, units:0, entry:null, posLev:1, slPx:null, tpPx:null,
       fin:0, spreadPaid:0, gslPaid:0, slip:0, nbp:0, trades:0, wins:0, closeouts:0, realized:0, peakEq:10000, maxDD:0,
       capsize:0, cu:null, toast:null, odin:false,
@@ -1640,10 +1640,15 @@ function drawHouse(g, x, baseY, scale, accent){
     boats.forEach(function(b){
       var bx = 140 + b.x * (w - 220);
       var by;
-      if (b.side === 'KÖP') by = yUp + (yKurs - yUp) * 0.45;
-      else if (b.side === 'SÄLJ') by = yKurs + (yLo - yKurs) * 0.45;
+      // Fast avstånd från kurslinjen: en vinnande KÖP-båt nära övre bandet ska inte se FLAT ut.
+      var OFF = 46;
+      if (b.side === 'KÖP') by = yKurs - OFF;
+      else if (b.side === 'SÄLJ') by = yKurs + OFF;
       else by = yKurs;
       by = Math.max(yUp + 36, Math.min(yLo - 28, by));
+      if (b.side === 'KÖP') by = Math.min(by, yKurs - OFF * 0.6);
+      else if (b.side === 'SÄLJ') by = Math.max(by, yKurs + OFF * 0.6);
+      by = Math.max(20, Math.min(h - 20, by));
       b._sx = bx; b._sy = by;
       var col = b.tint === 'gold' ? '#ffe066' : '#9fe0ff';
       var lev = b.pos ? b.posLev : levOf(b);
@@ -1898,7 +1903,7 @@ function drawHouse(g, x, baseY, scale, accent){
     b.realized = 0; b.peakEq = START_EQ; b.maxDD = 0; b.capsize = 0; b.cu = null; b.toast = null; b.faceHit = null; b.faceFlash = 0; b.odin = false;
   }
   function openPos(b, dir){
-    if (b.pos === -dir) { closePos(b, 'motorder'); return; }   // nettning: motsatt order stänger positionen
+    if (b.pos === -dir) closePos(b, 'motorder');   // motorder vänder direkt: stäng och öppna motsatt (FLAT bara via EXIT)
     if (b.pos === dir) { toast(b, dir > 0 ? 'Redan KÖP' : 'Redan SÄLJ'); return; }
     var eq = equity(b);
     if (eq <= 1) { toast(b, 'Kontot är tomt'); return; }

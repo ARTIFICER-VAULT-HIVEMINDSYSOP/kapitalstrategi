@@ -40,7 +40,6 @@ test('pilen längs rörelsen ökar hävstången', () => {
 test('per läge: W/S oförändrade, pil längs rörelsen, tvärställda pilar och hjul styr, mellanslag är FLAT', () => {
   const cases = [
     [MODES.trendRider.orientation, 'ArrowRight', 'ArrowUp', 'ArrowDown'],
-    [MODES.raket.orientation, 'ArrowUp', 'ArrowRight', 'ArrowLeft'],
     [MODES.rabbitHole.orientation, 'ArrowDown', 'ArrowRight', 'ArrowLeft'],
   ]
   for (const [o, fwd, high, low] of cases) {
@@ -120,7 +119,8 @@ test('hash: #trade-rider, #racex, #academy och #rabbit-hole, med äldre alias', 
   assert.equal(hashForView('tra'), 'tra')
   assert.equal(hashForView('rabbit'), 'rabbit-hole')
   assert.equal(travelVector(MODES.rabbitHole.orientation).y, 1)
-  assert.equal(travelVector(MODES.raket.orientation).y, -1)
+  assert.equal(travelVector(MODES.raket.orientation).x, 1)
+  assert.equal(travelVector(MODES.raket.orientation).y, 0)
   assert.equal(travelVector(MODES.trendRider.orientation).x, 1)
   assert.equal(selectMode({ via: 'click', value: 2 }), 'raket')
   assert.equal(selectMode({ via: 'key', value: 'Digit3' }), 'akademin')
@@ -159,4 +159,23 @@ test('klick, tangent 1–4 och hash i alla fyra lägen, med alias', () => {
       assert.equal(modeFromHash(alias), mode, alias)
     }
   }
+})
+
+test('RaceX är vriden 90°: → / D framåt, ← / A bakåt, ↑ / W KÖP, ↓ / S SÄLJ, mellanslag FLAT', () => {
+  const o = MODES.raket.orientation
+  assert.deepEqual({ movement: o.movement, highPriceSide: o.highPriceSide }, { movement: 'right', highPriceSide: 'up' })
+  for (const [code, intent] of [
+    ['ArrowRight', 'FORWARD'],
+    ['KeyD', 'FORWARD'],
+    ['ArrowLeft', 'BACKWARD'],
+    ['KeyA', 'BACKWARD'],
+    ['ArrowUp', 'STEER_TOWARD_HIGH'],
+    ['KeyW', 'STEER_TOWARD_HIGH'],
+    ['ArrowDown', 'STEER_TOWARD_LOW'],
+    ['KeyS', 'STEER_TOWARD_LOW'],
+    ['Space', 'FLAT'],
+  ]) assert.equal(keyToIntent(code, o), intent, code)
+  // Trade Rider behåller W/S som hävstång (spegling gäller bara RaceX).
+  assert.equal(keyToIntent('KeyW', MODES.trendRider.orientation), 'FORWARD')
+  assert.equal(keyToIntent('KeyS', MODES.trendRider.orientation), 'BACKWARD')
 })
