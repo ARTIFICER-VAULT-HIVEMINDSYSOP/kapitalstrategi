@@ -370,7 +370,7 @@ export const CHAPTER = {
 }
 
 export function chapterLang(lang) {
-  return lang === 'en' || lang === 'uk' ? lang : 'sv'
+  return lang === 'en' || lang === 'uk' ? 'en' : 'sv'
 }
 
 function esc(s) {
