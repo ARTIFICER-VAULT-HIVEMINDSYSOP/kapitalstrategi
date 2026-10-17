@@ -5,6 +5,7 @@
   function read() {
     try {
       var value = JSON.parse(localStorage.getItem(KEY) || '"sv"');
+      if (value === "uk") value = "en"; // UA borttagen som val -> engelska
       if (value === "en" || value === "uk" || value === "sv") return value;
     } catch (e) {}
     return "sv";
@@ -40,6 +41,7 @@
   });
 
   var query = new URLSearchParams(location.search).get("lang");
+  if (query === "uk") query = "en"; // UA borttagen som val -> engelska
   if (query === "sv" || query === "en" || query === "uk") {
     persist(query);
     apply(query);

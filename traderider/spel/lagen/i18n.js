@@ -14,6 +14,8 @@ export const SITE_LANG_KEY = 'ig.app.language'
 export const LANGS = ['sv', 'no', 'en', 'uk']
 const HTML_LANG = { sv: 'sv', no: 'nb', en: 'en', uk: 'uk' }
 const isLang = (v) => LANGS.includes(v)
+/* UA borttagen som val (2026-10-17): sparat/valt 'uk' faller tillbaka till engelska. */
+const fromUk = (v) => (v === 'uk' ? 'en' : v)
 
 const sv = {
   'lang.group': 'Språk',
@@ -1484,6 +1486,7 @@ function readStored() {
   } catch {
     /* storage unavailable */
   }
+  v = fromUk(v)
   /* Sajtens växel kan spara NO i ig.app.language men 'sv' i app.language. Då gäller NO. */
   if ((v === 'sv' || !isLang(v)) && readSite() === 'no') return 'no'
   return isLang(v) ? v : 'sv'
@@ -1491,7 +1494,7 @@ function readStored() {
 
 function persistQuery() {
   try {
-    const q = new URLSearchParams(location.search).get('lang')
+    const q = fromUk(new URLSearchParams(location.search).get('lang'))
     if (isLang(q)) {
       localStorage.setItem(LANG_KEY, q)
       localStorage.setItem(SITE_LANG_KEY, JSON.stringify(q))
@@ -1511,6 +1514,7 @@ function emit() {
 }
 
 export function setLang(lang) {
+  lang = fromUk(lang)
   if (!isLang(lang)) return
   try {
     localStorage.setItem(LANG_KEY, lang)
@@ -1582,6 +1586,7 @@ export function mountSwitcher(host) {
   box.className = 'lang-switcher'
   box.setAttribute('role', 'group')
   for (const id of LANGS) {
+    if (id === 'uk') continue
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'lang-switcher-btn'
