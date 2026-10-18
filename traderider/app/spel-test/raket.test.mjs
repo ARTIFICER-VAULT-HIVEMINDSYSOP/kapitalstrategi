@@ -274,3 +274,66 @@ test('jämförelsens etiketter finns på svenska, engelska och ukrainska', () =>
     }
   }
 })
+
+import { CFD, fillPrice, exitPrice, accrueFinancing, marginCall } from '../../spel/lagen/raket.js'
+import { RACEX_SL, RACEX_TP, RACEX_MAX_LOSS_PCT, assessPlan, referenceDistances, loadPlan, slotKey } from '../../spel/lagen/riskplan.js'
+
+test('CFD: KÖP öppnas på ask och stängs på bid, SÄLJ tvärtom – spreaden kostar även utan kursrörelse', () => {
+  const cfd = { spread: 0.01, finLong: 0, finShort: 0, closeOut: 50 }
+  const flat = { side: 'buy', entry: null, realized: 0, lev: 1, cfd }
+  close(fillPrice(flat, 'buy', 100), 100.5)
+  close(fillPrice(flat, 'sell', 100), 99.5)
+  close(exitPrice(flat, 'buy', 100), 99.5)
+  close(exitPrice(flat, 'sell', 100), 100.5)
+  const long = switchSide(flat, 'buy', 100)
+  close(long.entry, 100.5)
+  assert.ok(openPct(long, 100) < 0, 'köp kostar spread direkt')
+  close(openPct(long, 100), (99.5 / 100.5 - 1) * 100)
+  const short = switchSide(flat, 'sell', 100)
+  assert.ok(openPct(short, 100) < 0, 'sälj kostar spread direkt')
+  // Lång vinner när kursen stiger, kort när den faller.
+  assert.ok(openPct(long, 110) > 0)
+  assert.ok(openPct(short, 90) > 0)
+  // Utan cfd: oförändrad mittkurslogik (som tidigare).
+  close(openPct(switchSide({ side: 'buy', entry: null, realized: 0, lev: 1 }, 'buy', 100), 100), 0)
+})
+
+test('CFD: motorder vänder direkt och hävstångsbyte tar ingen ny spread', () => {
+  const cfd = { spread: 0.01, finLong: 0, finShort: 0, closeOut: 50 }
+  let st = switchSide({ side: 'buy', entry: null, realized: 0, lev: 1, cfd }, 'buy', 100)
+  st = switchSide(st, 'sell', 100)
+  assert.equal(st.side, 'sell')
+  assert.equal(isFlat(st), false)
+  close(st.entry, 99.5)
+  const before = pnlPct(st, 100)
+  const lev2 = setLev(st, 2, 100)
+  close(pnlPct(lev2, 100), before)
+})
+
+test('CFD: dold finansiering per dag och marginalavslut vid 50 % av marginalen', () => {
+  const st = { side: 'buy', entry: 100, realized: 0, lev: 2, cfd: { spread: 0, finLong: 0.072, finShort: 0.036, closeOut: 50 } }
+  close(accrueFinancing(st, 10).realized, -0.072 * (10 / 360) * 2 * 100)
+  close(accrueFinancing({ ...st, side: 'sell' }, 10).realized, -0.036 * (10 / 360) * 2 * 100)
+  assert.equal(accrueFinancing({ ...st, entry: null }, 10).realized, 0) // stängd: ingen kostnad
+  assert.equal(marginCall(st, 76), false) // −48 %
+  assert.equal(marginCall(st, 75), true) // −50 %
+  assert.equal(marginCall({ ...st, cfd: undefined }, 10), false)
+  assert.ok(CFD.spread > 0 && CFD.finLong > 0 && CFD.closeOut === 50)
+})
+
+test('RaceX: vidare automatiska stopp (5 % / 10 %) som går att använda på alla hävstångssteg', () => {
+  assert.equal(RACEX_SL, 5)
+  assert.equal(RACEX_TP, 10)
+  assert.deepEqual(referenceDistances(2, RACEX_SL), { slPct: 5, tpPct: 10, ratio: 2 })
+  assert.deepEqual(referenceDistances(1.5, RACEX_SL), { slPct: 5, tpPct: 7.5, ratio: 1.5 })
+  for (const leverage of [1, 2, 3, 4]) {
+    assert.equal(assessPlan({ unit: 'pct', sl: RACEX_SL, tp: RACEX_TP }, { leverage, maxLossPct: RACEX_MAX_LOSS_PCT }).ok, true, `${leverage}×`)
+  }
+  // Övriga lägen behåller 2 %-taket.
+  assert.equal(assessPlan({ unit: 'pct', sl: RACEX_SL, tp: RACEX_TP }, { leverage: 1 }).ok, false)
+  const empty = { getItem: () => null }
+  assert.deepEqual(loadPlan(empty, 'racex', { sl: RACEX_SL, tp: RACEX_TP }), { v: 1, unit: 'pct', sl: 5, tp: 10 })
+  assert.equal(slotKey('racex'), 'tr.riskplan.racex')
+  assert.equal(slotKey('racex-p2'), 'tr.riskplan.racex-p2')
+  assert.equal(slotKey('shared'), 'tr.riskplan')
+})

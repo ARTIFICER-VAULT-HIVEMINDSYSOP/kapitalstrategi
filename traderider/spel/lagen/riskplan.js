@@ -1,6 +1,6 @@
 /**
  * Gemensam stop-loss / take-profit för simulerade affärer.
- * Förval är 2 % stopp och 4 % mål (1:2). Valet sparas i localStorage, inget anrop till en server.
+ * Förval är 2 % stopp och 4 % mål (1:2). RaceX har egna, vidare förval (RACEX_SL / RACEX_TP) och egna platser i localStorage. Valet sparas i localStorage, inget anrop till en server.
  *
  * Jämförelse mellan två spelare (eller en spelare och en referens) sker i realiserat R
  * mot den egna risken, och bara om planen följdes: utgång på egen stopp eller eget mål,
@@ -24,13 +24,22 @@ export const PCT_TP_MIN = 0.1
 export const PCT_TP_MAX = 80
 /** En träffad stop-loss får kosta högst så här många procent av övningsinsatsen, inklusive hävstång. */
 export const MAX_LOSS_PCT = 2
+/** RaceX: vidare automatiska stopp (5 % stopp, 10 % mål = 1:2) så att positionen inte stängs av vanligt brus. */
+export const RACEX_SL = 5
+export const RACEX_TP = 10
+/** RaceX: förlusttaket räknas så att förvalet går att använda på alla hävstångssteg (1–4×). */
+export const RACEX_MAX_LOSS_PCT = RACEX_SL * 4
 
-export function defaultPlan() {
-  return { v: 1, unit: 'pct', sl: DEFAULT_SL, tp: DEFAULT_TP }
+export function defaultPlan(defaults) {
+  const sl = Number(defaults?.sl) > 0 ? Number(defaults.sl) : DEFAULT_SL
+  const tp = Number(defaults?.tp) > 0 ? Number(defaults.tp) : DEFAULT_TP
+  return { v: 1, unit: 'pct', sl, tp }
 }
 
 export function slotKey(slot) {
-  return slot === 'p2' ? `${STORE_KEY}.p2` : STORE_KEY
+  if (slot === 'p2') return `${STORE_KEY}.p2`
+  if (slot === 'racex' || slot === 'racex-p2') return `${STORE_KEY}.${slot}`
+  return STORE_KEY
 }
 
 /** Andel vunna affärer som krävs för jämnt utfall. 2 betyder 1:2 och ger 1/3. */
@@ -90,10 +99,11 @@ export function setChosenRatio(storage, ratio) {
   return value
 }
 
-/** Referensen använder alltid 2 % stopp och mål enligt valt förhållande: 4 % vid 1:2, 3 % vid 1:1,5. */
-export function referenceDistances(ratio) {
+/** Referensen använder sl % stopp (förval 2) och mål enligt valt förhållande: 2 × sl vid 1:2, 1,5 × sl vid 1:1,5. */
+export function referenceDistances(ratio, sl = 2) {
   const reward = Math.abs(Number(ratio) - 1.5) < 0.05 ? 1.5 : 2
-  return { slPct: 2, tpPct: reward === 1.5 ? 3 : 4, ratio: reward }
+  const s = Number(sl) > 0 ? Number(sl) : 2
+  return { slPct: s, tpPct: Math.round(s * reward * 100) / 100, ratio: reward }
 }
 
 export function assessPlan(plan, opts = {}) {
@@ -110,7 +120,8 @@ export function assessPlan(plan, opts = {}) {
   else if (unit === 'price' && !(sl < 1e6)) errors.push('sl-bounds')
   if (sl > 0) {
     const lossPct = unit === 'price' && price > 0 ? (sl / price) * 100 * leverage : unit === 'pct' ? sl * leverage : null
-    if (lossPct != null && lossPct > MAX_LOSS_PCT + 1e-9) errors.push('loss-cap')
+    const cap = Number(opts.maxLossPct) > 0 ? Number(opts.maxLossPct) : MAX_LOSS_PCT
+    if (lossPct != null && lossPct > cap + 1e-9) errors.push('loss-cap')
   }
   if (!(tp > 0)) errors.push('tp-missing')
   else if (unit === 'pct' && (tp < PCT_TP_MIN || tp > PCT_TP_MAX)) errors.push('tp-bounds')
@@ -121,8 +132,8 @@ export function assessPlan(plan, opts = {}) {
   return { ok: errors.length === 0, errors, warnings, ratio, breakEven: breakEvenWinRate(ratio), unit, minRatio, leverage }
 }
 
-export function loadPlan(storage, slot = 'shared') {
-  const base = defaultPlan()
+export function loadPlan(storage, slot = 'shared', defaults) {
+  const base = defaultPlan(defaults)
   try {
     const raw = storage?.getItem?.(slotKey(slot))
     if (!raw) return base
@@ -264,7 +275,7 @@ function ensureStyle() {
  * Fält för SL och TP. slot «p2» har egen nyckel, övriga delar «tr.riskplan».
  * onEdit(plan) körs när användaren ändrar. getPrice() används när enheten växlar.
  */
-export function mountPlanControl(parent, { slot = 'shared', storage, onEdit, getPrice, getLeverage, t, comma } = {}) {
+export function mountPlanControl(parent, { slot = 'shared', storage, onEdit, getPrice, getLeverage, t, comma, defaults, maxLossPct } = {}) {
   ensureStyle()
   const say = typeof t === 'function' ? t : (k) => k
   const root = document.createElement('div')
@@ -283,12 +294,12 @@ export function mountPlanControl(parent, { slot = 'shared', storage, onEdit, get
     <span class="tr-plan-warn" data-k="warn"></span>`
   parent.appendChild(root)
   const q = (k) => root.querySelector(`[data-k="${k}"]`)
-  let plan = loadPlan(storage ?? (typeof localStorage !== 'undefined' ? localStorage : null), slot)
+  let plan = loadPlan(storage ?? (typeof localStorage !== 'undefined' ? localStorage : null), slot, defaults)
   const store = () => storage ?? (typeof localStorage !== 'undefined' ? localStorage : null)
   const useComma = () => (typeof comma === 'function' ? comma() : !!comma)
 
   function options() {
-    return { minRatio: floorFor(store()), leverage: Number(getLeverage?.()) || 1, price: Number(getPrice?.()) }
+    return { minRatio: floorFor(store()), leverage: Number(getLeverage?.()) || 1, price: Number(getPrice?.()), maxLossPct }
   }
   function paint() {
     const unlocked = ratioChoiceUnlocked(store())
@@ -371,7 +382,7 @@ export function mountPlanControl(parent, { slot = 'shared', storage, onEdit, get
   ]) {
     q(key).addEventListener('click', () => {
       if (mult < 2 && !ratioChoiceUnlocked(store())) return
-      const sl = Number(plan.sl) > 0 ? Number(plan.sl) : DEFAULT_SL
+      const sl = Number(plan.sl) > 0 ? Number(plan.sl) : defaultPlan(defaults).sl
       commit({ ...plan, sl, tp: Math.round(sl * mult * 100) / 100 })
     })
   }
@@ -380,7 +391,7 @@ export function mountPlanControl(parent, { slot = 'shared', storage, onEdit, get
     root,
     getPlan: () => plan,
     refresh() {
-      plan = loadPlan(store(), slot)
+      plan = loadPlan(store(), slot, defaults)
       paint()
     },
     paint,

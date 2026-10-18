@@ -1,8 +1,8 @@
 /**
  * Raket (ny, egen vy för NVDA Line – ingen kod eller grafik från andra Raket-/tågvarianter).
  * Samma simulerade kurser och samma Bollinger-räls som NVDA Line (motorns track.points för vald period),
- * vriden på höjden: tiden går uppåt, högre pris åt höger. Grön BUY-räls till höger (övre bandet),
- * röd SELL-räls till vänster (undre bandet), streckad mittlinje. Raketen åker på vald sidas räls, nosen framåt;
+ * vriden 90° (beslut 6 okt 2026): tiden går vänster → höger, högre pris uppåt. Grön BUY-räls överst (övre bandet),
+ * röd SELL-räls nederst (undre bandet), streckad mittlinje. Raketen åker på vald sidas räls, nosen framåt (åt höger);
  * flat (ingen position) = lugnt längs mittlinjen.
  * 1P eller 2P (delad skärm, samma data, samma period och samma klocka; egen position, hävstång, resultat,
  * asteroider och boost per spelare). I 1P kan man också tävla mot en referens på samma kursserie:
@@ -22,8 +22,8 @@ import { keyAction, PREVENT_DEFAULT } from './keys.js'
 import { MODES, controlHints } from './orientation.js'
 import { simTid } from './simtid.js'
 import { t, onLang, getLang } from './i18n.js'
-import { assessPlan, levelsFor, tickBook, closeBook, compareDuel, mountPlanControl, floorFor, chosenRatio, referenceDistances } from './riskplan.js'
-import { stepSide, readSide } from './styrmotor.js'
+import { assessPlan, levelsFor, tickBook, closeBook, compareDuel, mountPlanControl, floorFor, chosenRatio, referenceDistances, RACEX_SL, RACEX_TP, RACEX_MAX_LOSS_PCT } from './riskplan.js'
+import { readSide } from './styrmotor.js'
 import { positionFor } from './spar.js'
 import { mountEntrySnap, bindStepGestures } from './snapp.js'
 
@@ -84,6 +84,11 @@ const css = `
 .nlr-rk-who{left:14px;top:64px;font:600 12px ${MONO};letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;color:${CYAN}}
 .nlr-rk-ctl{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;width:min(616px,calc(100% - 24px));display:flex;flex-direction:column;gap:8px;z-index:5}
 .nlr-rk-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+/* KÖP överst, FLAT i mitten, SÄLJ nederst – samma sida som zonerna (högre pris uppåt). */
+.nlr-rk-stack{position:absolute;left:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px;width:clamp(92px,13vw,148px);z-index:5}
+.nlr-rk-stack .nlr-rk-side{width:100%;min-height:0;gap:6px}
+.nlr-rk-stack.tight .nlr-rk-side{font-size:12px;letter-spacing:.06em;gap:4px}
+.nlr-rk-stack.tight .nlr-rk-kbd{display:none}
 .nlr-rk-side{height:52px;border-radius:4px;border:1px solid rgba(46,230,255,.35);background:rgba(10,15,46,.86);color:${TEXT};font:600 15px ${MONO};letter-spacing:.14em;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;padding:0 6px;min-width:0;box-shadow:inset 0 0 14px rgba(46,230,255,.06)}
 .nlr-rk-side svg{width:18px;height:18px;flex:none}
 .nlr-rk-side.buy{border-color:rgba(140,240,60,.55);color:${BUY}}
@@ -203,35 +208,71 @@ function periodName(k) {
 
 /* ---------- ren logik (testbar utan DOM) ---------- */
 
+/**
+ * CFD-regler (dolda i gränssnittet, men logiken gäller): state.cfd = { spread, finLong, finShort, closeOut }.
+ *  spread   = andel av mittkursen mellan köp- och säljkurs. KÖP öppnas på ask och stängs på bid, SÄLJ tvärtom.
+ *  finLong / finShort = årlig finansieringskostnad på nominellt värde (dras per tidssteg, 360-dagarsår).
+ *  closeOut = marginalavslut när förlusten når så många procent av marginalen (ESMA: 50).
+ * Utan state.cfd räknas allt på mittkurs, som tidigare (rena tester och referensloppet).
+ */
+export const CFD = { spread: 0.0005, finLong: 0.07, finShort: 0.025, closeOut: 50 }
+function halfSpread(state) {
+  const s = Number(state?.cfd?.spread)
+  return s > 0 ? s / 2 : 0
+}
+/** Kurs man öppnar på: KÖP på ask, SÄLJ på bid. */
+export function fillPrice(state, side, mid) {
+  const h = halfSpread(state)
+  return side === 'buy' ? mid * (1 + h) : mid * (1 - h)
+}
+/** Kurs man stänger på: KÖP stängs på bid, SÄLJ på ask. */
+export function exitPrice(state, side, mid) {
+  const h = halfSpread(state)
+  return side === 'buy' ? mid * (1 - h) : mid * (1 + h)
+}
 /** Totalt resultat i % av positionen: realiserat + ev. orealiserat för öppen position (med hävstång). */
 export function pnlPct(state, price) {
   return state.realized + openPct(state, price)
 }
-/** Orealiserat resultat i % – 0 när man är flat. */
+/** Orealiserat resultat i % – 0 när man är flat. Stängs på motsatt sida av spreaden. */
 export function openPct(state, price) {
   if (state.entry == null || !Number.isFinite(price) || !(state.entry > 0)) return 0
-  return (state.side === 'buy' ? 1 : -1) * (price / state.entry - 1) * state.lev * 100
+  const exit = exitPrice(state, state.side, price)
+  return (state.side === 'buy' ? 1 : -1) * (exit / state.entry - 1) * state.lev * 100
 }
 export function isFlat(state) {
   return state.entry == null
 }
-/** BUY/SELL: öppna eller byt sida. Byte bokför det gamla resultatet och öppnar på samma kurs. */
+/** BUY/SELL: öppna eller vänd direkt. Vändning stänger den gamla positionen och öppnar den motsatta på samma mittkurs. */
 export function switchSide(state, side, price) {
   if (state.entry != null && side === state.side) return state
   const realized = state.entry != null ? pnlPct(state, price) : state.realized
-  return { ...state, side, entry: price, realized }
+  return { ...state, side, entry: fillPrice(state, side, price), realized }
 }
 /** FLAT: stäng öppen position och bokför det realiserade resultatet. Redan flat → oförändrat. */
 export function closePosition(state, price) {
   if (state.entry == null) return state
   return { ...state, realized: pnlPct(state, price), entry: null }
 }
-/** Hävstång inom befintliga steg (1–4). Öppen position bokförs och öppnas om på samma kurs, så att den nya hävstången gäller från nu. */
+/** Hävstång inom befintliga steg (1–4). Öppen position bokförs och öppnas om på stängningskursen (ingen ny spread), så att den nya hävstången gäller från nu. */
 export function setLev(state, lev, price) {
   const l = Math.min(LEV_MAX, Math.max(LEV_MIN, Math.round(lev)))
   if (l === state.lev) return state
-  if (state.entry != null) return { ...state, realized: pnlPct(state, price), entry: price, lev: l }
+  if (state.entry != null) return { ...state, realized: pnlPct(state, price), entry: exitPrice(state, state.side, price), lev: l }
   return { ...state, lev: l }
+}
+/** Dold finansiering per tidssteg: dras från realiserat resultat (procent av positionen, med hävstång). */
+export function accrueFinancing(state, days) {
+  if (!state?.cfd || state.entry == null || !(days > 0)) return state
+  const rate = state.side === 'buy' ? Number(state.cfd.finLong) || 0 : Number(state.cfd.finShort) || 0
+  if (!rate) return state
+  return { ...state, realized: state.realized - rate * (days / 360) * state.lev * 100 }
+}
+/** Marginalavslut: öppen förlust (procent av marginalen) har nått closeOut. */
+export function marginCall(state, price) {
+  if (!state?.cfd || state.entry == null) return false
+  const limit = Number(state.cfd.closeOut) || 0
+  return limit > 0 && openPct(state, price) <= -limit
 }
 export { LEV_MIN, LEV_MAX }
 
@@ -266,7 +307,7 @@ export function splitViewports(W, H, mode) {
 }
 
 function newPlayerState(lev = 1) {
-  return { side: 'buy', entry: null, realized: 0, lev: Math.min(LEV_MAX, Math.max(LEV_MIN, lev)), traded: false }
+  return { side: 'buy', entry: null, realized: 0, lev: Math.min(LEV_MAX, Math.max(LEV_MIN, lev)), traded: false, cfd: CFD }
 }
 /* ---------- stil- och rörelsehjälpare (rena, testbara) ---------- */
 
@@ -800,13 +841,13 @@ export function createRaket({ engine }) {
       <div class="nlr-rk-card nlr-rk-quote"><small data-k="quoteLbl"></small><b data-k="price">—</b><span data-k="when">—</span></div>
       <div class="nlr-rk-card nlr-rk-pnl" data-k="pnlCard"><small data-k="pnlLabel"></small><b data-k="pnl">—</b><span data-k="pnlSub"></span>
         <div class="nlr-rk-boost"><span data-k="boostLbl"></span><i><u data-k="boost"></u></i><span data-k="boostVal">0</span></div></div>
+      <div class="nlr-rk-row nlr-rk-stack" data-k="stack">
+        <button type="button" class="nlr-rk-side buy" data-k="buy">${ICON_UP}<span data-k="buyLbl"></span><kbd class="nlr-rk-kbd">${h.buy}</kbd></button>
+        <button type="button" class="nlr-rk-side flat" data-k="flat"><i data-k="flatIcon" style="display:contents">${ICON_FLAT}</i><span data-k="flatLbl"></span><kbd class="nlr-rk-kbd">${h.flat}</kbd></button>
+        <button type="button" class="nlr-rk-side sell" data-k="sell">${ICON_DOWN}<span data-k="sellLbl"></span><kbd class="nlr-rk-kbd">${h.sell}</kbd></button>
+      </div>
       <div class="nlr-rk-ctl">
         <div data-k="planHost"></div>
-        <div class="nlr-rk-row">
-          <button type="button" class="nlr-rk-side buy" data-k="buy">${ICON_UP}<span data-k="buyLbl"></span><kbd class="nlr-rk-kbd">${h.buy}</kbd></button>
-          <button type="button" class="nlr-rk-side sell" data-k="sell">${ICON_DOWN}<span data-k="sellLbl"></span><kbd class="nlr-rk-kbd">${h.sell}</kbd></button>
-          <button type="button" class="nlr-rk-side flat" data-k="flat"><i data-k="flatIcon" style="display:contents">${ICON_FLAT}</i><span data-k="flatLbl"></span><kbd class="nlr-rk-kbd">${h.flat}</kbd></button>
-        </div>
         <div class="nlr-rk-card nlr-rk-bar">
           <button type="button" class="play" data-k="play">▶</button>
           <button type="button" data-k="reset">↺</button>
@@ -838,7 +879,9 @@ export function createRaket({ engine }) {
     bindBtn('reset', () => act(0, 'reset'))
     bindBtn('ref', () => toggleRef())
     const planCtl = mountPlanControl(q('planHost'), {
-      slot: mode === '2p' ? (i === 0 ? 'p1' : 'p2') : 'shared',
+      slot: mode === '2p' && i === 1 ? 'racex-p2' : 'racex',
+      defaults: { sl: RACEX_SL, tp: RACEX_TP },
+      maxLossPct: RACEX_MAX_LOSS_PCT,
       onEdit: (next) => {
         const pl = players[i]
         if (pl?.book && !pl.book.exit) pl.book = { ...pl.book, overridden: true, plan: next }
@@ -903,7 +946,7 @@ export function createRaket({ engine }) {
   }
 
   function livePlan() {
-    const d = referenceDistances(chosenRatio())
+    const d = referenceDistances(chosenRatio(), RACEX_SL)
     return { tp: d.tpPct, sl: d.slPct }
   }
 
@@ -1024,17 +1067,15 @@ export function createRaket({ engine }) {
     const price = priceAt(clock.p)
     if (kind === 'buy' || kind === 'sell') {
       if (clock.ended) return
-      const next = stepSide(readSide(pl.st), kind === 'buy' ? 1 : -1)
+      // Motorder vänder direkt (stäng + öppna motsatt), som i en CFD. FLAT bara via FLAT-knappen/mellanslag.
+      const next = kind
       if (next === readSide(pl.st)) return
-      if (next === 'flat') {
-        pl.book = closeBook(pl.book, price, 'manual')
-        pl.st = closePosition(pl.st, price)
-      } else if (!assessPlan(pl.dom.planCtl.getPlan(), { minRatio: floorFor(), leverage: pl.st.lev, price }).ok) {
+      if (!assessPlan(pl.dom.planCtl.getPlan(), { minRatio: floorFor(), leverage: pl.st.lev, price, maxLossPct: RACEX_MAX_LOSS_PCT }).ok) {
         pl.dom.planCtl.paint()
       } else {
         pl.book = closeBook(pl.book, price, 'manual')
         pl.st = { ...switchSide(pl.st, next, price), traded: true }
-        const levels = levelsFor(pl.dom.planCtl.getPlan(), price, next, { minRatio: floorFor(), leverage: pl.st.lev, price })
+        const levels = levelsFor(pl.dom.planCtl.getPlan(), price, next, { minRatio: floorFor(), leverage: pl.st.lev, price, maxLossPct: RACEX_MAX_LOSS_PCT })
         pl.book = levels
           ? { entry: price, side: next, stop: levels.stop, target: levels.target, overridden: false, exit: null }
           : null
@@ -1082,7 +1123,7 @@ export function createRaket({ engine }) {
     startCard.style.maxHeight = ''
     startCard.style.overflow = ''
     startCard.style.width = ''
-    const blocks = [...root.querySelectorAll('.nlr-rk-ctl, .nlr-rk-who, .nlr-rk-pnl, .nlr-rk-quote')]
+    const blocks = [...root.querySelectorAll('.nlr-rk-ctl, .nlr-rk-who, .nlr-rk-pnl, .nlr-rk-quote, .nlr-rk-stack')]
       .filter((el) => getComputedStyle(el).display !== 'none')
       .map((el) => el.getBoundingClientRect())
       .filter((r) => r.width > 2 && r.height > 2)
@@ -1097,13 +1138,20 @@ export function createRaket({ engine }) {
       .filter((el) => getComputedStyle(el).display !== 'none')
       .map((el) => el.getBoundingClientRect())
       .filter((r) => r.width > 2 && r.height > 2 && r.top < ctlTop)
-    const floor = sides.length ? Math.max(...sides.map((r) => r.bottom)) + 8 : rootBox.top + 8
+    // Kortet läggs till höger om den vertikala KÖP/FLAT/SÄLJ-stapeln (i 2P sida vid sida: inom spelare 1:s halva).
+    const stack = root.querySelector('.nlr-rk-stack')?.getBoundingClientRect()
+    const left = stack && stack.width > 2 ? Math.round(stack.right - rootBox.left + 8) : 12
+    const vps = splitViewports(rootBox.width, rootBox.height, mode)
+    const rightEdge = vps.length > 1 && vps[1].x > 0 ? vps[0].w - 8 : rootBox.width - 12
+    const cardW = Math.max(120, Math.round(rightEdge - left))
+    const over = sides.filter((r) => r.right - rootBox.left > left && r.left - rootBox.left < left + cardW)
+    const floor = over.length ? Math.max(...over.map((r) => r.bottom)) + 8 : rootBox.top + 8
     const gap = ctlTop - 8 - floor
-    startCard.style.left = '12px'
+    startCard.style.left = `${left}px`
     startCard.style.right = 'auto'
     startCard.style.transform = 'none'
-    startCard.style.width = `${Math.max(120, Math.round(rootBox.width - 24))}px`
-    startCard.style.maxWidth = `${Math.max(120, Math.round(rootBox.width - 24))}px`
+    startCard.style.width = `${cardW}px`
+    startCard.style.maxWidth = `${cardW}px`
     if (gap >= 24) {
       startCard.style.top = `${Math.max(8, Math.round(floor - rootBox.top))}px`
       startCard.style.maxHeight = `${Math.floor(gap)}px`
@@ -1161,6 +1209,7 @@ export function createRaket({ engine }) {
           cEl.style.maxWidth = ''
         }
       }
+      placeStack(pl, vp)
       c.save()
       c.beginPath()
       c.rect(vp.x, vp.y, vp.w, vp.h)
@@ -1174,6 +1223,44 @@ export function createRaket({ engine }) {
       const v = vps[1]
       Object.assign(divider.style, v.x > 0 ? { display: 'block', left: `${v.x}px`, top: '0', width: '1px', height: '100%' } : { display: 'block', left: '0', top: `${v.y}px`, width: '100%', height: '1px' })
     } else divider.style.display = 'none'
+  }
+
+  /**
+   * KÖP/FLAT/SÄLJ-stapeln ligger längs vänsterkanten (bakom raketen), i den största fria luckan mellan korten
+   * och kontrollraden. Knapparna krymper om luckan är trång, men ordningen är alltid KÖP – FLAT – SÄLJ.
+   */
+  function placeStack(pl, vp) {
+    const stack = pl.dom.q('stack')
+    if (!stack) return
+    const paneTop = pl.dom.el.getBoundingClientRect().top
+    const paneLeft = pl.dom.el.getBoundingClientRect().left
+    const colL = 12
+    const colR = colL + Math.max(92, Math.min(148, vp.w * 0.13))
+    const obstacles = []
+    for (const sel of ['.nlr-rk-who', '.nlr-rk-pnl', '.nlr-rk-quote', '.nlr-rk-ctl']) {
+      const el = pl.dom.el.querySelector(sel)
+      if (!el || getComputedStyle(el).display === 'none') continue
+      const r = el.getBoundingClientRect()
+      if (!(r.width > 2) || !(r.height > 2)) continue
+      const l = r.left - paneLeft
+      if (r.right - paneLeft <= colL || l >= colR) continue
+      obstacles.push([r.top - paneTop - 6, r.bottom - paneTop + 6])
+    }
+    obstacles.sort((a, b) => a[0] - b[0])
+    let best = [8, 8]
+    let y = 8
+    for (const [a, b] of [...obstacles, [vp.h - 8, vp.h]]) {
+      if (a - y > best[1] - best[0]) best = [y, a]
+      y = Math.max(y, b)
+    }
+    const gap = Math.max(0, best[1] - best[0])
+    const full = mode === '2p' ? 44 : 52
+    const h = Math.max(26, Math.min(full, Math.floor((gap - 12) / 3)))
+    stack.classList.toggle("tight", h < 40 || colR - colL < 120)
+    for (const b of stack.children) b.style.height = `${h}px`
+    const total = 3 * h + 12
+    const top = Math.round(best[0] + Math.max(0, (gap - total) / 2))
+    Object.assign(stack.style, { top: `${top}px`, transform: 'none', width: `${Math.round(colR - colL)}px` })
   }
 
   function backdrop(c, pl, W, H, dt, calm, now, speed, compact) {
@@ -1219,26 +1306,27 @@ export function createRaket({ engine }) {
       pl.bg = { k: bk, cv }
     }
     c.drawImage(pl.bg.cv, 0, 0, W, H)
-    pl.grid = (pl.grid + (speed / Math.max(120, H)) * 0.9 * dt) % 1
+    // Färden går åt höger: rutnät och stjärnor glider åt vänster.
+    pl.grid = (pl.grid + (speed / Math.max(120, W)) * 0.9 * dt) % 1
     const N = compact ? 9 : 12
     c.lineWidth = 1
     for (let k = 0; k < N; k++) {
-      const t = (k + pl.grid) / N
-      const y = hy + (H - hy) * t * t
-      c.strokeStyle = `rgba(255,79,192,${(0.03 + 0.11 * t).toFixed(3)})`
+      const t = (k + 1 - pl.grid) / N
+      const x = W * t
+      c.strokeStyle = `rgba(255,79,192,${(0.04 + 0.08 * (1 - Math.abs(2 * t - 1))).toFixed(3)})`
       c.beginPath()
-      c.moveTo(0, y)
-      c.lineTo(W, y)
+      c.moveTo(x, hy)
+      c.lineTo(x, H)
       c.stroke()
     }
     // stjärnor i tre lager med parallax
     STAR_LAYERS.forEach((Ly, li) => {
-      pl.scroll[li] = (pl.scroll[li] + speed * Ly.speed * dt) % H
+      pl.scroll[li] = (pl.scroll[li] + speed * Ly.speed * dt) % W
       const off = pl.scroll[li]
       for (const s of stars[li]) {
-        const x = s.x * W
-        let y = s.y * H + off
-        if (y > H) y -= H
+        let x = s.x * W - off
+        if (x < 0) x += W
+        const y = s.y * H
         const tw = calm ? 1 : 0.65 + 0.35 * Math.sin(now * 1.7 + s.tw)
         const a = Ly.alpha * tw * (y < hy ? 1 : 0.55)
         c.globalAlpha = a
@@ -1252,7 +1340,7 @@ export function createRaket({ engine }) {
       }
     })
     c.globalAlpha = 1
-    const skyDrift = calm ? 0 : (pl.scroll[0] / Math.max(H, 1) - 0.5) * 16
+    const skyDrift = calm ? 0 : (pl.scroll[0] / Math.max(W, 1) - 0.5) * 16
     drawSkyHomage(c, W, H, now, calm, skyDrift)
   }
 
@@ -1303,14 +1391,20 @@ export function createRaket({ engine }) {
     return box
   }
 
+  /**
+   * Banan ritas i en virtuell ram (tiden uppåt, högre pris åt vänster) som vrids 90° medurs till skärmen:
+   * tiden går vänster → höger och högre pris ligger uppåt. Text ritas alltid upprätt i skärmkoordinater.
+   */
   function renderPlayer(c, pl, i, vp, dt, calm, now) {
-    const W = vp.w
-    const H = vp.h
+    const SW = vp.w
+    const SH = vp.h
+    const W = SH // virtuell bredd = skärmens höjd (prisaxeln)
+    const H = SW // virtuell höjd = skärmens bredd (tidsaxeln)
     const st = pl.st
     notePath(pl)
     const q = pl.dom.q
     const twoP = mode === '2p'
-    const compact = W <= 640 || twoP
+    const compact = SW <= 640 || twoP
     const pxPer = twoP && H < 500 ? 20 : compact ? 26 : 30
     const fx = effectLevels(st, priceAt(clock.p), priceAt(Math.max(0, clock.p - 1)))
     pl.fx = fx
@@ -1329,24 +1423,41 @@ export function createRaket({ engine }) {
     const lift = burstLift(pl.burst, calm)
     const wob = wobbleOffset(now, pl.wobble, calm)
     const speed = parallaxSpeed(clock.playing && !clock.ended, calm, PTS_PER_SEC * pxPer, visualBoost)
-    backdrop(c, pl, W, H, dt, calm, now, speed, compact)
+    backdrop(c, pl, SW, SH, dt, calm, now, speed, compact)
     if (!pts.length) {
       c.fillStyle = TEXT2
       c.font = `500 14px ${MONO}`
       c.fillText(t('rk.missing'), 20, 40)
       return
     }
-    const paneTop = pl.dom.el.getBoundingClientRect().top
-    let cardBand = 0
-    if (twoP) {
-      for (const sel of ['.nlr-rk-who', '.nlr-rk-pnl']) {
-        const card = pl.dom.el.querySelector(sel)
-        if (!card || getComputedStyle(card).display === 'none') continue
-        cardBand = Math.max(cardBand, card.getBoundingClientRect().bottom - paneTop)
-      }
+    const paneRect = pl.dom.el.getBoundingClientRect()
+    const paneTop = paneRect.top
+    // Prisaxelns marginaler (skärmens topp/botten) så att banan inte hamnar under korten eller kontrollerna.
+    let padTop = compact ? 44 : 64
+    let padBot = compact ? 36 : 48
+    for (const sel of ['.nlr-rk-quote', '.nlr-rk-pnl', '.nlr-rk-who', '.nlr-rk-ctl']) {
+      const el = pl.dom.el.querySelector(sel)
+      if (!el || getComputedStyle(el).display === 'none') continue
+      const r = el.getBoundingClientRect()
+      if (!(r.height > 2) || !(r.width > 2)) continue
+      const top = r.top - paneTop
+      const bottom = r.bottom - paneTop
+      if ((top + bottom) / 2 < SH / 2) padTop = Math.max(padTop, bottom + 14)
+      else padBot = Math.max(padBot, SH - top + 14)
     }
-    let rocketY = Math.round(H * (twoP ? (H < 500 ? 0.42 : 0.5) : W <= 640 ? 0.52 : 0.6))
-    if (twoP) rocketY = Math.max(rocketY, Math.round(cardBand + 28))
+    const minSpan = Math.min(SH * 0.5, 160)
+    if (SH - padTop - padBot < minSpan) {
+      const k = Math.max(0, SH - minSpan) / Math.max(1, padTop + padBot)
+      padTop *= k
+      padBot *= k
+    }
+    // Raketen ligger en bit in från vänster (skärm-x = SW − rocketY), banan framför syns åt höger.
+    const rocketY = Math.round(H * (SW <= 640 ? 0.55 : 0.6))
+    const base = c.getTransform()
+    const toScreen = (vx, vy) => ({ x: SW - vy, y: vx })
+    const later = [] // text och HUD i skärmkoordinater, ritas efter banan
+    c.save()
+    c.transform(0, 1, -1, 0, SW, 0)
     const p = clock.p
     const row = (k) => rocketY - (k - p) * pxPer
     const ahead = Math.ceil(rocketY / pxPer) + 2
@@ -1365,8 +1476,8 @@ export function createRaket({ engine }) {
     // skalan glider mjukt (tidsbaserad easing)
     pl.scale = pl.scale ? { lo: smoothTo(pl.scale.lo, lo, dt || 0.016, 4.5), hi: smoothTo(pl.scale.hi, hi, dt || 0.016, 4.5) } : { lo, hi }
     const scale = pl.scale
-    const padX = compact ? 40 : Math.max(120, W * 0.18)
-    const col = (v) => padX + ((L(v) - scale.lo) / (scale.hi - scale.lo || 1)) * (W - padX * 2)
+    // Virtuell x = skärmens y. Högre pris → mindre x → högre upp på skärmen.
+    const col = (v) => padTop + (1 - (L(v) - scale.lo) / (scale.hi - scale.lo || 1)) * (W - padTop - padBot)
     const path = (f) => {
       c.beginPath()
       for (let k = i0; k <= i1; k++) (k === i0 ? c.moveTo : c.lineTo).call(c, col(pts[k][f]), row(k))
@@ -1416,22 +1527,28 @@ export function createRaket({ engine }) {
     }
     rail('upper', BUY, BUY_D, '140,240,60')
     rail('lower', SELL, SELL_D, '255,90,106')
-    c.font = `600 12px ${MONO}`
-    c.textBaseline = 'middle'
-    c.lineWidth = 4
-    c.strokeStyle = BG_PANEL
+    // Rälsetiketter: KÖP ovanför den övre (gröna) rälsen, SÄLJ under den undre (röda) – samma sida som knapparna.
     const labI = Math.min(pts.length - 1, Math.floor(p) + Math.floor(ahead * 0.55))
-    c.textAlign = 'left'
-    const buyW = t('btn.buy')
-    const sellW = t('btn.sell')
-    c.strokeText(buyW, col(pts[labI].upper) + 13, row(labI))
-    c.fillStyle = BUY
-    c.fillText(buyW, col(pts[labI].upper) + 13, row(labI))
-    c.textAlign = 'right'
-    c.strokeText(sellW, col(pts[labI].lower) - 13, row(labI))
-    c.fillStyle = SELL
-    c.fillText(sellW, col(pts[labI].lower) - 13, row(labI))
-    c.textAlign = 'left'
+    const buyAt = toScreen(col(pts[labI].upper), row(labI))
+    const sellAt = toScreen(col(pts[labI].lower), row(labI))
+    later.push(() => {
+      c.font = `600 12px ${MONO}`
+      c.lineWidth = 4
+      c.strokeStyle = BG_PANEL
+      c.textAlign = 'center'
+      const buyW = t('btn.buy')
+      const sellW = t('btn.sell')
+      c.textBaseline = 'bottom'
+      c.strokeText(buyW, buyAt.x, buyAt.y - 13)
+      c.fillStyle = BUY
+      c.fillText(buyW, buyAt.x, buyAt.y - 13)
+      c.textBaseline = 'top'
+      c.strokeText(sellW, sellAt.x, sellAt.y + 13)
+      c.fillStyle = SELL
+      c.fillText(sellW, sellAt.x, sellAt.y + 13)
+      c.textAlign = 'left'
+      c.textBaseline = 'middle'
+    })
 
     c.setLineDash([2, 4])
     c.strokeStyle = 'rgba(234,246,255,0.55)'
@@ -1439,7 +1556,7 @@ export function createRaket({ engine }) {
     path('price')
     c.stroke()
     c.setLineDash([])
-    hudFrame(c, W, H, compact)
+    later.push(() => hudFrame(c, SW, SH, compact))
 
     // raket: vald sidas räls, eller mittlinjen när flat. Mjuk interpolation i sidled och lutning.
     const flat = isFlat(st)
@@ -1473,27 +1590,25 @@ export function createRaket({ engine }) {
     const tagTxt = fx.boost > 0.01 ? t('rk.boost') : fx.loss > 0.01 ? t('rk.rocks') : flat && st.traded ? t('pos.flat') : ''
     const price = priceAt(p)
     const priceText = fmtPrice(price)
-    c.font = `600 13px ${MONO}`
-    const priceMeasure = c.measureText(priceText).width
-    const priceOuter = priceMeasure + 16
-    let priceX = x + (flat || st.side === 'buy' ? -priceOuter - 28 : 28)
-    if (priceX < 4) priceX = x + 28
-    if (priceX + priceOuter > W - 4) priceX = x - priceOuter - 28
-    const fixedLabels = []
     const anchorX = x + wob.x
     const anchorY = rocketY - lift
+    // Etiketter i skärmkoordinater: kursen ovanför raketen (under om det är trångt), läget på andra sidan.
+    const rs = toScreen(anchorX, anchorY)
+    const priceY = rs.y - 38 > padTop * 0.5 + 12 ? rs.y - 38 : rs.y + 38
+    const tagY = priceY < rs.y ? rs.y + 40 : rs.y - 40
+    const fixedLabels = []
+    c.save()
+    c.setTransform(base)
+    c.font = `600 13px ${MONO}`
+    fixedLabels.push(labelBox(rs.x, priceY, c.measureText(priceText).width, { size: 13, align: 'center', W: SW }))
     if (tagTxt) {
       c.font = `600 11px ${MONO}`
-      fixedLabels.push(labelBox(anchorX, anchorY + 64, c.measureText(tagTxt).width, { size: 11, align: 'center', W }))
+      fixedLabels.push(labelBox(rs.x, tagY, c.measureText(tagTxt).width, { size: 11, align: 'center', W: SW }))
     }
-    fixedLabels.push(labelBox(priceX + wob.x, anchorY, priceMeasure, { size: 13, align: 'left', W }))
+    c.restore()
     const alert = fx.move <= -GLITCH_AT
-    const alertY = Math.max(twoP ? 110 : 86, rocketY - (compact ? 120 : 150))
+    const alertY = Math.max(twoP ? 40 : 56, Math.round(padTop * 0.5))
     const alertSize = compact ? 10 : 12
-    if (alert) {
-      c.font = `600 ${alertSize}px ${MONO}`
-      fixedLabels.push(labelBox(W / 2, alertY, c.measureText(t('rk.warn', { pct: fmtPct(fx.move) })).width, { size: alertSize, align: 'center', W }))
-    }
 
     // ingångslinje (befintligt ingångspris – ingen ny logik)
     if (!flat) {
@@ -1507,23 +1622,17 @@ export function createRaket({ engine }) {
         c.lineTo(ex + 0.5, H)
         c.stroke()
         c.setLineDash([])
-        const ctlTop = pl.dom.el.querySelector('.nlr-rk-ctl')?.getBoundingClientRect()
-        let entryY = rocketY + (compact ? 78 : 92)
-        let maxY = H - 16
-        if (ctlTop) {
-          const limit = ctlTop.top - paneTop - 16
-          if (entryY > limit) entryY = limit
-          maxY = Math.min(maxY, limit)
-        }
+        // ENTRY-etiketten på ingångslinjen, framför raketen. Hoppar åt höger om den skulle täcka en annan etikett.
         const entryText = `ENTRY ${fmtPrice(st.entry)}`
-        c.font = `600 11px ${MONO}`
-        const entryW = c.measureText(entryText).width
-        const placed = dodgeEntryY((yy) => labelBox(ex, yy, entryW, { size: 11, align: 'center', W }), fixedLabels, {
-          minY: rocketY + 21,
-          maxY,
-          startY: entryY,
-        })
-        if (placed != null) hudLabel(c, entryText, ex, placed, { size: 11, align: 'center', color: TEXT, border: `rgba(${accentRGB},0.8)`, W })
+        if (ex > padTop - 8 && ex < SH - padBot + 8) {
+          later.push(() => {
+            c.font = `600 11px ${MONO}`
+            const entryW = c.measureText(entryText).width
+            let ax = Math.min(SW - entryW / 2 - 20, rs.x + (compact ? 96 : 130))
+            for (let k = 0; k < 4 && fixedLabels.some((b) => boxesOverlap(b, labelBox(ax, ex, entryW, { size: 11, align: 'center', W: SW }))); k++) ax = Math.min(SW - entryW / 2 - 20, ax + entryW + 24)
+            hudLabel(c, entryText, ax, ex, { size: 11, align: 'center', color: TEXT, border: `rgba(${accentRGB},0.8)`, W: SW })
+          })
+        }
       }
     }
 
@@ -1689,13 +1798,13 @@ export function createRaket({ engine }) {
       c.drawImage(r.sprite, -z / 2, -z / 2, z, z)
       c.restore()
     }
-    const SH = ['rgba(46,230,255,', 'rgba(255,79,192,', 'rgba(150,130,200,']
+    const SHARD_RGB = ['rgba(46,230,255,', 'rgba(255,79,192,', 'rgba(150,130,200,']
     for (const sh of pl.shards) {
       const al = (1 - sh.life / sh.max).toFixed(3)
       c.save()
       c.translate(sh.x, sh.y)
       c.rotate(sh.rot)
-      c.fillStyle = SH[sh.c] + al + ')'
+      c.fillStyle = SHARD_RGB[sh.c] + al + ')'
       c.beginPath()
       c.moveTo(0, -sh.s)
       c.lineTo(sh.s * 0.8, sh.s * 0.7)
@@ -1724,11 +1833,11 @@ export function createRaket({ engine }) {
       c.globalAlpha = 0.82
       drawRocket(c, pl.refX, gy, 0, rs, clock.playing, { boost: rs === 'flat' ? 0 : 0.22 }, calm, now, getSprite(rs, 1), 0)
       c.restore()
-      let labelX = pl.refX
-      if (Math.abs(labelX - anchorX) < 72) labelX += anchorX < W * 0.55 ? 84 : -84
+      const refAt = toScreen(pl.refX, gy)
+      let refY = refAt.y + 30
+      if (Math.abs(refY - rs.y) < 26 || Math.abs(refY - tagY) < 22) refY = refAt.y - 30
       const refLabel = t('rk.refName')
-      c.font = `600 11px ${MONO}`
-      hudLabel(c, refLabel, labelX, gy + 58, { size: 11, align: 'center', W, color: ON_DARK, bg: PLAYER_ACCENT[1], border: PLAYER_ACCENT[1] })
+      later.push(() => hudLabel(c, refLabel, refAt.x - 24, refY, { size: 11, align: 'center', W: SW, color: ON_DARK, bg: PLAYER_ACCENT[1], border: PLAYER_ACCENT[1] }))
     }
     drawRocket(c, anchorX + jolt, anchorY, tilt + jolt * 0.02 + wob.rot, sideKey, clock.playing, fx, calm, now, getSprite(sideKey, i), calm ? 0 : pl.burst)
     if (pl.hit > 0) {
@@ -1736,15 +1845,18 @@ export function createRaket({ engine }) {
       c.fillRect(0, 0, W, H)
     }
 
-    // etikett under raketen: läge + öppet resultat (riktiga tal). Rutan är redan räknad så ENTRY kan väja.
+    // Slut på den vridna ramen: allt nedan ritas upprätt i skärmkoordinater.
+    c.restore()
+    for (const draw of later) draw()
+    // etikett vid raketen: läge + öppet resultat (riktiga tal). Rutan är redan räknad så ENTRY kan väja.
     if (tagTxt) {
       const plus = fx.boost > 0.01
       const minus = fx.loss > 0.01
-      hudLabel(c, tagTxt, anchorX, anchorY + 64, { size: 11, align: 'center', W, color: plus || minus ? ON_DARK : TEXT, bg: plus ? BUY : minus ? SELL : 'rgba(10,15,46,0.92)', border: plus ? BUY : minus ? SELL : CYAN })
+      hudLabel(c, tagTxt, rs.x, tagY, { size: 11, align: 'center', W: SW, color: plus || minus ? ON_DARK : TEXT, bg: plus ? BUY : minus ? SELL : 'rgba(10,15,46,0.92)', border: plus ? BUY : minus ? SELL : CYAN })
     }
-    if (alert) hudLabel(c, t('rk.warn', { pct: fmtPct(fx.move) }), W / 2, alertY, { size: alertSize, align: 'center', W, color: TEXT, border: SELL, bg: 'rgba(40,8,28,0.92)' })
+    if (alert) hudLabel(c, t('rk.warn', { pct: fmtPct(fx.move) }), SW / 2, alertY, { size: alertSize, align: 'center', W: SW, color: TEXT, border: SELL, bg: 'rgba(40,8,28,0.92)' })
 
-    hudLabel(c, priceText, priceX + wob.x, anchorY, { size: 13, W, color: TEXT, border: 'rgba(46,230,255,0.8)' })
+    hudLabel(c, priceText, rs.x, priceY, { size: 13, align: 'center', W: SW, color: TEXT, border: 'rgba(46,230,255,0.8)' })
 
     // glitch vid stor förlust (inte vid reducerad rörelse)
     const gl = glitchLevel(fx, calm)
@@ -1865,6 +1977,19 @@ export function createRaket({ engine }) {
     return `${text} ${verdict}`
   }
 
+  /** Dolda CFD-regler per tidssteg: finansiering på öppen position och marginalavslut. Inga kostnadstexter i UI. */
+  function chargeCfd(price) {
+    const tNow = priceAt(clock.p, 't')
+    for (const pl of players) {
+      if (!isFlat(pl.st) && Number.isFinite(pl.finT) && tNow > pl.finT) pl.st = accrueFinancing(pl.st, (tNow - pl.finT) / 86400)
+      pl.finT = tNow
+      if (marginCall(pl.st, price)) {
+        pl.book = closeBook(pl.book, price, 'margin')
+        pl.st = closePosition(pl.st, price)
+      }
+    }
+  }
+
   function settleBooks(price) {
     const px = Number.isFinite(price) ? price : priceAt(clock.p)
     for (const pl of players) {
@@ -1897,6 +2022,7 @@ export function createRaket({ engine }) {
     if (clock.playing && !clock.ended) {
       clock.p = Math.min(pts.length - 1, clock.p + PTS_PER_SEC * dt)
       const price = priceAt(clock.p)
+      chargeCfd(price)
       settleBooks(price)
       if (clock.p >= pts.length - 1) closePeriod()
     }

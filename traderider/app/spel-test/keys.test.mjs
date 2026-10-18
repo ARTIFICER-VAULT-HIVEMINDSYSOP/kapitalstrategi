@@ -121,3 +121,23 @@ test('NVDA Line-motorn (1P) följer Trend Rider-planen', () => {
   assert.deepEqual(onButton.calls, [])
   assert.equal(onButton.prevented, false)
 })
+
+test('RaceX 1P och 2P: höger = framåt (hävstång +), upp = KÖP, ner = SÄLJ, för både pilar och WASD', () => {
+  const o = MODES.raket.orientation
+  for (const [code, action, player] of [
+    ['ArrowRight', 'levUp', 2],
+    ['ArrowLeft', 'levDown', 2],
+    ['ArrowUp', 'buy', 2],
+    ['ArrowDown', 'sell', 2],
+    ['KeyD', 'levUp', 1],
+    ['KeyA', 'levDown', 1],
+    ['KeyW', 'buy', 1],
+    ['KeyS', 'sell', 1],
+    ['Space', 'flat', 1],
+  ]) {
+    assert.equal(keyAction(ev(code), '1p', o).action, action, `1p ${code}`)
+    const two = keyAction(ev(code), '2p', o)
+    assert.equal(two.action, action, `2p ${code}`)
+    assert.equal(two.player, player, `2p ${code}`)
+  }
+})

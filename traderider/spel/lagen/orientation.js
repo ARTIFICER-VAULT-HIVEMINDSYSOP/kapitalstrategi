@@ -3,6 +3,8 @@
  * movement: riktningen priset/banan rör sig. W = FORWARD, S = BACKWARD i varje riktning.
  * Pilen längs movement ökar hävstången. Den vinkelräta axeln styr SÄLJ ↔ FLAT ↔ KÖP.
  * Att vrida 90° är bara ett nytt movement-värde.
+ * letters: 'mirror' låter WASD spegla pilarna (W = ↑, S = ↓, A = ←, D = →). RaceX använder det:
+ * banan går vänster → höger, → / D = framåt (hävstång +), ← / A = bakåt, ↑ / W = KÖP, ↓ / S = SÄLJ.
  */
 import { stepSide } from './styrmotor.js'
 
@@ -21,7 +23,8 @@ export const MODES = {
     hash: 'racex',
     aliases: ['raket'],
     nameKey: 'mode.raket.name',
-    orientation: { movement: 'up', highPriceSide: 'right' },
+    // Vriden 90° (beslut 6 okt 2026): vänster → höger, högre pris uppåt, höger = framåt.
+    orientation: { movement: 'right', highPriceSide: 'up', letters: 'mirror' },
   },
   akademin: {
     id: 'akademin',
@@ -86,6 +89,12 @@ export function keyToIntent(code, orientation) {
   if (code === 'Space' || code === 'Digit0' || code === 'Numpad0') return 'FLAT'
   const arrows = arrowMap(orientation)
   if (arrows[code]) return arrows[code]
+  if (orientation.letters === 'mirror') {
+    if (code === 'KeyW') return arrows.ArrowUp
+    if (code === 'KeyS') return arrows.ArrowDown
+    if (code === 'KeyD') return arrows.ArrowRight
+    if (code === 'KeyA') return arrows.ArrowLeft
+  }
   if (code === 'KeyW') return 'FORWARD'
   if (code === 'KeyS') return 'BACKWARD'
   if (code === 'KeyD') return arrows.ArrowRight
@@ -140,6 +149,17 @@ export function glyphs(orientation) {
   const highArrows = joinKeys(of('STEER_TOWARD_HIGH'))
   const lowArrows = joinKeys(of('STEER_TOWARD_LOW'))
   const horizontal = orientation.movement === 'left' || orientation.movement === 'right'
+  if (orientation.letters === 'mirror') {
+    const letter = { ArrowUp: 'W', ArrowDown: 'S', ArrowLeft: 'A', ArrowRight: 'D' }
+    const withLetters = (intent) => of(intent).map((k) => `${joinKeys([k])}/${letter[k]}`).join('/')
+    return {
+      steerHigh: withLetters('STEER_TOWARD_HIGH'),
+      steerLow: withLetters('STEER_TOWARD_LOW'),
+      forward: withLetters('FORWARD'),
+      backward: withLetters('BACKWARD'),
+      flat: '␣',
+    }
+  }
   return {
     steerHigh: horizontal ? highArrows : `${highArrows}/D`,
     steerLow: horizontal ? lowArrows : `${lowArrows}/A`,
@@ -195,7 +215,8 @@ export function instructionText(orientation, translate) {
   const sell = translate('btn.sell')
   const flat = translate('btn.flat')
   const buy = translate('btn.buy')
-  const steer = translate('instr.steer', { high: g.steerHigh, low: g.steerLow, sell, flat, buy })
+  const steerKey = orientation.letters === 'mirror' ? 'instr.steerDirect' : 'instr.steer'
+  const steer = translate(steerKey, { high: g.steerHigh, low: g.steerLow, sell, flat, buy })
   const space = translate('instr.space', { flat })
   const forward = translate('instr.forward', { keys: g.forward })
   const backward = translate('instr.backward', { keys: g.backward })
